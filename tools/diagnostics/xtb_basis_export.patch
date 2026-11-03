@@ -1,0 +1,300 @@
+diff --git a/include/xtb.h b/include/xtb.h
+index e661490..534cf84 100644
+--- a/include/xtb.h
++++ b/include/xtb.h
+@@ -339,6 +339,20 @@ xtb_getOrbitalCoefficients(xtb_TEnvironment /* env */,
+                            xtb_TResults /* res */,
+                            double* /* c */) XTB_API_SUFFIX__VERSION_2_0_0;
+ 
++/* rdkit-eth extension ABI v1; upstream API version remains unchanged.
++ * Enable on Results BEFORE singlepoint. Copies own their snapshots.
++ * Failed/repeated calculations and toggling retention invalidate old snapshots.
++ * Sizes: [natoms, nshell, nao]. All map indices are ZERO-based, in native AO order.
++ * Overlap is column-major [nao, nao], matching orbital coefficients.
++ * Buffers must have exactly the specified capacity; errors leave buffers untouched.
++ */
++extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getBasisAPIVersion(void);
++extern XTB_API_ENTRY void XTB_API_CALL xtb_rdkit_setKeepOverlap(xtb_TEnvironment, xtb_TResults, bool);
++extern XTB_API_ENTRY void XTB_API_CALL xtb_rdkit_getBasisSize(xtb_TEnvironment, xtb_TResults, int*);
++extern XTB_API_ENTRY void XTB_API_CALL xtb_rdkit_getOverlap(xtb_TEnvironment, xtb_TResults, int, double*);
++extern XTB_API_ENTRY void XTB_API_CALL xtb_rdkit_getBasisMap(xtb_TEnvironment, xtb_TResults,
++    int, int, int*, int*, int*, int*);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/api/interface.f90 b/src/api/interface.f90
+index 296c570..160f5b8 100644
+--- a/src/api/interface.f90
++++ b/src/api/interface.f90
+@@ -50,10 +50,16 @@ subroutine singlepoint_api(venv, vmol, vcalc, vres) &
+    type(c_ptr), value :: vres
+    type(VResults), pointer :: res
+    type(scc_results) :: spRes
++   logical :: basis_failed
+ 
+    if (c_associated(venv)) then
+       call c_f_pointer(venv, env)
+       call checkGlobalEnv
++      ! Every attempt invalidates old basis snapshots, even on setup failure.
++      if (c_associated(vres)) then
++         call c_f_pointer(vres, res)
++         if (allocated(res%chk)) call res%chk%wfn%clear_basis
++      end if
+ 
+       if (.not.c_associated(vmol)) then
+          call env%ptr%error("Molecular structure data is not allocated", source)
+@@ -132,10 +138,17 @@ subroutine singlepoint_api(venv, vmol, vcalc, vres) &
+          allocate(res%sigma(3, 3))
+       end if
+ 
++      res%chk%wfn%rdkit_keep_basis = res%rdkit_keep_basis
+       ! singlepoint calculation
+       call calc%ptr%singlepoint(env%ptr, mol%ptr, res%chk, env%verbosity, .true., &
+          & res%energy, res%gradient, res%sigma, res%egap, spRes)
+ 
++      call env%ptr%check(basis_failed)
++      if (basis_failed) then
++         call res%chk%wfn%clear_basis
++         return
++      end if
++
+       ! invalidate cache for properties not produced in GFN-FF
+       select type(gfnff => calc%ptr)
+       type is(TGFFCalculator)
+@@ -179,6 +192,14 @@ subroutine cpcmx_calc_api(venv, vmol, vcalc, vres) &
+    if (c_associated(venv)) then
+       call c_f_pointer(venv, env)
+       call checkGlobalEnv
++      ! These workflows do not promise a final single-point basis snapshot.
++      if (c_associated(vres)) then
++         call c_f_pointer(vres, res)
++         if (allocated(res%chk)) then
++            call res%chk%wfn%clear_basis
++            res%chk%wfn%rdkit_keep_basis = .false.
++         end if
++      end if
+ 
+       if (.not.c_associated(vmol)) then
+          call env%ptr%error("Molecular structure data is not allocated", source)
+@@ -343,6 +364,14 @@ subroutine hessian_api(venv, vmol, vcalc, vres, c_hess, &
+    if (c_associated(venv)) then
+       call c_f_pointer(venv, env)
+       call checkGlobalEnv
++      ! These workflows do not promise a final single-point basis snapshot.
++      if (c_associated(vres)) then
++         call c_f_pointer(vres, res)
++         if (allocated(res%chk)) then
++            call res%chk%wfn%clear_basis
++            res%chk%wfn%rdkit_keep_basis = .false.
++         end if
++      end if
+ 
+       if (.not.c_associated(vmol)) then
+          call env%ptr%error("Molecular structure data is not allocated", source)
+diff --git a/src/api/results.f90 b/src/api/results.f90
+index 58b29b1..67e3512 100644
+--- a/src/api/results.f90
++++ b/src/api/results.f90
+@@ -26,6 +26,7 @@ module xtb_api_results
+    implicit none
+    private
+ 
++   public :: rdkit_basis_version, rdkit_keep_overlap, rdkit_basis_size, rdkit_overlap, rdkit_basis_map
+    public :: VResults
+    public :: newResults_api, delResults_api, getEnergy_api, getGradient_api, &
+       & getPCGradient_api, getVirial_api, getDipole_api, getCharges_api, &
+@@ -36,6 +37,7 @@ module xtb_api_results
+ 
+    !> Void pointer to wavefunction and result objects
+    type :: VResults
++      logical :: rdkit_keep_basis = .false.
+       type(TRestart), allocatable :: chk
+       real(wp), allocatable :: energy
+       real(wp), allocatable :: gradient(:, :)
+@@ -502,4 +504,99 @@ subroutine getOrbitalCoefficients_api(venv, vres, dptr) &
+ end subroutine getOrbitalCoefficients_api
+ 
+ 
++! Project-local extension ABI. Upstream xtb_getAPIVersion is unchanged.
++function rdkit_basis_version() result(version) bind(C, name="xtb_rdkit_getBasisAPIVersion")
++   integer(c_int) :: version
++   version = 1
++end function
++
++subroutine rdkit_keep_overlap(venv, vres, enabled) bind(C, name="xtb_rdkit_setKeepOverlap")
++   type(c_ptr), value :: venv, vres
++   logical(c_bool), value :: enabled
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   if (.not.c_associated(venv)) return
++   call c_f_pointer(venv, env)
++   if (.not.c_associated(vres)) then
++      call env%ptr%error("Results are not allocated", "rdkit_setKeepOverlap")
++      return
++   end if
++   call c_f_pointer(vres, res)
++   res%rdkit_keep_basis = enabled
++   if (allocated(res%chk)) call res%chk%wfn%clear_basis
++end subroutine
++
++logical function rdkit_basis_ready(venv, vres, env, res) result(ready)
++   type(c_ptr), value :: venv, vres
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   ready = .false.
++   if (.not.c_associated(venv)) return
++   call c_f_pointer(venv, env)
++   if (.not.c_associated(vres)) then
++      call env%ptr%error("Results are not allocated", "rdkit_basis")
++      return
++   end if
++   call c_f_pointer(vres, res)
++   if (allocated(res%chk)) then
++      ready = allocated(res%chk%wfn%rdkit_overlap)
++   end if
++   if (.not.ready) call env%ptr%error("No retained basis from a successful single point", "rdkit_basis")
++end function
++
++subroutine rdkit_basis_size(venv, vres, sizes_ptr) bind(C, name="xtb_rdkit_getBasisSize")
++   type(c_ptr), value :: venv, vres, sizes_ptr
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   integer(c_int), pointer :: sizes(:)
++   if (.not.rdkit_basis_ready(venv, vres, env, res)) return
++   if (.not.c_associated(sizes_ptr)) then
++      call env%ptr%error("Null size buffer", "rdkit_basis")
++      return
++   end if
++   call c_f_pointer(sizes_ptr, sizes, [3])
++   sizes = [res%chk%wfn%n, res%chk%wfn%nshell, res%chk%wfn%nao]
++end subroutine
++
++subroutine rdkit_overlap(venv, vres, capacity, output_ptr) bind(C, name="xtb_rdkit_getOverlap")
++   type(c_ptr), value :: venv, vres, output_ptr
++   integer(c_int), value :: capacity
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   real(c_double), pointer :: output(:)
++   integer :: count
++   if (.not.rdkit_basis_ready(venv, vres, env, res)) return
++   count = size(res%chk%wfn%rdkit_overlap)
++   if (capacity /= count .or. .not.c_associated(output_ptr)) then
++      call env%ptr%error("Overlap buffer size/null mismatch", "rdkit_basis")
++      return
++   end if
++   call c_f_pointer(output_ptr, output, [count])
++   output = reshape(res%chk%wfn%rdkit_overlap, [count])
++end subroutine
++
++subroutine rdkit_basis_map(venv, vres, nao, nshell, aa_ptr, as_ptr, sa_ptr, sl_ptr) &
++      & bind(C, name="xtb_rdkit_getBasisMap")
++   type(c_ptr), value :: venv, vres, aa_ptr, as_ptr, sa_ptr, sl_ptr
++   integer(c_int), value :: nao, nshell
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   integer(c_int), pointer :: aa(:), ash(:), sa(:), sl(:)
++   if (.not.rdkit_basis_ready(venv, vres, env, res)) return
++   if (nao /= res%chk%wfn%nao .or. nshell /= res%chk%wfn%nshell .or. &
++       & .not.c_associated(aa_ptr) .or. .not.c_associated(as_ptr) .or. &
++       & .not.c_associated(sa_ptr) .or. .not.c_associated(sl_ptr)) then
++      call env%ptr%error("Basis map buffer size/null mismatch", "rdkit_basis")
++      return
++   end if
++   call c_f_pointer(aa_ptr, aa, [nao])
++   call c_f_pointer(as_ptr, ash, [nao])
++   call c_f_pointer(sa_ptr, sa, [nshell])
++   call c_f_pointer(sl_ptr, sl, [nshell])
++   aa = res%chk%wfn%rdkit_ao_atom
++   ash = res%chk%wfn%rdkit_ao_shell
++   sa = res%chk%wfn%rdkit_shell_atom
++   sl = res%chk%wfn%rdkit_shell_l
++end subroutine
++
+ end module xtb_api_results
+diff --git a/src/peeq_module.f90 b/src/peeq_module.f90
+index 8843722..8bca9e7 100644
+--- a/src/peeq_module.f90
++++ b/src/peeq_module.f90
+@@ -634,6 +634,14 @@ subroutine peeq &
+    res%dipole  = matmul(mol%xyz,wfn%q)
+    res%g_solv  = 0.0_wp
+ 
++   if (wfn%rdkit_keep_basis) then
++      wfn%rdkit_overlap = S
++      wfn%rdkit_ao_atom = basis%aoat2(:basis%nao) - 1
++      wfn%rdkit_ao_shell = basis%ao2sh(:basis%nao) - 1
++      wfn%rdkit_shell_atom = basis%ash(:basis%nshell) - 1
++      wfn%rdkit_shell_l = basis%lsh(:basis%nshell)
++   end if
++
+    if (profile.and.pr) call timer%write(env%unit,'EHT')
+ 
+ end associate
+diff --git a/src/scf_module.F90 b/src/scf_module.F90
+index 374c51b..96a5ed4 100644
+--- a/src/scf_module.F90
++++ b/src/scf_module.F90
+@@ -917,6 +917,14 @@ subroutine scf(env, mol, wfn, basis, pcem, xtbData, solvation, &
+ ! ========================================================================
+    if (profile) call timer%deallocate
+ 
++   if (wfn%rdkit_keep_basis) then
++      wfn%rdkit_overlap = S
++      wfn%rdkit_ao_atom = basis%aoat2(:basis%nao) - 1
++      wfn%rdkit_ao_shell = basis%ao2sh(:basis%nao) - 1
++      wfn%rdkit_shell_atom = basis%ash(:basis%nshell) - 1
++      wfn%rdkit_shell_l = basis%lsh(:basis%nshell)
++   end if
++
+ end subroutine scf
+ 
+ 
+diff --git a/src/type/wavefunction.f90 b/src/type/wavefunction.f90
+index 6b67882..ffd4aad 100644
+--- a/src/type/wavefunction.f90
++++ b/src/type/wavefunction.f90
+@@ -24,6 +24,11 @@ module xtb_type_wavefunction
+    private
+ 
+    type :: TWavefunction
++      ! Optional snapshot of the metric and spherical basis used with C.
++      logical :: rdkit_keep_basis = .false.
++      real(wp), allocatable :: rdkit_overlap(:, :)
++      integer, allocatable :: rdkit_ao_atom(:), rdkit_ao_shell(:)
++      integer, allocatable :: rdkit_shell_atom(:), rdkit_shell_l(:)
+       
+       !> number of atoms 
+       integer :: n = 0
+@@ -82,6 +87,7 @@ module xtb_type_wavefunction
+    contains
+    procedure :: allocate => allocate_wavefunction
+    procedure :: deallocate => deallocate_wavefunction
++   procedure :: clear_basis => clear_basis_wavefunction
+    procedure :: print => print_wavefunction
+    end type TWavefunction
+ 
+@@ -112,6 +118,7 @@ end subroutine allocate_wavefunction
+ 
+ subroutine deallocate_wavefunction(self)
+    class(TWavefunction),intent(inout) :: self
++   call self%clear_basis
+    if(allocated(self%P))    deallocate(self%P)
+    if(allocated(self%q))    deallocate(self%q)
+    if(allocated(self%qsh))  deallocate(self%qsh)
+@@ -125,6 +132,15 @@ subroutine deallocate_wavefunction(self)
+    if(allocated(self%C))    deallocate(self%C)
+ end subroutine deallocate_wavefunction
+ 
++subroutine clear_basis_wavefunction(self)
++   class(TWavefunction), intent(inout) :: self
++   if (allocated(self%rdkit_overlap)) deallocate(self%rdkit_overlap)
++   if (allocated(self%rdkit_ao_atom)) deallocate(self%rdkit_ao_atom)
++   if (allocated(self%rdkit_ao_shell)) deallocate(self%rdkit_ao_shell)
++   if (allocated(self%rdkit_shell_atom)) deallocate(self%rdkit_shell_atom)
++   if (allocated(self%rdkit_shell_l)) deallocate(self%rdkit_shell_l)
++end subroutine clear_basis_wavefunction
++
+ !> print content of wavefunction (for debug)
+ subroutine print_wavefunction(self, level, unit)
+    use iso_fortran_env, only : output_unit

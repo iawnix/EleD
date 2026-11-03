@@ -1,0 +1,1164 @@
+COMMAND ['cmake', '-S', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src', '-B', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build', '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_INSTALL_PREFIX=/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install', '-DCMAKE_INSTALL_LIBDIR=lib', '-DBUILD_SHARED_LIBS=ON', '-DWITH_OBJECT=ON', '-DCMAKE_POSITION_INDEPENDENT_CODE=ON', '-DWITH_TESTS=ON', '-DWITH_TBLITE=OFF', '-DWITH_CPCMX=OFF', '-DCMAKE_C_STANDARD=17', '-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON', '-DCMAKE_PREFIX_PATH=/home/iaw/project/rdkit_eth/.xtb-build-env', '-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib', '-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/rdkit_eth/.xtb-build-env/lib', '-DCMAKE_C_COMPILER=/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc', '-DCMAKE_Fortran_COMPILER=/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran', '-DCMAKE_C_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include', '-DCMAKE_Fortran_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include -I/home/iaw/project/rdkit_eth/.xtb-build-env/include', '-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -L/home/iaw/project/rdkit_eth/.xtb-build-env/lib']
+-- The C compiler identification is GNU 16.2.0
+-- The Fortran compiler identification is GNU 16.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting Fortran compiler ABI info
+-- Detecting Fortran compiler ABI info - done
+-- Check for working Fortran compiler: /home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran - skipped
+致命错误：不是 Git 仓库（或者任何父目录）：.git
+-- Found OpenMP_C: -fopenmp (found version "5.2")
+-- Found OpenMP_Fortran: -fopenmp (found version "5.2")
+-- Found OpenMP: TRUE (found version "5.2")
+-- Looking for Fortran sgemm
+-- Looking for Fortran sgemm - not found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Looking for Fortran sgemm
+-- Looking for Fortran sgemm - found
+-- Found BLAS: /home/iaw/project/rdkit_eth/.xtb-build-env/lib/libblas.so
+-- Looking for Fortran cheev
+-- Looking for Fortran cheev - found
+-- Found LAPACK: /home/iaw/project/rdkit_eth/.xtb-build-env/lib/libblas.so;-lm;-ldl
+-- Configuring done (1.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build
+COMMAND ['cmake', '--build', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build', '--parallel', '6']
+[1/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/calculator.f90-pp.f90
+[2/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/environment.f90-pp.f90
+[3/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/molecule.f90-pp.f90
+[4/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/interface.f90-pp.f90
+[5/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/results.f90-pp.f90
+[6/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/utils.f90-pp.f90
+[7/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/coulomb/ewald.f90-pp.f90
+[8/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/version.f90-pp.f90
+[9/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipro/bondorder.F90-pp.f90
+[10/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/coulomb/gaussian.f90-pp.f90
+[11/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipro/fragment.f90-pp.f90
+[12/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/coulomb/klopmanohno.F90-pp.f90
+[13/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipro/output.f90-pp.f90
+[14/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipro/version.f90-pp.f90
+[15/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipro/xtb.F90-pp.f90
+[16/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/coordinationnumber.F90-pp.f90
+[17/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/cutoff.f90-pp.f90
+[18/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/dftd3.f-pp.f
+[19/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/dftd3.f90-pp.f90
+[20/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/encharges.f90-pp.f90
+[21/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/dftd4.F90-pp.f90
+[22/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/dftd4_parameters.f90-pp.f90
+[23/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/ncoord.f90-pp.f90
+[24/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/docking/search_nci.f90-pp.f90
+[25/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/extern/driver.f90-pp.f90
+[26/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/docking/param.f90-pp.f90
+[27/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/docking/set_module.f90-pp.f90
+[28/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/extern/mopac.f90-pp.f90
+[29/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/extern/orca.f90-pp.f90
+[30/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/extern/turbomole.f90-pp.f90
+[31/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/freq/project.f90-pp.f90
+[32/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/freq/io.f90-pp.f90
+[33/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/freq/utils.f90-pp.f90
+[34/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/disp/dftd3_parameters.f90-pp.f90
+[35/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/calculator.f90-pp.f90
+[36/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/frag_hess.f90-pp.f90
+[37/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gdisp0.f90-pp.f90
+[38/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/data.f90-pp.f90
+[39/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/generator.f90-pp.f90
+[40/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_eg.f90-pp.f90
+[41/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_ini2.F90-pp.f90
+[42/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_param.f90-pp.f90
+[43/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_rab.f-pp.f
+[44/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_qm.f90-pp.f90
+[45/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_ini.f90-pp.f90
+[46/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/neighbourlist.f90-pp.f90
+[47/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/math.f-pp.f
+[48/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/mrec.f90-pp.f90
+[49/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/shake_module.f90-pp.f90
+[50/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/gfnff_setup.f90-pp.f90
+[51/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/struc_converter.f90-pp.f90
+[52/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/internals/graph.f90-pp.f90
+[53/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/neighbor.f90-pp.f90
+[54/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfnff/topology.f90-pp.f90
+[55/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/internals/type.f90-pp.f90
+[56/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/reader/genformat.f90-pp.f90
+[57/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/internals/redundant.f90-pp.f90
+[58/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/reader/turbomole.f90-pp.f90
+[59/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/reader/orca.f90-pp.f90
+[60/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/writer/gaussian.f90-pp.f90
+[61/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/writer/orca.f90-pp.f90
+[62/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/reader.f90-pp.f90
+[63/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/writer/turbomole.f90-pp.f90
+[64/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/io/writer.f90-pp.f90
+[65/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iff/calculator.f90-pp.f90
+[66/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iff/data.f90-pp.f90
+[67/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iff/iff_lmo.f90-pp.f90
+[68/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iff/iff_energy.f90-pp.f90
+[69/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iff/iff_ini.f90-pp.f90
+[70/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/main/defaults.f90-pp.f90
+[71/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iff/iff_prepare.f90-pp.f90
+[72/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/main/geometry.f90-pp.f90
+[73/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/main/setup.f90-pp.f90
+[74/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/main/json.F90-pp.f90
+[75/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas/level1.F90-pp.f90
+[76/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/main/property.F90-pp.f90
+[77/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas/level2.F90-pp.f90
+[78/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas/wrap1.f90-pp.f90
+[79/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas/wrap2.f90-pp.f90
+[80/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas/level3.F90-pp.f90
+[81/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas/wrap3.f90-pp.f90
+[82/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/eigensolve.F90-pp.f90
+[83/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/geneigval.f90-pp.f90
+[84/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/stdeigval.f90-pp.f90
+[85/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/trf.f90-pp.f90
+[86/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/tri.f90-pp.f90
+[87/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/wrap.f90-pp.f90
+[88/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/gst.f90-pp.f90
+[89/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack/trs.f90-pp.f90
+[90/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/boundaryconditions.f90-pp.f90
+[91/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/chartools.f90-pp.f90
+[92/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/io.f90-pp.f90
+[93/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/convert.f90-pp.f90
+[94/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/accuracy.f90-pp.f90
+[95/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/filetypes.f90-pp.f90
+[96/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/math.f90-pp.f90
+[97/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/search.f90-pp.f90
+[98/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/resize.f90-pp.f90
+[99/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/sort.f90-pp.f90
+[100/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/namegen.f90-pp.f90
+[101/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/runtypes.f90-pp.f90
+[102/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/symbols.f90-pp.f90
+[103/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/systools.F90-pp.f90
+[104/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/thresholds.f90-pp.f90
+[105/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_strings.f90-pp.f90
+[106/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/version.f90-pp.f90
+[107/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_global.F90-pp.f90
+[108/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_constants.f90-pp.f90
+[109/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_param.f90-pp.f90
+[110/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/param/chemical_hardnesses.f90-pp.f90
+[111/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/param/atomic_masses.f90-pp.f90
+[112/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/param/covalent_radii.f90-pp.f90
+[113/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/param/electronegativities.f90-pp.f90
+[114/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/param/pse.f90-pp.f90
+[115/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_timings.f90-pp.f90
+[116/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_filetools.f90-pp.f90
+[117/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/param/r4r2_expectation_values.f90-pp.f90
+[118/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/linalg.f90-pp.f90
+[119/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/blas.f90-pp.f90
+[120/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/error.f90-pp.f90
+[121/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/lapack.f90-pp.f90
+[122/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mctc/mctc_init.F90-pp.f90
+[123/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/model_hessian.f90-pp.f90
+[124/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/atomicmass.f90-pp.f90
+[125/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/paulingen.f90-pp.f90
+[126/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/sqrtzr4r2.f90-pp.f90
+[127/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/covalentradd3.f90-pp.f90
+[128/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/vdwradd3.f90-pp.f90
+[129/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/atomicrad.f90-pp.f90
+[130/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/vdwradcosmo.f90-pp.f90
+[131/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/calculator.F90-pp.f90
+[132/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/covalentrad.f90-pp.f90
+[133/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/param/uffvdwrad.f90-pp.f90
+[134/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/param.F90-pp.f90
+[135/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/data.f90-pp.f90
+[136/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/mmlpopanalysis.F90-pp.f90
+[137/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/vdzp.F90-pp.f90
+[138/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/twostepscf.F90-pp.f90
+[139/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/ncoord.F90-pp.f90
+[140/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/hamiltonian.F90-pp.f90
+[141/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/corebasis.F90-pp.f90
+[142/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/paulixc.F90-pp.f90
+[143/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/guess.F90-pp.f90
+[144/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/integrals.F90-pp.f90
+[145/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/integral_types.F90-pp.f90
+[146/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/coulomb.F90-pp.f90
+[147/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/plusu.F90-pp.f90
+[148/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/property.F90-pp.f90
+[149/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/response.F90-pp.f90
+[150/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/ddcosmo/core.f90-pp.f90
+[151/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ptb/solver.F90-pp.f90
+[152/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/ddcosmo/solver.f90-pp.f90
+[153/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/born.f90-pp.f90
+[154/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/input.F90-pp.f90
+[155/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/gbsa.f90-pp.f90
+[156/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/kernel.f90-pp.f90
+[157/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/cm5.f90-pp.f90
+[158/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/cosmo.f90-pp.f90
+[159/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/lebedev.f90-pp.f90
+[160/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/sasa.f90-pp.f90
+[161/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/cpx.F90-pp.f90
+[162/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/state.f90-pp.f90
+[163/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/ddvolume.f90-pp.f90
+[164/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/tblite/calculator.F90-pp.f90
+[165/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/solv/model.f90-pp.f90
+[166/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/tblite/restart.F90-pp.f90
+[167/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/tblite/mapping.F90-pp.f90
+[168/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/atomlist.f90-pp.f90
+[169/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/basisset.f90-pp.f90
+[170/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/buffer.f90-pp.f90
+[171/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/anc.f90-pp.f90
+[172/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/coulomb.f90-pp.f90
+[173/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/calculator.f90-pp.f90
+[174/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/dispersion_model.f90-pp.f90
+[175/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/data.F90-pp.f90
+[176/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/environment.f90-pp.f90
+[177/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/fragments.f90-pp.f90
+[178/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/neighbourlist.f90-pp.f90
+[179/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/molecule.f90-pp.f90
+[180/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/latticepoint.f90-pp.f90
+[181/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/iohandler.f90-pp.f90
+[182/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/identitymap.f90-pp.f90
+[183/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/options.f90-pp.f90
+[184/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/pcem.f90-pp.f90
+[185/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/param.f90-pp.f90
+[186/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/reader.F90-pp.f90
+[187/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/restart.F90-pp.f90
+[188/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/setvar.f90-pp.f90
+[189/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/solvation.f90-pp.f90
+[190/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/topology.f90-pp.f90
+[191/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/timer.f90-pp.f90
+[192/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/wavefunction.f90-pp.f90
+[193/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/wignerseitzcell.f90-pp.f90
+[194/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/wsc.f90-pp.f90
+[195/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/type/vendordata.f90-pp.f90
+[196/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/coulomb.f90-pp.f90
+[197/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/calculator.f90-pp.f90
+[198/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/data.f90-pp.f90
+[199/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/basisset.f90-pp.f90
+[200/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/dispersion.f90-pp.f90
+[201/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/eeq.f90-pp.f90
+[202/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/gfn0.f90-pp.f90
+[203/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/gfn2.f90-pp.f90
+[204/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/gfn1.f90-pp.f90
+[205/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/halogen.f90-pp.f90
+[206/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/hamiltonian.F90-pp.f90
+[207/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/multipole.f90-pp.f90
+[208/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/repulsion.F90-pp.f90
+[209/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/hamiltonian_gpu.f90-pp.f90
+[210/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xtb/thirdorder.f90-pp.f90
+[211/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lbfgs_anc/driver.f90-pp.f90
+[212/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lbfgs_anc/filter_cart.f90-pp.f90
+[213/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lbfgs_anc/filter.f90-pp.f90
+[214/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lbfgs_anc/filter_type.f90-pp.f90
+[215/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lbfgs_anc/optimizer.f90-pp.f90
+[216/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/aespot.F90-pp.f90
+[217/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lbfgs_anc/lbfgs.f90-pp.f90
+[218/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/anharmlib.f90-pp.f90
+[219/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/aoparam.f90-pp.f90
+[220/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/approxrab.f90-pp.f90
+[221/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/axis_trafo.f90-pp.f90
+[222/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/basic_geo.f90-pp.f90
+[223/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/bfgs.f90-pp.f90
+[224/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/blowsy.f90-pp.f90
+[225/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/bias_path.f90-pp.f90
+[226/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/broyden.f90-pp.f90
+[227/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/bmatrix.f90-pp.f90
+[228/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/coffee.f90-pp.f90
+[229/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/charge_model.f90-pp.f90
+[230/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/compliance.f90-pp.f90
+[231/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/constrain_param.f90-pp.f90
+[232/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/constrain_pot.f90-pp.f90
+[233/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/constr.f90-pp.f90
+[234/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/cube.f90-pp.f90
+[235/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/cqpath.f90-pp.f90
+[236/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/david.f-pp.f
+[237/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/david2.f90-pp.f90
+[238/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/define.f90-pp.f90
+[239/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/detrotra.f90-pp.f90
+[240/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipole.f90-pp.f90
+[241/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dipro.F90-pp.f90
+[242/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dtrafo.f90-pp.f90
+[243/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/drsp.f-pp.f
+[244/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/dynamic.f90-pp.f90
+[245/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/eeq_model.f90-pp.f90
+[246/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/elem.f90-pp.f90
+[247/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/embedding.f90-pp.f90
+[248/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/eqrot.f90-pp.f90
+[249/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/enso_printout.f90-pp.f90
+[250/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/esp.f-pp.f
+[251/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/filetools.F90-pp.f90
+[252/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/expire.f90-pp.f90
+[253/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/features.F90-pp.f90
+[254/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/foden.f90-pp.f90
+[255/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/fragment.f90-pp.f90
+[256/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/fixparam.f90-pp.f90
+[257/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/generate_wsc.f90-pp.f90
+[258/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/getname.f90-pp.f90
+[259/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/getkopt.f90-pp.f90
+[260/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/geosum.f90-pp.f90
+[261/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/geoopt_driver.f90-pp.f90
+[262/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/getsymnum.f90-pp.f90
+[263/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfn0param.f90-pp.f90
+[264/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfn_paramset.f90-pp.f90
+[265/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/gfn_prparam.f90-pp.f90
+[266/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/grad_core.f90-pp.f90
+[267/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/header.f90-pp.f90
+[268/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/hessian.F90-pp.f90
+[269/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ifind.f90-pp.f90
+[270/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/hlex.f90-pp.f90
+[271/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/iniq.f90-pp.f90
+[272/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/intgrad.f90-pp.f90
+[273/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/intmodes.f90-pp.f90
+[274/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lin.f90-pp.f90
+[275/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lidep.f90-pp.f90
+[276/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/intpack.f90-pp.f90
+[277/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/local.F90-pp.f90
+[278/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lin_mod.f90-pp.f90
+[279/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/lopt.f90-pp.f90
+[280/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/locmode.f90-pp.f90
+[281/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/ls_rmsd.f90-pp.f90
+[282/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/makel.f90-pp.f90
+[283/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/matinv.f90-pp.f90
+[284/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/modef.f90-pp.f90
+[285/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/metadynamic.f90-pp.f90
+[286/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/type.f90-pp.f90
+[287/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/mdoptim.f90-pp.f90
+[288/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/shared.f90-pp.f90
+[289/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/gff.f90-pp.f90
+[290/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/swart.f90-pp.f90
+[291/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/eeq.f90-pp.f90
+[292/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/lindh.f90-pp.f90
+[293/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/model_hessian/internal.f90-pp.f90
+[294/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/neighbor.f90-pp.f90
+[295/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/o1numhess.f90-pp.f90
+[296/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/oniom.F90-pp.f90
+[297/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/onetri.f90-pp.f90
+[298/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/optimizer.f90-pp.f90
+[299/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/pbc.f90-pp.f90
+[300/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/pbc_tools.f90-pp.f90
+[301/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/pqn.f90-pp.f90
+[302/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/peeq_module.f90-pp.f90
+[303/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/pocketscan.f90-pp.f90
+[304/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/printmold.f90-pp.f90
+[305/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/printout.f90-pp.f90
+[306/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/prmat.f90-pp.f90
+[307/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/qpot.f90-pp.f90
+[308/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/pseudodiag.f90-pp.f90
+[309/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/qsort.f90-pp.f90
+[310/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/read_gfn_param.f90-pp.f90
+[311/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/readin.f90-pp.f90
+[312/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/rdcoord2.f90-pp.f90
+[313/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/readl.f90-pp.f90
+[314/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/readl2.f90-pp.f90
+[315/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/restart.f90-pp.f90
+[316/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/rmrottr.f90-pp.f90
+[317/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/rmsd.f90-pp.f90
+[318/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/relaxation_engine.f90-pp.f90
+[319/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/scan_driver.f90-pp.f90
+[320/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/scanparam.f90-pp.f90
+[321/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/scf_module.F90-pp.f90
+[322/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/screening.f90-pp.f90
+[323/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/scc_core.f90-pp.f90
+[324/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/set_module.f90-pp.f90
+[325/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/setparam.f90-pp.f90
+[326/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/shake_module.f90-pp.f90
+[327/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/single.f90-pp.f90
+[328/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/slater.f90-pp.f90
+[329/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/shiftlp.f90-pp.f90
+[330/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/sphereparam.f90-pp.f90
+[331/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/spline3.f90-pp.f90
+[332/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/spline2.f90-pp.f90
+[333/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/stm.f-pp.f
+[334/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/surfac.f-pp.f
+[335/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/splitparam.f90-pp.f90
+[336/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/timing.f90-pp.f90
+[337/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/thermo.f90-pp.f90
+[338/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/vertical.F90-pp.f90
+[339/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/topology.f90-pp.f90
+[340/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/wrgbw.f90-pp.f90
+[341/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/wrbas.f90-pp.f90
+[342/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/wrmo.f90-pp.f90
+[343/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/wrmodef.f90-pp.f90
+[344/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/xhelp.f90-pp.f90
+[345/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/zmatpr.f90-pp.f90
+[346/793] Building Fortran preprocessed CMakeFiles/xtb-object.dir/symmetry/symmetry.f90-pp.f90
+[347/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/argparser.f90-pp.f90
+[348/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/info.f90-pp.f90
+[349/793] Building C object CMakeFiles/xtb-object.dir/src/mctc/signal.c.o
+[350/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/dock.f90-pp.f90
+[351/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/irmod.f90-pp.f90
+[352/793] Generating Fortran dyndep file CMakeFiles/xtb-object.dir/Fortran.dd
+[353/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/primary.f90-pp.f90
+[354/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/submodules.f90-pp.f90
+[355/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/main.F90-pp.f90
+[356/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/thermo.f90-pp.f90
+[357/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipro/bondorder.F90.o
+[358/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/version.f90.o
+[359/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipro/version.f90.o
+[360/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipro/xtb.F90.o
+[361/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/accuracy.f90.o
+[362/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/cutoff.f90.o
+[363/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipro/output.f90.o
+[364/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/math.f.o
+[365/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/generator.f90.o
+[366/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipro/fragment.f90.o
+[367/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/mrec.f90.o
+[368/793] Building Fortran object CMakeFiles/xtb-object.dir/src/internals/type.f90.o
+[369/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_rab.f.o
+[370/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/neighbourlist.f90.o
+[371/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/data.f90.o
+[372/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/geneigval.f90.o
+[373/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/boundaryconditions.f90.o
+[374/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/chartools.f90.o
+[375/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/filetypes.f90.o
+[376/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/io.f90.o
+[377/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas/level1.F90.o
+[378/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/namegen.f90.o
+[379/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/resize.f90.o
+[380/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/runtypes.f90.o
+[381/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/search.f90.o
+[382/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas/level2.F90.o
+[383/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas/wrap1.f90.o
+[384/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/sort.f90.o
+[385/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas/wrap2.f90.o
+[386/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/thresholds.f90.o
+[387/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/version.f90.o
+[388/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/symbols.f90.o
+[389/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_constants.f90.o
+[390/793] Building C object CMakeFiles/xtb-object.dir/symmetry/symmetry_i.c.o
+[391/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/systools.F90.o
+[392/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/param/chemical_hardnesses.f90.o
+[393/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/convert.f90.o
+[394/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas/level3.F90.o
+[395/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/param/electronegativities.f90.o
+[396/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/param/atomic_masses.f90.o
+[397/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/param/covalent_radii.f90.o
+[398/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/param/pse.f90.o
+[399/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/param/r4r2_expectation_values.f90.o
+[400/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_param.f90.o
+[401/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_timings.f90.o
+[402/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/model_hessian.f90.o
+[403/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_filetools.f90.o
+[404/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/dftd4_parameters.f90.o
+[405/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/atomicmass.f90.o
+[406/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas/wrap3.f90.o
+[407/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/covalentradd3.f90.o
+[408/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/atomicrad.f90.o
+[409/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/paulingen.f90.o
+[410/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/blas.f90.o
+[411/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/vdwradd3.f90.o
+[412/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/vdwradcosmo.f90.o
+[413/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/covalentrad.f90.o
+[414/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/sqrtzr4r2.f90.o
+[415/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/param.F90.o
+[416/793] Building Fortran object CMakeFiles/xtb-object.dir/src/param/uffvdwrad.f90.o
+[417/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/twostepscf.F90.o
+[418/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/mmlpopanalysis.F90.o
+[419/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/ncoord.F90.o
+[420/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/corebasis.F90.o
+[421/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/hamiltonian.F90.o
+[422/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/guess.F90.o
+[423/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/vdzp.F90.o
+[424/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/integral_types.F90.o
+[425/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/paulixc.F90.o
+[426/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/coulomb.F90.o
+[427/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/integrals.F90.o
+[428/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/plusu.F90.o
+[429/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/response.F90.o
+[430/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/property.F90.o
+[431/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/solver.F90.o
+[432/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_strings.f90.o
+[433/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/cm5.f90.o
+[434/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/born.f90.o
+[435/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/sasa.f90.o
+[436/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/state.f90.o
+[437/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/dftd3_parameters.f90.o
+[438/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/ddvolume.f90.o
+[439/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/kernel.f90.o
+[440/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/input.F90.o
+[441/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/atomlist.f90.o
+[442/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/basisset.f90.o
+[443/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/buffer.f90.o
+[444/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/dispersion_model.f90.o
+[445/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/fragments.f90.o
+[446/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/topology.f90.o
+[447/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/options.f90.o
+[448/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/shake_module.f90.o
+[449/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/data.f90.o
+[450/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/param.f90.o
+[451/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/iohandler.f90.o
+[452/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/reader.F90.o
+[453/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/pcem.f90.o
+[454/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/timer.f90.o
+[455/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/topology.f90.o
+[456/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/environment.f90.o
+[457/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/wavefunction.f90.o
+[458/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/wsc.f90.o
+[459/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/setvar.f90.o
+[460/793] Building Fortran object CMakeFiles/xtb-object.dir/src/coulomb/ewald.f90.o
+[461/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/gst.f90.o
+[462/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/ddcosmo/core.f90.o
+[463/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/stdeigval.f90.o
+[464/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_global.F90.o
+[465/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/lebedev.f90.o
+[466/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/mctc_init.F90.o
+[467/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/error.f90.o
+[468/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/trf.f90.o
+[469/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/tri.f90.o
+[470/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/restart.F90.o
+[471/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/solvation.f90.o
+[472/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/frag_hess.f90.o
+[473/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/vendordata.f90.o
+[474/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/trs.f90.o
+[475/793] Building Fortran object CMakeFiles/xtb-object.dir/src/anharmlib.f90.o
+[476/793] Building Fortran object CMakeFiles/xtb-object.dir/src/aoparam.f90.o
+[477/793] Building Fortran object CMakeFiles/xtb-object.dir/src/approxrab.f90.o
+[478/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/wrap.f90.o
+[479/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/neighbourlist.f90.o
+[480/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack.f90.o
+[481/793] Building Fortran object CMakeFiles/xtb-object.dir/src/basic_geo.f90.o
+[482/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/math.f90.o
+[483/793] Building Fortran object CMakeFiles/xtb-object.dir/src/freq/utils.f90.o
+[484/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/ddcosmo/solver.f90.o
+[485/793] Building Fortran object CMakeFiles/xtb-object.dir/src/internals/graph.f90.o
+[486/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/linalg.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/mctc/linalg.f90:232:109:
+
+   21 |    use xtb_mctc_blas
+      |       2                                                                                                      
+......
+  232 |         call dgemm('t','n',ibsize,ncol,m,1.0_dp,darray(1,jstrt),ndim,darray(1,istrt),ndim,0.0_dp,smat,ibsize)
+      |                                                                                                             1
+Warning: Mismatch in PURE attribute between (1) and (2)
+[487/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/data.f90.o
+[488/793] Building Fortran object CMakeFiles/xtb-object.dir/src/bfgs.f90.o
+[489/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/multipole.f90.o
+[490/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/wignerseitzcell.f90.o
+[491/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/thirdorder.f90.o
+[492/793] Building Fortran object CMakeFiles/xtb-object.dir/src/blowsy.f90.o
+[493/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/eigensolve.F90.o
+[494/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/gfn1.f90.o
+[495/793] Building Fortran object CMakeFiles/xtb-object.dir/src/broyden.f90.o
+[496/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/coulomb.f90.o
+[497/793] Building Fortran object CMakeFiles/xtb-object.dir/src/charge_model.f90.o
+[498/793] Building Fortran object CMakeFiles/xtb-object.dir/src/constrain_pot.f90.o
+[499/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/gbsa.f90.o
+[500/793] Building Fortran object CMakeFiles/xtb-object.dir/src/define.f90.o
+[501/793] Building Fortran object CMakeFiles/xtb-object.dir/src/david2.f90.o
+[502/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/cosmo.f90.o
+[503/793] Building Fortran object CMakeFiles/xtb-object.dir/src/cqpath.f90.o
+[504/793] Building Fortran object CMakeFiles/xtb-object.dir/src/elem.f90.o
+[505/793] Building Fortran object CMakeFiles/xtb-object.dir/src/eqrot.f90.o
+[506/793] Building Fortran object CMakeFiles/xtb-object.dir/src/expire.f90.o
+[507/793] Building Fortran object CMakeFiles/xtb-object.dir/src/features.F90.o
+[508/793] Building Fortran object CMakeFiles/xtb-object.dir/src/detrotra.f90.o
+[509/793] Building Fortran object CMakeFiles/xtb-object.dir/src/drsp.f.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/drsp.f:187:72:
+
+  187 |    10 E(I-1) = E(I)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/drsp.f:216:72:
+
+  216 |    50    D(I) = D(I) - H
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 50 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/drsp.f:339:72:
+
+  339 |    10 E2(I-1) = E2(I)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/drsp.f:371:72:
+
+  371 |    60    D(I) = D(I) - H
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/drsp.f:616:72:
+
+  616 |             DO 80   K = 1, J
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 80 at (1)
+[510/793] Building Fortran object CMakeFiles/xtb-object.dir/src/david.f.o
+[511/793] Building Fortran object CMakeFiles/xtb-object.dir/src/fixparam.f90.o
+[512/793] Building Fortran object CMakeFiles/xtb-object.dir/src/bmatrix.f90.o
+[513/793] Building Fortran object CMakeFiles/xtb-object.dir/src/foden.f90.o
+[514/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfn0param.f90.o
+[515/793] Building Fortran object CMakeFiles/xtb-object.dir/src/getsymnum.f90.o
+[516/793] Building Fortran object CMakeFiles/xtb-object.dir/src/fragment.f90.o
+[517/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ifind.f90.o
+[518/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfn_prparam.f90.o
+[519/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lin.f90.o
+[520/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lin_mod.f90.o
+[521/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/halogen.f90.o
+[522/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dtrafo.f90.o
+[523/793] Building Fortran object CMakeFiles/xtb-object.dir/src/intpack.f90.o
+[524/793] Building Fortran object CMakeFiles/xtb-object.dir/src/internals/redundant.f90.o
+[525/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/anc.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/type/anc.f90:500:89:
+
+   20 |    use xtb_mctc_blas
+      |       2                                                                                  
+......
+  500 |    call dgemv('t',self%n3,self%nvar,1.0_wp,self%B,self%n3,array_form,1,0.0_wp,g_normal,1)
+      |                                                                                         1
+Warning: Mismatch in PURE attribute between (1) and (2)
+[526/793] Building Fortran object CMakeFiles/xtb-object.dir/src/locmode.f90.o
+[527/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipole.f90.o
+[528/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/model.f90.o
+[529/793] Building Fortran object CMakeFiles/xtb-object.dir/src/makel.f90.o
+[530/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/type.f90.o
+[531/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/shared.f90.o
+[532/793] Building Fortran object CMakeFiles/xtb-object.dir/src/matinv.f90.o
+[533/793] Building Fortran object CMakeFiles/xtb-object.dir/src/onetri.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/onetri.f90:59:68:
+
+   19 |    use xtb_mctc_blas, only : blas_symm, blas_gemm
+      |       2                                                             
+......
+   59 |       call dgemm('t','n',ival,ival,n,1.d0,array,n,s2,n,0.d0,s1,ival)
+      |                                                                    1
+Warning: Mismatch in PURE attribute between (1) and (2)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/onetri.f90:58:60:
+
+   19 |    use xtb_mctc_blas, only : blas_symm, blas_gemm
+      |       2                                                     
+......
+   58 |       call dsymm('l','l',n,ival,1.d0,s1,n,array,n,0.d0,s2,n)
+      |                                                            1
+Warning: Mismatch in PURE attribute between (1) and (2)
+[534/793] Building Fortran object CMakeFiles/xtb-object.dir/src/neighbor.f90.o
+[535/793] Building Fortran object CMakeFiles/xtb-object.dir/src/hlex.f90.o
+[536/793] Building Fortran object CMakeFiles/xtb-object.dir/src/pbc.f90.o
+[537/793] Building Fortran object CMakeFiles/xtb-object.dir/src/pqn.f90.o
+[538/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/eeq.f90.o
+[539/793] Building Fortran object CMakeFiles/xtb-object.dir/src/pbc_tools.f90.o
+[540/793] Building Fortran object CMakeFiles/xtb-object.dir/src/printmold.f90.o
+[541/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ls_rmsd.f90.o
+[542/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/internal.f90.o
+[543/793] Building Fortran object CMakeFiles/xtb-object.dir/src/qsort.f90.o
+[544/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/lindh.f90.o
+[545/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/swart.f90.o
+[546/793] Building Fortran object CMakeFiles/xtb-object.dir/src/readl2.f90.o
+[547/793] Building Fortran object CMakeFiles/xtb-object.dir/src/readl.f90.o
+[548/793] Building Fortran object CMakeFiles/xtb-object.dir/src/pseudodiag.f90.o
+[549/793] Building Fortran object CMakeFiles/xtb-object.dir/src/rmrottr.f90.o
+[550/793] Building Fortran object CMakeFiles/xtb-object.dir/src/rmsd.f90.o
+[551/793] Building Fortran object CMakeFiles/xtb-object.dir/src/shiftlp.f90.o
+[552/793] Building Fortran object CMakeFiles/xtb-object.dir/src/prmat.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:132:19:
+
+  132 |       IF(M)10,10,80
+      |                   1
+Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:151:14:
+
+  151 |    20 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:164:14:
+
+  164 |    30 K2=K2+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:165:16:
+
+  165 |    40 KD=KD+NKPB
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:177:14:
+
+  177 |    60 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:190:17:
+
+  190 |       DO 90 J=1,N
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:193:22:
+
+  193 |    90 I2=I1+(NKPB-1)*N
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:224:19:
+
+  224 |       IF(M)10,10,80
+      |                   1
+Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:243:14:
+
+  243 |    20 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:256:14:
+
+  256 |    30 K2=K2+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:257:16:
+
+  257 |    40 KD=KD+NKPB
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:269:14:
+
+  269 |    60 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:282:17:
+
+  282 |       DO 90 J=1,N
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:285:22:
+
+  285 |    90 I2=I1+(NKPB-1)*N
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:318:19:
+
+  318 |       IF(M)10,10,80
+      |                   1
+Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:337:14:
+
+  337 |    20 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:350:14:
+
+  350 |    30 K2=K2+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:351:16:
+
+  351 |    40 KD=KD+NKPB
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:363:14:
+
+  363 |    60 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:376:17:
+
+  376 |       DO 90 J=1,N
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:379:22:
+
+  379 |    90 I2=I1+(NKPB-1)*N
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:410:19:
+
+  410 |       IF(M)10,10,80
+      |                   1
+Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:429:14:
+
+  429 |    20 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:442:14:
+
+  442 |    30 K2=K2+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:443:16:
+
+  443 |    40 KD=KD+NKPB
+      |                1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:455:14:
+
+  455 |    60 K2=K1+KK
+      |              1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:468:17:
+
+  468 |       DO 90 J=1,N
+      |                 1
+Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prmat.f90:471:22:
+
+  471 |    90 I2=I1+(NKPB-1)*N
+      |                      1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
+[553/793] Building Fortran object CMakeFiles/xtb-object.dir/src/aespot.F90.o
+[554/793] Building Fortran object CMakeFiles/xtb-object.dir/src/spline2.f90.o
+[555/793] Building Fortran object CMakeFiles/xtb-object.dir/src/slater.f90.o
+[556/793] Building Fortran object CMakeFiles/xtb-object.dir/src/scanparam.f90.o
+[557/793] Building Fortran object CMakeFiles/xtb-object.dir/src/surfac.f.o
+[558/793] Building Fortran object CMakeFiles/xtb-object.dir/src/setparam.f90.o
+[559/793] Building Fortran object CMakeFiles/xtb-object.dir/src/spline3.f90.o
+[560/793] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/cpx.F90.o
+[561/793] Building Fortran object CMakeFiles/xtb-object.dir/src/thermo.f90.o
+[562/793] Building Fortran object CMakeFiles/xtb-object.dir/src/splitparam.f90.o
+[563/793] Building Fortran object CMakeFiles/xtb-object.dir/src/getname.f90.o
+[564/793] Building Fortran object CMakeFiles/xtb-object.dir/src/axis_trafo.f90.o
+[565/793] Building Fortran object CMakeFiles/xtb-object.dir/src/freq/io.f90.o
+[566/793] Building Fortran object CMakeFiles/xtb-object.dir/src/geosum.f90.o
+[567/793] Building Fortran object CMakeFiles/xtb-object.dir/src/cube.f90.o
+[568/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lopt.f90.o
+[569/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lidep.f90.o
+[570/793] Building Fortran object CMakeFiles/xtb-object.dir/src/intmodes.f90.o
+[571/793] Building Fortran object CMakeFiles/xtb-object.dir/src/printout.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/printout.f90:102:15:
+
+  102 |    !$omp master
+      |               1
+Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+[572/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/basisset.f90.o
+[573/793] Building Fortran object CMakeFiles/xtb-object.dir/src/qpot.f90.o
+[574/793] Building Fortran object CMakeFiles/xtb-object.dir/src/readin.f90.o
+[575/793] Building Fortran object CMakeFiles/xtb-object.dir/src/shake_module.f90.o
+[576/793] Building Fortran object CMakeFiles/xtb-object.dir/src/filetools.F90.o
+[577/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/molecule.f90.o
+[578/793] Building Fortran object CMakeFiles/xtb-object.dir/src/embedding.f90.o
+[579/793] Building Fortran object CMakeFiles/xtb-object.dir/src/esp.f.o
+[580/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/utils.f90.o
+[581/793] Building Fortran object CMakeFiles/xtb-object.dir/src/metadynamic.f90.o
+[582/793] Building Fortran object CMakeFiles/xtb-object.dir/src/sphereparam.f90.o
+[583/793] Building Fortran object CMakeFiles/xtb-object.dir/src/freq/project.f90.o
+[584/793] Building Fortran object CMakeFiles/xtb-object.dir/src/docking/param.f90.o
+[585/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/reader/genformat.f90.o
+[586/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/reader/orca.f90.o
+[587/793] Building Fortran object CMakeFiles/xtb-object.dir/src/intgrad.f90.o
+[588/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/writer/gaussian.f90.o
+[589/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/reader/turbomole.f90.o
+[590/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/writer/orca.f90.o
+[591/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/ncoord.f90.o
+[592/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/reader.f90.o
+[593/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/writer/turbomole.f90.o
+[594/793] Building Fortran object CMakeFiles/xtb-object.dir/src/io/writer.f90.o
+[595/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/data.f90.o
+[596/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/dftd3.f.o
+[597/793] Building Fortran object CMakeFiles/xtb-object.dir/src/tblite/restart.F90.o
+[598/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/dftd3.f90.o
+[599/793] Building Fortran object CMakeFiles/xtb-object.dir/src/main/geometry.f90.o
+[600/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/data.F90.o
+[601/793] Building Fortran object CMakeFiles/xtb-object.dir/src/tblite/mapping.F90.o
+[602/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/identitymap.f90.o
+[603/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/filter_type.f90.o
+[604/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/latticepoint.f90.o
+[605/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/repulsion.F90.o
+[606/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/filter_cart.f90.o
+[607/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/iff_energy.f90.o
+[608/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/filter.f90.o
+[609/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/lbfgs.f90.o
+[610/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/optimizer.f90.o
+[611/793] Building Fortran object CMakeFiles/xtb-object.dir/src/coffee.f90.o
+[612/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/coordinationnumber.F90.o
+[613/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/neighbor.f90.o
+[614/793] Building Fortran object CMakeFiles/xtb-object.dir/src/compliance.f90.o
+[615/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_param.f90.o
+[616/793] Building Fortran object CMakeFiles/xtb-object.dir/src/constr.f90.o
+[617/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gdisp0.f90.o
+[618/793] Building Fortran object CMakeFiles/xtb-object.dir/src/enso_printout.f90.o
+[619/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/coulomb.f90.o
+[620/793] Building Fortran object CMakeFiles/xtb-object.dir/src/generate_wsc.f90.o
+[621/793] Building Fortran object CMakeFiles/xtb-object.dir/src/constrain_param.f90.o
+[622/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/dftd4.F90.o
+[623/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/dispersion.f90.o
+[624/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/gfn2.f90.o
+[625/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/gfn0.f90.o
+[626/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/eeq.f90.o
+[627/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfn_paramset.f90.o
+[628/793] Building Fortran object CMakeFiles/xtb-object.dir/src/coulomb/klopmanohno.F90.o
+[629/793] Building Fortran object CMakeFiles/xtb-object.dir/src/coulomb/gaussian.f90.o
+[630/793] Building Fortran object CMakeFiles/xtb-object.dir/src/header.f90.o
+[631/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iniq.f90.o
+[632/793] Building Fortran object CMakeFiles/xtb-object.dir/src/disp/encharges.f90.o
+[633/793] Building Fortran object CMakeFiles/xtb-object.dir/src/model_hessian/gff.f90.o
+[634/793] Building Fortran object CMakeFiles/xtb-object.dir/src/restart.f90.o
+[635/793] Building Fortran object CMakeFiles/xtb-object.dir/src/pocketscan.f90.o
+[636/793] Building Fortran object CMakeFiles/xtb-object.dir/src/eeq_model.f90.o
+[637/793] Building Fortran object CMakeFiles/xtb-object.dir/src/timing.f90.o
+[638/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_ini2.F90.o
+[639/793] Building Fortran object CMakeFiles/xtb-object.dir/src/read_gfn_param.f90.o
+[640/793] Building Fortran object CMakeFiles/xtb-object.dir/src/wrbas.f90.o
+[641/793] Building Fortran object CMakeFiles/xtb-object.dir/src/topology.f90.o
+[642/793] Building Fortran object CMakeFiles/xtb-object.dir/src/wrgbw.f90.o
+[643/793] Building Fortran object CMakeFiles/xtb-object.dir/src/wrmo.f90.o
+[644/793] Building Fortran object CMakeFiles/xtb-object.dir/src/wrmodef.f90.o
+[645/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xhelp.f90.o
+[646/793] Building Fortran object CMakeFiles/xtb-object.dir/src/zmatpr.f90.o
+[647/793] Generating Fortran dyndep file CMakeFiles/lib-xtb-static.dir/Fortran.dd
+[648/793] Building Fortran preprocessed CMakeFiles/xtb-exe.dir/src/prog/topology.f90-pp.f90
+[649/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/main.f90-pp.f90
+[650/793] Building Fortran object CMakeFiles/xtb-object.dir/symmetry/symmetry.f90.o
+[651/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_atomlist.f90-pp.f90
+[652/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/molstock.f90-pp.f90
+[653/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_bmatrix.f90-pp.f90
+[654/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_coordinationnumber.f90-pp.f90
+[655/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_coulomb.f90-pp.f90
+[656/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_dftd3.f90-pp.f90
+[657/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_dftd4.f90-pp.f90
+[658/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_detrotra.f90-pp.f90
+[659/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_eeq.f90-pp.f90
+[660/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_docking.f90-pp.f90
+[661/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_gfn0.f90-pp.f90
+[662/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_gfn1.f90-pp.f90
+[663/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_gfnff.f90-pp.f90
+[664/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_gfn2.f90-pp.f90
+[665/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_iff.f90-pp.f90
+[666/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_hessian.f90-pp.f90
+[667/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_latticepoint.f90-pp.f90
+[668/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_molecule.f90-pp.f90
+[669/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_oniom.f90-pp.f90
+[670/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_model_hessian.f90-pp.f90
+[671/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_optimizer.f90-pp.f90
+[672/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_dipro.f90-pp.f90
+[673/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_pbc_tools.f90-pp.f90
+[674/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_peeq.f90-pp.f90
+[675/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_repulsion.f90-pp.f90
+[676/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_random.f90-pp.f90
+[677/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_symmetry.f90-pp.f90
+[678/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_tblite.f90-pp.f90
+[679/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_thermo.f90-pp.f90
+[680/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_vertical.f90-pp.f90
+[681/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_wsc.f90-pp.f90
+[682/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_cpx.f90-pp.f90
+[683/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_ptb.F90-pp.f90
+[684/793] Building Fortran preprocessed test/unit/CMakeFiles/xtb-tester.dir/test_fermi.F90-pp.f90
+[685/793] Generating Fortran dyndep file CMakeFiles/xtb-exe.dir/Fortran.dd
+[686/793] Generating Fortran dyndep file test/unit/CMakeFiles/xtb-tester.dir/Fortran.dd
+[687/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/submodules.f90.o
+[688/793] Building Fortran object CMakeFiles/xtb-object.dir/src/o1numhess.f90.o
+[689/793] Building C object test/api/CMakeFiles/xtb_tests_capi.dir/c_api_example.c.o
+[690/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/argparser.f90.o
+[691/793] Building Fortran object CMakeFiles/xtb-object.dir/src/scc_core.f90.o
+[692/793] Building Fortran object CMakeFiles/xtb-object.dir/src/set_module.f90.o
+[693/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_qm.f90.o
+[694/793] Building Fortran object CMakeFiles/xtb-object.dir/src/grad_core.f90.o
+[695/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/info.f90.o
+[696/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/iff_lmo.f90.o
+[697/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/molstock.f90.o
+[698/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/iff_ini.f90.o
+[699/793] Building Fortran object CMakeFiles/xtb-object.dir/src/rdcoord2.f90.o
+[700/793] Building Fortran object CMakeFiles/xtb-object.dir/src/stm.f.o
+[701/793] Building Fortran object CMakeFiles/xtb-object.dir/src/local.F90.o
+[702/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_atomlist.f90.o
+[703/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/hamiltonian.F90.o
+[704/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_bmatrix.f90.o
+[705/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_coordinationnumber.f90.o
+[706/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/hamiltonian_gpu.f90.o
+[707/793] Building Fortran object CMakeFiles/xtb-object.dir/src/type/calculator.f90.o
+[708/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_dftd3.f90.o
+[709/793] Building Fortran object CMakeFiles/xtb-object.dir/src/extern/mopac.f90.o
+[710/793] Building Fortran object CMakeFiles/xtb-object.dir/src/extern/turbomole.f90.o
+[711/793] Building Fortran object CMakeFiles/xtb-object.dir/src/scf_module.F90.o
+[712/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/calculator.f90.o
+[713/793] Building Fortran object CMakeFiles/xtb-object.dir/src/extern/driver.f90.o
+[714/793] Building Fortran object CMakeFiles/xtb-object.dir/src/ptb/calculator.F90.o
+[715/793] Building Fortran object CMakeFiles/xtb-object.dir/src/tblite/calculator.F90.o
+[716/793] Building Fortran object CMakeFiles/xtb-object.dir/src/peeq_module.f90.o
+[717/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_eg.f90.o
+[718/793] Building Fortran object CMakeFiles/xtb-object.dir/src/docking/set_module.f90.o
+[719/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dipro.F90.o
+[720/793] Building Fortran object CMakeFiles/xtb-object.dir/src/main/json.F90.o
+[721/793] Building Fortran object CMakeFiles/xtb-object.dir/src/single.f90.o
+[722/793] Building Fortran object CMakeFiles/xtb-object.dir/src/extern/orca.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/extern/orca.f90:326:18:
+
+  326 |       !$omp master
+      |                  1
+Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/extern/orca.f90:826:18:
+
+  826 |       !$omp master
+      |                  1
+Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+[723/793] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/calculator.f90.o
+[724/793] Building Fortran object CMakeFiles/xtb-object.dir/src/vertical.F90.o
+[725/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/environment.f90.o
+[726/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/molecule.f90.o
+[727/793] Building Fortran object CMakeFiles/xtb-object.dir/src/dynamic.f90.o
+[728/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_detrotra.f90.o
+[729/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/results.f90.o
+[730/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_dftd4.f90.o
+[731/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_latticepoint.f90.o
+[732/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_molecule.f90.o
+[733/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_coulomb.f90.o
+[734/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_dipro.f90.o
+[735/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_pbc_tools.f90.o
+[736/793] Building Fortran object CMakeFiles/xtb-object.dir/src/hessian.F90.o
+[737/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_random.f90.o
+[738/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_symmetry.f90.o
+[739/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_wsc.f90.o
+[740/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_ptb.F90.o
+[741/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_fermi.F90.o
+[742/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_repulsion.f90.o
+[743/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_peeq.f90.o
+[744/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_eeq.f90.o
+[745/793] Building Fortran object CMakeFiles/xtb-object.dir/src/main/property.F90.o
+[746/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_thermo.f90.o
+[747/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/irmod.f90.o
+[748/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/thermo.f90.o
+[749/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_tblite.f90.o
+[750/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_ini.f90.o
+[751/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_setup.f90.o
+[752/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/calculator.f90.o
+[753/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/topology.f90.o
+[754/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_model_hessian.f90.o
+[755/793] Building Fortran object CMakeFiles/xtb-object.dir/src/optimizer.f90.o
+[756/793] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/driver.f90.o
+[757/793] Building Fortran object CMakeFiles/xtb-object.dir/src/oniom.F90.o
+[758/793] Building Fortran object CMakeFiles/xtb-object.dir/src/main/setup.f90.o
+[759/793] Building Fortran object CMakeFiles/xtb-object.dir/src/main/defaults.f90.o
+[760/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/calculator.f90.o
+[761/793] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/iff_prepare.f90.o
+[762/793] Building Fortran object CMakeFiles/xtb-object.dir/src/api/interface.f90.o
+[763/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_gfn0.f90.o
+[764/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_iff.f90.o
+[765/793] Building Fortran object CMakeFiles/xtb-object.dir/src/relaxation_engine.f90.o
+[766/793] Building Fortran object CMakeFiles/xtb-object.dir/src/geoopt_driver.f90.o
+[767/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_gfn1.f90.o
+[768/793] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/struc_converter.f90.o
+[769/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_gfn2.f90.o
+[770/793] Building Fortran object CMakeFiles/xtb-object.dir/src/getkopt.f90.o
+[771/793] Building Fortran object CMakeFiles/xtb-object.dir/src/mdoptim.f90.o
+[772/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_hessian.f90.o
+[773/793] Building Fortran object CMakeFiles/xtb-object.dir/src/scan_driver.f90.o
+[774/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_oniom.f90.o
+[775/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_gfnff.f90.o
+[776/793] Building Fortran object CMakeFiles/xtb-object.dir/src/bias_path.f90.o
+[777/793] Building Fortran object CMakeFiles/xtb-object.dir/src/docking/search_nci.f90.o
+[778/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_cpx.f90.o
+[779/793] Building Fortran object CMakeFiles/xtb-object.dir/src/screening.f90.o
+[780/793] Building Fortran object CMakeFiles/xtb-object.dir/src/modef.f90.o
+[781/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_vertical.f90.o
+[782/793] Linking Fortran static library libxtb.a
+[783/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_optimizer.f90.o
+[784/793] Linking Fortran shared library libxtb.so.6.7.1
+[785/793] Creating library symlink libxtb.so.6 libxtb.so
+[786/793] Linking C executable test/api/xtb_tests_capi
+[787/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/dock.f90.o
+/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src/src/prog/dock.f90:720:18:
+
+  720 |       !$omp master
+      |                  1
+Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
+[788/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_docking.f90.o
+[789/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/main.F90.o
+[790/793] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/main.f90.o
+[791/793] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/primary.f90.o
+[792/793] Linking Fortran executable test/unit/xtb-tester
+[793/793] Linking Fortran executable xtb
+COMMAND ['ctest', '--test-dir', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build', '--output-on-failure', '--parallel', '6']
+Test project /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build
+      Start  1: xtb/CAPI
+      Start  2: xtb/atomlist
+      Start  3: xtb/bmatrix
+      Start  4: xtb/coordinationnumber
+      Start  5: xtb/coulomb
+      Start  6: xtb/dftd3
+ 1/45 Test  #2: xtb/atomlist .....................   Passed    0.00 sec
+      Start  7: xtb/dftd4
+ 2/45 Test  #3: xtb/bmatrix ......................   Passed    0.00 sec
+      Start  8: xtb/detrotra
+ 3/45 Test  #8: xtb/detrotra .....................   Passed    0.00 sec
+      Start  9: xtb/docking
+ 4/45 Test  #4: xtb/coordinationnumber ...........   Passed    0.02 sec
+      Start 10: xtb/eeq
+ 5/45 Test #10: xtb/eeq ..........................   Passed    0.02 sec
+      Start 11: xtb/gfn0
+ 6/45 Test  #1: xtb/CAPI .........................   Passed    0.06 sec
+      Start 12: xtb/gfn1
+ 7/45 Test #11: xtb/gfn0 .........................   Passed    0.17 sec
+      Start 13: xtb/gfn2
+ 8/45 Test  #5: xtb/coulomb ......................   Passed    0.28 sec
+      Start 14: xtb/gfnff
+ 9/45 Test  #6: xtb/dftd3 ........................   Passed    0.46 sec
+      Start 15: xtb/hessian
+10/45 Test  #7: xtb/dftd4 ........................   Passed    0.46 sec
+      Start 17: xtb/latticepoint
+11/45 Test #17: xtb/latticepoint .................   Passed    0.00 sec
+      Start 18: xtb/molecule
+12/45 Test #18: xtb/molecule .....................   Passed    0.00 sec
+      Start 19: xtb/model-hessian
+13/45 Test #15: xtb/hessian ......................   Passed    0.03 sec
+      Start 20: xtb/oniom
+14/45 Test #19: xtb/model-hessian ................   Passed    0.07 sec
+      Start 21: xtb/optimizer
+15/45 Test #20: xtb/oniom ........................   Passed    0.06 sec
+      Start 22: xtb/dipro
+16/45 Test #22: xtb/dipro ........................   Passed    0.00 sec
+      Start 23: xtb/pbc-tools
+17/45 Test #21: xtb/optimizer ....................   Passed    0.02 sec
+      Start 24: xtb/peeq
+18/45 Test #23: xtb/pbc-tools ....................   Passed    0.00 sec
+      Start 25: xtb/random
+19/45 Test #25: xtb/random .......................   Passed    0.00 sec
+      Start 26: xtb/repulsion
+20/45 Test #24: xtb/peeq .........................   Passed    0.05 sec
+      Start 27: xtb/symmetry
+21/45 Test #27: xtb/symmetry .....................   Passed    0.04 sec
+      Start 29: xtb/thermo
+22/45 Test #29: xtb/thermo .......................   Passed    0.00 sec
+      Start 30: xtb/vertical
+23/45 Test #30: xtb/vertical .....................   Passed    0.02 sec
+      Start 31: xtb/wsc
+24/45 Test #31: xtb/wsc ..........................   Passed    0.00 sec
+      Start 32: xtb/cpx
+25/45 Test #32: xtb/cpx ..........................   Passed    0.00 sec
+      Start 33: xtb/ptb
+26/45 Test #26: xtb/repulsion ....................   Passed    0.11 sec
+      Start 34: xtb/fermi
+27/45 Test #33: xtb/ptb ..........................   Passed    0.00 sec
+      Start 35: xtb/Argparser_print_version
+28/45 Test #34: xtb/fermi ........................   Passed    0.00 sec
+      Start 36: xtb/Argparser_print_help
+29/45 Test #35: xtb/Argparser_print_version ......   Passed    0.00 sec
+      Start 37: xtb/Argparser_print_license
+30/45 Test #36: xtb/Argparser_print_help .........   Passed    0.00 sec
+      Start 38: xtb/Info
+31/45 Test #37: xtb/Argparser_print_license ......   Passed    0.00 sec
+      Start 39: xtb/Singlepoint
+32/45 Test #38: xtb/Info .........................   Passed    0.01 sec
+      Start 40: xtb/IP/EA
+33/45 Test #39: xtb/Singlepoint ..................   Passed    0.02 sec
+      Start 41: xtb/GFN0-xTB
+34/45 Test #41: xtb/GFN0-xTB .....................   Passed    0.02 sec
+      Start 42: xtb/GFN1-xTB
+35/45 Test #40: xtb/IP/EA ........................   Passed    0.04 sec
+      Start 43: xtb/GFN2-xTB/GBSA
+36/45 Test #43: xtb/GFN2-xTB/GBSA ................   Passed    0.02 sec
+      Start 44: xtb/GFN2-FF
+37/45 Test #42: xtb/GFN1-xTB .....................   Passed    0.03 sec
+      Start 45: xtb/GFN2-FF/xcontrol
+38/45 Test #44: xtb/GFN2-FF ......................   Passed    0.01 sec
+39/45 Test #45: xtb/GFN2-FF/xcontrol .............   Passed    0.01 sec
+40/45 Test #12: xtb/gfn1 .........................   Passed    0.95 sec
+41/45 Test #13: xtb/gfn2 .........................   Passed    1.12 sec
+      Start 16: xtb/iff
+42/45 Test #16: xtb/iff ..........................   Passed    0.07 sec
+      Start 28: xtb/tblite
+43/45 Test #28: xtb/tblite .......................   Passed    0.00 sec
+44/45 Test  #9: xtb/docking ......................   Passed    1.96 sec
+45/45 Test #14: xtb/gfnff ........................   Passed    4.07 sec
+
+100% tests passed out of 45
+
+Total Test time (real) =   4.36 sec
+COMMAND ['cmake', '--install', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build']
+-- Install configuration: "Release"
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/Findcpcmx.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/Finddftd4.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/Findmctc-lib.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/Findmulticharge.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/Findtblite.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/Findtest-drive.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/xtb-utils.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/include/xtb.h
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/share/xtb/param_gfn0-xtb.txt
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/share/xtb/param_gfn1-xtb.txt
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/share/xtb/param_gfn1-si-xtb.txt
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/share/xtb/param_gfn2-xtb.txt
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/share/xtb/param_ipea-xtb.txt
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/share/xtb/.param_gfnff.xtb
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/libxtb.a
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/libxtb.so.6.7.1
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/libxtb.so.6
+-- Set non-toolchain portion of runtime path of "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/libxtb.so.6.7.1" to "$ORIGIN:$ORIGIN/../lib:/home/iaw/project/rdkit_eth/.xtb-build-env/lib"
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/libxtb.so
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/bin/xtb
+-- Set non-toolchain portion of runtime path of "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/bin/xtb" to "$ORIGIN:$ORIGIN/../lib:/home/iaw/project/rdkit_eth/.xtb-build-env/lib"
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/xtb-config.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/xtb-config-version.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/xtb-targets.cmake
+-- Installing: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install/lib/cmake/xtb/xtb-targets-release.cmake

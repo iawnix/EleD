@@ -1,0 +1,15 @@
+{
+  "number": 1486,
+  "url": "https://github.com/grimme-lab/xtb/issues/1486",
+  "title": "C API: loading GFN0 changes subsequent GFN2 results via global D4 reference tables",
+  "state": "closed",
+  "author": "iawnix",
+  "created_at": "2026-11-01T09:30:25Z",
+  "body_file": "xtb-gfn0-state-issue.md",
+  "body_sha256": "8b977c3dc57d441df95ddb3ada9c7a6eb9c9e62ba7a9049a8077bdc3180b188d",
+  "state_reason": "completed",
+  "closed_at": "2026-11-02T14:26:53Z",
+  "fix_pr": "https://github.com/grimme-lab/xtb/pull/1490",
+  "fix_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
+  "last_checked_at": "2026-11-03T18:18:39.915551+00:00"
+}

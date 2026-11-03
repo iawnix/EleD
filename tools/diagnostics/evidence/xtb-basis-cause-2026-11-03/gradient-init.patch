@@ -1,0 +1,12 @@
+diff --git a/src/intgrad.f90 b/src/intgrad.f90
+index 44f8f7e..6318d83 100644
+--- a/src/intgrad.f90
++++ b/src/intgrad.f90
+@@ -755,6 +755,7 @@ pure subroutine get_overlap(icao,jcao,naoi,naoj,ishtyp,jshtyp,ri,rj,point,intcut
+    real(wp),parameter :: sqrtpi = sqrt(pi)
+ 
+    sint = 0.0_wp
++   t = 0.0_wp
+    iptyp = itt(ishtyp)
+    jptyp = itt(jshtyp)
+ 

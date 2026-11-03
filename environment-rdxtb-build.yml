@@ -1,0 +1,19 @@
+# Matched RDKit/Boost/Python development ABI, Linux x86-64.
+name: rdkit-eth-rdxtb-build
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - rdkit=2026.09.1
+  - librdkit-dev=2026.09.1
+# Select xTB from a separate runtime/toolchain prefix; see docs/install.md.
+  - libboost-devel=1.90
+  - libboost-python-devel=1.90
+  - numpy>=1.23,<3
+  - openssl
+  - cmake>=3.28
+  - ninja
+  - gxx_linux-64=16.2
+  - setuptools>=68
+  - pip
+  - pytest>=8

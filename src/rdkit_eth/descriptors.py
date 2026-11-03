@@ -1,0 +1,83 @@
+"""Common scalar descriptors for RDKit's EHT and xTB backends."""
+
+from __future__ import annotations
+
+from typing import Any, Mapping
+
+from .xtb import XTBResult, calc_xtb_descriptors, run_xtb
+
+
+def _frontier_from_fermi(energies: tuple[float, ...], fermi: float) -> tuple[float | None, float | None]:
+    occupied = [energy for energy in energies if energy <= fermi + 1.0e-7]
+    virtual = [energy for energy in energies if energy > fermi + 1.0e-7]
+    return (occupied[-1] if occupied else None, virtual[0] if virtual else None)
+
+
+def calc_eht_descriptors(result: Any) -> dict[str, float | int | str | None]:
+    """Extract stable scalar descriptors from an RDKit ``EHTResults`` object."""
+
+    energies = tuple(float(value) for value in result.GetOrbitalEnergies())
+    # YAeHMOP's Fermi value can differ from the returned HOMO by a few ulps.
+    # The electron count gives an unambiguous frontier index for its
+    # valence-only, doubly occupied ordering.
+    occupied_count = (int(result.numElectrons) + 1) // 2
+    if 0 < occupied_count < len(energies):
+        homo, lumo = energies[occupied_count - 1], energies[occupied_count]
+    else:
+        homo, lumo = _frontier_from_fermi(energies, float(result.fermiEnergy))
+    return {
+        "eht_backend": "yaehmop",
+        "eht_homo_eV": homo,
+        "eht_lumo_eV": lumo,
+        "eht_gap_eV": lumo - homo if homo is not None and lumo is not None else None,
+        "eht_fermi_eV": float(result.fermiEnergy),
+        "eht_total_energy_eV": float(result.totalEnergy),
+        "eht_num_orbitals": int(result.numOrbitals),
+        "eht_num_electrons": int(result.numElectrons),
+    }
+
+
+def calc_orbital_descriptors(
+    mol: Any,
+    *,
+    backend: str = "xtb",
+    conf_id: int = -1,
+    keep_matrices: bool = False,
+    xtb_backend: str = "native",
+    frontier_depth: int = 2,
+    occupation_threshold: float = 1e-7,
+    **xtb_options: Any,
+) -> Mapping[str, float | int | str | None]:
+    """Calculate method-prefixed scalar orbital descriptors.
+
+    ``backend`` can be ``"eht"``, ``"xtb"``, or ``"both"``. xTB options are
+    forwarded to :func:`run_xtb`; EHT always uses RDKit's YAeHMOP interface.
+    frontier_depth and occupation_threshold configure xTB feature extraction
+    only; they do not change the calculation or EHT frontier convention.
+    """
+
+    normalized = backend.strip().lower()
+    if normalized not in {"eht", "xtb", "both"}:
+        raise ValueError("backend must be 'eht', 'xtb', or 'both'")
+    descriptors: dict[str, float | int | str | None] = {}
+    if normalized in {"eht", "both"}:
+        from rdkit.Chem import rdEHTTools
+
+        ok, result = rdEHTTools.RunMol(
+            mol,
+            confId=conf_id,
+            keepOverlapAndHamiltonianMatrices=keep_matrices,
+        )
+        if not ok:
+            raise RuntimeError("RDKit YAeHMOP EHT calculation failed")
+        descriptors.update(calc_eht_descriptors(result))
+    if normalized in {"xtb", "both"}:
+        result: XTBResult = run_xtb(
+            mol,
+            conf_id=conf_id,
+            backend=xtb_backend,
+            **xtb_options,
+        )
+        descriptors.update(calc_xtb_descriptors(result, frontier_depth=frontier_depth,
+                                                 occupation_threshold=occupation_threshold))
+    return descriptors

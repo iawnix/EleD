@@ -1,0 +1,37 @@
+name: adapter and installed wheel
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ''
+          auto-activate-base: true
+      - name: Create locked runtime
+        run: conda create --yes --prefix "$PWD/.runtime-env" --file locks/linux-64/runtime.txt
+      - name: Install adapter and release tools
+        run: |
+          conda run --no-capture-output -p "$PWD/.runtime-env" python -m pip install --no-deps --no-build-isolation -e .
+          conda run --no-capture-output -p "$PWD/.runtime-env" python -m pip install --no-deps --require-hashes -r locks/linux-64/release-tools-py311.txt
+      - name: Test without the optional Python backend
+        run: |
+          conda run --no-capture-output -p "$PWD/.runtime-env" python -m pytest -q
+          conda run --no-capture-output -p "$PWD/.runtime-env" python examples/rdkit_workflow.py
+          conda run --no-capture-output -p "$PWD/.runtime-env" python examples/electronic_descriptors.py
+      - name: Build source archive and pure wheel
+        run: conda run --no-capture-output -p "$PWD/.runtime-env" python tools/build_release.py --output dist/0.4.0
+      - name: Verify installed wheel outside checkout
+        run: |
+          conda run --no-capture-output -p "$PWD/.runtime-env" python tools/check_wheel.py dist/0.4.0/pure/*.whl --kind pure --check native --output dist/0.4.0/installed-pure.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pure-python-0.4.0
+          path: dist/0.4.0/

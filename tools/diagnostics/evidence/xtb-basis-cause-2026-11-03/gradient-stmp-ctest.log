@@ -1,0 +1,81 @@
+Test project /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build
+      Start 10: xtb/gfn1
+      Start 11: xtb/gfn2
+      Start 13: xtb/hessian
+      Start 17: xtb/oniom
+      Start 12: xtb/gfnff
+      Start  5: xtb/dftd3
+ 1/38 Test #13: xtb/hessian ......................   Passed    0.02 sec
+      Start  6: xtb/dftd4
+ 2/38 Test #17: xtb/oniom ........................   Passed    0.02 sec
+      Start  4: xtb/coulomb
+ 3/38 Test  #4: xtb/coulomb ......................   Passed    0.29 sec
+      Start  9: xtb/gfn0
+ 4/38 Test  #9: xtb/gfn0 .........................   Passed    0.18 sec
+      Start 21: xtb/repulsion
+ 5/38 Test #21: xtb/repulsion ....................   Passed    0.19 sec
+      Start 20: xtb/peeq
+ 6/38 Test  #6: xtb/dftd4 ........................   Passed    0.66 sec
+      Start  7: xtb/docking
+ 7/38 Test  #5: xtb/dftd3 ........................   Passed    0.68 sec
+      Start 34: xtb/IP/EA
+ 8/38 Test #20: xtb/peeq .........................   Passed    0.06 sec
+      Start 14: xtb/iff
+ 9/38 Test #34: xtb/IP/EA ........................   Passed    0.06 sec
+      Start  1: xtb/CAPI
+10/38 Test  #7: xtb/docking ......................   Passed    0.07 sec
+      Start  3: xtb/coordinationnumber
+11/38 Test  #1: xtb/CAPI .........................   Passed    0.04 sec
+      Start 22: xtb/symmetry
+12/38 Test  #3: xtb/coordinationnumber ...........   Passed    0.04 sec
+      Start  8: xtb/eeq
+13/38 Test #14: xtb/iff ..........................   Passed    0.07 sec
+      Start 36: xtb/GFN1-xTB
+14/38 Test  #8: xtb/eeq ..........................   Passed    0.03 sec
+      Start 33: xtb/Singlepoint
+15/38 Test #22: xtb/symmetry .....................   Passed    0.04 sec
+      Start 37: xtb/GFN2-xTB/GBSA
+16/38 Test #36: xtb/GFN1-xTB .....................   Passed    0.04 sec
+      Start 25: xtb/vertical
+17/38 Test #33: xtb/Singlepoint ..................   Passed    0.03 sec
+      Start 35: xtb/GFN0-xTB
+18/38 Test #37: xtb/GFN2-xTB/GBSA ................   Passed    0.03 sec
+      Start 32: xtb/Info
+19/38 Test #32: xtb/Info .........................   Passed    0.01 sec
+      Start 38: xtb/GFN2-FF
+20/38 Test #25: xtb/vertical .....................   Passed    0.02 sec
+      Start 24: xtb/thermo
+21/38 Test #38: xtb/GFN2-FF ......................   Passed    0.01 sec
+      Start 26: xtb/wsc
+22/38 Test #35: xtb/GFN0-xTB .....................   Passed    0.02 sec
+      Start 27: xtb/cpx
+23/38 Test #24: xtb/thermo .......................   Passed    0.00 sec
+      Start 15: xtb/latticepoint
+24/38 Test #26: xtb/wsc ..........................   Passed    0.00 sec
+      Start 19: xtb/pbc-tools
+25/38 Test #27: xtb/cpx ..........................   Passed    0.00 sec
+      Start 31: xtb/Argparser_print_license
+26/38 Test #15: xtb/latticepoint .................   Passed    0.00 sec
+27/38 Test #19: xtb/pbc-tools ....................   Passed    0.00 sec
+      Start 28: xtb/ptb
+      Start 18: xtb/dipro
+28/38 Test #31: xtb/Argparser_print_license ......   Passed    0.00 sec
+      Start 23: xtb/tblite
+29/38 Test #28: xtb/ptb ..........................   Passed    0.00 sec
+      Start 29: xtb/Argparser_print_version
+30/38 Test #18: xtb/dipro ........................   Passed    0.00 sec
+      Start 16: xtb/molecule
+31/38 Test #23: xtb/tblite .......................   Passed    0.00 sec
+      Start  2: xtb/atomlist
+32/38 Test #29: xtb/Argparser_print_version ......   Passed    0.00 sec
+      Start 30: xtb/Argparser_print_help
+33/38 Test #16: xtb/molecule .....................   Passed    0.00 sec
+34/38 Test  #2: xtb/atomlist .....................   Passed    0.00 sec
+35/38 Test #30: xtb/Argparser_print_help .........   Passed    0.00 sec
+36/38 Test #11: xtb/gfn2 .........................   Passed    1.06 sec
+37/38 Test #10: xtb/gfn1 .........................   Passed    1.28 sec
+38/38 Test #12: xtb/gfnff ........................   Passed    3.42 sec
+
+100% tests passed out of 38
+
+Total Test time (real) =   3.44 sec

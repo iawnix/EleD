@@ -1,0 +1,10 @@
+include CMakeLists.txt environment*.yml
+include CHANGELOG.md
+recursive-include .github/workflows *.yml
+recursive-include locks *.txt *.json *.md
+recursive-include cpp *.h *.cpp *.cmake.in
+recursive-include docs *.md *.json *.diff *.log
+recursive-include examples *.py
+recursive-include tools *.py *.sh *.json *.csv *.patch *.c *.md *.txt
+recursive-include tools/diagnostics/evidence *.log
+recursive-include tests *.py *.json

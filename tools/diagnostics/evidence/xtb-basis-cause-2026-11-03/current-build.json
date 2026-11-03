@@ -1,0 +1,56 @@
+{
+  "source_commit": "a9040512dd7c15793472aa20f9647d36a266f7cd",
+  "source_diff": "",
+  "commands": [
+    [
+      "cmake",
+      "-S",
+      "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-src",
+      "-B",
+      "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_INSTALL_PREFIX=/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-install",
+      "-DCMAKE_INSTALL_LIBDIR=lib",
+      "-DBUILD_SHARED_LIBS=ON",
+      "-DWITH_OBJECT=ON",
+      "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+      "-DWITH_TESTS=ON",
+      "-DWITH_TBLITE=OFF",
+      "-DWITH_CPCMX=OFF",
+      "-DCMAKE_C_STANDARD=17",
+      "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
+      "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON",
+      "-DCMAKE_PREFIX_PATH=/home/iaw/project/rdkit_eth/.xtb-build-env",
+      "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib",
+      "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/rdkit_eth/.xtb-build-env/lib",
+      "-DCMAKE_C_COMPILER=/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc",
+      "-DCMAKE_Fortran_COMPILER=/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran",
+      "-DCMAKE_C_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include",
+      "-DCMAKE_Fortran_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include -I/home/iaw/project/rdkit_eth/.xtb-build-env/include",
+      "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -L/home/iaw/project/rdkit_eth/.xtb-build-env/lib"
+    ],
+    [
+      "cmake",
+      "--build",
+      "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build",
+      "--parallel",
+      "6"
+    ],
+    [
+      "ctest",
+      "--test-dir",
+      "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build",
+      "--output-on-failure",
+      "--parallel",
+      "6"
+    ],
+    [
+      "cmake",
+      "--install",
+      "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/current-build"
+    ]
+  ],
+  "library_sha256": "a1990a9a99b91ea5b24fe149c43c7437e8005e49fdc05e2915256c36d7a5eeba"
+}

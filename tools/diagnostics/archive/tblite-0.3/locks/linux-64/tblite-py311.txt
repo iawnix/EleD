@@ -1,0 +1,4 @@
+# Use with --require-hashes --no-deps inside the matching locked conda environment.
+tblite==0.8.0 --hash=sha256:43d440860feb904154373d9862d5e4187b773e38a1ff273af55d047f0cef14ef
+cffi==2.1.1 --hash=sha256:34e261f78cb6ceaaa36f42f2613f4380d94d9c759a9c73c769ee6e0247364632
+pycparser==3.12 --hash=sha256:a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e

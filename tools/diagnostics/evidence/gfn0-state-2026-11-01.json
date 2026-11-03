@@ -1,0 +1,1365 @@
+{
+  "date": "2026-11-01",
+  "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "main": {
+    "sha": "a9040512dd7c15793472aa20f9647d36a266f7cd",
+    "date": "2026-10-30T14:43:19Z",
+    "url": "https://github.com/grimme-lab/xtb/commit/a9040512dd7c15793472aa20f9647d36a266f7cd"
+  },
+  "release": "v6.7.1",
+  "build": {
+    "C_and_Fortran_compiler": "conda-forge GNU 16.2.0",
+    "cmake": "4.4.5",
+    "mctc_lib": "0.7.0",
+    "test_drive": "0.6.1",
+    "openblas": "0.3.34",
+    "build_type": "Release",
+    "WITH_TBLITE": false,
+    "WITH_CPCMX": false,
+    "BUILD_SHARED_LIBS": true,
+    "WITH_TESTS_main": true,
+    "release_C_flags": "-std=c17",
+    "thread_environment": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    },
+    "unset_environment": [
+      "LD_LIBRARY_PATH",
+      "LD_PRELOAD",
+      "XTBPATH",
+      "XTBHOME"
+    ]
+  },
+  "reproducer": {
+    "source": "tools/diagnostics/xtb_gfn0_state.c",
+    "sha256": "2158a279d9982ab91e5006ea0d51e42c8893b1db9e0bd7782a73b3faea9b3b9c",
+    "internal_symbol_inspection_used": false,
+    "energy_tolerance_Eh": 1e-10,
+    "orbital_tolerance_eV": 1e-08,
+    "contamination_exit_code": 3,
+    "fresh_handles_and_full_cleanup_per_calculation": true,
+    "fresh_process_per_sequence": true
+  },
+  "patch": {
+    "file": "tools/diagnostics/xtb_d4_local_references.patch",
+    "sha256": "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859"
+  },
+  "source_builds": {
+    "main": {
+      "dftd4_original_sha256": "5876621ecc89c40f5c8d42d6ef38d7396c401eb82c9a3f6c87cd59afee5b12d0",
+      "dftd4_patched_sha256": "f921bef5fb49be1e5b3eb904f8a257c8b2ae04ecdf228033acdaecf5cd291ad7",
+      "reproducer_binary_sha256": "1a875a52d65577b3bc8b7d2a671f362518acf732d82a83a0ea24082c203647ca",
+      "parameter_sha256": {
+        "0": "278461cabbf89b14379aedc78ef3e141c8cef1f911f3a3c72530aec7a52b6d34",
+        "1": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399",
+        "2": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+      },
+      "before": [
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38871517778061,
+              "delta_energy_Eh": -0.0001111703626488492,
+              "max_orbital_delta_eV": 0.0007635450311748853
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -10.82855707084973
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38871517778061,
+              "delta_energy_Eh": -0.0001111703626488492,
+              "max_orbital_delta_eV": 0.0007635450311748853
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -12.15844123059335
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -11.38860400741796
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357120943894,
+              "delta_energy_Eh": 4.229524188659184e-07,
+              "max_orbital_delta_eV": 1.084465219467583e-05
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -4.366763625955626
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357120943894,
+              "delta_energy_Eh": 4.229524188659184e-07,
+              "max_orbital_delta_eV": 1.084465219467583e-05
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -5.768629100356095
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -5.070357543896313
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        }
+      ],
+      "ctest_before": {
+        "passed": 45,
+        "failed": [],
+        "assertion_failures": [],
+        "full_log_local_path": "/tmp/xtb-state-verify-0cck0304/ctest-main-before.log"
+      },
+      "after": [
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -10.82855707084973
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -12.15844123059335
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -11.38860400741796
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400741796,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -4.366763625955626
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -5.768629100356095
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -5.070357543896313
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357543896313,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        }
+      ],
+      "ctest_after": {
+        "passed": 45,
+        "failed": [],
+        "assertion_failures": [],
+        "full_log_local_path": "/tmp/xtb-state-verify-0cck0304/ctest-main-after.log"
+      }
+    },
+    "release": {
+      "dftd4_original_sha256": "69e4899a835d89f264834eea6e297e3e6e30fb4df73b194b5f542fc0c3ee7f3b",
+      "dftd4_patched_sha256": "32a71d2e985ee6f6fd10670bb538e15ed672486cc425e85c8f5e6b969858418e",
+      "reproducer_binary_sha256": "d3ed688a0ae84a5f0f8996aff15338640aa957bb755da794f601cf3373d46edc",
+      "parameter_sha256": {
+        "0": "278461cabbf89b14379aedc78ef3e141c8cef1f911f3a3c72530aec7a52b6d34",
+        "1": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399",
+        "2": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+      },
+      "before": [
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38871517219716,
+              "delta_energy_Eh": -0.0001111703594478541,
+              "max_orbital_delta_eV": 0.0007635684228234822
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -10.82855703971183
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38871517219716,
+              "delta_energy_Eh": -0.0001111703594478541,
+              "max_orbital_delta_eV": 0.0007635684228234822
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -12.15844122312541
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -11.38860400183772
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357118250127,
+              "delta_energy_Eh": 4.229524108723126e-07,
+              "max_orbital_delta_eV": 1.084464535799272e-05
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 3,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -4.366763619736029
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357118250127,
+              "delta_energy_Eh": 4.229524108723126e-07,
+              "max_orbital_delta_eV": 1.084464535799272e-05
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -5.768629096092941
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -5.070357541202537
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        }
+      ],
+      "ctest_before": {
+        "passed": 34,
+        "failed": [
+          "xtb/gfn1",
+          "xtb/gfn2",
+          "xtb/hessian",
+          "xtb/oniom"
+        ],
+        "assertion_failures": [
+          "expected 0.69904725519999997E-002 but got 0.12900179247732219 (difference: 0.12201131992532219)",
+          "expected 0.64574201250000001E-002 but got 0.13475209890909465 (difference: 0.12829467878409465)",
+          "expected 0.96427243151450001E-004 but got -0.74775908235793248E-001 (difference: 0.74872335478944702E-001)",
+          "expected 0.32719420000000001E-003 but got 0.17482263587024405 (difference: 0.17449544167024406)"
+        ],
+        "full_log_local_path": "/tmp/xtb-state-verify-0cck0304/ctest-release-before.log"
+      },
+      "after": [
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -10.82855703971183
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -12.15844122312541
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "ethanol",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -11.38860400183772
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -11.38860400183772,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 0,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 0,
+              "energy_Eh": -4.366763619736029
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 1,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 1,
+              "energy_Eh": -5.768629096092941
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "load",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        },
+        {
+          "molecule": "water",
+          "intermediate_method": 2,
+          "intermediate_action": "singlepoint",
+          "exit_code": 0,
+          "records": [
+            {
+              "stage": "gfn2_before",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            },
+            {
+              "stage": "intermediate_calculation",
+              "method": 2,
+              "energy_Eh": -5.070357541202537
+            },
+            {
+              "stage": "gfn2_after_parameter_load",
+              "energy_Eh": -5.070357541202537,
+              "delta_energy_Eh": 0,
+              "max_orbital_delta_eV": 0
+            }
+          ],
+          "stderr": ""
+        }
+      ],
+      "ctest_after": {
+        "passed": 34,
+        "failed": [
+          "xtb/gfn1",
+          "xtb/gfn2",
+          "xtb/hessian",
+          "xtb/oniom"
+        ],
+        "assertion_failures": [
+          "expected 0.69904725519999997E-002 but got 0.12900179247732219 (difference: 0.12201131992532219)",
+          "expected 0.64574201250000001E-002 but got 0.13475209890909465 (difference: 0.12829467878409465)",
+          "expected 0.96427243151450001E-004 but got -0.74775908235793248E-001 (difference: 0.74872335478944702E-001)",
+          "expected 0.32719420000000001E-003 but got 0.17482263587024405 (difference: 0.17449544167024406)"
+        ],
+        "full_log_local_path": "/tmp/xtb-state-verify-0cck0304/ctest-release-after.log"
+      }
+    }
+  },
+  "conda_forge_recheck": {
+    "package": "xtb 6.7.1 gfortran_ha02e54d_5",
+    "molecule": "ethanol",
+    "intermediate": "load",
+    "repeats": [
+      {
+        "method_loaded": 0,
+        "repeat": 1,
+        "rows": [
+          {
+            "stage": "gfn2_before",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          },
+          {
+            "stage": "gfn2_after_parameter_load",
+            "energy_Eh": -11.38871517219716,
+            "delta_energy_Eh": -0.0001111703594478541,
+            "max_orbital_delta_eV": 0.0007635684228234822
+          }
+        ]
+      },
+      {
+        "method_loaded": 0,
+        "repeat": 2,
+        "rows": [
+          {
+            "stage": "gfn2_before",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          },
+          {
+            "stage": "gfn2_after_parameter_load",
+            "energy_Eh": -11.38871517219716,
+            "delta_energy_Eh": -0.0001111703594478541,
+            "max_orbital_delta_eV": 0.0007635684228234822
+          }
+        ]
+      },
+      {
+        "method_loaded": 0,
+        "repeat": 3,
+        "rows": [
+          {
+            "stage": "gfn2_before",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          },
+          {
+            "stage": "gfn2_after_parameter_load",
+            "energy_Eh": -11.38871517219716,
+            "delta_energy_Eh": -0.0001111703594478541,
+            "max_orbital_delta_eV": 0.0007635684228234822
+          }
+        ]
+      },
+      {
+        "method_loaded": 1,
+        "repeat": 1,
+        "rows": [
+          {
+            "stage": "gfn2_before",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          },
+          {
+            "stage": "gfn2_after_parameter_load",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          }
+        ]
+      },
+      {
+        "method_loaded": 1,
+        "repeat": 2,
+        "rows": [
+          {
+            "stage": "gfn2_before",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          },
+          {
+            "stage": "gfn2_after_parameter_load",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          }
+        ]
+      },
+      {
+        "method_loaded": 1,
+        "repeat": 3,
+        "rows": [
+          {
+            "stage": "gfn2_before",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          },
+          {
+            "stage": "gfn2_after_parameter_load",
+            "energy_Eh": -11.38860400183772,
+            "delta_energy_Eh": 0,
+            "max_orbital_delta_eV": 0
+          }
+        ]
+      }
+    ]
+  }
+}

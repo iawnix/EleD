@@ -1,0 +1,5 @@
+# Preserve reviewed patches and historical numerical evidence byte-for-byte.
+*.patch -text -whitespace
+*.diff -text -whitespace
+tools/diagnostics/evidence/** -text -whitespace
+docs/upstream/xtb-gfn0-state-issue.md -text -whitespace

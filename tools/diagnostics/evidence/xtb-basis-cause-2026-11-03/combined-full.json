@@ -1,0 +1,3821 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-03T08:51:34.107391+00:00",
+  "implementation_sha256": {
+    "tools/compare_orbitals.py": "b1f3aeac740402ddc29a2a6d7ce6d0e04bc75087748abb93b8d96427e58446cf",
+    "src/rdkit_eth/orbital_alignment.py": "3df9d52f96e8f66326247f3792d90637145c336d00b0f59deb5211ea1f284313",
+    "src/rdkit_eth/backends/tblite.py": "50ec954299684def1653738076b01becb2118737d8b889cd6f499d4c0c1ecc1d",
+    "cpp/rdXTBTools/XTBTools.cpp": "1dd35aaa66534c88ce6a6b65fa937692d16b73a012c84c8990d6a15d7cfbda9c",
+    "cpp/rdXTBTools/Wrap.cpp": "c46cb2c21a1b0753f93b2d271073d2ce4f1a453b4df038d0f85dce95484b73b8"
+  },
+  "dataset": {
+    "path": "/home/iaw/project/rdkit_eth/tests/data/orbital_alignment_cases.json",
+    "sha256": "a358b8db57cebddeceba542d74275196cd39c1ba72e76287c14fa27763efcd81",
+    "metadata": {
+      "schema_version": 1,
+      "description": "Frozen unoptimized RDKit conformers for numerical agreement, not a chemical accuracy benchmark.",
+      "generator": {
+        "rdkit": "2026.09.1",
+        "procedure": "AddHs(MolFromSmiles); AllChem.EmbedMolecule(randomSeed=1); round coordinates to 12 decimal places",
+        "optimization": false
+      }
+    }
+  },
+  "environment": {
+    "python": "3.11.18",
+    "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
+    "rdkit": "2026.09.1",
+    "numpy": "2.4.6",
+    "tblite": "0.8.0",
+    "thread_environment": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": null
+    }
+  },
+  "settings": {
+    "accuracy": 0.01,
+    "max_iterations": 250,
+    "temperature_kelvin": 300.0,
+    "uhf": 0,
+    "solvent": null,
+    "optimize": false,
+    "degeneracy_ev": 0.001,
+    "occupation_tolerance": 1e-06,
+    "ao_convention": "libxtb-6.7.1-to-tblite-0.8.0-spd"
+  },
+  "limits": {
+    "energy_eh": 2e-07,
+    "orbital_energies_ev": 0.00015,
+    "occupations": 1e-06,
+    "charges_e": 5e-05,
+    "dipole_e_bohr": 0.0002,
+    "wiberg": 5e-05,
+    "reference_orthonormality_error": 1e-08,
+    "candidate_orthonormality_error": 1e-08,
+    "max_projector_distance": 0.001,
+    "density_orthonormal_max_abs": 0.0001,
+    "density_trace_difference": 1e-06
+  },
+  "cases": [
+    {
+      "name": "water",
+      "smiles": "O",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.39002700858282e-09,
+        "orbital_energies_ev": 2.6955324905486577e-07,
+        "occupations": 0.0,
+        "charges_e": 3.0972946429841386e-09,
+        "dipole_e_bohr": 3.0936317951812953e-09,
+        "wiberg": 1.4358654265578252e-09,
+        "wiberg_within_10_bohr": 1.4358654265578252e-09,
+        "raw_coefficients_max_abs": 1.6432828086367572,
+        "reference_orthonormality_error": 2.4424906541753444e-15,
+        "candidate_orthonormality_error": 8.715250743307479e-14,
+        "sign_aligned_max_abs": 7.896123532802335e-09,
+        "subspace_aligned_max_abs": 7.896123532802335e-09,
+        "max_projector_distance": 9.99056496165076e-09,
+        "density_orthonormal_max_abs": 5.4138684368876255e-09,
+        "density_trace_difference": 3.907985046680551e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.008337632985785604,
+        "tblite_with_overlap": 0.0183940299320966
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 1.8523930260991779,
+        "rdXTBTools": 0.8924878847551393,
+        "tblite": 0.8924878861910047
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "water",
+      "smiles": "O",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.7016469061891257e-09,
+        "orbital_energies_ev": 2.0100018520707863e-06,
+        "occupations": 0.0,
+        "charges_e": 2.0710146153568587e-07,
+        "dipole_e_bohr": 2.1330252031326324e-07,
+        "wiberg": 5.818430492965376e-08,
+        "wiberg_within_10_bohr": 5.818430492965376e-08,
+        "raw_coefficients_max_abs": 1.7727407854146375,
+        "reference_orthonormality_error": 8.881784197001252e-16,
+        "candidate_orthonormality_error": 8.881784197001252e-16,
+        "sign_aligned_max_abs": 1.0385915000243884e-07,
+        "subspace_aligned_max_abs": 1.0385915000243884e-07,
+        "max_projector_distance": 9.111981994338198e-08,
+        "density_orthonormal_max_abs": 7.003654078907573e-08,
+        "density_trace_difference": 6.217248937900877e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.003966714954003692,
+        "tblite_with_overlap": 0.0009349590400233865
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 1.8556058445116494,
+        "rdXTBTools": 0.9202316769318026,
+        "tblite": 0.9202316187474977
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ammonia",
+      "smiles": "N",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.73291716929225e-09,
+        "orbital_energies_ev": 3.635100598309293e-07,
+        "occupations": 0.0,
+        "charges_e": 3.261403103138605e-08,
+        "dipole_e_bohr": 6.960065700428036e-08,
+        "wiberg": 2.371785856603026e-08,
+        "wiberg_within_10_bohr": 2.371785856603026e-08,
+        "raw_coefficients_max_abs": 1.7379105939177988,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 4.218847493575595e-14,
+        "sign_aligned_max_abs": 4.921433872651093e-07,
+        "subspace_aligned_max_abs": 4.921433872651093e-07,
+        "max_projector_distance": 7.102460467885155e-07,
+        "density_orthonormal_max_abs": 2.818799799131355e-08,
+        "density_trace_difference": 1.7763568394002505e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0018347071018069983,
+        "tblite_with_overlap": 0.00094373500905931
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 1.9590565137189737,
+        "rdXTBTools": 0.9635818496079372,
+        "tblite": 0.9635818733257958
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ammonia",
+      "smiles": "N",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.5577851775769886e-09,
+        "orbital_energies_ev": 3.2172757258308593e-07,
+        "occupations": 0.0,
+        "charges_e": 7.517319167149594e-08,
+        "dipole_e_bohr": 3.106534551822193e-08,
+        "wiberg": 6.009165054443599e-09,
+        "wiberg_within_10_bohr": 6.009165054443599e-09,
+        "raw_coefficients_max_abs": 1.2529354618176998,
+        "reference_orthonormality_error": 8.881784197001252e-16,
+        "candidate_orthonormality_error": 1.4432899320127035e-15,
+        "sign_aligned_max_abs": 1.7797953985598802e-08,
+        "subspace_aligned_max_abs": 1.7797953985598802e-08,
+        "max_projector_distance": 2.6052643498006636e-08,
+        "density_orthonormal_max_abs": 1.4891394561900029e-08,
+        "density_trace_difference": 9.769962616701378e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002574439044110477,
+        "tblite_with_overlap": 0.0008666779613122344
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 1.9572676133962994,
+        "rdXTBTools": 0.9795829503221622,
+        "tblite": 0.9795829443129972
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "methane",
+      "smiles": "C",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.900716917191403e-09,
+        "orbital_energies_ev": 1.5843863820919069e-07,
+        "occupations": 0.0,
+        "charges_e": 3.526518721486127e-08,
+        "dipole_e_bohr": 3.072271879608901e-09,
+        "wiberg": 7.190184003746936e-10,
+        "wiberg_within_10_bohr": 7.190184003746936e-10,
+        "raw_coefficients_max_abs": 2.5492141024588886,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 1.2434497875801753e-14,
+        "sign_aligned_max_abs": 3.3695868889571656e-07,
+        "subspace_aligned_max_abs": 3.3695868889571656e-07,
+        "max_projector_distance": 4.44957107386089e-07,
+        "density_orthonormal_max_abs": 6.812080899365469e-09,
+        "density_trace_difference": 6.217248937900877e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.00201511406339705,
+        "tblite_with_overlap": 0.0010141979437321424
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 2.0899368166132737,
+        "rdXTBTools": 0.9985457946073564,
+        "tblite": 0.998545793888338
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "methane",
+      "smiles": "C",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.7951915509684113e-09,
+        "orbital_energies_ev": 2.1053168453022408e-07,
+        "occupations": 0.0,
+        "charges_e": 6.21208856299571e-08,
+        "dipole_e_bohr": 6.612400162142595e-09,
+        "wiberg": 1.7598009716124352e-09,
+        "wiberg_within_10_bohr": 1.7598009716124352e-09,
+        "raw_coefficients_max_abs": 1.3087887904896245,
+        "reference_orthonormality_error": 1.1102230246251565e-15,
+        "candidate_orthonormality_error": 1.1102230246251565e-15,
+        "sign_aligned_max_abs": 8.46612078775344e-08,
+        "subspace_aligned_max_abs": 8.46612078775344e-08,
+        "max_projector_distance": 1.3762370648970732e-07,
+        "density_orthonormal_max_abs": 1.4551071236823532e-08,
+        "density_trace_difference": 1.7763568394002505e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0026347710518166423,
+        "tblite_with_overlap": 0.0008919920073822141
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 2.0899368166132737,
+        "rdXTBTools": 0.998372747821167,
+        "tblite": 0.9983727460613661
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethane",
+      "smiles": "CC",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.6367717726193405e-09,
+        "orbital_energies_ev": 9.477888598397044e-07,
+        "occupations": 0.0,
+        "charges_e": 1.5667855846057677e-07,
+        "dipole_e_bohr": 2.601326469569773e-07,
+        "wiberg": 1.1166922053718054e-08,
+        "wiberg_within_10_bohr": 1.1166922053718054e-08,
+        "raw_coefficients_max_abs": 1.8015944132662258,
+        "reference_orthonormality_error": 2.9976021664879227e-15,
+        "candidate_orthonormality_error": 6.4178048860310916e-12,
+        "sign_aligned_max_abs": 1.3997410366978214e-05,
+        "subspace_aligned_max_abs": 1.3997410366978214e-05,
+        "max_projector_distance": 2.3936234533605796e-05,
+        "density_orthonormal_max_abs": 6.508939776050937e-08,
+        "density_trace_difference": 2.2026824808563106e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0033656220184639096,
+        "tblite_with_overlap": 0.001932722982019186
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          3
+        ],
+        "distance_bohr": 2.0992056185737806,
+        "rdXTBTools": 0.9867743608347229,
+        "tblite": 0.9867743496678009
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethane",
+      "smiles": "CC",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.2890969947629856e-09,
+        "orbital_energies_ev": 2.315922547069249e-07,
+        "occupations": 0.0,
+        "charges_e": 1.1604734123649152e-07,
+        "dipole_e_bohr": 4.36719632332383e-08,
+        "wiberg": 2.4088809835731695e-09,
+        "wiberg_within_10_bohr": 2.4088809835731695e-09,
+        "raw_coefficients_max_abs": 1.6481399342703953,
+        "reference_orthonormality_error": 1.3322676295501878e-15,
+        "candidate_orthonormality_error": 3.108576833367004e-14,
+        "sign_aligned_max_abs": 5.792009597580666e-07,
+        "subspace_aligned_max_abs": 5.792009597580666e-07,
+        "max_projector_distance": 1.4186969412398097e-06,
+        "density_orthonormal_max_abs": 2.2893010653834978e-08,
+        "density_trace_difference": 2.3092638912203256e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.00353354902472347,
+        "tblite_with_overlap": 0.0015096520073711872
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          6
+        ],
+        "distance_bohr": 2.082021515776682,
+        "rdXTBTools": 0.9872788749033303,
+        "tblite": 0.9872788724944493
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethene",
+      "smiles": "C=C",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.5883340743225745e-09,
+        "orbital_energies_ev": 3.111025801416645e-07,
+        "occupations": 0.0,
+        "charges_e": 1.6427765126003635e-07,
+        "dipole_e_bohr": 4.175167929304502e-07,
+        "wiberg": 1.774036562096626e-08,
+        "wiberg_within_10_bohr": 1.774036562096626e-08,
+        "raw_coefficients_max_abs": 1.428750871976129,
+        "reference_orthonormality_error": 2.1094237467877974e-15,
+        "candidate_orthonormality_error": 4.054534485931072e-12,
+        "sign_aligned_max_abs": 1.2794830167583982e-06,
+        "subspace_aligned_max_abs": 1.2794830167583982e-06,
+        "max_projector_distance": 2.0367531253391607e-06,
+        "density_orthonormal_max_abs": 8.146221819327337e-08,
+        "density_trace_difference": 1.936228954946273e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002817557076923549,
+        "tblite_with_overlap": 0.0015429039485752583
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          4
+        ],
+        "distance_bohr": 2.0672286048268935,
+        "rdXTBTools": 0.9805939172748578,
+        "tblite": 0.9805938995344922
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethene",
+      "smiles": "C=C",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.472599014424759e-09,
+        "orbital_energies_ev": 1.4441059192904504e-07,
+        "occupations": 0.0,
+        "charges_e": 1.3591777828225737e-08,
+        "dipole_e_bohr": 6.453621712032565e-08,
+        "wiberg": 1.0073699652224377e-09,
+        "wiberg_within_10_bohr": 1.0073699652224377e-09,
+        "raw_coefficients_max_abs": 1.650091766595399,
+        "reference_orthonormality_error": 9.992007221626409e-16,
+        "candidate_orthonormality_error": 3.9968028886505635e-15,
+        "sign_aligned_max_abs": 1.288460331483332e-07,
+        "subspace_aligned_max_abs": 1.288460331483332e-07,
+        "max_projector_distance": 1.5517884095366216e-07,
+        "density_orthonormal_max_abs": 9.097957998083217e-09,
+        "density_trace_difference": 0.0
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0035207030596211553,
+        "tblite_with_overlap": 0.0012907449854537845
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          4
+        ],
+        "distance_bohr": 2.0672286048268935,
+        "rdXTBTools": 0.9779085464662132,
+        "tblite": 0.9779085474735831
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethyne",
+      "smiles": "C#C",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.4153400108039023e-09,
+        "orbital_energies_ev": 6.519415371997184e-07,
+        "occupations": 0.0,
+        "charges_e": 1.8348546659829879e-07,
+        "dipole_e_bohr": 2.0337237709633273e-07,
+        "wiberg": 1.221715506538601e-08,
+        "wiberg_within_10_bohr": 1.221715506538601e-08,
+        "raw_coefficients_max_abs": 1.7731570065664086,
+        "reference_orthonormality_error": 1.7407460408597293e-15,
+        "candidate_orthonormality_error": 1.5050183321818622e-12,
+        "sign_aligned_max_abs": 1.2797461834690438e-07,
+        "subspace_aligned_max_abs": 1.2797461834690438e-07,
+        "max_projector_distance": 1.835842774947001e-07,
+        "density_orthonormal_max_abs": 4.1470029521484264e-08,
+        "density_trace_difference": 1.5987211554602254e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0021380610996857285,
+        "tblite_with_overlap": 0.0011671590618789196
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 2.0073581421608697,
+        "rdXTBTools": 0.9816386320764914,
+        "tblite": 0.9816386442936464
+      },
+      "mixed_groups": [
+        {
+          "start": 3,
+          "stop": 5,
+          "size": 2,
+          "reference_span_ev": 5.7832152824843774e-05,
+          "candidate_span_ev": 5.783215318011514e-05,
+          "minimum_principal_cosine": 0.9999999999999997,
+          "projector_distance": 2.1455367113353652e-08
+        },
+        {
+          "start": 5,
+          "stop": 7,
+          "size": 2,
+          "reference_span_ev": 0.0007620456344090698,
+          "candidate_span_ev": 0.0007620455956693917,
+          "minimum_principal_cosine": 0.9999999999999998,
+          "projector_distance": 2.1506396347053428e-08
+        }
+      ]
+    },
+    {
+      "name": "ethyne",
+      "smiles": "C#C",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.076888883095762e-09,
+        "orbital_energies_ev": 1.0776655301469873e-07,
+        "occupations": 0.0,
+        "charges_e": 1.7007017594217189e-07,
+        "dipole_e_bohr": 4.842367082591448e-07,
+        "wiberg": 4.682069731920535e-09,
+        "wiberg_within_10_bohr": 4.682069731920535e-09,
+        "raw_coefficients_max_abs": 1.6516330587009886,
+        "reference_orthonormality_error": 1.1102230246251565e-15,
+        "candidate_orthonormality_error": 8.770761894538737e-15,
+        "sign_aligned_max_abs": 1.5463734315268596e-07,
+        "subspace_aligned_max_abs": 1.5463734315268596e-07,
+        "max_projector_distance": 3.619509576728371e-07,
+        "density_orthonormal_max_abs": 6.879011349436581e-08,
+        "density_trace_difference": 1.7763568394002505e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.003251016023568809,
+        "tblite_with_overlap": 0.0011155740357935429
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 2.0073581421608697,
+        "rdXTBTools": 0.9691703175903393,
+        "tblite": 0.9691703222724091
+      },
+      "mixed_groups": [
+        {
+          "start": 3,
+          "stop": 5,
+          "size": 2,
+          "reference_span_ev": 7.348985663924168e-05,
+          "candidate_span_ev": 7.349028849468198e-05,
+          "minimum_principal_cosine": 0.9999999999999993,
+          "projector_distance": 3.601866763107954e-08
+        },
+        {
+          "start": 5,
+          "stop": 7,
+          "size": 2,
+          "reference_span_ev": 0.0006282530653924923,
+          "candidate_span_ev": 0.0006282535988626492,
+          "minimum_principal_cosine": 0.9999999999999993,
+          "projector_distance": 3.5774649049254905e-08
+        }
+      ]
+    },
+    {
+      "name": "methanol",
+      "smiles": "CO",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 6.077188530184685e-09,
+        "orbital_energies_ev": 1.6984563266930763e-07,
+        "occupations": 0.0,
+        "charges_e": 3.2317799547598725e-09,
+        "dipole_e_bohr": 2.8979866284473133e-09,
+        "wiberg": 2.0323734917226943e-09,
+        "wiberg_within_10_bohr": 2.0323734917226943e-09,
+        "raw_coefficients_max_abs": 2.254498419173938,
+        "reference_orthonormality_error": 2.55351295663786e-15,
+        "candidate_orthonormality_error": 3.596476888323794e-12,
+        "sign_aligned_max_abs": 5.46812162910415e-08,
+        "subspace_aligned_max_abs": 5.46812162910415e-08,
+        "max_projector_distance": 5.8597762846334784e-08,
+        "density_orthonormal_max_abs": 5.593998153585744e-09,
+        "density_trace_difference": 8.881784197001252e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0028224859852343798,
+        "tblite_with_overlap": 0.0016124970279633999
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          5
+        ],
+        "distance_bohr": 1.851661199368133,
+        "rdXTBTools": 0.8810503462781982,
+        "tblite": 0.8810503483105717
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "methanol",
+      "smiles": "CO",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.1456171828713195e-09,
+        "orbital_energies_ev": 1.1728638558139437e-06,
+        "occupations": 0.0,
+        "charges_e": 2.659776947022685e-07,
+        "dipole_e_bohr": 2.4019351974047254e-07,
+        "wiberg": 7.712879557253416e-08,
+        "wiberg_within_10_bohr": 7.712879557253416e-08,
+        "raw_coefficients_max_abs": 2.060693919993862,
+        "reference_orthonormality_error": 1.5543122344752192e-15,
+        "candidate_orthonormality_error": 5.67323965583455e-14,
+        "sign_aligned_max_abs": 3.7421441639873265e-07,
+        "subspace_aligned_max_abs": 3.7421441639873265e-07,
+        "max_projector_distance": 4.282739390271511e-07,
+        "density_orthonormal_max_abs": 9.94640836360361e-08,
+        "density_trace_difference": 2.1316282072803006e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.003563322010450065,
+        "tblite_with_overlap": 0.0013774220133200288
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          5
+        ],
+        "distance_bohr": 1.851661199368133,
+        "rdXTBTools": 0.9031904170990548,
+        "tblite": 0.9031903399702592
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethanol",
+      "smiles": "CCO",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.586601569187224e-09,
+        "orbital_energies_ev": 2.8596486867371596e-07,
+        "occupations": 0.0,
+        "charges_e": 3.0326098708621796e-08,
+        "dipole_e_bohr": 8.068738910349538e-08,
+        "wiberg": 3.793979019839355e-09,
+        "wiberg_within_10_bohr": 3.793979019839355e-09,
+        "raw_coefficients_max_abs": 1.5430116103009865,
+        "reference_orthonormality_error": 2.886579864025407e-15,
+        "candidate_orthonormality_error": 7.474271601443042e-12,
+        "sign_aligned_max_abs": 3.368416417459663e-07,
+        "subspace_aligned_max_abs": 3.368416417459663e-07,
+        "max_projector_distance": 6.651947296006576e-07,
+        "density_orthonormal_max_abs": 1.5974972344956484e-08,
+        "density_trace_difference": 1.6058265828178264e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004588671959936619,
+        "tblite_with_overlap": 0.00265443604439497
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          5
+        ],
+        "distance_bohr": 2.0719564648944986,
+        "rdXTBTools": 0.9865987937008618,
+        "tblite": 0.9865987974948408
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ethanol",
+      "smiles": "CCO",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.520035983863636e-09,
+        "orbital_energies_ev": 2.3147413008572926e-07,
+        "occupations": 0.0,
+        "charges_e": 1.8894308645434066e-08,
+        "dipole_e_bohr": 5.194521446316713e-08,
+        "wiberg": 7.490670417276135e-09,
+        "wiberg_within_10_bohr": 7.490670417276135e-09,
+        "raw_coefficients_max_abs": 1.6023980094797978,
+        "reference_orthonormality_error": 1.5543122344752192e-15,
+        "candidate_orthonormality_error": 2.523758979577906e-12,
+        "sign_aligned_max_abs": 1.6547603670091782e-06,
+        "subspace_aligned_max_abs": 1.6547603670091782e-06,
+        "max_projector_distance": 2.0704795652917196e-06,
+        "density_orthonormal_max_abs": 1.0640607062128993e-08,
+        "density_trace_difference": 8.277822871605167e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004071490024216473,
+        "tblite_with_overlap": 0.002046825014986098
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          8
+        ],
+        "distance_bohr": 1.8472161596476424,
+        "rdXTBTools": 0.8977679569454735,
+        "tblite": 0.8977679644361439
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetone",
+      "smiles": "CC(=O)C",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.937893897747017e-09,
+        "orbital_energies_ev": 4.271488194262929e-07,
+        "occupations": 0.0,
+        "charges_e": 1.908326033861485e-07,
+        "dipole_e_bohr": 3.0457094646330063e-07,
+        "wiberg": 9.686160495903096e-08,
+        "wiberg_within_10_bohr": 9.686160495903096e-08,
+        "raw_coefficients_max_abs": 2.3980675536690264,
+        "reference_orthonormality_error": 2.4424906541753444e-15,
+        "candidate_orthonormality_error": 8.244738225471338e-12,
+        "sign_aligned_max_abs": 2.0339952291892338e-07,
+        "subspace_aligned_max_abs": 2.0339952291892338e-07,
+        "max_projector_distance": 4.508569221820789e-07,
+        "density_orthonormal_max_abs": 9.731201289220337e-08,
+        "density_trace_difference": 4.263256414560601e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.005686238058842719,
+        "tblite_with_overlap": 0.0033646889496594667
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 2.322147520858306,
+        "rdXTBTools": 1.7763669657495293,
+        "tblite": 1.7763668688879244
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetone",
+      "smiles": "CC(=O)C",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 6.8674186337602805e-09,
+        "orbital_energies_ev": 2.728404862040179e-07,
+        "occupations": 0.0,
+        "charges_e": 3.1463284921873225e-08,
+        "dipole_e_bohr": 8.270301937729485e-08,
+        "wiberg": 4.880854609368157e-09,
+        "wiberg_within_10_bohr": 4.880854609368157e-09,
+        "raw_coefficients_max_abs": 1.6125694823013932,
+        "reference_orthonormality_error": 1.7763568394002505e-15,
+        "candidate_orthonormality_error": 4.779006161083647e-13,
+        "sign_aligned_max_abs": 1.582531929389397e-07,
+        "subspace_aligned_max_abs": 1.582531929389397e-07,
+        "max_projector_distance": 2.442417614973014e-07,
+        "density_orthonormal_max_abs": 1.4371945245006401e-08,
+        "density_trace_difference": 1.2079226507921703e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004865764989517629,
+        "tblite_with_overlap": 0.0026812489377334714
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          5
+        ],
+        "distance_bohr": 2.1290682945053954,
+        "rdXTBTools": 0.9452777165456407,
+        "tblite": 0.9452777214264954
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetic_acid",
+      "smiles": "CC(=O)O",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.030432983384344e-08,
+        "orbital_energies_ev": 2.0392256239176731e-07,
+        "occupations": 0.0,
+        "charges_e": 6.166509880500826e-08,
+        "dipole_e_bohr": 7.542375501934373e-08,
+        "wiberg": 2.789143116466164e-08,
+        "wiberg_within_10_bohr": 2.789143116466164e-08,
+        "raw_coefficients_max_abs": 1.6559527673106587,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 1.91141036179827e-11,
+        "sign_aligned_max_abs": 5.464626282591922e-07,
+        "subspace_aligned_max_abs": 5.464626282591922e-07,
+        "max_projector_distance": 1.079778509990715e-06,
+        "density_orthonormal_max_abs": 3.044132967922053e-08,
+        "density_trace_difference": 3.339550858072471e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004600898013450205,
+        "tblite_with_overlap": 0.002788931946270168
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 2.3774933134239173,
+        "rdXTBTools": 1.7135033641771091,
+        "tblite": 1.7135033920685403
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetic_acid",
+      "smiles": "CC(=O)O",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.66764607362802e-09,
+        "orbital_energies_ev": 1.0540089707689049e-06,
+        "occupations": 0.0,
+        "charges_e": 6.700164578155032e-07,
+        "dipole_e_bohr": 9.401477268911052e-08,
+        "wiberg": 1.3368670714886122e-07,
+        "wiberg_within_10_bohr": 1.3368670714886122e-07,
+        "raw_coefficients_max_abs": 1.867130704028705,
+        "reference_orthonormality_error": 1.5543122344752192e-15,
+        "candidate_orthonormality_error": 6.363798377151397e-13,
+        "sign_aligned_max_abs": 1.9716361213117928e-06,
+        "subspace_aligned_max_abs": 1.9716361213117928e-06,
+        "max_projector_distance": 4.375058216513247e-06,
+        "density_orthonormal_max_abs": 3.533409167477686e-07,
+        "density_trace_difference": 5.968558980384842e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004235237021930516,
+        "tblite_with_overlap": 0.0021329320734366775
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          3
+        ],
+        "distance_bohr": 4.402756192354401,
+        "rdXTBTools": 0.17007017797813975,
+        "tblite": 0.1700700442914326
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetate",
+      "smiles": "CC(=O)[O-]",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 8.243304705501941e-09,
+        "orbital_energies_ev": 2.7630391130628595e-07,
+        "occupations": 0.0,
+        "charges_e": 7.181838696662668e-09,
+        "dipole_e_bohr": 1.2046724180703183e-08,
+        "wiberg": 2.6226028015940983e-09,
+        "wiberg_within_10_bohr": 2.6226028015940983e-09,
+        "raw_coefficients_max_abs": 1.7671280601961554,
+        "reference_orthonormality_error": 2.6645352591003757e-15,
+        "candidate_orthonormality_error": 3.2030960362124462e-12,
+        "sign_aligned_max_abs": 7.514648889261899e-08,
+        "subspace_aligned_max_abs": 7.514648889261899e-08,
+        "max_projector_distance": 1.0363937357329042e-07,
+        "density_orthonormal_max_abs": 5.101481015401532e-09,
+        "density_trace_difference": 9.237055564881302e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.003894770983606577,
+        "tblite_with_overlap": 0.0022712189238518476
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          3
+        ],
+        "distance_bohr": 2.580074021635495,
+        "rdXTBTools": 1.396793485848082,
+        "tblite": 1.3967934832254791
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetate",
+      "smiles": "CC(=O)[O-]",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.8622919851814e-09,
+        "orbital_energies_ev": 3.2566417651480606e-07,
+        "occupations": 0.0,
+        "charges_e": 4.235055495183104e-08,
+        "dipole_e_bohr": 3.981199933611457e-07,
+        "wiberg": 9.054767446947665e-08,
+        "wiberg_within_10_bohr": 9.054767446947665e-08,
+        "raw_coefficients_max_abs": 1.3409573566458861,
+        "reference_orthonormality_error": 2.1094237467877974e-15,
+        "candidate_orthonormality_error": 1.8954223699535013e-13,
+        "sign_aligned_max_abs": 5.017327401324323e-07,
+        "subspace_aligned_max_abs": 5.017327401324323e-07,
+        "max_projector_distance": 1.0678060584650104e-06,
+        "density_orthonormal_max_abs": 8.240680027249425e-08,
+        "density_trace_difference": 1.7408297026122455e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004028064897283912,
+        "tblite_with_overlap": 0.0019712629728019238
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          3
+        ],
+        "distance_bohr": 2.580074021635495,
+        "rdXTBTools": 1.4210829083659955,
+        "tblite": 1.42108299891367
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "methylammonium",
+      "smiles": "C[NH3+]",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.389694189896545e-09,
+        "orbital_energies_ev": 9.232293631811217e-07,
+        "occupations": 0.0,
+        "charges_e": 1.0438397812784217e-07,
+        "dipole_e_bohr": 1.7753284597965546e-07,
+        "wiberg": 3.23786406575266e-08,
+        "wiberg_within_10_bohr": 3.23786406575266e-08,
+        "raw_coefficients_max_abs": 1.4944753616524538,
+        "reference_orthonormality_error": 3.3306690738754696e-15,
+        "candidate_orthonormality_error": 5.6165311063251423e-14,
+        "sign_aligned_max_abs": 6.668067179443904e-06,
+        "subspace_aligned_max_abs": 6.668067179443904e-06,
+        "max_projector_distance": 9.150433123508354e-06,
+        "density_orthonormal_max_abs": 5.193096791478169e-08,
+        "density_trace_difference": 1.7763568394002505e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0034417170099914074,
+        "tblite_with_overlap": 0.0017904489068314433
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          5
+        ],
+        "distance_bohr": 1.9924783755005127,
+        "rdXTBTools": 0.8986576642070535,
+        "tblite": 0.8986576318284129
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "methylammonium",
+      "smiles": "C[NH3+]",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.501271603871373e-09,
+        "orbital_energies_ev": 1.8202647211751355e-06,
+        "occupations": 0.0,
+        "charges_e": 6.468740360587866e-07,
+        "dipole_e_bohr": 9.809117024195402e-08,
+        "wiberg": 9.851630400348199e-08,
+        "wiberg_within_10_bohr": 9.851630400348199e-08,
+        "raw_coefficients_max_abs": 2.2334055630221235,
+        "reference_orthonormality_error": 1.7763568394002505e-15,
+        "candidate_orthonormality_error": 1.9040995521744737e-14,
+        "sign_aligned_max_abs": 1.2569617938162914e-06,
+        "subspace_aligned_max_abs": 1.2569617938162914e-06,
+        "max_projector_distance": 1.4426304854450346e-06,
+        "density_orthonormal_max_abs": 1.1236974950534773e-07,
+        "density_trace_difference": 1.4210854715202004e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0032052319729700685,
+        "tblite_with_overlap": 0.0013927130494266748
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          7
+        ],
+        "distance_bohr": 1.99064518089014,
+        "rdXTBTools": 0.9070402280083069,
+        "tblite": 0.9070403265246109
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ammonium",
+      "smiles": "[NH4+]",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.90159743296681e-09,
+        "orbital_energies_ev": 6.333034612282518e-07,
+        "occupations": 0.0,
+        "charges_e": 6.16779862738781e-08,
+        "dipole_e_bohr": 4.648487293354431e-08,
+        "wiberg": 3.256079794677902e-08,
+        "wiberg_within_10_bohr": 3.256079794677902e-08,
+        "raw_coefficients_max_abs": 1.6148778361018148,
+        "reference_orthonormality_error": 2.6645352591003757e-15,
+        "candidate_orthonormality_error": 5.484501741648273e-14,
+        "sign_aligned_max_abs": 4.743328475609321e-06,
+        "subspace_aligned_max_abs": 4.743328475609321e-06,
+        "max_projector_distance": 6.420811873899107e-06,
+        "density_orthonormal_max_abs": 2.402387383471094e-08,
+        "density_trace_difference": 3.552713678800501e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.00202067696955055,
+        "tblite_with_overlap": 0.0010067420080304146
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          3
+        ],
+        "distance_bohr": 1.9703872393000128,
+        "rdXTBTools": 0.8920829457070348,
+        "tblite": 0.8920829782678328
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "ammonium",
+      "smiles": "[NH4+]",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.74553826737656e-09,
+        "orbital_energies_ev": 3.257622012142747e-07,
+        "occupations": 0.0,
+        "charges_e": 7.549855213229151e-08,
+        "dipole_e_bohr": 2.836016879670389e-09,
+        "wiberg": 1.2953615513566774e-08,
+        "wiberg_within_10_bohr": 1.2953615513566774e-08,
+        "raw_coefficients_max_abs": 2.276818030565936,
+        "reference_orthonormality_error": 1.3322676295501878e-15,
+        "candidate_orthonormality_error": 1.1102230246251565e-15,
+        "sign_aligned_max_abs": 5.3805798039263664e-08,
+        "subspace_aligned_max_abs": 5.3805798039263664e-08,
+        "max_projector_distance": 8.310590361053618e-08,
+        "density_orthonormal_max_abs": 1.4579047302731851e-08,
+        "density_trace_difference": 2.6645352591003757e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002749584964476526,
+        "tblite_with_overlap": 0.000951661029830575
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          3
+        ],
+        "distance_bohr": 1.9703872393000128,
+        "rdXTBTools": 0.9046153683727853,
+        "tblite": 0.9046153554191698
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "benzene",
+      "smiles": "c1ccccc1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 9.599007810834337e-09,
+        "orbital_energies_ev": 4.4146597222294304e-07,
+        "occupations": 0.0,
+        "charges_e": 1.9926499794653552e-07,
+        "dipole_e_bohr": 1.1031021130911145e-06,
+        "wiberg": 1.3983857294341817e-08,
+        "wiberg_within_10_bohr": 1.3983857294341817e-08,
+        "raw_coefficients_max_abs": 1.01806560259376,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 5.342282172193791e-11,
+        "sign_aligned_max_abs": 7.053849411964297e-06,
+        "subspace_aligned_max_abs": 7.053849411964297e-06,
+        "max_projector_distance": 1.1227773536361336e-05,
+        "density_orthonormal_max_abs": 1.2447883701582896e-07,
+        "density_trace_difference": 1.5702994460298214e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.007100756047293544,
+        "tblite_with_overlap": 0.003700246918015182
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          8
+        ],
+        "distance_bohr": 2.0612551299507573,
+        "rdXTBTools": 0.9730906286900134,
+        "tblite": 0.9730906426738707
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "benzene",
+      "smiles": "c1ccccc1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 9.302791426080148e-09,
+        "orbital_energies_ev": 1.6036114232065302e-06,
+        "occupations": 0.0,
+        "charges_e": 3.8800280782042007e-07,
+        "dipole_e_bohr": 1.4278807749876915e-06,
+        "wiberg": 8.489184577520348e-09,
+        "wiberg_within_10_bohr": 8.489184577520348e-09,
+        "raw_coefficients_max_abs": 1.3880340606415351,
+        "reference_orthonormality_error": 1.4082390854264637e-15,
+        "candidate_orthonormality_error": 9.852674232035952e-12,
+        "sign_aligned_max_abs": 1.3231515044592745e-06,
+        "subspace_aligned_max_abs": 1.3231515044592745e-06,
+        "max_projector_distance": 2.1239377502235646e-06,
+        "density_orthonormal_max_abs": 1.9533917527958522e-07,
+        "density_trace_difference": 2.504663143554353e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.005342764896340668,
+        "tblite_with_overlap": 0.0030075659742578864
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          4,
+          10
+        ],
+        "distance_bohr": 2.0259365093359274,
+        "rdXTBTools": 0.9728449953973057,
+        "tblite": 0.9728449869081212
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "pyridine",
+      "smiles": "c1ccncc1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.1084221540613726e-08,
+        "orbital_energies_ev": 2.6768955052602905e-07,
+        "occupations": 0.0,
+        "charges_e": 1.008468113461447e-07,
+        "dipole_e_bohr": 9.00433703154846e-08,
+        "wiberg": 8.131575524039647e-09,
+        "wiberg_within_10_bohr": 8.131575524039647e-09,
+        "raw_coefficients_max_abs": 1.0416268384214509,
+        "reference_orthonormality_error": 2.4424906541753444e-15,
+        "candidate_orthonormality_error": 5.721845219852639e-11,
+        "sign_aligned_max_abs": 9.676105601319485e-06,
+        "subspace_aligned_max_abs": 9.676105601319485e-06,
+        "max_projector_distance": 1.54087926375659e-05,
+        "density_orthonormal_max_abs": 4.094630601247928e-08,
+        "density_trace_difference": 1.4743761767022079e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.006566861062310636,
+        "tblite_with_overlap": 0.00415350089315325
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          6
+        ],
+        "distance_bohr": 2.028989413666696,
+        "rdXTBTools": 0.9747394071807612,
+        "tblite": 0.9747393990491857
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "pyridine",
+      "smiles": "c1ccncc1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 9.761709662825524e-09,
+        "orbital_energies_ev": 3.002649853200978e-07,
+        "occupations": 0.0,
+        "charges_e": 4.4607636175142407e-08,
+        "dipole_e_bohr": 4.788190768323375e-07,
+        "wiberg": 1.3921914732151208e-08,
+        "wiberg_within_10_bohr": 1.3921914732151208e-08,
+        "raw_coefficients_max_abs": 1.6753573283835597,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 6.24226184938575e-12,
+        "sign_aligned_max_abs": 2.3011694758323653e-06,
+        "subspace_aligned_max_abs": 2.3011694758323653e-06,
+        "max_projector_distance": 5.9347162702781445e-06,
+        "density_orthonormal_max_abs": 8.477398294459704e-08,
+        "density_trace_difference": 1.3820056210533949e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0059419970493763685,
+        "tblite_with_overlap": 0.003632819978520274
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          3
+        ],
+        "distance_bohr": 2.5438448783527865,
+        "rdXTBTools": 1.4434399628079095,
+        "tblite": 1.4434399488859948
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "pyrrole",
+      "smiles": "c1cc[nH]c1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.0715307752207082e-08,
+        "orbital_energies_ev": 1.9173239262926245e-07,
+        "occupations": 0.0,
+        "charges_e": 1.4586369889713069e-08,
+        "dipole_e_bohr": 2.321439496189015e-08,
+        "wiberg": 2.117705788506896e-09,
+        "wiberg_within_10_bohr": 2.117705788506896e-09,
+        "raw_coefficients_max_abs": 1.1223212588025695,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 9.144549045939145e-12,
+        "sign_aligned_max_abs": 1.883207112474139e-07,
+        "subspace_aligned_max_abs": 1.883207112474139e-07,
+        "max_projector_distance": 2.757830216903806e-07,
+        "density_orthonormal_max_abs": 5.764377197792214e-09,
+        "density_trace_difference": 1.4210854715202004e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.005790362018160522,
+        "tblite_with_overlap": 0.0032411490101367235
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          3,
+          4
+        ],
+        "distance_bohr": 2.5400626567013496,
+        "rdXTBTools": 1.2113066778697466,
+        "tblite": 1.2113066799874523
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "pyrrole",
+      "smiles": "c1cc[nH]c1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.0917661441567361e-08,
+        "orbital_energies_ev": 1.2655856274079724e-07,
+        "occupations": 0.0,
+        "charges_e": 3.0350063628947765e-08,
+        "dipole_e_bohr": 7.222267228712553e-09,
+        "wiberg": 1.6656884538335248e-08,
+        "wiberg_within_10_bohr": 1.6656884538335248e-08,
+        "raw_coefficients_max_abs": 1.9218442895763017,
+        "reference_orthonormality_error": 3.3306690738754696e-15,
+        "candidate_orthonormality_error": 2.4929915033049274e-12,
+        "sign_aligned_max_abs": 1.0067728288890021e-07,
+        "subspace_aligned_max_abs": 1.0067728288890021e-07,
+        "max_projector_distance": 2.856709601760217e-07,
+        "density_orthonormal_max_abs": 3.004302651099522e-08,
+        "density_trace_difference": 5.506706202140776e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.00511391693726182,
+        "tblite_with_overlap": 0.0033335379557684064
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          3
+        ],
+        "distance_bohr": 2.5400033686080663,
+        "rdXTBTools": 1.2499966625438255,
+        "tblite": 1.249996645886941
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "furan",
+      "smiles": "c1ccoc1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.0207676481854833e-08,
+        "orbital_energies_ev": 2.995148520312796e-07,
+        "occupations": 0.0,
+        "charges_e": 1.068573848850285e-07,
+        "dipole_e_bohr": 9.818654470028498e-08,
+        "wiberg": 4.579472379084848e-08,
+        "wiberg_within_10_bohr": 4.579472379084848e-08,
+        "raw_coefficients_max_abs": 1.2946650513977283,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 9.956813151745791e-12,
+        "sign_aligned_max_abs": 3.718078920300627e-07,
+        "subspace_aligned_max_abs": 3.718078920300627e-07,
+        "max_projector_distance": 5.395907290333629e-07,
+        "density_orthonormal_max_abs": 3.312178731285087e-08,
+        "density_trace_difference": 1.4885870314174099e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.00544232502579689,
+        "tblite_with_overlap": 0.003028691979125142
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          3,
+          4
+        ],
+        "distance_bohr": 2.471035003683092,
+        "rdXTBTools": 1.11855898113954,
+        "tblite": 1.1185590269342638
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "furan",
+      "smiles": "c1ccoc1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.023650320064462e-08,
+        "orbital_energies_ev": 1.075219209223377e-07,
+        "occupations": 0.0,
+        "charges_e": 2.9493337640185135e-08,
+        "dipole_e_bohr": 3.2864852034242276e-08,
+        "wiberg": 1.3812535559765138e-08,
+        "wiberg_within_10_bohr": 1.3812535559765138e-08,
+        "raw_coefficients_max_abs": 1.4508664919900953,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 2.284172850863797e-12,
+        "sign_aligned_max_abs": 3.448535232375427e-08,
+        "subspace_aligned_max_abs": 3.448535232375427e-08,
+        "max_projector_distance": 9.828745982975552e-08,
+        "density_orthonormal_max_abs": 1.733148291549469e-08,
+        "density_trace_difference": 1.4530598946294049e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004972259979695082,
+        "tblite_with_overlap": 0.003059205017052591
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          3
+        ],
+        "distance_bohr": 2.4817431767924067,
+        "rdXTBTools": 1.1651862968663087,
+        "tblite": 1.1651863106788443
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "thiophene",
+      "smiles": "c1ccsc1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.0998222776947841e-08,
+        "orbital_energies_ev": 1.9052243138695246e-07,
+        "occupations": 0.0,
+        "charges_e": 1.265527142108036e-07,
+        "dipole_e_bohr": 1.9315004226583277e-07,
+        "wiberg": 2.37792525670244e-08,
+        "wiberg_within_10_bohr": 2.37792525670244e-08,
+        "raw_coefficients_max_abs": 1.432909262631663,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 6.658540385728884e-11,
+        "sign_aligned_max_abs": 1.638743290677258e-06,
+        "subspace_aligned_max_abs": 1.638743290677258e-06,
+        "max_projector_distance": 2.8332423343396787e-06,
+        "density_orthonormal_max_abs": 2.9720545802192078e-08,
+        "density_trace_difference": 6.288303211476887e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.006853905972093344,
+        "tblite_with_overlap": 0.004028605995699763
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          3,
+          4
+        ],
+        "distance_bohr": 3.37690871453902,
+        "rdXTBTools": 1.1564127987901849,
+        "tblite": 1.1564128225694374
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "thiophene",
+      "smiles": "c1ccsc1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.565876648461199e-09,
+        "orbital_energies_ev": 5.298343968007657e-07,
+        "occupations": 0.0,
+        "charges_e": 3.57098054570848e-07,
+        "dipole_e_bohr": 1.9670210374411745e-07,
+        "wiberg": 7.603678708889561e-08,
+        "wiberg_within_10_bohr": 7.603678708889561e-08,
+        "raw_coefficients_max_abs": 1.3178312425077523,
+        "reference_orthonormality_error": 1.6653345369377348e-15,
+        "candidate_orthonormality_error": 8.980372001587966e-12,
+        "sign_aligned_max_abs": 1.6752164200273256e-06,
+        "subspace_aligned_max_abs": 1.6752164200273256e-06,
+        "max_projector_distance": 2.304826716952755e-06,
+        "density_orthonormal_max_abs": 1.6815027437111496e-07,
+        "density_trace_difference": 1.1723955140041653e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.006011479999870062,
+        "tblite_with_overlap": 0.003602334065362811
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          2,
+          3
+        ],
+        "distance_bohr": 3.4864251042391685,
+        "rdXTBTools": 1.1460427500536108,
+        "tblite": 1.1460426740168237
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "phenol",
+      "smiles": "Oc1ccccc1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.357558332415465e-08,
+        "orbital_energies_ev": 2.1760610202647968e-07,
+        "occupations": 0.0,
+        "charges_e": 1.2297154294849122e-08,
+        "dipole_e_bohr": 5.21342224946153e-09,
+        "wiberg": 3.912644539418241e-05,
+        "wiberg_within_10_bohr": 2.8195434875755154e-09,
+        "raw_coefficients_max_abs": 1.8185704331878463,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 3.5566660727681665e-11,
+        "sign_aligned_max_abs": 2.548944423863553e-07,
+        "subspace_aligned_max_abs": 2.548944423863553e-07,
+        "max_projector_distance": 4.398330177025666e-07,
+        "density_orthonormal_max_abs": 5.120014134885054e-09,
+        "density_trace_difference": 5.471179065352771e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.009608410997316241,
+        "tblite_with_overlap": 0.006183363031595945
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          7,
+          10
+        ],
+        "distance_bohr": 10.92707208925774,
+        "rdXTBTools": 0.0,
+        "tblite": 3.912644539418241e-05
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "phenol",
+      "smiles": "Oc1ccccc1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.2020283435276724e-08,
+        "orbital_energies_ev": 5.5395426024063e-07,
+        "occupations": 0.0,
+        "charges_e": 2.3541737348420355e-07,
+        "dipole_e_bohr": 5.602120294323498e-07,
+        "wiberg": 3.77074343877995e-05,
+        "wiberg_within_10_bohr": 5.888666287923172e-08,
+        "raw_coefficients_max_abs": 1.7342024174591284,
+        "reference_orthonormality_error": 2.4424906541753444e-15,
+        "candidate_orthonormality_error": 1.5729417768284293e-11,
+        "sign_aligned_max_abs": 2.721774483155359e-07,
+        "subspace_aligned_max_abs": 2.721774483155359e-07,
+        "max_projector_distance": 4.4276750078271845e-07,
+        "density_orthonormal_max_abs": 1.3125418796278154e-07,
+        "density_trace_difference": 1.8403056856186595e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.007136389031074941,
+        "tblite_with_overlap": 0.005007687956094742
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          7,
+          10
+        ],
+        "distance_bohr": 10.92707208925774,
+        "rdXTBTools": 0.0,
+        "tblite": 3.77074343877995e-05
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "aniline",
+      "smiles": "Nc1ccccc1",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.4645170409721686e-08,
+        "orbital_energies_ev": 5.737421862050951e-07,
+        "occupations": 0.0,
+        "charges_e": 2.135669188163547e-07,
+        "dipole_e_bohr": 2.343118039593861e-07,
+        "wiberg": 1.2146930636390476e-05,
+        "wiberg_within_10_bohr": 1.955967532385472e-08,
+        "raw_coefficients_max_abs": 1.1720286767270283,
+        "reference_orthonormality_error": 2.886579864025407e-15,
+        "candidate_orthonormality_error": 5.538769443091951e-11,
+        "sign_aligned_max_abs": 3.0617306459035376e-06,
+        "subspace_aligned_max_abs": 3.0617306459035376e-06,
+        "max_projector_distance": 4.664294818312075e-06,
+        "density_orthonormal_max_abs": 9.580469972902961e-08,
+        "density_trace_difference": 3.630873379734112e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.009603795944713056,
+        "tblite_with_overlap": 0.005663685966283083
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          7,
+          11
+        ],
+        "distance_bohr": 11.155896828798358,
+        "rdXTBTools": 0.0,
+        "tblite": 1.2146930636390476e-05
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "aniline",
+      "smiles": "Nc1ccccc1",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.376872305058896e-08,
+        "orbital_energies_ev": 3.0781186435291374e-06,
+        "occupations": 0.0,
+        "charges_e": 6.525264015233567e-07,
+        "dipole_e_bohr": 4.3591760984229566e-07,
+        "wiberg": 2.3048270416312054e-05,
+        "wiberg_within_10_bohr": 6.342076530607699e-08,
+        "raw_coefficients_max_abs": 1.1401613392599408,
+        "reference_orthonormality_error": 1.6653345369377348e-15,
+        "candidate_orthonormality_error": 1.4703793738135573e-11,
+        "sign_aligned_max_abs": 1.6338915843072677e-06,
+        "subspace_aligned_max_abs": 1.6338915843072677e-06,
+        "max_projector_distance": 2.7809909560382803e-06,
+        "density_orthonormal_max_abs": 1.899790518233857e-07,
+        "density_trace_difference": 2.6574298317427747e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.006887822994031012,
+        "tblite_with_overlap": 0.004625111003406346
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          7,
+          11
+        ],
+        "distance_bohr": 11.155896828798358,
+        "rdXTBTools": 0.0,
+        "tblite": 2.3048270416312054e-05
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetonitrile",
+      "smiles": "CC#N",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.341592057561684e-09,
+        "orbital_energies_ev": 4.04548956112194e-07,
+        "occupations": 0.0,
+        "charges_e": 1.9952312335647093e-07,
+        "dipole_e_bohr": 3.9461532352902395e-07,
+        "wiberg": 4.078538573537571e-08,
+        "wiberg_within_10_bohr": 4.078538573537571e-08,
+        "raw_coefficients_max_abs": 2.1764680878170517,
+        "reference_orthonormality_error": 3.1086244689504383e-15,
+        "candidate_orthonormality_error": 1.0520005766814068e-11,
+        "sign_aligned_max_abs": 3.5009592959378555e-06,
+        "subspace_aligned_max_abs": 3.5009592959378555e-06,
+        "max_projector_distance": 4.56549687417776e-06,
+        "density_orthonormal_max_abs": 7.915137523184512e-08,
+        "density_trace_difference": 5.043077067057311e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0028093839064240456,
+        "tblite_with_overlap": 0.0014937130035832524
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 2.1607634228381505,
+        "rdXTBTools": 2.8821471591601084,
+        "tblite": 2.882147199945494
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "acetonitrile",
+      "smiles": "CC#N",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.571944600684219e-09,
+        "orbital_energies_ev": 5.443268920046762e-07,
+        "occupations": 0.0,
+        "charges_e": 8.160167508375338e-07,
+        "dipole_e_bohr": 1.0352055246354297e-06,
+        "wiberg": 1.0663485339179601e-07,
+        "wiberg_within_10_bohr": 1.0663485339179601e-07,
+        "raw_coefficients_max_abs": 1.9739632405064826,
+        "reference_orthonormality_error": 1.1102230246251565e-15,
+        "candidate_orthonormality_error": 6.751854098381676e-13,
+        "sign_aligned_max_abs": 1.492611008985234e-06,
+        "subspace_aligned_max_abs": 1.492611008985234e-06,
+        "max_projector_distance": 2.367701227968585e-06,
+        "density_orthonormal_max_abs": 2.2794205978282633e-07,
+        "density_trace_difference": 4.973799150320701e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.003101650974713266,
+        "tblite_with_overlap": 0.0013344930484890938
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 2.1607634228381505,
+        "rdXTBTools": 2.862929767990652,
+        "tblite": 2.862929874625505
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "formamide",
+      "smiles": "NC=O",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 9.746681683964198e-09,
+        "orbital_energies_ev": 4.455031170635948e-07,
+        "occupations": 0.0,
+        "charges_e": 3.101118197235131e-07,
+        "dipole_e_bohr": 4.101587001148488e-07,
+        "wiberg": 1.5990340185290108e-07,
+        "wiberg_within_10_bohr": 1.5990340185290108e-07,
+        "raw_coefficients_max_abs": 1.8035429981677675,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 3.986608545598523e-12,
+        "sign_aligned_max_abs": 4.775719204541673e-07,
+        "subspace_aligned_max_abs": 4.775719204541673e-07,
+        "max_projector_distance": 8.019355774091174e-07,
+        "density_orthonormal_max_abs": 1.59287235734773e-07,
+        "density_trace_difference": 6.608047442568932e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002888086950406432,
+        "tblite_with_overlap": 0.0015660980716347694
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 2.394674410270952,
+        "rdXTBTools": 1.843095533046966,
+        "tblite": 1.843095692950368
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "formamide",
+      "smiles": "NC=O",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.2529573458268715e-09,
+        "orbital_energies_ev": 2.4270574172646775e-07,
+        "occupations": 3.8486112048183005e-24,
+        "charges_e": 5.565365346349438e-08,
+        "dipole_e_bohr": 2.3760920309090494e-07,
+        "wiberg": 6.420545939356259e-08,
+        "wiberg_within_10_bohr": 6.420545939356259e-08,
+        "raw_coefficients_max_abs": 2.0608027183429334,
+        "reference_orthonormality_error": 1.4432899320127035e-15,
+        "candidate_orthonormality_error": 1.0027248100236349e-13,
+        "sign_aligned_max_abs": 8.839010107175582e-08,
+        "subspace_aligned_max_abs": 8.839010107175582e-08,
+        "max_projector_distance": 2.0129667390492554e-07,
+        "density_orthonormal_max_abs": 8.912873861177673e-08,
+        "density_trace_difference": 1.2434497875801753e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.003922062925994396,
+        "tblite_with_overlap": 0.0018620979972183704
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 2.394674410270952,
+        "rdXTBTools": 1.900983475398243,
+        "tblite": 1.9009835396037025
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dimethyl_sulfide",
+      "smiles": "CSC",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 6.619906400828768e-09,
+        "orbital_energies_ev": 3.7597235214015257e-07,
+        "occupations": 0.0,
+        "charges_e": 1.1055212148503024e-07,
+        "dipole_e_bohr": 1.4595973071851454e-07,
+        "wiberg": 8.183786981419416e-09,
+        "wiberg_within_10_bohr": 8.183786981419416e-09,
+        "raw_coefficients_max_abs": 1.1863082872393313,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 3.2987057529965114e-11,
+        "sign_aligned_max_abs": 1.3338091467834934e-06,
+        "subspace_aligned_max_abs": 1.3338091467834934e-06,
+        "max_projector_distance": 2.1104046684754207e-06,
+        "density_orthonormal_max_abs": 4.0085558872249294e-08,
+        "density_trace_difference": 1.4566126083082054e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.005122608970850706,
+        "tblite_with_overlap": 0.0029213459929451346
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 3.4033964764335667,
+        "rdXTBTools": 0.9873267534500155,
+        "tblite": 0.9873267616338025
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dimethyl_sulfide",
+      "smiles": "CSC",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.6161365579137055e-09,
+        "orbital_energies_ev": 3.1055280835801113e-07,
+        "occupations": 0.0,
+        "charges_e": 4.367805137017733e-08,
+        "dipole_e_bohr": 1.396659167207659e-07,
+        "wiberg": 4.894077365591443e-09,
+        "wiberg_within_10_bohr": 4.894077365591443e-09,
+        "raw_coefficients_max_abs": 1.8009487909810074,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 1.7832402221529264e-12,
+        "sign_aligned_max_abs": 1.7161654387864989e-07,
+        "subspace_aligned_max_abs": 1.7161654387864989e-07,
+        "max_projector_distance": 5.03857522644986e-07,
+        "density_orthonormal_max_abs": 3.2650781855991795e-08,
+        "density_trace_difference": 7.496225862269057e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004347311914898455,
+        "tblite_with_overlap": 0.002281106892041862
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.416507327337752,
+        "rdXTBTools": 1.0046653272433632,
+        "tblite": 1.0046653321374406
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dimethyl_sulfoxide",
+      "smiles": "CS(C)=O",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 8.612126123352937e-09,
+        "orbital_energies_ev": 3.010277040971232e-07,
+        "occupations": 0.0,
+        "charges_e": 1.1234014862804287e-07,
+        "dipole_e_bohr": 2.651125361463613e-07,
+        "wiberg": 9.161243963440313e-08,
+        "wiberg_within_10_bohr": 9.161243963440313e-08,
+        "raw_coefficients_max_abs": 1.287461177420286,
+        "reference_orthonormality_error": 3.3306690738754696e-15,
+        "candidate_orthonormality_error": 7.722352822134789e-12,
+        "sign_aligned_max_abs": 8.422347853379031e-07,
+        "subspace_aligned_max_abs": 8.422347853379031e-07,
+        "max_projector_distance": 1.8480332222514645e-06,
+        "density_orthonormal_max_abs": 4.6634074823970195e-08,
+        "density_trace_difference": 5.542233338928781e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.006204152014106512,
+        "tblite_with_overlap": 0.0038936929777264595
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          3
+        ],
+        "distance_bohr": 2.8462746114171904,
+        "rdXTBTools": 1.676372056865697,
+        "tblite": 1.6763719652532574
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dimethyl_sulfoxide",
+      "smiles": "CS(C)=O",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.5033327350220134e-09,
+        "orbital_energies_ev": 2.5097898515014094e-07,
+        "occupations": 0.0,
+        "charges_e": 3.502205092598132e-08,
+        "dipole_e_bohr": 2.983718871973906e-08,
+        "wiberg": 1.534434734828949e-08,
+        "wiberg_within_10_bohr": 1.534434734828949e-08,
+        "raw_coefficients_max_abs": 1.771470933358723,
+        "reference_orthonormality_error": 1.6653345369377348e-15,
+        "candidate_orthonormality_error": 4.5263248600943147e-13,
+        "sign_aligned_max_abs": 6.264299306363297e-08,
+        "subspace_aligned_max_abs": 6.264299306363297e-08,
+        "max_projector_distance": 9.022937665107916e-08,
+        "density_orthonormal_max_abs": 1.607636135325663e-08,
+        "density_trace_difference": 9.947598300641403e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.00477382296230644,
+        "tblite_with_overlap": 0.002991404035128653
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          3
+        ],
+        "distance_bohr": 2.8462746114171904,
+        "rdXTBTools": 1.759803598011623,
+        "tblite": 1.7598035826672755
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dimethyl_sulfone",
+      "smiles": "CS(C)(=O)=O",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.2266294646678944e-08,
+        "orbital_energies_ev": 4.777094098074031e-07,
+        "occupations": 0.0,
+        "charges_e": 9.424929381385283e-08,
+        "dipole_e_bohr": 1.0184240861743632e-07,
+        "wiberg": 1.9610455925800352e-08,
+        "wiberg_within_10_bohr": 1.9610455925800352e-08,
+        "raw_coefficients_max_abs": 2.198257549874782,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 1.6505352640194815e-11,
+        "sign_aligned_max_abs": 8.203620758817642e-07,
+        "subspace_aligned_max_abs": 8.203620758817642e-07,
+        "max_projector_distance": 1.4159310150432968e-06,
+        "density_orthonormal_max_abs": 1.1947155154068412e-08,
+        "density_trace_difference": 7.062794793455396e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.007709407014772296,
+        "tblite_with_overlap": 0.004789639031514525
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          4
+        ],
+        "distance_bohr": 2.8266905413370615,
+        "rdXTBTools": 1.649736067733656,
+        "tblite": 1.6497360481232002
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dimethyl_sulfone",
+      "smiles": "CS(C)(=O)=O",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.1973011027066605e-08,
+        "orbital_energies_ev": 2.3142844547408004e-06,
+        "occupations": 0.0,
+        "charges_e": 2.283244822098851e-07,
+        "dipole_e_bohr": 7.495302950522031e-08,
+        "wiberg": 9.71566289642567e-08,
+        "wiberg_within_10_bohr": 9.71566289642567e-08,
+        "raw_coefficients_max_abs": 1.727529066704025,
+        "reference_orthonormality_error": 1.887379141862766e-15,
+        "candidate_orthonormality_error": 2.7423725172229844e-12,
+        "sign_aligned_max_abs": 1.4505727188390827e-05,
+        "subspace_aligned_max_abs": 1.4505727188390827e-05,
+        "max_projector_distance": 4.144764372997775e-05,
+        "density_orthonormal_max_abs": 1.332701935474745e-07,
+        "density_trace_difference": 1.794120407794253e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0059341550804674625,
+        "tblite_with_overlap": 0.003470005001872778
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.3717180003879217,
+        "rdXTBTools": 0.8035192928405978,
+        "tblite": 0.8035193899972267
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "phosphine",
+      "smiles": "P",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.3782513736136934e-09,
+        "orbital_energies_ev": 2.7198970897757135e-07,
+        "occupations": 0.0,
+        "charges_e": 2.7777148338403723e-08,
+        "dipole_e_bohr": 7.368974295996963e-08,
+        "wiberg": 4.027858824251496e-09,
+        "wiberg_within_10_bohr": 4.027858824251496e-09,
+        "raw_coefficients_max_abs": 1.6762218575173187,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 3.021138894609976e-12,
+        "sign_aligned_max_abs": 0.014969224127224595,
+        "subspace_aligned_max_abs": 4.59611072473054e-06,
+        "max_projector_distance": 4.835116661994677e-06,
+        "density_orthonormal_max_abs": 1.0767844310644037e-08,
+        "density_trace_difference": 7.105427357601002e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0022342560114338994,
+        "tblite_with_overlap": 0.001127645024098456
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 2.7296095850447535,
+        "rdXTBTools": 0.9690864944851032,
+        "tblite": 0.969086498512962
+      },
+      "mixed_groups": [
+        {
+          "start": 10,
+          "stop": 12,
+          "size": 2,
+          "reference_span_ev": 2.4424906541753444e-15,
+          "candidate_span_ev": 3.608224830031759e-15,
+          "minimum_principal_cosine": 1.0,
+          "projector_distance": 2.6217120186646302e-15
+        }
+      ]
+    },
+    {
+      "name": "phosphine",
+      "smiles": "P",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.992766923171075e-09,
+        "orbital_energies_ev": 4.4301206969521445e-07,
+        "occupations": 0.0,
+        "charges_e": 8.286157465731137e-08,
+        "dipole_e_bohr": 8.527823314175009e-08,
+        "wiberg": 6.912841077344467e-09,
+        "wiberg_within_10_bohr": 6.912841077344467e-09,
+        "raw_coefficients_max_abs": 1.6099335008691567,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 2.220446049250313e-15,
+        "sign_aligned_max_abs": 3.2959416335076597e-07,
+        "subspace_aligned_max_abs": 3.2959416335076597e-07,
+        "max_projector_distance": 4.2575212138620857e-07,
+        "density_orthonormal_max_abs": 4.1384772414554405e-08,
+        "density_trace_difference": 5.329070518200751e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004661432933062315,
+        "tblite_with_overlap": 0.0014113819925114512
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          3
+        ],
+        "distance_bohr": 2.760095041486593,
+        "rdXTBTools": 0.9396672866409749,
+        "tblite": 0.9396672797281338
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "trimethylphosphine",
+      "smiles": "CP(C)C",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 7.003329471899633e-09,
+        "orbital_energies_ev": 2.3601853449406462e-07,
+        "occupations": 0.0,
+        "charges_e": 5.0272607826640225e-08,
+        "dipole_e_bohr": 1.3252102062932813e-07,
+        "wiberg": 1.6036729166835073e-08,
+        "wiberg_within_10_bohr": 1.6036729166835073e-08,
+        "raw_coefficients_max_abs": 1.8484672143258325,
+        "reference_orthonormality_error": 3.1086244689504383e-15,
+        "candidate_orthonormality_error": 7.693290449140022e-11,
+        "sign_aligned_max_abs": 5.849296146887006e-07,
+        "subspace_aligned_max_abs": 5.849296146887006e-07,
+        "max_projector_distance": 1.19945581747939e-06,
+        "density_orthonormal_max_abs": 1.6816471548608547e-08,
+        "density_trace_difference": 2.9771740628348198e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.008048787014558911,
+        "tblite_with_overlap": 0.004573213984258473
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.4160750375727322,
+        "rdXTBTools": 0.9922822550831517,
+        "tblite": 0.9922822390464225
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "trimethylphosphine",
+      "smiles": "CP(C)C",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 6.0131437606969484e-09,
+        "orbital_energies_ev": 8.496380843325824e-07,
+        "occupations": 0.0,
+        "charges_e": 1.9733688105816327e-07,
+        "dipole_e_bohr": 3.030110653501339e-07,
+        "wiberg": 3.3190651116399295e-08,
+        "wiberg_within_10_bohr": 3.3190651116399295e-08,
+        "raw_coefficients_max_abs": 1.8194084736661917,
+        "reference_orthonormality_error": 1.2606868977762859e-15,
+        "candidate_orthonormality_error": 9.87465664792353e-12,
+        "sign_aligned_max_abs": 3.0491162103518654e-07,
+        "subspace_aligned_max_abs": 3.0491162103518654e-07,
+        "max_projector_distance": 5.665652430918271e-07,
+        "density_orthonormal_max_abs": 9.091596608890029e-08,
+        "density_trace_difference": 9.631406783228158e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.005274183000437915,
+        "tblite_with_overlap": 0.0032419569324702024
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          1,
+          2
+        ],
+        "distance_bohr": 3.4569908479354576,
+        "rdXTBTools": 1.0307440569088278,
+        "tblite": 1.0307440900994789
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dihydrogen_phosphate",
+      "smiles": "OP(=O)(O)[O-]",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 5.930786528551835e-09,
+        "orbital_energies_ev": 3.5989362956456716e-07,
+        "occupations": 0.0,
+        "charges_e": 2.3156654815892352e-08,
+        "dipole_e_bohr": 8.087792613409306e-08,
+        "wiberg": 3.930670744445308e-08,
+        "wiberg_within_10_bohr": 3.930670744445308e-08,
+        "raw_coefficients_max_abs": 1.2786106890458488,
+        "reference_orthonormality_error": 1.5543122344752192e-15,
+        "candidate_orthonormality_error": 4.664046926450283e-12,
+        "sign_aligned_max_abs": 1.6330575319800644e-07,
+        "subspace_aligned_max_abs": 1.6330575319800644e-07,
+        "max_projector_distance": 2.564117460750702e-07,
+        "density_orthonormal_max_abs": 2.3022930006888487e-08,
+        "density_trace_difference": 2.504663143554353e-12
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004614353994838893,
+        "tblite_with_overlap": 0.0029356569284573197
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.2073954073268327,
+        "rdXTBTools": 1.0918030876021931,
+        "tblite": 1.0918030482954857
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "dihydrogen_phosphate",
+      "smiles": "OP(=O)(O)[O-]",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.838491670014264e-08,
+        "orbital_energies_ev": 5.083501832814363e-07,
+        "occupations": 0.0,
+        "charges_e": 2.425916256765248e-07,
+        "dipole_e_bohr": 7.875163721138279e-08,
+        "wiberg": 3.902286893620044e-08,
+        "wiberg_within_10_bohr": 3.902286893620044e-08,
+        "raw_coefficients_max_abs": 2.0644030844749413,
+        "reference_orthonormality_error": 1.5543122344752192e-15,
+        "candidate_orthonormality_error": 1.995459353310025e-11,
+        "sign_aligned_max_abs": 6.928703388808799e-08,
+        "subspace_aligned_max_abs": 6.928703388808799e-08,
+        "max_projector_distance": 1.3311799425636756e-07,
+        "density_orthonormal_max_abs": 2.0514648424452275e-08,
+        "density_trace_difference": 5.785238954558736e-11
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.004550247918814421,
+        "tblite_with_overlap": 0.002645064960233867
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.2073954073268327,
+        "rdXTBTools": 1.1398061379265836,
+        "tblite": 1.1398060989037146
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "hydrogen_fluoride",
+      "smiles": "F",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.8796707240985597e-09,
+        "orbital_energies_ev": 2.969910930517017e-07,
+        "occupations": 0.0,
+        "charges_e": 2.363350287692967e-08,
+        "dipole_e_bohr": 3.331440723286505e-08,
+        "wiberg": 1.8667873358246823e-08,
+        "wiberg_within_10_bohr": 1.8667873358246823e-08,
+        "raw_coefficients_max_abs": 1.7925390931696548,
+        "reference_orthonormality_error": 1.7763568394002505e-15,
+        "candidate_orthonormality_error": 4.951594689828198e-14,
+        "sign_aligned_max_abs": 0.5283073470458366,
+        "subspace_aligned_max_abs": 1.1325176740850651e-08,
+        "max_projector_distance": 1.1208581931813436e-08,
+        "density_orthonormal_max_abs": 1.4169571849187435e-08,
+        "density_trace_difference": 8.881784197001252e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0014443970285356045,
+        "tblite_with_overlap": 0.0006469980580732226
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 1.8434531787619621,
+        "rdXTBTools": 0.8491337449314776,
+        "tblite": 0.8491337262636043
+      },
+      "mixed_groups": [
+        {
+          "start": 2,
+          "stop": 4,
+          "size": 2,
+          "reference_span_ev": 0.0,
+          "candidate_span_ev": 1.2434497875801753e-14,
+          "minimum_principal_cosine": 1.0000000000000002,
+          "projector_distance": 2.002820859746993e-15
+        }
+      ]
+    },
+    {
+      "name": "hydrogen_fluoride",
+      "smiles": "F",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.431003037235314e-09,
+        "orbital_energies_ev": 1.1210491415170054e-06,
+        "occupations": 0.0,
+        "charges_e": 4.59068960623199e-09,
+        "dipole_e_bohr": 1.52593312430227e-07,
+        "wiberg": 9.167785419705865e-08,
+        "wiberg_within_10_bohr": 9.167785419705865e-08,
+        "raw_coefficients_max_abs": 1.7990525255545649,
+        "reference_orthonormality_error": 6.661338147750939e-16,
+        "candidate_orthonormality_error": 8.881784197001252e-16,
+        "sign_aligned_max_abs": 0.5092302737384543,
+        "subspace_aligned_max_abs": 5.155734600359452e-08,
+        "max_projector_distance": 5.149553867974248e-08,
+        "density_orthonormal_max_abs": 6.516952733015557e-08,
+        "density_trace_difference": 5.329070518200751e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0025421049213036895,
+        "tblite_with_overlap": 0.0009101539617404342
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 1.8434531787619621,
+        "rdXTBTools": 0.8509781028407735,
+        "tblite": 0.8509780111629193
+      },
+      "mixed_groups": [
+        {
+          "start": 2,
+          "stop": 4,
+          "size": 2,
+          "reference_span_ev": 7.105427357601002e-15,
+          "candidate_span_ev": 3.552713678800501e-15,
+          "minimum_principal_cosine": 0.9999999999999997,
+          "projector_distance": 3.0436549059082408e-15
+        }
+      ]
+    },
+    {
+      "name": "fluoromethane",
+      "smiles": "CF",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.161220701348611e-09,
+        "orbital_energies_ev": 3.4192330566895635e-07,
+        "occupations": 0.0,
+        "charges_e": 1.0261285654511454e-07,
+        "dipole_e_bohr": 1.543735539399904e-08,
+        "wiberg": 1.822492079472937e-08,
+        "wiberg_within_10_bohr": 1.822492079472937e-08,
+        "raw_coefficients_max_abs": 1.7624479191823348,
+        "reference_orthonormality_error": 2.4424906541753444e-15,
+        "candidate_orthonormality_error": 2.2382096176443156e-13,
+        "sign_aligned_max_abs": 7.282961787535847e-07,
+        "subspace_aligned_max_abs": 7.282961787535847e-07,
+        "max_projector_distance": 9.517455386740144e-07,
+        "density_orthonormal_max_abs": 2.132568788226763e-08,
+        "density_trace_difference": 1.2612133559741778e-13
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002186479978263378,
+        "tblite_with_overlap": 0.0011389170540496707
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 2.6223553025578177,
+        "rdXTBTools": 0.9212580369523705,
+        "tblite": 0.9212580187274497
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "fluoromethane",
+      "smiles": "CF",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.839140561012755e-09,
+        "orbital_energies_ev": 1.2849688140192939e-06,
+        "occupations": 0.0,
+        "charges_e": 9.841118663034276e-08,
+        "dipole_e_bohr": 1.0251810145245344e-07,
+        "wiberg": 6.690787923702146e-09,
+        "wiberg_within_10_bohr": 6.690787923702146e-09,
+        "raw_coefficients_max_abs": 1.804574468366405,
+        "reference_orthonormality_error": 1.5543122344752192e-15,
+        "candidate_orthonormality_error": 6.439293542825908e-14,
+        "sign_aligned_max_abs": 2.11640457936646e-06,
+        "subspace_aligned_max_abs": 2.11640457936646e-06,
+        "max_projector_distance": 4.078452725112714e-06,
+        "density_orthonormal_max_abs": 3.913195067983821e-08,
+        "density_trace_difference": 2.842170943040401e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002771995961666107,
+        "tblite_with_overlap": 0.0011092009954154491
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          2
+        ],
+        "distance_bohr": 2.09410410026106,
+        "rdXTBTools": 0.9808950655084708,
+        "tblite": 0.9808950588176829
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "chloromethane",
+      "smiles": "CCl",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 3.976364126856424e-09,
+        "orbital_energies_ev": 1.6168842797981142e-07,
+        "occupations": 0.0,
+        "charges_e": 2.065172893805922e-09,
+        "dipole_e_bohr": 1.3521662123316958e-09,
+        "wiberg": 2.225937212330109e-10,
+        "wiberg_within_10_bohr": 2.225937212330109e-10,
+        "raw_coefficients_max_abs": 2.323406681181737,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 1.0658141036401503e-14,
+        "sign_aligned_max_abs": 1.141940508819772e-08,
+        "subspace_aligned_max_abs": 1.141940508819772e-08,
+        "max_projector_distance": 1.7137761268893763e-08,
+        "density_orthonormal_max_abs": 2.0819084234346974e-09,
+        "density_trace_difference": 1.0658141036401503e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0026712269755080342,
+        "tblite_with_overlap": 0.001524094957858324
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          4
+        ],
+        "distance_bohr": 2.105911281554821,
+        "rdXTBTools": 0.9954609399596066,
+        "tblite": 0.9954609401822003
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "chloromethane",
+      "smiles": "CCl",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.096911089211062e-09,
+        "orbital_energies_ev": 1.0627345847780134e-07,
+        "occupations": 0.0,
+        "charges_e": 1.4864418293458748e-08,
+        "dipole_e_bohr": 2.052256167783817e-08,
+        "wiberg": 3.933909753506271e-09,
+        "wiberg_within_10_bohr": 3.933909753506271e-09,
+        "raw_coefficients_max_abs": 1.9629512544329049,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 1.0093037516867298e-12,
+        "sign_aligned_max_abs": 1.1343581327039054e-06,
+        "subspace_aligned_max_abs": 1.2621431177972653e-07,
+        "max_projector_distance": 1.7081965761485467e-07,
+        "density_orthonormal_max_abs": 1.0383077175823985e-08,
+        "density_trace_difference": 2.842170943040401e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0031952719436958432,
+        "tblite_with_overlap": 0.001423913985490799
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.34651394501225,
+        "rdXTBTools": 0.9759592991887998,
+        "tblite": 0.97595929525489
+      },
+      "mixed_groups": [
+        {
+          "start": 10,
+          "stop": 12,
+          "size": 2,
+          "reference_span_ev": 0.0007309035027327493,
+          "candidate_span_ev": 0.0007309040705315573,
+          "minimum_principal_cosine": 0.9999999999999998,
+          "projector_distance": 8.971833827526318e-09
+        }
+      ]
+    },
+    {
+      "name": "bromomethane",
+      "smiles": "CBr",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.944140208351655e-09,
+        "orbital_energies_ev": 2.685913997879652e-07,
+        "occupations": 0.0,
+        "charges_e": 7.45744159480477e-09,
+        "dipole_e_bohr": 5.68012683554997e-08,
+        "wiberg": 3.904777057250897e-09,
+        "wiberg_within_10_bohr": 3.904777057250897e-09,
+        "raw_coefficients_max_abs": 1.5082991859586774,
+        "reference_orthonormality_error": 2.3314683517128287e-15,
+        "candidate_orthonormality_error": 2.0699135517546836e-13,
+        "sign_aligned_max_abs": 3.6322714243308685e-07,
+        "subspace_aligned_max_abs": 3.6322714243308685e-07,
+        "max_projector_distance": 6.331060814256602e-07,
+        "density_orthonormal_max_abs": 2.1120996840373607e-08,
+        "density_trace_difference": 5.861977570020827e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.002566161099821329,
+        "tblite_with_overlap": 0.0013473869767040014
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.639176568129831,
+        "rdXTBTools": 0.9904398137651095,
+        "tblite": 0.9904398098603324
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "bromomethane",
+      "smiles": "CBr",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 2.230087225996158e-09,
+        "orbital_energies_ev": 2.0706301961936902e-07,
+        "occupations": 0.0,
+        "charges_e": 2.4560760265857073e-08,
+        "dipole_e_bohr": 1.4535763259715395e-07,
+        "wiberg": 1.2376032754168875e-08,
+        "wiberg_within_10_bohr": 1.2376032754168875e-08,
+        "raw_coefficients_max_abs": 1.4863589859276947,
+        "reference_orthonormality_error": 1.9984014443252818e-15,
+        "candidate_orthonormality_error": 4.6818087646202665e-15,
+        "sign_aligned_max_abs": 5.465358365874806e-08,
+        "subspace_aligned_max_abs": 5.465358365874806e-08,
+        "max_projector_distance": 1.2066898534519648e-07,
+        "density_orthonormal_max_abs": 3.7483191550613526e-08,
+        "density_trace_difference": 7.105427357601002e-15
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0030293139861896634,
+        "tblite_with_overlap": 0.0013820009771734476
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 3.639176568129831,
+        "rdXTBTools": 0.9971227944958673,
+        "tblite": 0.9971227821198345
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "iodomethane",
+      "smiles": "CI",
+      "method": "GFN1-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 4.459852043225965e-09,
+        "orbital_energies_ev": 1.2448904485040657e-07,
+        "occupations": 0.0,
+        "charges_e": 2.090172913221666e-09,
+        "dipole_e_bohr": 2.7506747546368615e-08,
+        "wiberg": 1.2521018666333816e-09,
+        "wiberg_within_10_bohr": 1.2521018666333816e-09,
+        "raw_coefficients_max_abs": 1.5267409512138548,
+        "reference_orthonormality_error": 2.220446049250313e-15,
+        "candidate_orthonormality_error": 4.860832115133604e-14,
+        "sign_aligned_max_abs": 8.184174166148139e-08,
+        "subspace_aligned_max_abs": 8.184174166148139e-08,
+        "max_projector_distance": 1.0052817131878838e-07,
+        "density_orthonormal_max_abs": 1.0687717599822122e-08,
+        "density_trace_difference": 1.0658141036401503e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0025414370466023684,
+        "tblite_with_overlap": 0.0013449069811031222
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 4.013965006905358,
+        "rdXTBTools": 0.9958249936903378,
+        "tblite": 0.995824992438236
+      },
+      "mixed_groups": []
+    },
+    {
+      "name": "iodomethane",
+      "smiles": "CI",
+      "method": "GFN2-xTB",
+      "status": "within_limits",
+      "exceeded": [],
+      "differences": {
+        "energy_eh": 1.7176970956711557e-09,
+        "orbital_energies_ev": 1.9747233359623806e-07,
+        "occupations": 0.0,
+        "charges_e": 6.46078044952425e-08,
+        "dipole_e_bohr": 5.998902952164542e-08,
+        "wiberg": 4.341534687313242e-09,
+        "wiberg_within_10_bohr": 4.341534687313242e-09,
+        "raw_coefficients_max_abs": 1.5022195870275385,
+        "reference_orthonormality_error": 1.7763568394002505e-15,
+        "candidate_orthonormality_error": 7.041438881309626e-13,
+        "sign_aligned_max_abs": 1.7189770051828646e-07,
+        "subspace_aligned_max_abs": 1.7189770051828646e-07,
+        "max_projector_distance": 2.5332397003302915e-07,
+        "density_orthonormal_max_abs": 1.516115458177758e-08,
+        "density_trace_difference": 1.5987211554602254e-14
+      },
+      "timings_seconds": {
+        "rdXTBTools": 0.0029185559833422303,
+        "tblite_with_overlap": 0.0013417109148576856
+      },
+      "engines": {
+        "rdXTBTools": {
+          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+          "api_version": 10000,
+          "source_commit": "",
+          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "tblite": {
+          "backend": "tblite",
+          "package": "tblite",
+          "version": "0.8.0",
+          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
+        }
+      },
+      "largest_wiberg_difference": {
+        "atoms": [
+          0,
+          1
+        ],
+        "distance_bohr": 4.013965006905358,
+        "rdXTBTools": 0.9971446631406016,
+        "tblite": 0.9971446674821363
+      },
+      "mixed_groups": []
+    }
+  ],
+  "summary": {
+    "GFN1-xTB": {
+      "counts": {
+        "within_limits": 33,
+        "outside_limits": 0,
+        "error": 0
+      },
+      "maxima": {
+        "energy_eh": 1.4645170409721686e-08,
+        "orbital_energies_ev": 9.477888598397044e-07,
+        "occupations": 0.0,
+        "charges_e": 3.101118197235131e-07,
+        "dipole_e_bohr": 1.1031021130911145e-06,
+        "wiberg": 3.912644539418241e-05,
+        "wiberg_within_10_bohr": 1.5990340185290108e-07,
+        "raw_coefficients_max_abs": 2.5492141024588886,
+        "reference_orthonormality_error": 3.3306690738754696e-15,
+        "candidate_orthonormality_error": 7.693290449140022e-11,
+        "sign_aligned_max_abs": 0.5283073470458366,
+        "subspace_aligned_max_abs": 1.3997410366978214e-05,
+        "max_projector_distance": 2.3936234533605796e-05,
+        "density_orthonormal_max_abs": 1.59287235734773e-07,
+        "density_trace_difference": 7.062794793455396e-12
+      }
+    },
+    "GFN2-xTB": {
+      "counts": {
+        "within_limits": 33,
+        "outside_limits": 0,
+        "error": 0
+      },
+      "maxima": {
+        "energy_eh": 1.838491670014264e-08,
+        "orbital_energies_ev": 3.0781186435291374e-06,
+        "occupations": 3.8486112048183005e-24,
+        "charges_e": 8.160167508375338e-07,
+        "dipole_e_bohr": 1.4278807749876915e-06,
+        "wiberg": 3.77074343877995e-05,
+        "wiberg_within_10_bohr": 1.3368670714886122e-07,
+        "raw_coefficients_max_abs": 2.276818030565936,
+        "reference_orthonormality_error": 3.3306690738754696e-15,
+        "candidate_orthonormality_error": 1.995459353310025e-11,
+        "sign_aligned_max_abs": 0.5092302737384543,
+        "subspace_aligned_max_abs": 1.4505727188390827e-05,
+        "max_projector_distance": 4.144764372997775e-05,
+        "density_orthonormal_max_abs": 3.533409167477686e-07,
+        "density_trace_difference": 5.785238954558736e-11
+      }
+    }
+  },
+  "full_report_sha256": "586ec2c1c4a7ae2a74b83cbc3fbc78108fc9e67e09392ef7df93047be9bfe494"
+}

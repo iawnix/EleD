@@ -1,0 +1,23 @@
+{
+  "base_commit": "26b28010e805f7d1aeeef39813feb473e69cc4be",
+  "library_sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
+  "source_patch_sha256": "28e58b7467f9530154677bb7749b5fb412e2a73c1a55785c9520e4d386e7ae43",
+  "diagnostic_only": true,
+  "comparison_command": [
+    "/home/iaw/project/rdkit_eth/.rdxtb-build-env/bin/python",
+    "/home/iaw/project/rdkit_eth/tools/compare_orbitals.py",
+    "--library",
+    "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+    "--accuracy",
+    "0.01",
+    "--case",
+    "water",
+    "--case",
+    "bromomethane",
+    "--case",
+    "iodomethane",
+    "--output",
+    "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/comparison"
+  ],
+  "comparison_exit_code": 0
+}

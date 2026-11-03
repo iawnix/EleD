@@ -1,0 +1,16 @@
+# Linux x86-64 developer toolchain for the pinned xTB source build.
+name: rdkit-eth-xtb-build
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - git
+  - cmake>=3.28
+  - ninja
+  - gcc_linux-64=16.2
+  - gfortran_linux-64=16.2
+  - mctc-lib-devel=0.7
+  - test-drive-devel=0.6
+  - libblas
+  - liblapack
+  - pkg-config

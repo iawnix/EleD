@@ -1,0 +1,86 @@
+{
+  "checked_at": "2026-11-03T18:18:39.915551+00:00",
+  "issue": {
+    "closedAt": "2026-11-02T14:26:53Z",
+    "closedByPullRequestsReferences": [
+      {
+        "id": "PR_kwDODKCtwM8AAAABMUD6ew",
+        "number": 1490,
+        "repository": {
+          "id": "MDEwOlJlcG9zaXRvcnkyMTE4NTY4MzI=",
+          "name": "xtb",
+          "owner": {
+            "id": "MDEyOk9yZ2FuaXphdGlvbjQ5NTIxMTc2",
+            "login": "grimme-lab"
+          }
+        },
+        "url": "https://github.com/grimme-lab/xtb/pull/1490"
+      }
+    ],
+    "comments": [
+      {
+        "id": "IC_kwDODKCtwM8AAAABiC2Tcw",
+        "author": {
+          "login": "thfroitzheim"
+        },
+        "authorAssociation": "MEMBER",
+        "body": "Thank you for raising this issue. It was an old parameter selection that was never removed and overwrote the reference charges for D4. Should be fixed by #1490",
+        "createdAt": "2026-11-02T14:28:01Z",
+        "includesCreatedEdit": false,
+        "isMinimized": false,
+        "minimizedReason": "",
+        "reactionGroups": [],
+        "url": "https://github.com/grimme-lab/xtb/issues/1486#issuecomment-6579655539",
+        "viewerDidAuthor": false
+      }
+    ],
+    "number": 1486,
+    "state": "CLOSED",
+    "stateReason": "COMPLETED",
+    "title": "C API: loading GFN0 changes subsequent GFN2 results via global D4 reference tables",
+    "url": "https://github.com/grimme-lab/xtb/issues/1486"
+  },
+  "fix": {
+    "author": {
+      "id": "U_kgDOBXw_TQ",
+      "is_bot": false,
+      "login": "thfroitzheim",
+      "name": "Thomas Froitzheim"
+    },
+    "body": "In `newD4Model`, a leftover `select case(mode)` block overwrote the module-level `refq` and `refh` arrays, overwriting defaults in a second calculation. Since the selection block was unnecessary anyway, I removed it. \n    \nFixes #1486.",
+    "files": [
+      {
+        "path": "src/disp/dftd4.F90",
+        "additions": 1,
+        "deletions": 28,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "test/api/c_api_example.c",
+        "additions": 130,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "test/unit/test_gfn2.f90",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "mergeCommit": {
+      "oid": "33fe381adde775c4992610c0f90d8914b7572bb5"
+    },
+    "mergedAt": "2026-11-02T14:26:51Z",
+    "number": 1490,
+    "state": "MERGED",
+    "title": "Fix global D4 reference charge table overwrite",
+    "url": "https://github.com/grimme-lab/xtb/pull/1490"
+  },
+  "latest_release": {
+    "html_url": "https://github.com/grimme-lab/xtb/releases/tag/v6.7.1",
+    "published_at": "2024-07-23T20:37:54Z",
+    "tag_name": "v6.7.1"
+  },
+  "verification": "GitHub metadata and source diff reviewed; merged revision not locally built in this check."
+}

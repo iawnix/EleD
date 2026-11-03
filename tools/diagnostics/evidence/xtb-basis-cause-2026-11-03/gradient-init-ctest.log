@@ -1,0 +1,364 @@
+Test project /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build
+      Start 10: xtb/gfn1
+      Start 11: xtb/gfn2
+      Start 13: xtb/hessian
+      Start 17: xtb/oniom
+      Start 12: xtb/gfnff
+      Start  5: xtb/dftd3
+ 1/38 Test #10: xtb/gfn1 .........................***Failed    0.03 sec
+# Testing: gfn1
+  Starting scc ... (1/10)
+
+          ...................................................
+          :                      SETUP                      :
+          :.................................................:
+          :  # basis functions                   8          :
+          :  # atomic orbitals                   8          :
+          :  # shells                            6          :
+          :  # electrons                         8          :
+          :  # halogen bonds                     0          :
+          :  max. iterations                    50          :
+          :  Hamiltonian                  GFN1-xTB          :
+          :  restarted?                      false          :
+          :  GBSA solvation                  false          :
+          :  PC potential                    false          :
+          :  electronic temp.          300.0000000     K    :
+          :  accuracy                    1.0000000          :
+          :  -> integral cutoff          0.2500000E+02      :
+          :  -> integral neglect         0.1000000E-07      :
+          :  -> SCF convergence          0.1000000E-05 Eh   :
+          :  -> wf. convergence          0.2000000E-04 e    :
+          :  Broyden damping             0.4000000          :
+          :  net charge                          0          :
+          :  unpaired electrons                  0          :
+          ...................................................
+
+ iter      E             dE          RMSdq      gap      omega  full diag
+   1     -5.7552108 -0.575521E+01  0.879E+00   13.15       0.0  T
+   2     -5.7986871 -0.434763E-01  0.392E+00   10.64       1.0  T
+   3     -5.8052817 -0.659452E-02  0.742E-01    9.10       1.0  T
+   4     -5.8054339 -0.152208E-03  0.184E-01    9.42       1.0  T
+   5     -5.8054764 -0.424913E-04  0.413E-03    9.31      14.0  T
+   6     -5.8054764 -0.222540E-07  0.179E-04    9.31     322.7  T
+   7     -5.8054764 -0.207994E-10  0.440E-06    9.31   13117.1  T
+
+   *** convergence criteria satisfied after 7 iterations ***
+
+         #    Occupation            Energy/Eh            Energy/eV
+      -------------------------------------------------------------
+         1        2.0000           -0.7582168             -20.6321
+         2        2.0000           -0.6111987             -16.6316
+         3        2.0000           -0.5482427             -14.9184
+         4        2.0000           -0.5002325             -13.6120 (HOMO)
+         5                         -0.1579283              -4.2974 (LUMO)
+         6                         -0.0504375              -1.3725
+         7                          0.3334210               9.0728
+         8                          0.4569909              12.4354
+      -------------------------------------------------------------
+                  HL-Gap            0.3423041 Eh            9.3146 eV
+             Fermi-level           -0.3290804 Eh           -8.9547 eV
+
+ SCC (total)                   0 d,  0 h,  0 min,  0.001 sec
+ SCC setup                      ...        0 min,  0.000 sec ( 12.208%)
+ Dispersion                     ...        0 min,  0.000 sec (  2.287%)
+ classical contributions        ...        0 min,  0.000 sec (  0.924%)
+ integral evaluation            ...        0 min,  0.000 sec ( 20.507%)
+ iterations                     ...        0 min,  0.000 sec ( 29.856%)
+ molecular gradient             ...        0 min,  0.000 sec ( 27.179%)
+ printout                       ...        0 min,  0.000 sec (  6.352%)
+
+[Fatal] Uncaught error
+Code: 1 Message: Floating point value mismatch
+           expected 0.69904725519999997E-002 but got 0.12900179247732219 (difference: 0.12201131992532219)
+ERROR STOP 
+
+Error termination. Backtrace:
+#0  0x7fac7f9895d6 in ???
+#1  0x7fac7f98a6dc in ???
+#2  0x7fac7f98a8e1 in ???
+#3  0x5565551d4180 in ???
+#4  0x55655515d77a in ???
+#5  0x55655515ec55 in ???
+#6  0x55655515d100 in ???
+#7  0x7fac7f0ed680 in ???
+#8  0x7fac7f0ed797 in ???
+#9  0x55655515d134 in ???
+#10  0xffffffffffffffff in ???
+
+      Start  6: xtb/dftd4
+ 2/38 Test #11: xtb/gfn2 .........................***Failed    0.04 sec
+# Testing: gfn2
+  Starting scc ... (1/11)
+
+          ...................................................
+          :                      SETUP                      :
+          :.................................................:
+          :  # basis functions                   6          :
+          :  # atomic orbitals                   6          :
+          :  # shells                            4          :
+          :  # electrons                         8          :
+          :  max. iterations                    50          :
+          :  Hamiltonian                  GFN2-xTB          :
+          :  restarted?                      false          :
+          :  GBSA solvation                  false          :
+          :  PC potential                    false          :
+          :  electronic temp.          300.0000000     K    :
+          :  accuracy                    1.0000000          :
+          :  -> integral cutoff          0.2500000E+02      :
+          :  -> integral neglect         0.1000000E-07      :
+          :  -> SCF convergence          0.1000000E-05 Eh   :
+          :  -> wf. convergence          0.1000000E-03 e    :
+          :  Broyden damping             0.4000000          :
+          :  net charge                          0          :
+          :  unpaired electrons                  0          :
+          ...................................................
+
+ iter      E             dE          RMSdq      gap      omega  full diag
+   1     -5.0690949 -0.506909E+01  0.789E+00   17.03       0.0  T
+   2     -5.0972457 -0.281508E-01  0.358E+00   15.45       1.0  T
+   3     -5.1041534 -0.690762E-02  0.919E-01   14.22       1.0  T
+   4     -5.1036157  0.537658E-03  0.971E-01   14.81       1.0  T
+   5     -5.1043504 -0.734689E-03  0.140E-01   14.49       1.0  T
+   6     -5.1043619 -0.115048E-04  0.342E-02   14.46       1.7  T
+   7     -5.1043628 -0.909883E-06  0.758E-04   14.45      76.2  T
+   8     -5.1043628 -0.501048E-10  0.104E-04   14.45     555.1  T
+
+   *** convergence criteria satisfied after 8 iterations ***
+
+         #    Occupation            Energy/Eh            Energy/eV
+      -------------------------------------------------------------
+         1        2.0000           -0.6808808             -18.5277
+         2        2.0000           -0.5666780             -15.4201
+         3        2.0000           -0.5137322             -13.9794
+         4        2.0000           -0.4471027             -12.1663 (HOMO)
+         5                          0.0839396               2.2841 (LUMO)
+         6                          0.2414234               6.5695
+      -------------------------------------------------------------
+                  HL-Gap            0.5310423 Eh           14.4504 eV
+             Fermi-level           -0.1815815 Eh           -4.9411 eV
+
+ SCC (total)                   0 d,  0 h,  0 min,  0.001 sec
+ SCC setup                      ...        0 min,  0.000 sec ( 14.173%)
+ Dispersion                     ...        0 min,  0.000 sec (  2.925%)
+ classical contributions        ...        0 min,  0.000 sec (  1.184%)
+ integral evaluation            ...        0 min,  0.000 sec ( 11.072%)
+ iterations                     ...        0 min,  0.000 sec ( 48.754%)
+ molecular gradient             ...        0 min,  0.000 sec ( 14.209%)
+ printout                       ...        0 min,  0.000 sec (  6.630%)
+
+[Fatal] Uncaught error
+Code: 1 Message: Floating point value mismatch
+           expected 0.64574201250000001E-002 but got 0.13475209890909465 (difference: 0.12829467878409465)
+ERROR STOP 
+
+Error termination. Backtrace:
+#0  0x7fc9fd2595d6 in ???
+#1  0x7fc9fd25a6dc in ???
+#2  0x7fc9fd25a8e1 in ???
+#3  0x56496d639ce0 in ???
+#4  0x56496d5a777a in ???
+#5  0x56496d5a8c55 in ???
+#6  0x56496d5a7100 in ???
+#7  0x7fc9fcfe8680 in ???
+#8  0x7fc9fcfe8797 in ???
+#9  0x56496d5a7134 in ???
+#10  0xffffffffffffffff in ???
+
+      Start  4: xtb/coulomb
+ 3/38 Test #13: xtb/hessian ......................***Failed    0.04 sec
+# Testing: hessian
+  Starting gfn1 ... (1/2)
+
+          ...................................................
+          :                      SETUP                      :
+          :.................................................:
+          :  # basis functions                   8          :
+          :  # atomic orbitals                   8          :
+          :  # shells                            6          :
+          :  # electrons                         8          :
+          :  # halogen bonds                     0          :
+          :  max. iterations                   250          :
+          :  Hamiltonian                  GFN1-xTB          :
+          :  restarted?                      false          :
+          :  GBSA solvation                  false          :
+          :  PC potential                    false          :
+          :  electronic temp.          300.0000000     K    :
+          :  accuracy                    1.0000000          :
+          :  -> integral cutoff          0.2500000E+02      :
+          :  -> integral neglect         0.1000000E-07      :
+          :  -> SCF convergence          0.1000000E-05 Eh   :
+          :  -> wf. convergence          0.2000000E-04 e    :
+          :  Broyden damping             0.4000000          :
+          :  net charge                          0          :
+          :  unpaired electrons                  0          :
+          ...................................................
+
+ iter      E             dE          RMSdq      gap      omega  full diag
+   1     -5.8055224 -0.580552E+01  0.465E+00    9.83       0.0  T
+   2     -5.8063504 -0.828082E-03  0.270E+00    9.51       1.0  T
+   3     -5.8064191 -0.686175E-04  0.199E-01    9.26       1.0  T
+   4     -5.8064530 -0.339402E-04  0.197E-03    9.35      29.3  T
+   5     -5.8064530 -0.346841E-08  0.123E-05    9.35    4694.1  T
+   6     -5.8064530 -0.213163E-13  0.577E-06    9.35   10008.6  T
+
+   *** convergence criteria satisfied after 6 iterations ***
+
+         #    Occupation            Energy/Eh            Energy/eV
+      -------------------------------------------------------------
+         1        2.0000           -0.7580005             -20.6262
+         2        2.0000           -0.6124889             -16.6667
+         3        2.0000           -0.5461589             -14.8617
+         4        2.0000           -0.4999622             -13.6047 (HOMO)
+         5                         -0.1564677              -4.2577 (LUMO)
+         6                         -0.0499101              -1.3581
+         7                          0.3483791               9.4799
+         8                          0.4555833              12.3971
+      -------------------------------------------------------------
+                  HL-Gap            0.3434945 Eh            9.3470 eV
+             Fermi-level           -0.3282150 Eh           -8.9312 eV
+
+ SCC (total)                   0 d,  0 h,  0 min,  0.001 sec
+ SCC setup                      ...        0 min,  0.000 sec ( 11.652%)
+ Dispersion                     ...        0 min,  0.000 sec (  2.486%)
+ classical contributions        ...        0 min,  0.000 sec (  1.039%)
+ integral evaluation            ...        0 min,  0.000 sec ( 17.569%)
+ iterations                     ...        0 min,  0.000 sec ( 43.426%)
+ molecular gradient             ...        0 min,  0.000 sec ( 18.401%)
+ printout                       ...        0 min,  0.000 sec (  4.908%)
+
+         :::::::::::::::::::::::::::::::::::::::::::::::::::::
+         ::                     SUMMARY                     ::
+         :::::::::::::::::::::::::::::::::::::::::::::::::::::
+         :: total energy              -5.768774915195 Eh    ::
+         :: gradient norm              0.131387380999 Eh/a0 ::
+         :: HOMO-LUMO gap              9.346961825390 eV    ::
+         ::.................................................::
+         :: SCC energy                -5.806453000882 Eh    ::
+         :: -> electrostatic           0.050067356828 Eh    ::
+         :: repulsion energy           0.037815655736 Eh    ::
+         :: dispersion energy         -0.000137570050 Eh    ::
+         :: halogen bond corr.         0.000000000000 Eh    ::
+         :: add. restraining           0.000000000000 Eh    ::
+         :: total charge               0.000000000000 e     ::
+         :::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+estimated CPU  time      0.00 min
+estimated wall time      0.00 min
+[Fatal] Uncaught error
+Code: 1 Message: Floating point value mismatch
+           expected 0.96427243151450001E-004 but got -0.74775908235793248E-001 (difference: 0.74872335478944702E-001)
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+ERROR STOP 
+
+Error termination. Backtrace:
+#0  0x7f1f01b735d6 in ???
+#1  0x7f1f01b746dc in ???
+#2  0x7f1f01b748e1 in ???
+#3  0x555a6eaa2698 in ???
+#4  0x555a6e9f377a in ???
+#5  0x555a6e9f4c55 in ???
+#6  0x555a6e9f3100 in ???
+#7  0x7f1f0124b680 in ???
+#8  0x7f1f0124b797 in ???
+#9  0x555a6e9f3134 in ???
+#10  0xffffffffffffffff in ???
+
+      Start  9: xtb/gfn0
+ 4/38 Test #17: xtb/oniom ........................***Failed    0.05 sec
+# Testing: oniom
+  Starting calculateCharge ... (1/3)
+       ... calculateCharge [PASSED]
+  Starting cutbond ... (2/3)
+[Fatal] Uncaught error
+Code: 1 Message: Floating point value mismatch
+           expected 0.32719420000000001E-003 but got 0.17482263587024405 (difference: 0.17449544167024406)
+Note: The following floating-point exceptions are signalling: IEEE_DENORMAL
+ERROR STOP 
+
+Error termination. Backtrace:
+#0  0x7f6ffd5695d6 in ???
+#1  0x7f6ffd56a6dc in ???
+#2  0x7f6ffd56a8e1 in ???
+#3  0x55e41059217b in ???
+#4  0x55e4104d977a in ???
+#5  0x55e4104dac55 in ???
+#6  0x55e4104d9100 in ???
+#7  0x7f6ffcdbd680 in ???
+#8  0x7f6ffcdbd797 in ???
+#9  0x55e4104d9134 in ???
+#10  0xffffffffffffffff in ???
+
+      Start 21: xtb/repulsion
+ 5/38 Test  #9: xtb/gfn0 .........................   Passed    0.15 sec
+      Start 20: xtb/peeq
+ 6/38 Test #21: xtb/repulsion ....................   Passed    0.15 sec
+      Start 34: xtb/IP/EA
+ 7/38 Test #20: xtb/peeq .........................   Passed    0.05 sec
+      Start  7: xtb/docking
+ 8/38 Test #34: xtb/IP/EA ........................   Passed    0.05 sec
+      Start 14: xtb/iff
+ 9/38 Test  #4: xtb/coulomb ......................   Passed    0.24 sec
+      Start  1: xtb/CAPI
+10/38 Test #14: xtb/iff ..........................   Passed    0.07 sec
+      Start  3: xtb/coordinationnumber
+11/38 Test  #7: xtb/docking ......................   Passed    0.08 sec
+      Start  8: xtb/eeq
+12/38 Test  #1: xtb/CAPI .........................   Passed    0.05 sec
+      Start 22: xtb/symmetry
+13/38 Test  #3: xtb/coordinationnumber ...........   Passed    0.04 sec
+      Start 36: xtb/GFN1-xTB
+14/38 Test  #8: xtb/eeq ..........................   Passed    0.03 sec
+      Start 37: xtb/GFN2-xTB/GBSA
+15/38 Test #22: xtb/symmetry .....................   Passed    0.03 sec
+      Start 33: xtb/Singlepoint
+16/38 Test #37: xtb/GFN2-xTB/GBSA ................   Passed    0.02 sec
+      Start 35: xtb/GFN0-xTB
+17/38 Test #36: xtb/GFN1-xTB .....................   Passed    0.04 sec
+      Start 25: xtb/vertical
+18/38 Test #35: xtb/GFN0-xTB .....................   Passed    0.02 sec
+      Start 32: xtb/Info
+19/38 Test #32: xtb/Info .........................   Passed    0.00 sec
+      Start 38: xtb/GFN2-FF
+20/38 Test #38: xtb/GFN2-FF ......................   Passed    0.01 sec
+      Start 26: xtb/wsc
+21/38 Test #33: xtb/Singlepoint ..................   Passed    0.04 sec
+      Start 24: xtb/thermo
+22/38 Test #26: xtb/wsc ..........................   Passed    0.00 sec
+      Start 27: xtb/cpx
+23/38 Test #24: xtb/thermo .......................   Passed    0.00 sec
+      Start 28: xtb/ptb
+24/38 Test #27: xtb/cpx ..........................   Passed    0.00 sec
+      Start 31: xtb/Argparser_print_license
+25/38 Test #28: xtb/ptb ..........................   Passed    0.00 sec
+      Start 15: xtb/latticepoint
+26/38 Test #31: xtb/Argparser_print_license ......   Passed    0.00 sec
+      Start 16: xtb/molecule
+27/38 Test #25: xtb/vertical .....................   Passed    0.03 sec
+      Start 19: xtb/pbc-tools
+28/38 Test #16: xtb/molecule .....................   Passed    0.00 sec
+      Start 18: xtb/dipro
+29/38 Test #15: xtb/latticepoint .................   Passed    0.00 sec
+      Start 23: xtb/tblite
+30/38 Test #19: xtb/pbc-tools ....................   Passed    0.00 sec
+      Start  2: xtb/atomlist
+31/38 Test #18: xtb/dipro ........................   Passed    0.00 sec
+      Start 29: xtb/Argparser_print_version
+32/38 Test #23: xtb/tblite .......................   Passed    0.00 sec
+      Start 30: xtb/Argparser_print_help
+33/38 Test  #2: xtb/atomlist .....................   Passed    0.00 sec
+34/38 Test #30: xtb/Argparser_print_help .........   Passed    0.00 sec
+35/38 Test #29: xtb/Argparser_print_version ......   Passed    0.00 sec
+36/38 Test  #5: xtb/dftd3 ........................   Passed    0.61 sec
+37/38 Test  #6: xtb/dftd4 ........................   Passed    0.60 sec
+38/38 Test #12: xtb/gfnff ........................   Passed    3.25 sec
+
+89% tests passed, 4 tests failed out of 38
+
+Total Test time (real) =   3.26 sec
+
+The following tests FAILED:
+	 10 - xtb/gfn1 (Failed)
+	 11 - xtb/gfn2 (Failed)
+	 13 - xtb/hessian (Failed)
+	 17 - xtb/oniom (Failed)
+Errors while running CTest

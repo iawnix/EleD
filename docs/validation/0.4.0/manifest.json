@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "python": "/home/iaw/project/rdkit_eth/build/native-release-sdk/bin/python",
+  "source": {
+    "file": "/home/iaw/project/rdkit_eth/dist/0.4.0/rdkit_eth-0.4.0.tar.gz",
+    "sha256": "53a58a50730aabb48238674dbc23b90c3688b9c4a26a28c57f0e81f2d22bfb90"
+  },
+  "wheels": [
+    {
+      "file": "/home/iaw/project/rdkit_eth/dist/0.4.0/pure/rdkit_eth-0.4.0-py3-none-any.whl",
+      "sha256": "b10efc27891e300e5c3ad61ad241b105276e8c6cf55c5262e0f0a0505d093e24",
+      "compiled": false,
+      "version": "0.4.0",
+      "requirements": [
+        "rdkit>=2024.03",
+        "numpy<3,>=1.23",
+        "pytest>=8; extra == \"test\""
+      ]
+    },
+    {
+      "file": "/home/iaw/project/rdkit_eth/dist/0.4.0/compiled/rdkit_eth-0.4.0-cp311-cp311-linux_x86_64.whl",
+      "sha256": "7962d31866dabba3b3ca9e87e58eece4b821bf67be01fe2c57b7bccd8e8c44db",
+      "compiled": true,
+      "version": "0.4.0",
+      "requirements": [
+        "rdkit>=2024.03",
+        "numpy<3,>=1.23",
+        "pytest>=8; extra == \"test\""
+      ]
+    }
+  ],
+  "build_packages": {
+    "rdkit": "2026.9.1",
+    "numpy": "2.4.6",
+    "setuptools": "84.2.1",
+    "wheel": "0.48.0",
+    "build": "1.2.2.post1",
+    "pyproject-hooks": "1.2.0"
+  },
+  "lock_sha256": {
+    "locks/linux-64/rdxtb-sdk.txt": "8947d29d0459859d2c174414327ac20bb307fcc932fa925b075262c3f16befbf",
+    "locks/linux-64/release-tools-py311.txt": "3faf3ed75742ace3eaa7b6a4e931a62f183bf7fb7f4b97586b1123f39dbef0e7",
+    "locks/linux-64/runtime.txt": "217a042a9ad3082b26e4d7f5f9621d1c036606f8fdeef4da73209554873ab0f9",
+    "locks/linux-64/xtb-toolchain.txt": "de5b9de44f2360ad254a0f0b08709e8844958bdae41a97bc3045367c1bb96ae6"
+  },
+  "xtb_source_lock_sha256": "4f8b719c397199e2059c505bc539bbbc36ab63b2b8587293fa1a0501be98730c",
+  "compiled_wheel_scope": "local Linux SDK/prefix; external libraries are not bundled",
+  "compiled_default_xtb": {
+    "path": "/home/iaw/project/rdkit_eth/.xtb-native/lib/libxtb.so",
+    "sha256": "6a8e2c7f01c6c95e29096369fb6130e97aefa3c2bcbf91982ede695c4aa48428"
+  }
+}

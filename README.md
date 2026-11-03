@@ -1,0 +1,238 @@
+# rdkit-eth
+
+An RDKit adapter for in-process xTB electronic-structure calculations. It
+validates indexed molecular input, returns quantities with explicit units,
+and maps results back to the original atoms and bonds. RDKit's YAeHMOP
+`rdEHTTools` interface remains available separately.
+
+Version 0.4 supports **gas-phase single points through libxtb only**.
+The tblite backend and Python extra have been removed. Our reviewed native
+extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
+fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
+
+## Installation
+
+Python 3.10+ is required; the locked installation profile is Linux x86-64 /
+Python 3.11. The runtime lock installs RDKit and xTB's shared library and
+parameter files. The conda xTB package also includes an executable, which
+this adapter does not use.
+
+```bash
+conda create --yes --prefix "$PWD/.runtime-env" --file locks/linux-64/runtime.txt
+conda activate "$PWD/.runtime-env"
+python -m pip install --no-deps --no-build-isolation .
+python -m rdkit_eth doctor --check native
+```
+
+Installing this project with pip installs the Python adapter and RDKit;
+libxtb must already be installed separately. The supplied conda recipe declares
+`rdkit` and `xtb` as runtime dependencies; it has not yet been published or
+validated with `conda build`.
+
+The reported GFN0 state bug is now [fixed upstream in PR #1490](https://github.com/grimme-lab/xtb/pull/1490).
+Our current source lock predates the fix and retains its verified local patch;
+see [upstream status and migration implications](docs/upstream/xtb-gfn0-upstream-fix.md).
+The native basis-export extension remains a separate project capability.
+
+See the [installation guide](docs/install.md) for the compiled profile,
+native GFN0, orbital populations and installed-wheel checks. YAML environment
+files remain development specifications; the explicit locks select tested
+package builds. This package has not been published to PyPI or conda-forge.
+
+## RDKit-style C++/Python interface
+
+The optional **`rdXTBTools` module** provides a direct `ROMol` → libxtb
+interface in RDKit's `RunMol()` style:
+
+```python
+from rdkit_eth import rdXTBTools
+ok, result = rdXTBTools.RunMol(mol, method="GFN2-xTB")
+if not ok:
+    raise RuntimeError(result.errorMessage)
+print(result.totalEnergyHartree)
+print(result.GetOrbitalEnergies())  # eV
+print(result.GetWibergBondOrders())  # dimensionless; not EHT overlap populations
+```
+
+Build it with `RDKIT_ETH_BUILD_RDXTB=1` in the matched RDKit/Boost development
+environment. It supports gas-phase GFN0/1/2, requires a verified patched
+library for GFN0, and also provides an installable C++ library. See the
+[build guide, API contract and unit comparison](docs/rdxtb-tools.md).
+
+## Single molecules and results
+
+The pure Python adapter uses ctypes to call the same native library:
+
+```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit_eth import run_xtb, calc_xtb_descriptors, annotate_mol
+
+mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
+assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
+result = run_xtb(mol, method="GFN2-xTB")  # backend="native" by default
+print(calc_xtb_descriptors(result))
+annotated = annotate_mol(mol, result)
+print(annotated.GetAtomWithIdx(0).GetDoubleProp("xtb_partial_charge"))
+print(annotated.GetBondWithIdx(0).GetDoubleProp("xtb_wiberg_order"))
+```
+
+`run_xtb` never changes the molecule. A missing/incompatible library or failed
+calculation raises an error. Geometry optimization, solvation and GFN-FF are
+outside the current API. Calculations do not create temporary work directories.
+
+Native GFN0 requires the build's capability record, the reviewed D4 patch hash,
+and a matching SHA-256 of the selected library. An xTB/API version alone cannot
+identify the fix. Missing or mismatched verification raises an error before
+GFN0 initialization. See the [root-cause analysis](docs/gfn0-native-state.md).
+After selecting a [patched installation](docs/xtb-patched-build.md):
+
+```bash
+source .xtb-native/activate.sh
+```
+
+```python
+result = run_xtb(mol, method="GFN0-xTB")
+print(result.metadata["engine"]["native_gfn0"])
+```
+
+Select a library explicitly with `xtb_library="/prefix/lib/libxtb.so"`.
+Discovery otherwise uses `XTB_LIBRARY`, the active Python installation,
+`CONDA_PREFIX`, `XTB_PREFIX`, and the system library loader. An explicit path
+is respected. Static `libxtb.a` cannot be loaded with ctypes.
+
+Parameter files are located using `XTBPATH`, then `share/xtb` associated with
+the selected library. Located parameters are used explicitly and recorded by
+path and SHA-256; installed text parameters can differ slightly from compiled-in
+parameters. GFN0 requires its parameter file; GFN1/2 can use built-in parameters.
+
+Inputs require a conformer marked as 3D, finite coordinates and separate
+hydrogen atoms. Hydrogen counts such as `[NH4+]` must also be expanded with
+`Chem.AddHs`. Charge and unpaired-electron count (`uhf`) default to the sum of
+RDKit formal charges and radical electrons. Their electron parity is checked;
+provide `uhf` explicitly when the RDKit radical count does not describe the
+intended spin state. The adapter does not choose protonation or spin states.
+
+`XTBResult` provides:
+
+- Orbital energies in eV, occupations, atomic charges in elementary charges,
+  dipole in atomic units, Wiberg bond orders, and total energy in Hartree.
+- Metadata with the resolved conformer ID, indexed structure and geometry
+  hashes, charge, spin, backend, engine/parameter identity and elapsed time.
+- Native orbital coefficients with axes `[AO][MO]`; with `keep_overlap=True`,
+  the verified extension also returns overlap and zero-based AO/shell/atom maps.
+
+`homo_ev` and `lumo_ev` use an occupation threshold of `1e-7`; `gap_ev` uses
+their difference when available. `fermi_energy_ev` is a HOMO-based estimate,
+not the electronic chemical potential. None of these gaps is an optical
+excitation energy. The native C API reports an ABI version separately from
+`result.version`, which uses a conda package version when identifiable and is
+otherwise `None`. The binary hash identifies the selected engine.
+
+`annotate_mol` returns a copy by default; `copy=False` modifies the input after
+validation. The original indexed topology and input conformer must match the
+result. Existing conformers and bond types are preserved. WBO properties are
+attached only to existing RDKit bonds; nonbonded pair values remain in the
+result matrix. Atom/bond properties are not automatically portable SDF fields.
+
+## Electronic descriptor interfaces
+
+The descriptor API provides molecular dipole/charge statistics, neighboring frontier
+energies, atomic WBO sums and explicitly indexed fragment descriptors. The
+common scalar/atom/fragment extractors accept both `XTBResult` and compiled
+`rdXTBTools.XTBResults` without rerunning a calculation.
+
+```python
+from rdkit_eth import calc_xtb_atom_descriptors, calc_xtb_fragment_descriptors
+atoms = calc_xtb_atom_descriptors(result)
+fragments = calc_xtb_fragment_descriptors(result, {"site_a": [0], "site_b": [1, 2]})
+```
+
+For nonorthogonal orbital populations, select the verified extended libxtb
+installation and retain its overlap and AO mapping:
+
+```python
+from rdkit_eth import calc_orbital_populations, calc_frontier_descriptors
+orbital_result = run_xtb(mol, keep_overlap=True)
+populations = calc_orbital_populations(orbital_result, scheme="lowdin")
+frontier = calc_frontier_descriptors(mol, orbital_result)
+```
+
+This adds Löwdin/Mulliken populations, degeneracy-aware frontier subspaces,
+localization measures and atom-centroid spatial proxies. GFN0/1/2 and
+radicals are supported with spin-summed populations. Official libxtb without
+the extension cannot retain overlap; requesting it raises a clear error. These are ground-state descriptors, not excited-state
+observables. See the [complete API, definitions and limitations](docs/descriptors.md)
+and [runnable example](examples/electronic_descriptors.py).
+
+## Native basis extension
+
+The project-local C API exports the actual overlap matrix and basis maps in
+libxtb's native AO order. No second engine supplies or reorders these data.
+`keep_overlap=True` (compiled: `keepOverlap=True`) also retains MO coefficients.
+Matrix storage is opt-in and costs O(NAO²). Both interfaces support the same
+population and molecule-mapping helpers. See [native build details](docs/xtb-patched-build.md).
+
+Historical tblite comparisons remain as validation history, with their tools
+archived under `tools/diagnostics/archive/tblite-0.3/`. They are not a runtime
+dependency. Removing tblite does not make the xTB Hamiltonian a new method;
+our contribution is the native data interface, provenance, descriptor definitions
+and validation.
+
+## Batch calculations and caching
+
+```python
+from rdkit_eth import XTBOptions, XTBCache, run_xtb_batch
+
+options = XTBOptions(method="gfn2")
+cache = XTBCache()
+results = run_xtb_batch([mol, mol], options=options, cache=cache,
+                        return_exceptions=True)
+# Successful entries are XTBResult objects; failures are Exception objects.
+# options.to_dict() also works with run_xtb(mol, **...).
+```
+
+Batches execute sequentially and preserve input order; only `max_workers=1`
+is supported. Native calls from Python threads are serialized within this
+package, including calls through `rdXTBTools`. Other independent bindings in
+the same process are outside that lock. No wall-clock timeout is enforced.
+
+The cache is in memory. Keys include indexed structure, coordinates, resolved
+charge/spin/conformer, settings, backend, engine identity, binary/parameter
+hashes and relevant environment settings. Concurrent identical cache requests
+share a calculation; errors are not stored. Returned metadata is copied.
+Cached elapsed times refer to the original calculation. Native caching needs
+a library file path that can be hashed. Clear the cache after changing external
+parameters/dependencies; restart Python after replacing a loaded library.
+
+## EHT comparison
+
+```python
+from rdkit_eth import calc_orbital_descriptors
+features = calc_orbital_descriptors(mol, backend="both")
+```
+
+EHT and xTB fields have different prefixes. Their physical models and energy
+references differ; the EHT total energy uses eV and xTB uses Hartree.
+
+## Development and validation
+
+```bash
+conda activate "$PWD/.runtime-env"
+python -m pip install --no-deps --no-build-isolation -e .
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest -q
+python examples/rdkit_workflow.py
+```
+
+Integration tests use `XTB_LIBRARY` or normal library discovery. They skip
+when required engines are absent; `python -m pytest -m 'not integration'`
+runs without xTB. Shared-library tests explicitly disable subprocess execution.
+See [validation notes](docs/validation.md) for the locally verified scope.
+
+`tools/build_patched_xtb.sh PREFIX` fetches the pinned xTB commit, applies
+the D4 fix and native basis-export patch, builds libxtb, installs parameters
+and runs upstream and installed-library tests.
+The upstream build also produces an executable used for build provenance;
+it is not a calculation backend in this package. See the
+[patched-build guide](docs/xtb-patched-build.md). Historical diagnostic tools
+retain their upstream executable reproductions.

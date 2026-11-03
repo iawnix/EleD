@@ -1,0 +1,507 @@
+{
+  "note": "S inferred as inv(C).T @ inv(C) from full real eigenvectors; not a directly exposed C API overlap and not an independent orthonormality check.",
+  "cases": [
+    {
+      "name": "water",
+      "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/tag-release/libxtb.so",
+      "library_sha256": "eded1d7ebbf00b8f67615ef42b30b533b0689f92e780bf33a8e9936b911c8867",
+      "coefficient_condition_number": 2.3133370677061795,
+      "same_atom_overlap_difference": 8.504010980419317e-10,
+      "different_atom_overlap_difference": 7.524536549396998e-14,
+      "tblite_diagonal": [
+        1.000000000006004,
+        0.9999999999256893,
+        0.9999999999256893,
+        0.9999999999256893,
+        0.9999999998392997,
+        0.9999999999999991,
+        0.9999999998392997,
+        0.9999999999999991
+      ],
+      "inferred_xtb_diagonal": [
+        0.9999999999999999,
+        1.0000000000000009,
+        1.0000000000000004,
+        0.9999999999999994,
+        1.0,
+        1.0000000000000009,
+        1.0000000000000004,
+        1.0
+      ],
+      "labels": [
+        {
+          "atom": 0,
+          "shell_on_atom": 0,
+          "n": 2,
+          "l": 0,
+          "shell": 0,
+          "component": "s"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "py"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "pz"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "px"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 2,
+          "component": "s"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 3,
+          "component": "s"
+        },
+        {
+          "atom": 2,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 4,
+          "component": "s"
+        },
+        {
+          "atom": 2,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 5,
+          "component": "s"
+        }
+      ]
+    },
+    {
+      "name": "bromomethane",
+      "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/tag-release/libxtb.so",
+      "library_sha256": "eded1d7ebbf00b8f67615ef42b30b533b0689f92e780bf33a8e9936b911c8867",
+      "coefficient_condition_number": 2.770823917589522,
+      "same_atom_overlap_difference": 2.079644060293262e-07,
+      "different_atom_overlap_difference": 1.1890488593735427e-13,
+      "tblite_diagonal": [
+        1.000000000006004,
+        0.9999999999256891,
+        0.9999999999256891,
+        0.9999999999256891,
+        0.9999999046253963,
+        0.9999997920355951,
+        0.9999997920355951,
+        0.9999997920355951,
+        1.0000000001200782,
+        1.0000000001200782,
+        1.000000000120078,
+        1.0000000001200782,
+        1.000000000120078,
+        0.9999999998392997,
+        0.9999999999999991,
+        0.9999999998392997,
+        0.9999999999999991,
+        0.9999999998392997,
+        0.9999999999999991
+      ],
+      "inferred_xtb_diagonal": [
+        1.0000000000000002,
+        0.9999999999999998,
+        0.9999999999999989,
+        1.0000000000000002,
+        0.9999999999999987,
+        1.000000000000001,
+        1.0000000000000004,
+        1.0000000000000002,
+        0.9999999999999997,
+        1.0000000000000004,
+        0.9999999999999999,
+        0.999999999999999,
+        0.9999999999999994,
+        0.9999999999999999,
+        0.9999999999999986,
+        0.9999999999999994,
+        0.9999999999999989,
+        0.9999999999999989,
+        0.9999999999999998
+      ],
+      "labels": [
+        {
+          "atom": 0,
+          "shell_on_atom": 0,
+          "n": 2,
+          "l": 0,
+          "shell": 0,
+          "component": "s"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "py"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "pz"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "px"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 0,
+          "n": 4,
+          "l": 0,
+          "shell": 2,
+          "component": "s"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 4,
+          "l": 1,
+          "shell": 3,
+          "component": "py"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 4,
+          "l": 1,
+          "shell": 3,
+          "component": "pz"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 4,
+          "l": 1,
+          "shell": 3,
+          "component": "px"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 4,
+          "l": 2,
+          "shell": 4,
+          "component": "dxy"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 4,
+          "l": 2,
+          "shell": 4,
+          "component": "dyz"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 4,
+          "l": 2,
+          "shell": 4,
+          "component": "dz2"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 4,
+          "l": 2,
+          "shell": 4,
+          "component": "dxz"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 4,
+          "l": 2,
+          "shell": 4,
+          "component": "dx2-y2"
+        },
+        {
+          "atom": 2,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 5,
+          "component": "s"
+        },
+        {
+          "atom": 2,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 6,
+          "component": "s"
+        },
+        {
+          "atom": 3,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 7,
+          "component": "s"
+        },
+        {
+          "atom": 3,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 8,
+          "component": "s"
+        },
+        {
+          "atom": 4,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 9,
+          "component": "s"
+        },
+        {
+          "atom": 4,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 10,
+          "component": "s"
+        }
+      ]
+    },
+    {
+      "name": "iodomethane",
+      "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/tag-release/libxtb.so",
+      "library_sha256": "eded1d7ebbf00b8f67615ef42b30b533b0689f92e780bf33a8e9936b911c8867",
+      "coefficient_condition_number": 2.7720745001753855,
+      "same_atom_overlap_difference": 8.504012101372215e-10,
+      "different_atom_overlap_difference": 1.9377314966671777e-05,
+      "tblite_diagonal": [
+        1.000000000006004,
+        0.9999999999256891,
+        0.9999999999256891,
+        0.9999999999256891,
+        1.0000000004275909,
+        0.999999999880738,
+        0.999999999880738,
+        0.999999999880738,
+        0.9999999998623423,
+        0.9999999998623423,
+        0.9999999998623424,
+        0.9999999998623423,
+        0.9999999998623426,
+        0.9999999998392997,
+        0.9999999999999991,
+        0.9999999998392997,
+        0.9999999999999991,
+        0.9999999998392997,
+        0.9999999999999991
+      ],
+      "inferred_xtb_diagonal": [
+        0.9999999999999999,
+        0.9999999999999999,
+        1.0000000000000002,
+        1.0000000000000004,
+        0.9999999999999994,
+        0.9999999999999999,
+        0.9999999999999999,
+        1.0000000000000002,
+        1.0000000000000004,
+        1.0000000000000009,
+        0.9999999999999996,
+        0.9999999999999999,
+        0.9999999999999994,
+        0.9999999999999997,
+        1.0000000000000002,
+        0.9999999999999993,
+        0.9999999999999999,
+        0.9999999999999991,
+        1.0000000000000002
+      ],
+      "labels": [
+        {
+          "atom": 0,
+          "shell_on_atom": 0,
+          "n": 2,
+          "l": 0,
+          "shell": 0,
+          "component": "s"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "py"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "pz"
+        },
+        {
+          "atom": 0,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 1,
+          "shell": 1,
+          "component": "px"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 0,
+          "n": 5,
+          "l": 0,
+          "shell": 2,
+          "component": "s"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 5,
+          "l": 1,
+          "shell": 3,
+          "component": "py"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 5,
+          "l": 1,
+          "shell": 3,
+          "component": "pz"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 1,
+          "n": 5,
+          "l": 1,
+          "shell": 3,
+          "component": "px"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 5,
+          "l": 2,
+          "shell": 4,
+          "component": "dxy"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 5,
+          "l": 2,
+          "shell": 4,
+          "component": "dyz"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 5,
+          "l": 2,
+          "shell": 4,
+          "component": "dz2"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 5,
+          "l": 2,
+          "shell": 4,
+          "component": "dxz"
+        },
+        {
+          "atom": 1,
+          "shell_on_atom": 2,
+          "n": 5,
+          "l": 2,
+          "shell": 4,
+          "component": "dx2-y2"
+        },
+        {
+          "atom": 2,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 5,
+          "component": "s"
+        },
+        {
+          "atom": 2,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 6,
+          "component": "s"
+        },
+        {
+          "atom": 3,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 7,
+          "component": "s"
+        },
+        {
+          "atom": 3,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 8,
+          "component": "s"
+        },
+        {
+          "atom": 4,
+          "shell_on_atom": 0,
+          "n": 1,
+          "l": 0,
+          "shell": 9,
+          "component": "s"
+        },
+        {
+          "atom": 4,
+          "shell_on_atom": 1,
+          "n": 2,
+          "l": 0,
+          "shell": 10,
+          "component": "s"
+        }
+      ]
+    }
+  ]
+}

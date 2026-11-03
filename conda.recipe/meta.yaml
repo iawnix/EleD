@@ -1,0 +1,29 @@
+{% set name = "rdkit-eth" %}
+{% set version = "0.4.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} -m pip install . --no-deps -vv
+
+requirements:
+  host:
+    - python
+    - pip
+    - setuptools >=68
+  run:
+    - python >=3.10
+    - rdkit >=2024.03
+    - numpy >=1.23,<3
+    - xtb >=6.7
+
+about:
+  summary: RDKit orbital descriptors with an xTB backend
+  license: BSD-3-Clause

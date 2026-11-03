@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "purpose": "Causal diagnosis of GFN1 Br/I agreement exceptions; no production engine replacement",
+  "source_commits": {
+    "release": "26b28010e805f7d1aeeef39813feb473e69cc4be",
+    "current": "a9040512dd7c15793472aa20f9647d36a266f7cd",
+    "upstream_onsite": "6d7cac2eb1172cb9c5b81f94e83942b48f173ac7",
+    "upstream_5sp": "59c8c0d9d4c1612c9201e09a66ce6039997559a2",
+    "upstream_stmp": "e39b5caab37b6b02cc63592a8acff14952ad5266"
+  },
+  "common_build_configuration": {
+    "CMAKE_C_COMPILER": "/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc",
+    "CMAKE_Fortran_COMPILER": "/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran",
+    "CMAKE_C_FLAGS": "-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include",
+    "CMAKE_Fortran_FLAGS": "-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include -I/home/iaw/project/rdkit_eth/.xtb-build-env/include",
+    "CMAKE_Fortran_FLAGS_RELEASE": "-O3",
+    "CMAKE_SHARED_LINKER_FLAGS": "-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -L/home/iaw/project/rdkit_eth/.xtb-build-env/lib",
+    "BLAS_blas_LIBRARY": "/home/iaw/project/rdkit_eth/.xtb-build-env/lib/libblas.so",
+    "LAPACK_lapack_LIBRARY": null,
+    "MCTCLIB_LIBRARIES": "/home/iaw/project/rdkit_eth/.xtb-build-env/lib/libmctc-lib.so",
+    "CMAKE_BUILD_TYPE": "Release",
+    "WITH_TBLITE": "OFF",
+    "WITH_OpenMP": "ON"
+  },
+  "dependency_files": {
+    "libopenblas.so.0": {
+      "path": "/home/iaw/project/rdkit_eth/.xtb-build-env/lib/libopenblasp-r0.3.34.so",
+      "sha256": "f1424288e9ac125331102c0150b66fbd244560987779552e0e97d5cfd9de572b"
+    },
+    "libgfortran.so.5": {
+      "path": "/home/iaw/project/rdkit_eth/.xtb-build-env/lib/libgfortran.so.5.0.0",
+      "sha256": "8b93406aef97f0f39ebac58aed3b63c58c9c26eb246595d8141dde5baeee5b33"
+    },
+    "libmctc-lib.so.0": {
+      "path": "/home/iaw/project/rdkit_eth/.xtb-build-env/lib/libmctc-lib.so.0.7.0",
+      "sha256": "d93eca8a2400f4c06f57cf8c2d8f8a039578837eeec800fe2b6ff7bba3f16044"
+    }
+  },
+  "compiler_version": "GNU Fortran (conda-forge gcc 16.2.0-7) 16.2.0",
+  "upstream_tests": {
+    "release": {
+      "passed": 34,
+      "failed": 4,
+      "failures": [
+        "xtb/gfn1",
+        "xtb/gfn2",
+        "xtb/hessian",
+        "xtb/oniom"
+      ],
+      "production_install_performed": false,
+      "failure_cause": "Unassigned stmp added to gradient in build_dSDQH0_noreset; applying upstream #1121 alone resolves all four failures."
+    },
+    "current": {
+      "passed": 45,
+      "failed": 0,
+      "d4_patch_applied": false
+    },
+    "release_plus_1121": {
+      "passed": 38,
+      "failed": 0,
+      "production_install_performed": false
+    }
+  },
+  "evidence_files_sha256": {
+    "5sp-only-build.json": "1b861f1168ddf6447a254be12037a95bdfd8bde9d614c4f4b551fe0389fbfb5b",
+    "5sp-only.csv": "214c9cb280a04aa78c424cf9393a69faed847e8128dbb947fce49be1c496ec6b",
+    "5sp-only.json": "bf3a6bda22d98b1648f07278e0c292aafe006781c4d0aa3935edf23752ae74a8",
+    "5sp-only.patch": "996610af97bf54a813973c301b54b629b7331ae25ac5a669e4f107718600180e",
+    "build_variant.py": "4efae944f9fe7f97d6e85ff00e2838d4a1590d5de52eb27f51b9909c20618fd3",
+    "check_gradient.py": "27bea299fdb271b9e6553066dea226c4d10458e635242e740a93b4b0a7a90476",
+    "check_gradient_fd.py": "e201f8942efd369ce9defe2ef8be37c38a59d6ee69ef923fad3547a6d92d70f6",
+    "check_gradient_stmp.py": "5196ffe5d7fa8e08cc13264054a9e58941dd1e21748f14c36ecf07ad90c833ba",
+    "combined-full.csv": "1aeac9e7d4096cb5a2d0cd6bd1779c2242f71b2ab06093d633f39b374bcdefb2",
+    "combined-full.json": "65d8a841a6dd6d7899ca37ade5a6195eefbcf836483a0b22823c66497f5d22a4",
+    "conda-gradient-fd.json": "c7282e084b14c6d55d3beaa2dcf883ea44a0bee69dde8e8653a780bc8346890a",
+    "current-build.json": "ddcc403a0b46502be972c9d6409cf2cc4eb03c0df51d8cd46ec1d0ee816bc28f",
+    "current-build.log": "7bfaa020d4d911a217180e725901ba409466b20904b3f35f4919a33f097664d3",
+    "current-full.csv": "c4a17594b3b8cf3e95500d6f1bd75335ce98fd4746f431f44220b3a62bc8ff42",
+    "current-full.json": "397c0b1f4b3848278fdb0deab33b7744b3a31e7022621c9c3c7ce5304805d4a7",
+    "gradient-init-ctest.log": "c1446f3b10b813fab28456a94f55f5ffa2db3d7b94353dc2f46b516a0a5dbb25",
+    "gradient-init-record.json": "0d72d7bb372171adc65c7d522128312e2ba5210325dcab180d1428ac42a3f93c",
+    "gradient-init.patch": "4c45de30aa2e2722b52b13d4765b8ae1c0a69858b628ec9f11560952d37eb8ba",
+    "gradient-stmp-ctest.log": "94d15c524cf9daa943eefd1f46239741c83354f2225766dc988a150eda243425",
+    "gradient-stmp-record.json": "5f84a8a6bf5b16e774cb97c64960d472556ebe07b41f3dd0149445c757022adf",
+    "gradient-stmp.patch": "631cd58b85f4dcf86871ac6a458322124b4169c6ea5347ac5641a75769b0040d",
+    "onsite-and-5sp-build.json": "8f732301aff24f53ae2e9f44a23ee4b2e5e15641aed79ad38ba7fca2acf20939",
+    "onsite-and-5sp.csv": "0bf240b41b059d69c03e09eb6fc1dac484a98f69be76c7bd540aa28532aae824",
+    "onsite-and-5sp.json": "7f54cff579c9702a57d7648a4d8008effe3930002ed394f89fdaddbcf49e3a41",
+    "onsite-and-5sp.patch": "28e58b7467f9530154677bb7749b5fb412e2a73c1a55785c9520e4d386e7ae43",
+    "onsite-only-build.json": "1bcaac6f662365e1f83fb73d58e45919bd470876342ef4c0bc7c4e1caf440b18",
+    "onsite-only.csv": "e7ea2fd162075a292227a576aed6125625a573c2cee0bdbf1e6641e488dbb4be",
+    "onsite-only.json": "3beee6db1687c0e583feb0f6617c46a31cc509eac7e74e9f4727f112ca1dcbd1",
+    "onsite-only.patch": "01aa24fec9037e5191f2c61003e3180f3c329c2184e0e1a61d345e93c706188f",
+    "overlap-probe.json": "6ede23b655b5c654d052b0187864f8e057eafa651d5a8f5f9c86405e6bedf624",
+    "probe_overlap.py": "e6f0a248cad22d8e71f9cdf209b13ea43c2d602013dfdab95300060ea0bbfd74",
+    "release-build.log": "c5babdf7704ae92f76c3ac7ef489d2f855964ac62d57ad49cbcd0ce41bc2ed1a",
+    "run_ablation.py": "2c3f541fbc9340e355a93133c74082d523fdc564279929939f9c18fd63a1d5d2",
+    "stmp-fixed-gradient-fd.json": "b1123faefacf2b3899a8a636d2b5dbd75a3bcb1c994bebaed50c4879893f5f52",
+    "stmp-fixed-orbital-comparison.json": "ebc3472aa87bcf027939989a3eee0eed0e4c11d6b1965c771f5b4233959ef730",
+    "tag-full.csv": "80f532e461eb01cfab26a58b9c869cf257f175cc7f9e2cf2012323d48de5a474",
+    "tag-full.json": "79ed006eb5ef39f19a5d3674374c959899c4c7b2f27266abcd279a57583e1c64",
+    "tag-gradient-fd.json": "945ff514ee62cf5410fcfcbee6dfc08fc55ff7d2e031d8c8e5c096e76fee4d69",
+    "tag-release-build.json": "f6c9ad7302ca8bd2cbc6ea05aeefd9e47cc4103242d66ee0fd759a130a6953a7",
+    "tag-release.csv": "c8834b799cc0dd74b693f2a8ba481357796ce2da3c3fe7ff71b0073955a7a92d",
+    "tag-release.json": "f9dbb57cc8b7f3044e09c470de917333d83dfb176ddf9e6f0b1de11442390b8e",
+    "tag-release.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "gradient_validation": {
+    "molecule": "water at upstream GFN1 test geometry",
+    "methods": [
+      "GFN1-xTB",
+      "GFN2-xTB"
+    ],
+    "accuracy": 0.0001,
+    "central_difference_step_bohr": 0.0001,
+    "maximum_errors_eh_bohr": {
+      "raw_tag": {
+        "GFN1-xTB": 0.0857295203769802,
+        "GFN2-xTB": 0.08790136510117295
+      },
+      "tag_plus_1121": {
+        "GFN1-xTB": 1.3168676323005446e-09,
+        "GFN2-xTB": 1.4144409081484621e-09
+      },
+      "conda_6.7.1": {
+        "GFN1-xTB": 1.2768994368805853e-09,
+        "GFN2-xTB": 1.4144409081484621e-09
+      }
+    }
+  }
+}

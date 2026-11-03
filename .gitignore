@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.xtb/
+.xtb-rdkit/
+.xtb-build-env/
+.rdxtb-build-env/
+.runtime-env/
+src/rdkit_eth/rdXTBTools*.so
+.venv/
+.xtb-native/
