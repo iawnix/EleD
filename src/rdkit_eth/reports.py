@@ -241,13 +241,14 @@ def export_descriptor_reports(reports, path, *, format=None):
     else:
         output = io.StringIO(newline='')
         headers = ['record_id','schema_version','descriptor_version','report_type','quality_status',
-                   *first['units'], 'units_json','analysis_settings_json','provenance_json','quality_json','missing_json','error_json']
+                   *first['units'], 'units_json','analysis_settings_json','provenance_json','quality_json','missing_json','error_json','execution_json']
         writer = csv.DictWriter(output, fieldnames=headers); writer.writeheader()
         for report in reports:
             row = {k:report[k] for k in ('record_id','schema_version','descriptor_version','report_type')}
             row.update(report['values']); row['quality_status'] = report['quality']['status']
             row.update({k+'_json':json.dumps(report[k],allow_nan=False) for k in
                         ('units','analysis_settings','provenance','quality','missing','error')})
+            row['execution_json'] = json.dumps(report.get('execution'), allow_nan=False)
             writer.writerow(row)
         text = output.getvalue()
     path.parent.mkdir(parents=True, exist_ok=True)

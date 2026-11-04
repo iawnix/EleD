@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--executable', type=Path, required=True)
     parser.add_argument('--library', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True, help='new empty directory')
+    parser.add_argument('--cases', type=Path, help='optional frozen reactivity_cases.json corpus')
     args = parser.parse_args()
     executable = args.executable.resolve(strict=True)
     library = args.library.resolve(strict=True)
@@ -35,9 +36,17 @@ def main():
                XTBPATH=str(library.parent.parent / 'share/xtb'))
     os.environ.update({key:env[key] for key in ('OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS','XTBPATH')})
     rows = []
-    for smi in ('O', 'CCO', '[CH3]', '[NH4+]'):
+    cases = (json.loads(args.cases.read_text())['cases'] if args.cases else
+             [{'smiles':smi} for smi in ('O', 'CCO', '[CH3]', '[NH4+]')])
+    for case_input in cases:
+        smi = case_input['smiles']
         mol = Chem.AddHs(Chem.MolFromSmiles(smi))
-        if AllChem.EmbedMolecule(mol, randomSeed=1): raise RuntimeError('Embedding failed')
+        if 'positions_angstrom' in case_input:
+            assert [a.GetAtomicNum() for a in mol.GetAtoms()]==case_input['atomic_numbers']
+            conf=Chem.Conformer(mol.GetNumAtoms());conf.Set3D(True)
+            for i,xyz in enumerate(case_input['positions_angstrom']):conf.SetAtomPosition(i,xyz)
+            mol.AddConformer(conf)
+        elif AllChem.EmbedMolecule(mol, randomSeed=1): raise RuntimeError('Embedding failed')
         charge = Chem.GetFormalCharge(mol)
         spin = sum(a.GetNumRadicalElectrons() for a in mol.GetAtoms())
         for method in (1, 2):
@@ -52,7 +61,7 @@ def main():
             completed = subprocess.run(command, cwd=case, env=env, capture_output=True, text=True, timeout=60)
             (case / 'stdout.log').write_text(completed.stdout)
             (case / 'stderr.log').write_text(completed.stderr)
-            row = {'smiles':smi,'method':method,'command':command,'directory':case.name,
+            row = {'smiles':smi,'name':case_input.get('name',smi),'method':method,'command':command,'directory':case.name,
                    'returncode':completed.returncode,'cli_output_decimal_places':3,
                    'absolute_tolerance':0.00051,'reports':{}}
             tail = completed.stdout.split('Fukui functions:')[-1].split('\n\n',1)[0]
@@ -87,7 +96,8 @@ def main():
             rows.append(row)
     evidence = {'executable':str(executable),'executable_sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),
                 'library':str(library),'library_sha256':hashlib.sha256(library.read_bytes()).hexdigest(),
-                'scope':'four fixed unoptimized molecules, GFN1/2, 300 K; CLI rounded to 3 decimals',
+                'scope':'fixed unoptimized molecules, GFN1/2, 300 K; CLI rounded to 3 decimals',
+                'input_molecule_count':len(cases),
                 'matched':sum(r['matched_printed_precision'] for r in rows),'total':len(rows),'cases':rows}
     (output / 'comparison.json').write_text(json.dumps(evidence, indent=2, allow_nan=False)+'\n')
     print(json.dumps({k:v for k,v in evidence.items() if k!='cases'},indent=2))

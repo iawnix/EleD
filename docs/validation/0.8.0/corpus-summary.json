@@ -1,0 +1,2062 @@
+{
+  "protocols": {
+    "gfn1-reference-native": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn1-reference-compiled": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn1-independent-native": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn1-independent-compiled": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn2-reference-native": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn2-reference-compiled": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn2-independent-native": {
+      "completed": 38,
+      "failed": 2
+    },
+    "gfn2-independent-compiled": {
+      "completed": 38,
+      "failed": 2
+    }
+  },
+  "interface_comparisons": [
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "water",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ammonia",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "methane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ethene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ethyne",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "methanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ethanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "acetone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "acetic_acid",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "acetate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "methylammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "benzene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "pyridine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "pyrrole",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "furan",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "thiophene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "phenol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "aniline",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "acetonitrile",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "formamide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "dimethyl_sulfide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "dimethyl_sulfoxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "dimethyl_sulfone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "phosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "trimethylphosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "dihydrogen_phosphate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "hydrogen_fluoride",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "fluoromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "chloromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "bromomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "iodomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "methyl_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "oxygen_triplet",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "nitric_oxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "phenoxy_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ethanol-cold",
+      "both_failed": true,
+      "failed_states": [
+        "attached",
+        "attached"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ammonium-cold",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "reference",
+      "id": "ethanol-one-iteration",
+      "both_failed": true,
+      "failed_states": [
+        "reference",
+        "reference"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "water",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ammonia",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "methane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ethene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ethyne",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "methanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ethanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "acetone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "acetic_acid",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "acetate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "methylammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "benzene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "pyridine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "pyrrole",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "furan",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "thiophene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "phenol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "aniline",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "acetonitrile",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "formamide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "dimethyl_sulfide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "dimethyl_sulfoxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "dimethyl_sulfone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "phosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "trimethylphosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "dihydrogen_phosphate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "hydrogen_fluoride",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "fluoromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "chloromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "bromomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "iodomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "methyl_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "oxygen_triplet",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "nitric_oxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "phenoxy_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ethanol-cold",
+      "both_failed": true,
+      "failed_states": [
+        "attached",
+        "attached"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ammonium-cold",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn1",
+      "initialization": "independent",
+      "id": "ethanol-one-iteration",
+      "both_failed": true,
+      "failed_states": [
+        "reference",
+        "reference"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "water",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ammonia",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "methane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ethene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ethyne",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "methanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ethanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "acetone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "acetic_acid",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "acetate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "methylammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "benzene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "pyridine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "pyrrole",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "furan",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "thiophene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "phenol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "aniline",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "acetonitrile",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "formamide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "dimethyl_sulfide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "dimethyl_sulfoxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "dimethyl_sulfone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "phosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "trimethylphosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "dihydrogen_phosphate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "hydrogen_fluoride",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "fluoromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "chloromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "bromomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "iodomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "methyl_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "oxygen_triplet",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "nitric_oxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "phenoxy_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ethanol-cold",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ammonium-cold",
+      "both_failed": true,
+      "failed_states": [
+        "ionized",
+        "ionized"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "reference",
+      "id": "ethanol-one-iteration",
+      "both_failed": true,
+      "failed_states": [
+        "reference",
+        "reference"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "water",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ammonia",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "methane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ethene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ethyne",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "methanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ethanol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "acetone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "acetic_acid",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "acetate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "methylammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ammonium",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "benzene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "pyridine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "pyrrole",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "furan",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "thiophene",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "phenol",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "aniline",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "acetonitrile",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "formamide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "dimethyl_sulfide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "dimethyl_sulfoxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "dimethyl_sulfone",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "phosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "trimethylphosphine",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "dihydrogen_phosphate",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "hydrogen_fluoride",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "fluoromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "chloromethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "bromomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "iodomethane",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "methyl_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "oxygen_triplet",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "nitric_oxide",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "phenoxy_radical",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ethanol-cold",
+      "max_abs_energy_difference_hartree": 0.0,
+      "max_abs_fukui_difference": 0.0,
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ammonium-cold",
+      "both_failed": true,
+      "failed_states": [
+        "ionized",
+        "ionized"
+      ],
+      "matched": true
+    },
+    {
+      "method": "gfn2",
+      "initialization": "independent",
+      "id": "ethanol-one-iteration",
+      "both_failed": true,
+      "failed_states": [
+        "reference",
+        "reference"
+      ],
+      "matched": true
+    }
+  ],
+  "initialization_comparisons": [
+    {
+      "method": "gfn1",
+      "id": "water",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.2308863516219404e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ammonia",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.3685677846542177e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "methane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.0420646945341616e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.50483111069655e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ethene",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 3.815070454216141e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ethyne",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.9646915649929042e-07
+    },
+    {
+      "method": "gfn1",
+      "id": "methanol",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.565199798189923e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ethanol",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.721755128502593e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "acetone",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.215121890029707e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "acetic_acid",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.6759316649194176e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "acetate",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.966815661257897e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "methylammonium",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 8.994942201634437e-07
+    },
+    {
+      "method": "gfn1",
+      "id": "ammonium",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.5286088594912428e-07
+    },
+    {
+      "method": "gfn1",
+      "id": "benzene",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.0065083281314315e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "pyridine",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.1866107178247773e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "pyrrole",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 3.173915747334277e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "furan",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.13468732674005e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "thiophene",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 3.73543561801859e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "phenol",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.441134894892727e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "aniline",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.1791835715934127e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "acetonitrile",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.3260971846461587e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "formamide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.802420478095982e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "dimethyl_sulfide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 3.888928401529768e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "dimethyl_sulfoxide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 9.179213539489695e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "dimethyl_sulfone",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.318516582475397e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "phosphine",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.5232615924176685e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "trimethylphosphine",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.9860989217690417e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "dihydrogen_phosphate",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.206480821666858e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "hydrogen_fluoride",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.4946424249373536e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "fluoromethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.303230937807712e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "chloromethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 7.224585159004704e-07
+    },
+    {
+      "method": "gfn1",
+      "id": "bromomethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.588608770978887e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "iodomethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.835471750175291e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "methyl_radical",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.76565863305467e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "oxygen_triplet",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.81623638140627e-12
+    },
+    {
+      "method": "gfn1",
+      "id": "nitric_oxide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.6787063517043066e-08
+    },
+    {
+      "method": "gfn1",
+      "id": "phenoxy_radical",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.8076178576187374e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ethanol-cold",
+      "failed_states": [
+        "attached",
+        "attached"
+      ]
+    },
+    {
+      "method": "gfn1",
+      "id": "ammonium-cold",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.3227461504182756e-06
+    },
+    {
+      "method": "gfn1",
+      "id": "ethanol-one-iteration",
+      "failed_states": [
+        "reference",
+        "reference"
+      ]
+    },
+    {
+      "method": "gfn2",
+      "id": "water",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.380744601575117e-07
+    },
+    {
+      "method": "gfn2",
+      "id": "ammonia",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.2744442223766583e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "methane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.590295009210266e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.215904547635098e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ethene",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.364010806945373e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ethyne",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.0271151931195988e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "methanol",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.7649659809215734e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ethanol",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 7.969987297240522e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "acetone",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.021381857954864e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "acetic_acid",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.531348083425257e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "acetate",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.651465943141588e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "methylammonium",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.535129071976286e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ammonium",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.5176612584185705e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "benzene",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.549163293234628e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "pyridine",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 3.6274966976890255e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "pyrrole",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.15963949373932e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "furan",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.522602027159152e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "thiophene",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.959526235306157e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "phenol",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 9.88874337304324e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "aniline",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.777765873293816e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "acetonitrile",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 9.572475046848439e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "formamide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 9.244113357009809e-07
+    },
+    {
+      "method": "gfn2",
+      "id": "dimethyl_sulfide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.4967870604353237e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "dimethyl_sulfoxide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.632636208674491e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "dimethyl_sulfone",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 7.817379473751274e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "phosphine",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 9.290342646295358e-07
+    },
+    {
+      "method": "gfn2",
+      "id": "trimethylphosphine",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 7.729887818386239e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "dihydrogen_phosphate",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 8.535770030349e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "hydrogen_fluoride",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 1.2281079000420192e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "fluoromethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.696480156494374e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "chloromethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 3.224386472489016e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "bromomethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.9301804165271506e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "iodomethane",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 2.0668289089087466e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "methyl_radical",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.1294773724119835e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "oxygen_triplet",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 4.496403249731884e-13
+    },
+    {
+      "method": "gfn2",
+      "id": "nitric_oxide",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 6.461477879415867e-07
+    },
+    {
+      "method": "gfn2",
+      "id": "phenoxy_radical",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 5.06655654364252e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ethanol-cold",
+      "failed_states": [
+        null,
+        null
+      ],
+      "max_abs_fukui_difference": 7.96405061254113e-06
+    },
+    {
+      "method": "gfn2",
+      "id": "ammonium-cold",
+      "failed_states": [
+        "ionized",
+        "ionized"
+      ]
+    },
+    {
+      "method": "gfn2",
+      "id": "ethanol-one-iteration",
+      "failed_states": [
+        "reference",
+        "reference"
+      ]
+    }
+  ],
+  "all_interface_checks_passed": true,
+  "scope": "frozen unoptimized structures; failure accounting and protocol agreement only"
+}

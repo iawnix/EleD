@@ -1,0 +1,10 @@
+{
+  "path": "tests/data/reactivity_cases.json",
+  "sha256": "4a677576eb760c148d82ec277af2621dc2f74998717422a94e2c3ebe9443d8d2",
+  "molecule_count": 37,
+  "additional_profiles_per_method": [
+    "ethanol-cold",
+    "ammonium-cold",
+    "ethanol-one-iteration"
+  ]
+}

@@ -28,6 +28,7 @@ struct XTBOptions {
 struct XTBResults {
   bool success = false;
   std::string errorMessage;
+  std::string failureKind;  // calculation or environment; empty on success
   std::string method;
   int conformerId = -1;
   unsigned int numAtoms = 0;

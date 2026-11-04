@@ -215,6 +215,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
   py::class_<XTBResults, std::shared_ptr<XTBResults>, boost::noncopyable>("XTBResults", py::no_init)
       .def_readonly("success", &XTBResults::success)
       .def_readonly("errorMessage", &XTBResults::errorMessage)
+      .def_readonly("failureKind", &XTBResults::failureKind)
       .def_readonly("method", &XTBResults::method)
       .def_readonly("conformerId", &XTBResults::conformerId)
       .def_readonly("numAtoms", &XTBResults::numAtoms)

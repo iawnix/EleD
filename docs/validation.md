@@ -1,7 +1,23 @@
 # Local validation — 2026-11-04
 
 
-## Current scope: 0.7 reference wavefunctions and unified temperature
+## Current scope: 0.8 persistent reactivity datasets
+
+The [0.8 evidence](validation/0.8.0/README.md) covers transactional disk caching,
+exact-dataset checkpoint recovery, explicit failure retry/history and fatal
+runtime/configuration/storage errors. Full development and installed suites
+each report **316 passed, 1 skipped**; official libxtb compatibility reports
+**202 passed, 115 skipped**. Standalone C++, installation and wheel checks passed.
+
+The frozen corpus now includes 37 molecules plus three additional difficulty
+profiles, tested across two methods, both initialization policies and both
+interfaces: **320 triplets**, with **304 completed and 16 failures retained**.
+All **160 interface comparisons** agree, including failed-state identity.
+Original `--vfukui` comparison increased from 8 to **74 cases**, all matching
+within its three-decimal printed precision. These checks verify software and
+protocol behavior, not predictive accuracy. See [persistent batch usage](persistent-batches.md).
+
+## 0.7 reference wavefunctions and unified temperature baseline
 
 Reactivity now defaults to 300 K and separate reference-wavefunction copies for
 both adjacent states. Independent initialization and explicit cold settings

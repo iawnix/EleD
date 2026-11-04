@@ -5,7 +5,7 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.7 supports **gas-phase single points through libxtb only**.
+Version 0.8 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
@@ -78,6 +78,19 @@ Charge-state calculations can fail to converge; errors retain settings and state
 diagnostics. These are approximate GFN energy differences, not calibrated IP/EA
 predictions or optical excitation energies. See the [protocol and API guide](docs/descriptor-reports.md)
 and `examples/descriptor_reports.py` for complete examples and spin conventions.
+
+## Persistent datasets
+
+Version 0.8 adds `ReactivityJob`, `run_reactivity_batch`, `XTBDiskCache` and
+`ReactivityCheckpoint`. Completed molecules resume across process restarts;
+failed rows retain attempt history and require explicit retry. Cache identity
+includes geometry, charge/spin, numerical settings, initialization, analysis,
+engine/parameter hashes and adapter implementation. Configuration, installation
+and storage errors abort instead of being swallowed as molecular failures.
+
+See [persistent batch usage](docs/persistent-batches.md) and
+`examples/reactivity_batch.py`. The frozen regression corpus now includes 37
+molecules plus difficult calculation protocols, with all failures retained.
 
 ## Single molecules and results
 

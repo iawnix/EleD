@@ -1,5 +1,19 @@
 # Changes
 
+## 0.8.0 — persistent reactivity datasets
+
+- Added explicit per-molecule jobs, sequential reactivity batches, successful
+  disk caching, exact-dataset checkpoints and auditable failed-row retries.
+- JSON/SQLite transactions, checksums and exclusive checkpoint writer locks;
+  protocol keys include structures/settings/engine/parameters/implementation.
+  Disk single-point caching also integrates with existing batch/report APIs.
+- Tightened failure handling: runtime/setup/allocation/extraction and unexpected
+  errors propagate even with `run_reactivity(return_errors=True)`. Only genuine
+  calculation failures become null descriptor rows; C++ exposes `failureKind`.
+- Added frozen 37-molecule corpus, cold/iteration-limit cases, cross-process
+  persistence tests and expanded original xTB Fukui comparison. Default physical
+  protocol remains 300 K/reference copies, with explicit open-shell spins.
+
 ## 0.7.0 — reference wavefunctions for charge-state analysis
 
 - Reactivity now defaults to 300 K, matching single-point options. Explicit 0 K

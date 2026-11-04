@@ -12,6 +12,14 @@ class XTBRunError(XTBError):
     """Raised when xTB does not terminate normally."""
 
 
+class XTBEnvironmentError(XTBRunError):
+    """Engine setup, allocation or extraction failed; do not skip as an SCF row."""
+
+
+class XTBCacheError(XTBError):
+    """Persistent data is incompatible, corrupt or conflicts with this dataset."""
+
+
 
 class DescriptorUnavailableError(ValueError):
     """A descriptor needs data not supplied by the selected calculation backend."""

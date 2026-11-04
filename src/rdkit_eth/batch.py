@@ -6,6 +6,7 @@ from copy import deepcopy
 from dataclasses import replace
 import hashlib
 import json
+import sqlite3
 from threading import RLock
 from typing import Any, Callable, Iterable
 
@@ -14,6 +15,7 @@ from .options import XTBOptions
 from .result import XTBResult
 from .runtime import _engine_identity, _parameter_context, _parameter_file
 from .xtb import _resolve_options, run_xtb
+from .errors import XTBCacheError
 
 
 def _prepare(mol: Any, options: XTBOptions) -> tuple[XTBOptions, dict]:
@@ -32,7 +34,9 @@ def _key(options: XTBOptions, metadata: dict) -> str:
         raise ValueError('caching needs an absolute xTB library path so its binary can be fingerprinted')
     values = options.to_dict()
     values.pop('xtb_library', None)
-    payload = {'schema': 4, 'input': metadata, 'options': values,
+    from .persistence import _implementation_identity
+    payload = {'schema': 5, 'input': metadata, 'options': values,
+               'implementation': _implementation_identity(),
                'engine': engine,
                'parameters': _parameter_context(),
                'parameter_file': _parameter_file(options.method, path)}
@@ -128,6 +132,8 @@ def run_xtb_batch(
             resolved, metadata = _prepare(mol, config)
             key = _key(resolved, metadata)
             return cache.get_or_compute(key, lambda: run_xtb(mol, **resolved.to_dict()))
+        except (XTBCacheError, sqlite3.Error):
+            raise
         except Exception as exc:
             if return_exceptions:
                 return exc

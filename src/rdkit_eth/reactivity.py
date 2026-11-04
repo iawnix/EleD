@@ -15,7 +15,7 @@ import numpy as np
 
 from .backends.native import HARTREE_TO_EV, _native_charge_states
 from .electronic_descriptors import _as_result, _finite, _fragments
-from .errors import XTBRunError
+from .errors import XTBRunError, XTBEnvironmentError
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .mapping import _validate_mapping
 from .options import XTBOptions
@@ -208,7 +208,9 @@ def run_reactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
             try:
                 result = next(calculations)
                 results[label] = result; states[label] = _summary(result)
-            except Exception as exc:
+            except XTBEnvironmentError:
+                raise
+            except XTBRunError as exc:
                 states[label] = {'status':'error','charge':charges[label],'uhf':spins[label],
                                  'error':{'type':type(exc).__name__,'message':str(exc)}}
                 for remaining in charges:
@@ -233,7 +235,9 @@ def _charge_state_results(mol, configurations, interface, initialization):
         raw_results = rdXTBTools._RunChargeStates(mol, configurations[0],
             configurations[1].uhf, configurations[2].uhf, initialization == 'reference')
         for raw in raw_results:
-            if not raw.success: raise XTBRunError(raw.errorMessage)
+            if not raw.success:
+                error_type = XTBRunError if raw.failureKind == 'calculation' else XTBEnvironmentError
+                raise error_type(raw.errorMessage)
             yield _as_result(raw)
     elif initialization == 'reference':
         with closing(_native_charge_states(mol, configurations)) as calculations:

@@ -128,11 +128,10 @@ def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_o
                 return None if count==fail_on else fn(source)
             return copy
         return fn
+    from rdkit_eth import XTBEnvironmentError
     with patch.object(_NativeXTB,'_bind',bind):
-        report=run_reactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
-    assert report['error']['state']==state
-    assert 'copy' in report['error']['message']
-    assert all(v is None for v in report['values'].values())
+        with pytest.raises(XTBEnvironmentError,match='copy'):
+            run_reactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
     assert run_reactivity(molecule(),options=XTBOptions(xtb_library=library))['error'] is None
 
 

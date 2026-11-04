@@ -310,6 +310,7 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
   result.parameterFile = parameterFile(api, options, method);
   if (!result.parameterFile.empty()) result.parameterSHA256 = sha256(result.parameterFile);
   Handles h(api);
+  bool inSinglePoint = false;
   try {
     h.env = api.newEnvironment();
     if (!h.env) throw EngineError("Cannot allocate xTB environment");
@@ -334,8 +335,10 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       api.setKeepOverlap(h.env, h.res, true);
       api.check(h.env, "Basis retention setup");
     }
+    inSinglePoint = true;
     api.singlepoint(h.env, h.mol, h.calc, h.res);
     api.check(h.env, "Single point");
+    inSinglePoint = false;
     api.getEnergy(h.env, h.res, &result.totalEnergyHartree);
     api.getNao(h.env, h.res, &result.numOrbitals);
     api.check(h.env, "Energy and basis size");
@@ -409,6 +412,7 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
     return true;
   } catch (const EngineError &error) {
     result.errorMessage = error.what();
+    result.failureKind = inSinglePoint ? "calculation" : "environment";
     return false;
   }
 }
@@ -436,15 +440,9 @@ std::vector<XTBResults> runChargeStates(const ROMol &mol, const XTBOptions &opti
       selected.numUnpairedElectrons = index == 1 ? ionizedUnpaired : attachedUnpaired;
     }
     results.emplace_back();
-    try {
-      if (!runMolImpl(mol, results.back(), selected,
-          index && reuseReference ? reference.res : nullptr,
-          !index && reuseReference ? &reference.res : nullptr)) break;
-    } catch (const std::exception &error) {
-      results.back().success = false;
-      results.back().errorMessage = error.what();
-      break;
-    }
+    if (!runMolImpl(mol, results.back(), selected,
+        index && reuseReference ? reference.res : nullptr,
+        !index && reuseReference ? &reference.res : nullptr)) break;
   }
   return results;
 }

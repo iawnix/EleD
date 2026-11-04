@@ -57,3 +57,10 @@ __all__ += [
     'calc_descriptor_report', 'run_descriptor_batch', 'export_descriptor_reports',
     'calc_reactivity_descriptors', 'run_reactivity', 'ChargeStateCalculationError',
 ]
+
+from .persistence import XTBDiskCache, ReactivityCheckpoint
+from .reactivity_batch import ReactivityJob, run_reactivity_batch
+from .errors import XTBCacheError, XTBEnvironmentError
+
+__all__ += ['XTBDiskCache', 'ReactivityCheckpoint', 'ReactivityJob',
+            'run_reactivity_batch', 'XTBCacheError', 'XTBEnvironmentError']

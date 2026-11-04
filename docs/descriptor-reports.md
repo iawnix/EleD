@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (0.7)
+# Descriptor reports and vertical reactivity (0.8)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
@@ -153,7 +153,9 @@ automatically. Signed values are preserved; sums are checked against 1, 1 and
 0. Explicit disjoint `fragments` aggregate these quantities. These finite
 charge differences are distinct from frontier-MO population approximations.
 
-Any charge-state calculation failure stops subsequent states. By default this
+Any charge-state calculation failure stops subsequent states. Runtime/setup,
+allocation/extraction and unexpected errors propagate even with `return_errors=True`
+(since 0.8); only genuine single-point failures receive error reports. By default this
 raises `ChargeStateCalculationError`, with `.state` and `.states` diagnostics.
 `return_errors=True` returns null derived features and retains completed states,
 failed-state diagnostics, requested settings/spins and `not_run` states. Invalid
@@ -191,3 +193,6 @@ CLI logs and frozen coordinates and compares both initialization policies.
 It is not a production calculation backend or a package dependency. Original
 CLI Fukui values print to three decimals, so matching those values only proves
 agreement within the reported tolerance, not full-precision numerical identity.
+
+For resumable datasets, per-molecule options/spins and persistent caching, see
+[persistent batches](persistent-batches.md).

@@ -8,7 +8,7 @@ from functools import wraps
 from threading import RLock
 from typing import Any, Sequence
 
-from ..errors import XTBNativeNotFoundError, XTBRunError, DescriptorUnavailableError
+from ..errors import XTBNativeNotFoundError, XTBRunError, XTBEnvironmentError, DescriptorUnavailableError
 from ..options import calculation_settings
 from ..result import XTBResult, _frontier_energies
 from ..input import _xyz_from_mol, _method_flag, _effective_charge_uhf, _input_metadata
@@ -124,7 +124,7 @@ class _NativeXTB:
         self.check(environment, 'basis size')
         nshell = sizes[1]
         if sizes[0] != natoms or sizes[2] != nao or not 0 < nshell <= nao or nao * nao > 2147483647:
-            raise XTBRunError('native basis dimensions do not match the result')
+            raise XTBEnvironmentError('native basis dimensions do not match the result')
         overlap = (ctypes.c_double * (nao * nao))()
         aa, ash = (ctypes.c_int * nao)(), (ctypes.c_int * nao)()
         sa, sl = (ctypes.c_int * nshell)(), (ctypes.c_int * nshell)()
@@ -145,7 +145,8 @@ class _NativeXTB:
         status = int(self.check_environment(environment))
         if status:
             detail = self.error(environment)
-            raise XTBRunError(f"native xTB {operation} failed" + (f": {detail}" if detail else ""))
+            error_type = XTBRunError if operation == 'single point' else XTBEnvironmentError
+            raise error_type(f"native xTB {operation} failed" + (f": {detail}" if detail else ""))
 
     @staticmethod
     def _delete(function: Any, handle: Any) -> None:
@@ -234,7 +235,7 @@ def _run_xtb_native(
     results = None
     try:
         if not environment:
-            raise XTBRunError("native xTB could not create an environment")
+            raise XTBEnvironmentError("native xTB could not create an environment")
         library.set_verbosity(environment, 0)
         molecule = library.new_molecule(
             environment,
@@ -248,10 +249,10 @@ def _run_xtb_native(
         )
         library.check(environment, "molecule setup")
         if not molecule:
-            raise XTBRunError('native xTB could not create a molecule')
+            raise XTBEnvironmentError('native xTB could not create a molecule')
         calculator = library.new_calculator()
         if not calculator:
-            raise XTBRunError("native xTB could not create a calculator")
+            raise XTBEnvironmentError("native xTB could not create a calculator")
         loader_name = {
             "GFN0-xTB": "load_gfn0xtb",
             "GFN1-xTB": "load_gfn1xtb",
@@ -267,8 +268,8 @@ def _run_xtb_native(
         results = library.copy_results(_restart) if _restart else library.new_results()
         if not results:
             if _restart:
-                raise XTBRunError('native xTB could not copy the reference wavefunction')
-            raise XTBRunError("native xTB could not create a results object")
+                raise XTBEnvironmentError('native xTB could not copy the reference wavefunction')
+            raise XTBEnvironmentError("native xTB could not create a results object")
         if keep_overlap:
             library.set_keep_overlap(environment, results, True)
             library.check(environment, "basis retention setup")
@@ -287,7 +288,7 @@ def _run_xtb_native(
         library.get_nao(environment, results, ctypes.byref(nao))
         library.check(environment, "result extraction")
         if nao.value <= 0:
-            raise XTBRunError("native xTB returned no orbital basis functions")
+            raise XTBEnvironmentError("native xTB returned no orbital basis functions")
         orbital_energies = (ctypes.c_double * nao.value)()
         occupations = (ctypes.c_double * nao.value)()
         coefficients = (ctypes.c_double * (nao.value * nao.value))()
@@ -302,7 +303,7 @@ def _run_xtb_native(
         if _save_restart is not None:
             saved = library.copy_results(results)
             if not saved:
-                raise XTBRunError('native xTB could not copy the reference wavefunction')
+                raise XTBEnvironmentError('native xTB could not copy the reference wavefunction')
             _save_restart.append((library, saved))
         return XTBResult(
             **basis,
