@@ -1,0 +1,159 @@
+# Descriptor reports and vertical reactivity (0.6)
+
+These APIs organize libxtb results into reproducible features. They do not add
+a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
+Both ctypes and compiled results work with the extraction functions. There
+are no additional Python dependencies.
+
+## Numerical settings
+
+| Python / `XTBOptions` | `rdXTBTools.RunMol` | Default / constraint |
+| --- | --- | --- |
+| `max_iterations` | `maxIterations` | 250; positive 32-bit integer |
+| `accuracy` | `accuracy` | 1.0; finite, 1e-4 to 1e3; smaller is tighter |
+| `electronic_temperature` | `electronicTemperature` | 300 K; finite, nonnegative |
+
+These are xTB numerical controls, not accuracy estimates. Booleans are rejected.
+Values outside the supported accuracy range are rejected instead of silently
+clamped. xTB floors temperature at 1e-6 K; metadata records both requested and
+effective temperature. Settings participate in cache identity. GFN0 is non-SCF;
+retaining its settings does not imply an SCC iteration or finite-T SCF protocol.
+
+## Report API and export
+
+```python
+from rdkit_eth import (
+    run_xtb, calc_descriptor_report, run_descriptor_batch,
+    export_descriptor_reports, XTBOptions, XTBCache,
+)
+
+result = run_xtb(mol, keep_overlap=True, accuracy=0.1)
+report = calc_descriptor_report(mol, result, record_id="molecule-1")
+reports = run_descriptor_batch(molecules, record_ids=identifiers, cache=XTBCache())
+export_descriptor_reports(reports, "features.csv")
+export_descriptor_reports(reports, "features.jsonl")
+```
+
+`calc_descriptor_report` performs no engine calls. It checks original atom order,
+topology and geometry before attaching atom/bond/spatial descriptors. It combines
+the [existing descriptors](descriptors.md), both population definitions and
+degeneracy-aware frontier distributions. `run_descriptor_batch` calculates
+sequentially and retains overlap by default. With an official library, explicitly
+use `options=XTBOptions(keep_overlap=False)` for basic features.
+
+The report schema version is **1** and descriptor-definition version is **1.0**;
+neither is the package version. `descriptor_columns(frontier_depth=2)` returns
+the ordered scalar schema and units. Each report includes:
+
+- `values`, `units`: fixed molecular/frontier scalar fields. Numeric units are
+  explicit; nonnumeric identity fields have no physical unit.
+- `atoms`, `bonds`, `fragments`, `populations`, `frontier`: nested indexed data.
+  Frontier sections retain the actual MO indices used for each group.
+- `analysis_settings`: thresholds, degeneracy tolerance and extraction controls.
+- `provenance`: input hashes, charge/spin, numerical settings, engine and parameter
+  identity. Failed calculations retain requested options where no result exists.
+- `quality`, `missing`, `error`: observed flags, missing reasons and errors.
+
+Statuses are `ok`, `partial`, `warning`, `error`; flags and `missing` remain the
+authoritative detail when issues coexist. Unretained basis gives null population
+sections, not zero populations. Invalid matrices or mismatched provenance raise
+on extraction; batching converts a row failure into null scalar fields and an
+error record. IDs and input order are preserved. Global analysis-argument errors
+are rejected before calculations. Fragment indices are shared across batch rows;
+for different fragment definitions, extract each report separately.
+
+CSV contains scalar features and JSON columns for units/settings/provenance/
+quality/missing/error. Null numeric features become blank CSV cells. JSONL keeps
+all nested atom, bond, fragment and orbital arrays. Export rejects incompatible
+schema/descriptor versions, report types or columns and nonfinite JSON values,
+then atomically replaces the destination. Export single-point and reactivity
+reports into separate files.
+
+Quality checks include fractional occupations, frontier-threshold sensitivity,
+charge/electron conservation, missing frontier groups, spin-summed open-shell
+interpretation and charged-dipole origin dependence. Actual SCF iteration counts
+and residuals are **not exposed by libxtb's C API**; they remain null with an
+explicit reason. Successful API completion is not a measured residual or an
+experimental accuracy guarantee.
+
+## Fixed-geometry charge-state analysis
+
+```python
+from rdkit_eth import run_reactivity, XTBOptions, calc_reactivity_descriptors
+
+# Default protocol: GFN2, requested 0 K, effective 1e-6 K, no geometry changes.
+reaction = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
+print(reaction["values"]["vertical_ip_eV"])
+print(reaction["atoms"])  # f_plus, f_minus, f_radical, dual
+
+# Explicit finite-temperature protocol; records a quality warning.
+reaction = run_reactivity(mol, options=XTBOptions(electronic_temperature=300.),
+                          interface="compiled", return_errors=True)
+# Existing compatible results can instead be analyzed without new calculations:
+# calc_reactivity_descriptors(mol, reference, ionized, attached)
+```
+
+Only GFN1/2 support this ΔSCF workflow. It evaluates reference charge Q,
+ionized Q+1 and attached Q−1 at the **same input geometry**, method, numerical
+settings, engine and parameter identity. Inputs require explicit H atoms and
+a 3D conformer, as for `run_xtb`. No optimization or spin-state search occurs.
+For a closed-shell reference, adjacent states default to one unpaired electron.
+For an open-shell reference, explicitly supply both `ionized_uhf` and
+`attached_uhf`; spin parity is validated. The selected states are not asserted
+to be ground states.
+
+`run_reactivity()` with no options requests 0 K. Passing `XTBOptions()` explicitly
+uses that object's usual 300 K default. Temperature here is an electronic
+occupation setting, not a nuclear thermal ensemble or a solution free energy.
+
+With N modeled electrons and energies converted from Hartree to eV:
+
+| Field | Definition |
+| --- | --- |
+| `vertical_ip_eV` | E(N−1) − E(N) |
+| `vertical_ea_eV` | E(N) − E(N+1) |
+| `chemical_potential_eV` | −(IP+EA)/2 |
+| `electronegativity_eV` | (IP+EA)/2 |
+| `hardness_eV` | η = (IP−EA)/2 |
+| `softness_per_eV` | 1/(IP−EA) = 1/(2η) |
+| `electrophilicity_eV` | μ²/(2η) |
+
+The softness convention is explicit because literature conventions differ.
+When η ≤ 1e-8 eV, softness/electrophilicity are null with a reason. Negative IP
+or EA is retained and flagged; a converged attached state does not establish a
+bound anion. These values use the libxtb total-energy API and are approximate
+GFN descriptors, **not calibrated experimental IP/EA or optical excitations**.
+
+For atomic electron populations nA, f+ = nA(N+1)−nA(N), f− = nA(N)−nA(N−1),
+f0 = (f++f−)/2, dual = f+−f−. `population_scheme="charges"` uses equivalent
+differences of engine charges: f+ = qA(N)−qA(N+1), f− = qA(N−1)−qA(N).
+`"mulliken"` and `"lowdin"` require the extended library and retain basis data
+automatically. Signed values are preserved; sums are checked against 1, 1 and
+0. Explicit disjoint `fragments` aggregate these quantities. These finite
+charge differences are distinct from frontier-MO population approximations.
+
+Any charge-state calculation failure stops subsequent states. By default this
+raises `ChargeStateCalculationError`, with `.state` and `.states` diagnostics.
+`return_errors=True` returns null derived features and retains completed states,
+failed-state diagnostics, requested settings/spins and `not_run` states. Invalid
+inputs, unsupported options and engine resolution errors before the state loop,
+or incompatible results during analysis, still raise; this flag is not a blanket
+exception suppressor. Dataset callers should handle those errors explicitly.
+
+There is no automatic change of temperature, spin or method to force convergence.
+In our frozen test geometries, cold GFN1 ethanol and GFN2 ammonium charge states
+failed even at 1000 iterations. Explicit 300 K protocols converged, with different
+energies. The first failing state can depend on numerical details; all failure
+rows must be retained in dataset accounting.
+
+## Reproduce checks
+
+```bash
+python -m rdkit_eth doctor --check compiled --keep-overlap --reactivity
+python examples/descriptor_reports.py --output build/reports --sensitivity
+```
+
+The example saves exact geometries, settings, all three state records and failure
+rows for a small temperature study. Its unoptimized structures test protocol
+behavior, not predictive accuracy. Conformer ensembles, solvent, calibrated
+IP/EA benchmarks and excited-state datasets remain future work.

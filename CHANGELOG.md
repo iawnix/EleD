@@ -1,5 +1,18 @@
 # Changes
 
+## 0.6.0 — versioned descriptor reports and vertical charge states
+
+- Unified iteration limit, accuracy and electronic temperature across ctypes and
+  C++/Python, with validated ranges, effective temperature and cache identity.
+- Added versioned descriptor reports, observable quality flags, ordered batch
+  extraction and atomic CSV/JSONL export with explicit missing/error semantics.
+- Added fixed-geometry GFN1/2 ΔSCF IP/EA, conceptual-DFT quantities, atomic and
+  fragment condensed Fukui descriptors from engine charges or Mulliken/Löwdin
+  populations. Explicit spin policy, three-state provenance and SCF failure records.
+- Added installed-wheel diagnostics and analytical/real-engine protocol tests.
+  Approximate energy differences are not calibrated experimental predictions.
+  Existing lower-level descriptor APIs and the 0.5 native engine remain usable.
+
 ## 0.5.0 — standard native installation and upstream GFN0 repair
 
 - Pinned upstream PR #1490 at `33fe381`; new engine builds apply only the basis

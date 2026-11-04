@@ -250,7 +250,7 @@ bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
     throw std::invalid_argument("Too many atoms for the xTB C API");
   if (!mol.getNumConformers()) throw std::invalid_argument("Molecule must have a 3D conformer");
   if (options.confId < -1) throw std::invalid_argument("confId must be -1 or a conformer ID");
-  if (options.maxIterations < 1 || !std::isfinite(options.accuracy) || options.accuracy <= 0 ||
+  if (options.maxIterations < 1 || !std::isfinite(options.accuracy) || (options.accuracy < 1e-4 || options.accuracy > 1e3) ||
       !std::isfinite(options.electronicTemperature) || options.electronicTemperature < 0)
     throw std::invalid_argument("Invalid iteration limit, accuracy, or electronic temperature");
   const Conformer *conf = nullptr;
@@ -289,6 +289,10 @@ bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
       (electrons - result.numUnpairedElectrons) % 2)
     throw std::invalid_argument("Charge and unpaired electrons are inconsistent with electron count");
   result.numTotalElectrons = static_cast<int>(electrons);
+  result.maxIterations = options.maxIterations;
+  result.accuracy = options.accuracy;
+  result.electronicTemperature = options.electronicTemperature;
+  result.effectiveElectronicTemperature = std::max(options.electronicTemperature, 1e-6);
   result.method = "GFN" + std::to_string(method) + "-xTB";
   result.numAtoms = n;
   result.conformerId = conf->getId();

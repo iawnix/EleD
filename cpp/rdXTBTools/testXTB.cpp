@@ -88,6 +88,18 @@ int main() {
     }
     for (auto &task : pending)
       require(std::abs(task.get() - before.totalEnergyHartree) < 1e-10, "Threaded C++ calculation differs");
+    options.accuracy = 0.1;
+    options.maxIterations = 333;
+    options.electronicTemperature = 0.;
+    require(RDKit::XTBTools::runMol(mol, intermediate, options), "Nondefault settings failed");
+    require(intermediate.accuracy == 0.1 && intermediate.maxIterations == 333 &&
+            intermediate.electronicTemperature == 0. && intermediate.effectiveElectronicTemperature == 1e-6,
+            "Numerical settings were not retained");
+    options.accuracy = 1e-5;
+    bool clampingRejected = false;
+    try { RDKit::XTBTools::runMol(mol, intermediate, options); }
+    catch (const std::invalid_argument &) { clampingRejected = true; }
+    require(clampingRejected, "Accuracy requiring engine clamping was accepted");
     require(mol.getNumAtoms() == 3 && mol.getConformer(7).getAtomPos(1).x == .758, "Input molecule changed");
     std::cout << "C++ GFN2, GFN0 guard/state, SCF failure recovery, and serialization passed\n";
     return 0;

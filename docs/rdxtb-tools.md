@@ -237,3 +237,11 @@ threads; and reject unverified GFN0 before initialization. The C++ test also
 exercises multiple calls without Python. The
 [compiled CI workflow](../.github/workflows/rdxtb-tools.yml) covers release
 and patched dependencies. See [local validation evidence](validation.md).
+
+## Shared numerical settings (0.6)
+
+`maxIterations`, `accuracy` and `electronicTemperature` have matching validated
+ctypes options and are retained on compiled results, together with
+`effectiveElectronicTemperature`. Recompile C++ consumers when upgrading.
+See [descriptor reports](descriptor-reports.md) for ranges, units, batch export
+and the GFN1/2 charge-state workflow accepting compiled results.

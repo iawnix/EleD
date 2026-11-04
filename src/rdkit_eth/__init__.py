@@ -45,3 +45,15 @@ __all__ = [
     "calc_frontier_descriptors",
     "DescriptorUnavailableError",
 ]
+
+from .reports import (
+    DESCRIPTOR_VERSION, descriptor_columns, assess_descriptor_quality,
+    calc_descriptor_report, run_descriptor_batch, export_descriptor_reports,
+)
+from .reactivity import calc_reactivity_descriptors, run_reactivity, ChargeStateCalculationError
+
+__all__ += [
+    'DESCRIPTOR_VERSION', 'descriptor_columns', 'assess_descriptor_quality',
+    'calc_descriptor_report', 'run_descriptor_batch', 'export_descriptor_reports',
+    'calc_reactivity_descriptors', 'run_reactivity', 'ChargeStateCalculationError',
+]

@@ -99,7 +99,8 @@ def main():
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
             for backend in ('native', 'compiled'):
                 checked = run([runtime / 'bin/python', '-I', '-m', 'rdkit_eth', 'doctor',
-                               '--check', backend, '--method', method, '--keep-overlap', '--json'],
+                               '--check', backend, '--method', method, '--keep-overlap', '--json',
+                               *(['--reactivity'] if method != 'GFN0-xTB' else [])],
                               env=env, cwd=neutral, capture_output=True, text=True)
                 report = json.loads(checked.stdout)
                 if not Path(report['package_path']).is_relative_to(runtime):

@@ -1,4 +1,4 @@
-# Installing rdkit-eth 0.5
+# Installing rdkit-eth 0.6
 
 The standard profile uses **one extended libxtb for GFN0/1/2 and all current
 descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux
@@ -71,11 +71,19 @@ the additional overlap matrix. Both APIs retain results in original atom order.
 The source build disables tblite and CPCM-X, and needs neither Python tblite
 nor ASE. GFN0/1/2 and radicals use the same engine, with spin-summed populations.
 
+## Upgrade from 0.5
+
+The extended engine is unchanged in 0.6. Rebuild the adapter in the matched SDK
+(the C++ result layout now includes numerical settings); restart Python sessions.
+The standard installer can be rerun and verifies the new reports and GFN1/2
+reactivity in addition to all-method population checks. Existing 0.5 artifacts
+remain historical. See [new API conventions](descriptor-reports.md).
+
 ## Upgrade from 0.4
 
 The 0.4 `.xtb-native` installation uses an older upstream revision plus our
 D4 repair. Preserve it to reproduce old experiments. The standard installer
-builds 0.5 in its own directory and uses the official GFN0 repair instead.
+builds the current adapter in its own directory and uses the official GFN0 repair instead.
 Previously verified 0.4 libraries are still recognized when selected explicitly.
 Unknown libraries do not gain GFN0 permission just because they report 6.7.1.
 
@@ -99,6 +107,7 @@ link native tblite; this does not apply to our standard source build.
 
 `python -m rdkit_eth doctor --check native` or `--check compiled` runs a water
 calculation. Add `--method GFN0-xTB --keep-overlap` to check the full capability.
+Add `--reactivity` with GFN1/2 to check the three charge states.
 `--json` records the actual library, parameters and descriptor checks. Missing
 capabilities fail explicitly. Inventory without `--check` does not prove the
 engine works. Restart Python after replacing a loaded library.
@@ -107,10 +116,10 @@ To reproduce an independent artifact directory in the standard environment:
 
 ```bash
 python tools/build_release.py --compiled --xtb-prefix "$CONDA_PREFIX" \
-  --output build/release-0.5.0
-python tools/check_wheel.py build/release-0.5.0/compiled/*.whl \
+  --output build/release-0.6.0
+python tools/check_wheel.py build/release-0.6.0/compiled/*.whl \
   --kind compiled --check compiled --check native --keep-overlap \
-  --output build/release-0.5.0/installed.json
+  --output build/release-0.6.0/installed.json
 ```
 
 Choose a new/empty output directory. Wheels contain the adapter, not copies of

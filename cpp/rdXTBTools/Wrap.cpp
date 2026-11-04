@@ -97,7 +97,8 @@ struct ReleaseGIL {
 py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
               const py::object &charge, const py::object &unpaired, bool keepCoefficients,
               const std::string &library, const std::string &parameterDirectory,
-              int maxIterations, double accuracy, double electronicTemperature, bool keepOverlap) {
+              const py::object &maxIterations, const py::object &accuracy,
+              const py::object &electronicTemperature, bool keepOverlap) {
   XTBOptions options;
   options.confId = confId;
   options.method = method;
@@ -107,9 +108,11 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.keepOverlap = keepOverlap;
   options.libraryPath = library;
   options.parameterDirectory = parameterDirectory;
-  options.maxIterations = maxIterations;
-  options.accuracy = accuracy;
-  options.electronicTemperature = electronicTemperature;
+  py::object settings = py::import("rdkit_eth.options").attr("calculation_settings")(
+      maxIterations, accuracy, electronicTemperature);
+  options.maxIterations = py::extract<int>(settings["max_iterations"]);
+  options.accuracy = py::extract<double>(settings["accuracy"]);
+  options.electronicTemperature = py::extract<double>(settings["electronic_temperature"]);
   // Snapshot the molecule under the GIL before allowing Python threads to run.
   RDKit::ROMol snapshot(mol);
   auto result = std::make_shared<XTBResults>();
@@ -174,6 +177,10 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def_readonly("numUnpairedElectrons", &XTBResults::numUnpairedElectrons)
       .def_readonly("charge", &XTBResults::charge)
       .def_readonly("apiVersion", &XTBResults::apiVersion)
+      .def_readonly("maxIterations", &XTBResults::maxIterations)
+      .def_readonly("accuracy", &XTBResults::accuracy)
+      .def_readonly("electronicTemperature", &XTBResults::electronicTemperature)
+      .def_readonly("effectiveElectronicTemperature", &XTBResults::effectiveElectronicTemperature)
       .def_readonly("gfn0StateFixVerified", &XTBResults::gfn0StateFixVerified)
       .def_readonly("basisExportVerified", &XTBResults::basisExportVerified)
       .def_readonly("inputProvenanceJSON", &XTBResults::inputProvenanceJSON)

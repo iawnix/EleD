@@ -23,8 +23,11 @@ def main():
     parser.add_argument("--method", default="GFN2-xTB", choices=("GFN0-xTB", "GFN1-xTB", "GFN2-xTB"))
     parser.add_argument("--library")
     parser.add_argument("--keep-overlap", action="store_true")
+    parser.add_argument("--reactivity", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    if args.reactivity and (not args.check or args.method == 'GFN0-xTB'):
+        parser.error('--reactivity requires --check and GFN1/2')
     wheel = args.wheel.resolve(strict=True)
     if args.library:
         args.library = str(Path(args.library).resolve())
@@ -59,6 +62,8 @@ def main():
             extra = ["--check", backend, "--method", args.method]
             if args.keep_overlap:
                 extra.append("--keep-overlap")
+            if args.reactivity:
+                extra.append("--reactivity")
             if args.library:
                 extra.extend(["--library", args.library])
             checks.append(doctor(extra))

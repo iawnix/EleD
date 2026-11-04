@@ -35,6 +35,14 @@ def _as_result(result):
                      shell_atom_indices=tuple(map(int, result.GetShellAtomMap())),
                      shell_angular_momenta=tuple(map(int, result.GetShellAngularMomenta())))
     metadata = json.loads(result.inputProvenanceJSON) if result.inputProvenanceJSON else {'atom_count': result.numAtoms}
+    metadata = dict(metadata)
+    metadata.update(calculation_status='success', calculation_settings={
+        'max_iterations': result.maxIterations, 'accuracy': result.accuracy,
+        'electronic_temperature': result.electronicTemperature,
+        'effective_electronic_temperature': result.effectiveElectronicTemperature},
+        engine={'backend': 'compiled', 'path': result.libraryPath, 'sha256': result.librarySHA256,
+                'source_commit': result.sourceCommit, 'api_version': result.apiVersion},
+        parameter_file={'path': result.parameterFile, 'sha256': result.parameterSHA256} if result.parameterFile else None)
     return XTBResult(
         **basis,
         method=result.method, version=None, total_energy_eh=result.totalEnergyHartree,

@@ -37,6 +37,10 @@ struct XTBResults {
   int numUnpairedElectrons = 0;
   int charge = 0;
   int apiVersion = 0;
+  int maxIterations = 250;
+  double accuracy = 1.0;
+  double electronicTemperature = 300.0;
+  double effectiveElectronicTemperature = 300.0;
   bool gfn0StateFixVerified = false;
   double totalEnergyHartree = std::numeric_limits<double>::quiet_NaN();
   std::string libraryPath;

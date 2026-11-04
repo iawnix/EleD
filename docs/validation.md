@@ -1,7 +1,26 @@
 # Local validation — 2026-11-04
 
 
-## Current scope: 0.5 standard native installation
+## Current scope: 0.6 descriptor reports and vertical reactivity
+
+Version 0.6 retains the 0.5 extended engine and adds shared numerical settings,
+versioned reports, CSV/JSONL export, observable quality flags and fixed-geometry
+GFN1/2 ΔSCF/Fukui analysis. The [0.6 evidence](validation/0.6.0/README.md) records:
+
+- Complete extended-engine suite and installed wheel outside checkout: each
+  **274 passed, 1 skipped**; official-library compatibility: **172 passed,
+  103 skipped** for unavailable extended capabilities.
+- Standalone C++, standard installer upgrade and both wheel variants passed.
+  Installed GFN1/2 diagnostics include all three charge states.
+- Nine temperature-protocol cases retain exact geometries and settings, seven
+  completed reports and two explicit cold SCF failures. No automatic temperature
+  retries or discarded failures.
+
+Analytical and interface tests verify formulas, provenance and conservation;
+they do not validate experimental IP/EA accuracy or excited-state predictions.
+See [API conventions and limitations](descriptor-reports.md).
+
+## 0.5 standard native installation baseline
 
 The native dependency now pins upstream PR #1490's merged commit `33fe381`.
 Only the basis-export patch is applied; the local D4 repair is retained as

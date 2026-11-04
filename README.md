@@ -5,7 +5,7 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.5 supports **gas-phase single points through libxtb only**.
+Version 0.6 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
@@ -54,6 +54,27 @@ Build it with `RDKIT_ETH_BUILD_RDXTB=1` in the matched RDKit/Boost development
 environment. It supports gas-phase GFN0/1/2, requires a verified patched
 library for GFN0, and also provides an installable C++ library. See the
 [build guide, API contract and unit comparison](docs/rdxtb-tools.md).
+
+## Versioned features and vertical reactivity
+
+Version 0.6 adds reports with units, provenance, quality flags and CSV/JSONL
+export, plus fixed-geometry GFN1/2 ΔSCF IP/EA, conceptual-DFT descriptors and
+charge/Mulliken/Löwdin condensed Fukui analysis. Numerical settings are shared
+by the ctypes and compiled APIs. No additional Python backend is required.
+
+```python
+from rdkit_eth import run_descriptor_batch, export_descriptor_reports, run_reactivity
+
+reports = run_descriptor_batch(molecules, record_ids=identifiers)
+export_descriptor_reports(reports, "features.csv")
+reactivity = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
+print(reactivity["values"])  # missing/failed values are None, never fabricated zeros
+```
+
+Charge-state calculations can fail to converge; errors retain settings and state
+diagnostics. These are approximate GFN energy differences, not calibrated IP/EA
+predictions or optical excitation energies. See the [protocol and API guide](docs/descriptor-reports.md)
+and `examples/descriptor_reports.py` for complete examples and spin conventions.
 
 ## Single molecules and results
 

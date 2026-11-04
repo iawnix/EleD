@@ -21,12 +21,13 @@ jobs:
         run: |
           .rdkit-eth/runtime/bin/python -I examples/electronic_descriptors.py --populations
           .rdkit-eth/runtime/bin/python -I examples/rdxtb_tools.py
+          .rdkit-eth/runtime/bin/python -I examples/descriptor_reports.py --output build/descriptor-example
       - name: Check the installed compiled wheel outside checkout
         run: |
           .rdkit-eth/runtime/bin/python tools/check_wheel.py .rdkit-eth/artifacts/build-*/compiled/*.whl --kind compiled --library "$PWD/.rdkit-eth/runtime/lib/libxtb.so" --check native --check compiled --method GFN0-xTB --keep-overlap --output .rdkit-eth/installed-wheel.json
       - uses: actions/upload-artifact@v4
         with:
-          name: standard-native-0.5.0
+          name: standard-native-0.6.0
           include-hidden-files: true
           path: |
             .rdkit-eth/installation.json

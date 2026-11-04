@@ -1,0 +1,9 @@
+[1/2] Building CXX object CMakeFiles/rdxtb_cpp_test.dir/cpp/rdXTBTools/testXTB.cpp.o
+[2/2] Linking CXX executable rdxtb_cpp_test
+Test project /home/iaw/project/rdkit_eth/build/core-0.6
+    Start 1: rdXTBTools/core
+1/1 Test #1: rdXTBTools/core ..................   Passed    0.24 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.24 sec

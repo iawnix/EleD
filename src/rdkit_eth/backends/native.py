@@ -9,6 +9,7 @@ from threading import RLock
 from typing import Any, Sequence
 
 from ..errors import XTBNativeNotFoundError, XTBRunError, DescriptorUnavailableError
+from ..options import calculation_settings
 from ..result import XTBResult, _frontier_energies
 from ..input import _xyz_from_mol, _method_flag, _effective_charge_uhf, _input_metadata
 from ..runtime import _find_xtb_library, _engine_identity, _parameter_file
@@ -78,6 +79,9 @@ class _NativeXTB:
                 "load_" + method.lower(),
                 self._bind("xtb_load" + method, None, [h, h, h, ctypes.c_char_p]),
             )
+        self.set_max_iterations = self._bind('xtb_setMaxIter', None, [h, h, ctypes.c_int])
+        self.set_accuracy = self._bind('xtb_setAccuracy', None, [h, h, ctypes.c_double])
+        self.set_temperature = self._bind('xtb_setElectronicTemp', None, [h, h, ctypes.c_double])
         self.new_results = self._bind("xtb_newResults", h, [])
         self.del_results = self._bind("xtb_delResults", None, [ctypes.POINTER(h)])
         self.singlepoint = self._bind("xtb_singlepoint", None, [h, h, h, h])
@@ -171,6 +175,9 @@ def run_xtb_native(
     uhf: int | None = None,
     xtb_library: str | os.PathLike[str] | None = None,
     keep_overlap: bool = False,
+    max_iterations: int = 250,
+    accuracy: float = 1.0,
+    electronic_temperature: float = 300.0,
 ) -> XTBResult:
     """Run a single point through a shared ``libxtb`` C API library.
 
@@ -178,6 +185,9 @@ def run_xtb_native(
     and solvent setup are outside its current API.
     """
 
+    from rdkit import Chem
+    settings = calculation_settings(max_iterations, accuracy, electronic_temperature)
+    mol = Chem.Mol(mol)  # Own the exact geometry/topology while ctypes releases the GIL.
     if not isinstance(keep_overlap, bool):
         raise ValueError('keep_overlap must be a bool')
     xyz = _xyz_from_mol(mol, conf_id)
@@ -247,6 +257,10 @@ def run_xtb_native(
         parameter_path = os.fsencode(parameter['path']) if parameter else None
         getattr(library, loader_name)(environment, molecule, calculator, parameter_path)
         library.check(environment, "parameter loading")
+        library.set_max_iterations(environment, calculator, settings['max_iterations'])
+        library.set_accuracy(environment, calculator, settings['accuracy'])
+        library.set_temperature(environment, calculator, settings['electronic_temperature'])
+        library.check(environment, 'calculator settings')
         results = library.new_results()
         if not results:
             raise XTBRunError("native xTB could not create a results object")
@@ -305,6 +319,8 @@ def run_xtb_native(
             raw_json={"native_api_version": int(library.get_api_version())},
             metadata={
                 **_input_metadata(mol, conf_id, charge, uhf, xyz),
+                'calculation_settings': settings,
+                'calculation_status': 'success',
                 'optimize': False,
                 'solvent': None,
                 'engine': engine,

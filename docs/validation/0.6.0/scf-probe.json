@@ -1,0 +1,322 @@
+[
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 0.0,
+    "max_iterations": 250,
+    "interface": "native",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "attached charge-state calculation failed: native xTB single point failed: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "attached"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 0.0,
+    "max_iterations": 250,
+    "interface": "compiled",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "attached charge-state calculation failed: Single point: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "attached"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 0.0,
+    "max_iterations": 1000,
+    "interface": "native",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "attached charge-state calculation failed: native xTB single point failed: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "attached"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 0.0,
+    "max_iterations": 1000,
+    "interface": "compiled",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "attached charge-state calculation failed: Single point: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "attached"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 300.0,
+    "max_iterations": 250,
+    "interface": "native",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 16.067756784486463,
+      "vertical_ea_eV": 0.11471282550255205,
+      "chemical_potential_eV": -8.091234804994507,
+      "electronegativity_eV": 8.091234804994507,
+      "hardness_eV": 7.976521979491955,
+      "softness_per_eV": 0.06268396191792933,
+      "electrophilicity_eV": 4.103798675530279
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 300.0,
+    "max_iterations": 250,
+    "interface": "compiled",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 16.067756784486463,
+      "vertical_ea_eV": 0.11471282550255205,
+      "chemical_potential_eV": -8.091234804994507,
+      "electronegativity_eV": 8.091234804994507,
+      "hardness_eV": 7.976521979491955,
+      "softness_per_eV": 0.06268396191792933,
+      "electrophilicity_eV": 4.103798675530279
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 1000.0,
+    "max_iterations": 250,
+    "interface": "native",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 16.05269181671661,
+      "vertical_ea_eV": 0.19223633415747396,
+      "chemical_potential_eV": -8.122464075437042,
+      "electronegativity_eV": 8.122464075437042,
+      "hardness_eV": 7.930227741279568,
+      "softness_per_eV": 0.0630498916692301,
+      "electrophilicity_eV": 4.159680201449054
+    }
+  },
+  {
+    "smiles": "CCO",
+    "method": "gfn1",
+    "temperature": 1000.0,
+    "max_iterations": 250,
+    "interface": "compiled",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 16.05269181671661,
+      "vertical_ea_eV": 0.19223633415747396,
+      "chemical_potential_eV": -8.122464075437042,
+      "electronegativity_eV": 8.122464075437042,
+      "hardness_eV": 7.930227741279568,
+      "softness_per_eV": 0.0630498916692301,
+      "electrophilicity_eV": 4.159680201449054
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 0.0,
+    "max_iterations": 250,
+    "interface": "native",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "ionized charge-state calculation failed: native xTB single point failed: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "ionized"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 0.0,
+    "max_iterations": 250,
+    "interface": "compiled",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "ionized charge-state calculation failed: Single point: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "ionized"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 0.0,
+    "max_iterations": 1000,
+    "interface": "native",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "ionized charge-state calculation failed: native xTB single point failed: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "ionized"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 0.0,
+    "max_iterations": 1000,
+    "interface": "compiled",
+    "status": "error",
+    "error": {
+      "type": "ChargeStateCalculationError",
+      "message": "ionized charge-state calculation failed: Single point: -2- xtb_calculator_singlepoint: Electronic structure method terminated\n-1- scf: Self consistent charge iterator did not converge",
+      "state": "ionized"
+    },
+    "values": {
+      "vertical_ip_eV": null,
+      "vertical_ea_eV": null,
+      "chemical_potential_eV": null,
+      "electronegativity_eV": null,
+      "hardness_eV": null,
+      "softness_per_eV": null,
+      "electrophilicity_eV": null
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 300.0,
+    "max_iterations": 250,
+    "interface": "native",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 27.226332252798503,
+      "vertical_ea_eV": 4.754807324579435,
+      "chemical_potential_eV": -15.990569788688969,
+      "electronegativity_eV": 15.990569788688969,
+      "hardness_eV": 11.235762464109534,
+      "softness_per_eV": 0.044500762773968666,
+      "electrophilicity_eV": 11.37877037645247
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 300.0,
+    "max_iterations": 250,
+    "interface": "compiled",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 27.226332252798503,
+      "vertical_ea_eV": 4.754807324579435,
+      "chemical_potential_eV": -15.990569788688969,
+      "electronegativity_eV": 15.990569788688969,
+      "hardness_eV": 11.235762464109534,
+      "softness_per_eV": 0.044500762773968666,
+      "electrophilicity_eV": 11.37877037645247
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 1000.0,
+    "max_iterations": 250,
+    "interface": "native",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 27.111934284065903,
+      "vertical_ea_eV": 4.754807324575012,
+      "chemical_potential_eV": -15.933370804320457,
+      "electronegativity_eV": 15.933370804320457,
+      "hardness_eV": 11.178563479745446,
+      "softness_per_eV": 0.04472846631017976,
+      "electrophilicity_eV": 11.35531884968786
+    }
+  },
+  {
+    "smiles": "[NH4+]",
+    "method": "gfn2",
+    "temperature": 1000.0,
+    "max_iterations": 250,
+    "interface": "compiled",
+    "status": "warning",
+    "error": null,
+    "values": {
+      "vertical_ip_eV": 27.111934284065903,
+      "vertical_ea_eV": 4.754807324575012,
+      "chemical_potential_eV": -15.933370804320457,
+      "electronegativity_eV": 15.933370804320457,
+      "hardness_eV": 11.178563479745446,
+      "softness_per_eV": 0.04472846631017976,
+      "electrophilicity_eV": 11.35531884968786
+    }
+  }
+]

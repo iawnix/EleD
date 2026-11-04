@@ -37,7 +37,7 @@ def installation_info():
     }
 
 
-def check_backend(backend, method, library=None, keep_overlap=False):
+def check_backend(backend, method, library=None, keep_overlap=False, reactivity=False):
     """Calculate fixed water, returning actual engine identity and explicit units."""
     from rdkit import Chem
 
@@ -100,11 +100,23 @@ def check_backend(backend, method, library=None, keep_overlap=False):
         population_check = {"electron_sum_e": electrons,
                             "orthonormality_error": populations["orthonormality_error"],
                             "homo_lumo_atom_overlap": frontier["homo_lumo_atom_overlap"]}
+    from .reports import calc_descriptor_report
+    descriptor_report = calc_descriptor_report(mol, result, include_orbitals=keep_overlap)
+    if descriptor_report['quality']['status'] == 'error':
+        raise RuntimeError('descriptor report failed quality checks')
+    reactivity_report = None
+    if reactivity:
+        from .options import XTBOptions
+        from .reactivity import run_reactivity
+        reactivity_report = run_reactivity(mol, interface=backend,
+            options=XTBOptions(method=method, xtb_library=library, electronic_temperature=0.),
+            population_scheme='lowdin' if keep_overlap else 'charges')
     return {"backend": backend, "method": method, "molecule": "water",
             "total_energy_hartree": energy, "num_orbitals": nao,
             "charge_sum_e": float(sum(charges)), "engine": engine,
             "descriptors": descriptors, "fragment_descriptors": fragments,
-            "population_check": population_check}
+            "population_check": population_check,
+            "descriptor_report": descriptor_report, "reactivity_report": reactivity_report}
 
 
 def main(argv=None):
@@ -116,12 +128,15 @@ def main(argv=None):
     doctor.add_argument("--method", default="GFN2-xTB", choices=("GFN0-xTB", "GFN1-xTB", "GFN2-xTB"))
     doctor.add_argument("--library", help="explicit libxtb shared library for native/compiled checks")
     doctor.add_argument("--keep-overlap", action="store_true", help="verify native basis export and population descriptors")
+    doctor.add_argument("--reactivity", action="store_true", help="also verify fixed-geometry GFN1/2 charge-state descriptors")
     args = parser.parse_args(argv)
+    if args.reactivity and (not args.check or args.method == 'GFN0-xTB'):
+        parser.error('--reactivity requires --check and GFN1/2')
     report = installation_info()
     report["status"] = "inventory"
     if args.check:
         try:
-            report["check"] = check_backend(args.check, args.method, args.library, args.keep_overlap)
+            report["check"] = check_backend(args.check, args.method, args.library, args.keep_overlap, args.reactivity)
             report["status"] = "ok"
             if args.check == "compiled":
                 report["compiled_module_import_checked"] = True

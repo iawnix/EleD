@@ -32,7 +32,7 @@ def _key(options: XTBOptions, metadata: dict) -> str:
         raise ValueError('caching needs an absolute xTB library path so its binary can be fingerprinted')
     values = options.to_dict()
     values.pop('xtb_library', None)
-    payload = {'schema': 3, 'input': metadata, 'options': values,
+    payload = {'schema': 4, 'input': metadata, 'options': values,
                'engine': engine,
                'parameters': _parameter_context(),
                'parameter_file': _parameter_file(options.method, path)}

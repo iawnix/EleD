@@ -1,4 +1,7 @@
-# Electronic descriptors and population analysis (0.5)
+# Electronic descriptors and population analysis (0.6)
+
+For standardized reports, quality flags, CSV/JSONL export and vertical charge-state
+analysis, see [descriptor reports](descriptor-reports.md).
 
 All extraction functions below use an existing result and perform no additional
 quantum calculation. Units are encoded in field names. Results are JSON-compatible
@@ -182,8 +185,9 @@ The two-group summary includes:
 
 Spatial values require matching original geometry and atom order. Their distance
 is invariant to a common translation/rotation of the coordinates. No excitation
-energy, oscillator strength, transition dipole, or ΔSCF/Fukui workflow is included
-in this interface.
+energy, oscillator strength or transition dipole is included in this interface.
+The separate [report and reactivity APIs](descriptor-reports.md) provide
+versioned export and fixed-geometry GFN1/2 ΔSCF/Fukui workflows.
 
 ## Validation
 
