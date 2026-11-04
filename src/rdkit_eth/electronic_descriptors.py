@@ -36,7 +36,7 @@ def _as_result(result):
                      shell_angular_momenta=tuple(map(int, result.GetShellAngularMomenta())))
     metadata = json.loads(result.inputProvenanceJSON) if result.inputProvenanceJSON else {'atom_count': result.numAtoms}
     metadata = dict(metadata)
-    metadata.update(calculation_status='success', calculation_settings={
+    metadata.update(calculation_status='success', initialization=result.initialization, calculation_settings={
         'max_iterations': result.maxIterations, 'accuracy': result.accuracy,
         'electronic_temperature': result.electronicTemperature,
         'effective_electronic_temperature': result.effectiveElectronicTemperature},

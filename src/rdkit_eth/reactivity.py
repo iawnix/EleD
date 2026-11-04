@@ -7,12 +7,13 @@ interpreted as guaranteed gas-phase experimental IP/EA values.
 from __future__ import annotations
 
 from copy import deepcopy
+from contextlib import closing
 from dataclasses import replace
 import json
 
 import numpy as np
 
-from .backends.native import HARTREE_TO_EV
+from .backends.native import HARTREE_TO_EV, _native_charge_states
 from .electronic_descriptors import _as_result, _finite, _fragments
 from .errors import XTBRunError
 from .input import _effective_charge_uhf, _xyz_from_mol
@@ -25,6 +26,8 @@ from .xtb import run_xtb, _resolve_options
 REACTIVITY_UNITS = {'vertical_ip_eV':'eV', 'vertical_ea_eV':'eV',
                     'chemical_potential_eV':'eV', 'electronegativity_eV':'eV',
                     'hardness_eV':'eV', 'softness_per_eV':'1/eV', 'electrophilicity_eV':'eV'}
+
+REACTIVITY_PROTOCOL_VERSION = '2.0'
 
 
 class ChargeStateCalculationError(XTBRunError):
@@ -157,10 +160,11 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
 
 def run_reactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
                    fragments=None, population_scheme='charges', interface='native',
-                   record_id=None, return_errors=False):
+                   record_id=None, return_errors=False, initialization='reference'):
     """Calculate fixed-geometry Q, Q+1, Q-1 states with explicit spin policy.
 
-    Default settings use 0 K requested / 1e-6 K effective electronic temperature.
+    Defaults use 300 K and independent copies of the reference wavefunction for
+    both adjacent states. initialization='independent' uses fresh guesses.
     A closed-shell reference defaults to doublet ions. For an open-shell reference,
     both neighboring spin counts must be specified. No search for the lowest spin
     state is implied. Calculation failures raise ChargeStateCalculationError, or
@@ -169,10 +173,12 @@ def run_reactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
     from rdkit import Chem
     _scheme(population_scheme)
     if interface not in ('native','compiled'): raise ValueError('interface must be native or compiled')
+    if initialization not in ('reference','independent'):
+        raise ValueError('initialization must be reference or independent')
     if not isinstance(return_errors,bool): raise ValueError('return_errors must be Boolean')
     _empty_report(record_id,population_scheme,{})
     snapshot = Chem.Mol(mol)
-    config = options or XTBOptions(electronic_temperature=0.)
+    config = options or XTBOptions()
     _xyz_from_mol(snapshot, config.conf_id)
     charge, uhf = _effective_charge_uhf(snapshot,config.charge,config.uhf)
     if config.method not in ('GFN1-xTB','GFN2-xTB'): raise ValueError('vertical Delta-SCF requires self-consistent GFN1/2, not GFN0')
@@ -187,39 +193,51 @@ def run_reactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
     config = _resolve_options(replace(config,charge=charge,uhf=uhf,
         keep_overlap=config.keep_overlap or population_scheme != 'charges'))
     protocol = {'requested_options': config.to_dict(), 'interface': interface,
+                'protocol_version': REACTIVITY_PROTOCOL_VERSION,
+                'initialization': initialization,
                 'charge_states': charges, 'unpaired_electrons': spins,
                 'spin_selection': 'closed_shell_doublet_defaults'
                     if not uhf and ionized_uhf is None and attached_uhf is None
                     else 'explicit_adjacent_spins'}
+    configurations = [replace(config, charge=charges[k], uhf=spins[k])
+                      for k in ('reference','ionized','attached')]
     results, states = {}, {}
-    for label in ('reference','ionized','attached'):
-        try:
-            selected = replace(config,charge=charges[label],uhf=spins[label])
-            if interface == 'native':
-                result = run_xtb(snapshot, **selected.to_dict())
-            else:
-                from . import rdXTBTools
-                ok, raw = rdXTBTools.RunMol(snapshot,confId=selected.conf_id,method=selected.method,
-                    charge=selected.charge,numUnpairedElectrons=selected.uhf,xtbLibrary=selected.xtb_library,
-                    keepOverlap=selected.keep_overlap,maxIterations=selected.max_iterations,
-                    accuracy=selected.accuracy,electronicTemperature=selected.electronic_temperature)
-                if not ok: raise XTBRunError(raw.errorMessage)
-                result = _as_result(raw)
-            results[label] = result; states[label] = _summary(result)
-        except Exception as exc:
-            states[label] = {'status':'error','charge':charges[label],'uhf':spins[label],
-                             'error':{'type':type(exc).__name__,'message':str(exc)}}
-            for remaining in charges:
-                if remaining not in states: states[remaining] = {'status':'not_run','charge':charges[remaining],'uhf':spins[remaining]}
-            error = ChargeStateCalculationError(label,exc,states)
-            if not return_errors: raise error from exc
-            report = _empty_report(record_id,population_scheme,states)
-            report['analysis_settings'].update(protocol)
-            report['error'] = {'type':type(error).__name__,'message':str(error),'state':label}
-            report['quality'] = {'status':'error','flags':[{'code':'charge_state_failed','severity':'error','detail':str(error)}]}
-            report['missing'] = dict.fromkeys(REACTIVITY_UNITS,'required_charge_state_failed')
-            return report
+    calculations = _charge_state_results(snapshot, configurations, interface, initialization)
+    with closing(calculations):
+        for label in ('reference','ionized','attached'):
+            try:
+                result = next(calculations)
+                results[label] = result; states[label] = _summary(result)
+            except Exception as exc:
+                states[label] = {'status':'error','charge':charges[label],'uhf':spins[label],
+                                 'error':{'type':type(exc).__name__,'message':str(exc)}}
+                for remaining in charges:
+                    if remaining not in states: states[remaining] = {'status':'not_run','charge':charges[remaining],'uhf':spins[remaining]}
+                error = ChargeStateCalculationError(label,exc,states)
+                if not return_errors: raise error from exc
+                report = _empty_report(record_id,population_scheme,states)
+                report['analysis_settings'].update(protocol)
+                report['error'] = {'type':type(error).__name__,'message':str(error),'state':label}
+                report['quality'] = {'status':'error','flags':[{'code':'charge_state_failed','severity':'error','detail':str(error)}]}
+                report['missing'] = dict.fromkeys(REACTIVITY_UNITS,'required_charge_state_failed')
+                return report
     report = calc_reactivity_descriptors(snapshot,**results,fragments=fragments,
               population_scheme=population_scheme,record_id=record_id)
     report['analysis_settings'].update(protocol)
     return report
+
+
+def _charge_state_results(mol, configurations, interface, initialization):
+    if interface == 'compiled':
+        from . import rdXTBTools
+        raw_results = rdXTBTools._RunChargeStates(mol, configurations[0],
+            configurations[1].uhf, configurations[2].uhf, initialization == 'reference')
+        for raw in raw_results:
+            if not raw.success: raise XTBRunError(raw.errorMessage)
+            yield _as_result(raw)
+    elif initialization == 'reference':
+        with closing(_native_charge_states(mol, configurations)) as calculations:
+            yield from calculations
+    else:
+        for selected in configurations:
+            yield run_xtb(mol, **selected.to_dict())

@@ -5,7 +5,7 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.6 supports **gas-phase single points through libxtb only**.
+Version 0.7 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
@@ -60,7 +60,10 @@ library for GFN0, and also provides an installable C++ library. See the
 Version 0.6 adds reports with units, provenance, quality flags and CSV/JSONL
 export, plus fixed-geometry GFN1/2 ΔSCF IP/EA, conceptual-DFT descriptors and
 charge/Mulliken/Löwdin condensed Fukui analysis. Numerical settings are shared
-by the ctypes and compiled APIs. No additional Python backend is required.
+by the ctypes and compiled APIs. No additional Python backend is required. Reactivity now defaults to 300 K and
+separate copies of the reference wavefunction for both adjacent charge states;
+`initialization="independent"` retains the fresh-guess protocol. Open-shell
+references still require explicit adjacent spins.
 
 ```python
 from rdkit_eth import run_descriptor_batch, export_descriptor_reports, run_reactivity

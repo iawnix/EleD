@@ -1,5 +1,18 @@
 # Changes
 
+## 0.7.0 — reference wavefunctions for charge-state analysis
+
+- Reactivity now defaults to 300 K, matching single-point options. Explicit 0 K
+  remains supported. Protocol version 2.0 records this change; descriptor
+  formulas/schema remain unchanged.
+- Both ctypes and C++ reuse separate deep copies of the reference wavefunction
+  for adjacent states. Added `initialization="independent"` for controlled
+  comparisons; no automatic retries or selection between converged solutions.
+- Open-shell adjacent spins remain explicit. Native restart handles stay scoped
+  to the triplet and are released on success, failures and early termination.
+- Added copy/lifetime, order-independence, interface parity and standalone C++
+  checks, plus an explicit developer comparison against xTB `--vfukui`.
+
 ## 0.6.0 — versioned descriptor reports and vertical charge states
 
 - Unified iteration limit, accuracy and electronic temperature across ctypes and

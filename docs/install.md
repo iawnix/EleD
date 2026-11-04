@@ -1,4 +1,4 @@
-# Installing rdkit-eth 0.6
+# Installing rdkit-eth 0.7
 
 The standard profile uses **one extended libxtb for GFN0/1/2 and all current
 descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux
@@ -71,6 +71,14 @@ the additional overlap matrix. Both APIs retain results in original atom order.
 The source build disables tblite and CPCM-X, and needs neither Python tblite
 nor ASE. GFN0/1/2 and radicals use the same engine, with spin-summed populations.
 
+## Upgrade from 0.6
+
+Rebuild/reinstall the adapter with the standard installer and restart Python.
+The native engine is unchanged. Reactivity now defaults to 300 K and reference
+wavefunction reuse. For the former defaults, explicitly pass
+`XTBOptions(electronic_temperature=0.)` and `initialization="independent"`.
+Protocol version 2.0 and each state's initialization are recorded in reports.
+
 ## Upgrade from 0.5
 
 The extended engine is unchanged in 0.6. Rebuild the adapter in the matched SDK
@@ -116,10 +124,10 @@ To reproduce an independent artifact directory in the standard environment:
 
 ```bash
 python tools/build_release.py --compiled --xtb-prefix "$CONDA_PREFIX" \
-  --output build/release-0.6.0
-python tools/check_wheel.py build/release-0.6.0/compiled/*.whl \
+  --output build/release-0.7.0
+python tools/check_wheel.py build/release-0.7.0/compiled/*.whl \
   --kind compiled --check compiled --check native --keep-overlap \
-  --output build/release-0.6.0/installed.json
+  --output build/release-0.7.0/installed.json
 ```
 
 Choose a new/empty output directory. Wheels contain the adapter, not copies of

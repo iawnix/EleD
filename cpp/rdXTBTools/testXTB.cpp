@@ -100,6 +100,25 @@ int main() {
     try { RDKit::XTBTools::runMol(mol, intermediate, options); }
     catch (const std::invalid_argument &) { clampingRejected = true; }
     require(clampingRejected, "Accuracy requiring engine clamping was accepted");
+    options.accuracy = 0.1;
+    options.electronicTemperature = 300.;
+    auto states = RDKit::XTBTools::runChargeStates(mol, options, 1, 1);
+    require(states.size() == 3 && states.back().success, "Reference restart triplet failed");
+    require(states[0].initialization == "independent" && states[1].initialization == "reference" &&
+            states[2].initialization == "reference", "Wrong initialization provenance");
+    require(states[1].numElectrons == states[0].numElectrons - 1 &&
+            states[2].numElectrons == states[0].numElectrons + 1, "Restart retained reference electron count");
+    auto repeated = RDKit::XTBTools::runChargeStates(mol, options, 1, 1);
+    require(states[0].atomicCharges == repeated[0].atomicCharges &&
+            states[1].atomicCharges == repeated[1].atomicCharges &&
+            states[2].atomicCharges == repeated[2].atomicCharges, "Restart contaminated later calculations");
+    options.maxIterations = 1;
+    auto failed = RDKit::XTBTools::runChargeStates(mol, options, 1, 1);
+    require(failed.size() == 1 && !failed[0].success, "Failed reference did not stop the sequence");
+    options.maxIterations = 250;
+    auto recovered = RDKit::XTBTools::runChargeStates(mol, options, 1, 1, false);
+    require(recovered.size() == 3 && recovered.back().success &&
+            recovered.back().initialization == "independent", "Independent initialization recovery failed");
     require(mol.getNumAtoms() == 3 && mol.getConformer(7).getAtomPos(1).x == .758, "Input molecule changed");
     std::cout << "C++ GFN2, GFN0 guard/state, SCF failure recovery, and serialization passed\n";
     return 0;

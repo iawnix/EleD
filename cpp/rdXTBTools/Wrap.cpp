@@ -143,6 +143,53 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
 
 void invalidArgument(const std::invalid_argument &error) { PyErr_SetString(PyExc_ValueError, error.what()); }
 void runtimeError(const std::runtime_error &error) { PyErr_SetString(PyExc_RuntimeError, error.what()); }
+
+// Internal bridge for the validated high-level reactivity protocol. Engine
+// handles remain scoped inside the C++ call; Python only receives owned data.
+py::list runStates(const RDKit::ROMol &mol, const py::object &config,
+                   const py::object &ionized, const py::object &attached, bool reuseReference) {
+  XTBOptions options;
+  options.confId = py::extract<int>(config.attr("conf_id"));
+  options.method = py::extract<std::string>(config.attr("method"));
+  options.charge = optionalInteger(config.attr("charge"), "charge");
+  options.numUnpairedElectrons = optionalInteger(config.attr("uhf"), "uhf");
+  options.libraryPath = py::extract<std::string>(config.attr("xtb_library"));
+  options.keepOverlap = py::extract<bool>(config.attr("keep_overlap"));
+  py::object settings = py::import("rdkit_eth.options").attr("calculation_settings")(
+      py::object(config.attr("max_iterations")), py::object(config.attr("accuracy")),
+      py::object(config.attr("electronic_temperature")));
+  options.maxIterations = py::extract<int>(settings["max_iterations"]);
+  options.accuracy = py::extract<double>(settings["accuracy"]);
+  options.electronicTemperature = py::extract<double>(settings["electronic_temperature"]);
+  auto ionSpin = optionalInteger(ionized, "ionized_uhf");
+  auto attachSpin = optionalInteger(attached, "attached_uhf");
+  if (!ionSpin || !attachSpin) throw std::invalid_argument("Adjacent spins must be explicit");
+  RDKit::ROMol snapshot(mol);
+  std::vector<XTBResults> results;
+  py::object lock = py::import("rdkit_eth.backends.native").attr("_native_lock");
+  lock.attr("acquire")();
+  try {
+    ReleaseGIL released;
+    results = RDKit::XTBTools::runChargeStates(snapshot, options, *ionSpin, *attachSpin, reuseReference);
+  } catch (...) {
+    lock.attr("release")();
+    throw;
+  }
+  lock.attr("release")();
+  py::list output;
+  for (auto &value : results) {
+    if (value.success) {
+      py::object input = py::import("rdkit_eth.input");
+      py::object snapshotObject(py::ptr(&snapshot));
+      py::object xyz = input.attr("_xyz_from_mol")(snapshotObject, value.conformerId);
+      py::object metadata = input.attr("_input_metadata")(snapshotObject, value.conformerId,
+                                       value.charge, value.numUnpairedElectrons, xyz);
+      value.inputProvenanceJSON = py::extract<std::string>(py::import("json").attr("dumps")(metadata));
+    }
+    output.append(std::make_shared<XTBResults>(std::move(value)));
+  }
+  return output;
+}
 }  // namespace
 
 BOOST_PYTHON_MODULE(rdXTBTools) {
@@ -184,6 +231,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def_readonly("gfn0StateFixVerified", &XTBResults::gfn0StateFixVerified)
       .def_readonly("basisExportVerified", &XTBResults::basisExportVerified)
       .def_readonly("inputProvenanceJSON", &XTBResults::inputProvenanceJSON)
+      .def_readonly("initialization", &XTBResults::initialization)
       .add_property("overlapRetained", hasOverlap)
       .def("GetOverlapMatrix", overlap)
       .def("GetAOAtomMap", aoAtoms)
@@ -203,6 +251,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def("GetWibergBondOrders", bondOrders, "Copy of dimensionless Wiberg bond orders, [atom,atom].")
       .def("GetOrbitalCoefficients", coefficients, "Copy of optional MO coefficients, [AO,MO].");
 
+  py::def("_RunChargeStates", runStates);
   py::def("RunMol", run,
           (py::arg("mol"), py::arg("confId") = -1, py::arg("method") = "GFN2-xTB",
            py::arg("charge") = py::object(), py::arg("numUnpairedElectrons") = py::object(),

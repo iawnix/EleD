@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (0.6)
+# Descriptor reports and vertical reactivity (0.7)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
@@ -81,14 +81,14 @@ experimental accuracy guarantee.
 ```python
 from rdkit_eth import run_reactivity, XTBOptions, calc_reactivity_descriptors
 
-# Default protocol: GFN2, requested 0 K, effective 1e-6 K, no geometry changes.
+# Default protocol: GFN2, 300 K, reference wavefunction copies, fixed geometry.
 reaction = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
 print(reaction["values"]["vertical_ip_eV"])
 print(reaction["atoms"])  # f_plus, f_minus, f_radical, dual
 
-# Explicit finite-temperature protocol; records a quality warning.
+# Explicit independent initialization for comparison; no automatic selection.
 reaction = run_reactivity(mol, options=XTBOptions(electronic_temperature=300.),
-                          interface="compiled", return_errors=True)
+                          interface="compiled", initialization="independent", return_errors=True)
 # Existing compatible results can instead be analyzed without new calculations:
 # calc_reactivity_descriptors(mol, reference, ionized, attached)
 ```
@@ -102,9 +102,30 @@ For an open-shell reference, explicitly supply both `ionized_uhf` and
 `attached_uhf`; spin parity is validated. The selected states are not asserted
 to be ground states.
 
-`run_reactivity()` with no options requests 0 K. Passing `XTBOptions()` explicitly
-uses that object's usual 300 K default. Temperature here is an electronic
-occupation setting, not a nuclear thermal ensemble or a solution free energy.
+Since 0.7, `run_reactivity()` and `XTBOptions()` both default to 300 K.
+Explicit `XTBOptions(electronic_temperature=0.)` still requests the 1e-6 K
+engine floor. Temperature is an electronic occupation setting, not a nuclear
+thermal ensemble or a solution free energy. Finite-T results retain their flag.
+
+The default `initialization="reference"` computes the reference independently,
+then supplies each adjacent state with its **own deep copy** via the official
+`xtb_copyResults` API. GFN1/2 resets electron count and spin from the target
+molecule during SCF. The ionized state is never used as the attached-state
+initial guess. Ctypes and compiled paths use the same protocol; no engine patch
+or additional dependency is needed. All restart handles are released within the
+triplet workflow, including failures. Returned results contain owned arrays.
+
+`initialization="independent"` uses fresh guesses for every state, reproducing
+0.6 initialization. To reproduce the complete 0.6 default protocol, also set
+`electronic_temperature=0.` explicitly. Reports record `protocol_version="2.0"`
+and requested initialization in `analysis_settings`; successful state provenance
+records the actual initialization. Descriptor version 1.0 and schema 1 remain
+unchanged because the formulas and output columns have not changed.
+
+Reference reuse can improve convergence, but neither initialization guarantees
+the lowest SCF solution. Compare protocols explicitly if this matters; the API
+does not automatically retry or choose the lower result. The CLI's automatic
+open-shell spin choice remains distinct from our explicit spin policy.
 
 With N modeled electrons and energies converted from Hartree to eV:
 
@@ -141,7 +162,7 @@ or incompatible results during analysis, still raise; this flag is not a blanket
 exception suppressor. Dataset callers should handle those errors explicitly.
 
 There is no automatic change of temperature, spin or method to force convergence.
-In our frozen test geometries, cold GFN1 ethanol and GFN2 ammonium charge states
+In the archived 0.6 independent-initialization tests, cold GFN1 ethanol and GFN2 ammonium charge states
 failed even at 1000 iterations. Explicit 300 K protocols converged, with different
 energies. The first failing state can depend on numerical details; all failure
 rows must be retained in dataset accounting.
@@ -157,3 +178,16 @@ The example saves exact geometries, settings, all three state records and failur
 rows for a small temperature study. Its unoptimized structures test protocol
 behavior, not predictive accuracy. Conformer ensembles, solvent, calibrated
 IP/EA benchmarks and excited-state datasets remain future work.
+
+
+The `charges` and `mulliken` options for gas-phase GFN1/2 are two extraction/
+validation paths for the same population definition, rather than independent
+new descriptors. Löwdin is a distinct, established partition. Original xTB
+already supports atomic charge-difference Fukui via `--vfukui`; our contribution
+is the RDKit/libxtb workflow, analysis options, fragment mapping and provenance.
+For an explicit development comparison, run `tools/compare_fukui_cli.py` with
+`--executable`, `--library` and a new `--output` directory. This diagnostic keeps
+CLI logs and frozen coordinates and compares both initialization policies.
+It is not a production calculation backend or a package dependency. Original
+CLI Fukui values print to three decimals, so matching those values only proves
+agreement within the reported tolerance, not full-precision numerical identity.

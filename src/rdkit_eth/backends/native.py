@@ -83,6 +83,7 @@ class _NativeXTB:
         self.set_accuracy = self._bind('xtb_setAccuracy', None, [h, h, ctypes.c_double])
         self.set_temperature = self._bind('xtb_setElectronicTemp', None, [h, h, ctypes.c_double])
         self.new_results = self._bind("xtb_newResults", h, [])
+        self.copy_results = self._bind("xtb_copyResults", h, [h])
         self.del_results = self._bind("xtb_delResults", None, [ctypes.POINTER(h)])
         self.singlepoint = self._bind("xtb_singlepoint", None, [h, h, h, h])
         self.get_energy = self._bind("xtb_getEnergy", None, [h, h, ctypes.POINTER(ctypes.c_double)])
@@ -166,7 +167,7 @@ def _serialized(function):
 
 
 @_serialized
-def run_xtb_native(
+def _run_xtb_native(
     mol: Any,
     *,
     conf_id: int = -1,
@@ -178,6 +179,8 @@ def run_xtb_native(
     max_iterations: int = 250,
     accuracy: float = 1.0,
     electronic_temperature: float = 300.0,
+    _restart=None,
+    _save_restart=None,
 ) -> XTBResult:
     """Run a single point through a shared ``libxtb`` C API library.
 
@@ -261,8 +264,10 @@ def run_xtb_native(
         library.set_accuracy(environment, calculator, settings['accuracy'])
         library.set_temperature(environment, calculator, settings['electronic_temperature'])
         library.check(environment, 'calculator settings')
-        results = library.new_results()
+        results = library.copy_results(_restart) if _restart else library.new_results()
         if not results:
+            if _restart:
+                raise XTBRunError('native xTB could not copy the reference wavefunction')
             raise XTBRunError("native xTB could not create a results object")
         if keep_overlap:
             library.set_keep_overlap(environment, results, True)
@@ -294,6 +299,11 @@ def run_xtb_native(
         occupation_values = tuple(float(value) for value in occupations)
         homo, lumo = _frontier_energies(energies_ev, occupation_values)
         basis = library.basis_data(environment, results, natoms, nao.value) if keep_overlap else {}
+        if _save_restart is not None:
+            saved = library.copy_results(results)
+            if not saved:
+                raise XTBRunError('native xTB could not copy the reference wavefunction')
+            _save_restart.append((library, saved))
         return XTBResult(
             **basis,
             method=method_name,
@@ -321,6 +331,7 @@ def run_xtb_native(
                 **_input_metadata(mol, conf_id, charge, uhf, xyz),
                 'calculation_settings': settings,
                 'calculation_status': 'success',
+                'initialization': 'reference' if _restart else 'independent',
                 'optimize': False,
                 'solvent': None,
                 'engine': engine,
@@ -336,3 +347,32 @@ def run_xtb_native(
         library._delete(library.del_calculator, calculator)
         library._delete(library.del_molecule, molecule)
         library._delete(library.del_environment, environment)
+
+
+def run_xtb_native(mol, *, conf_id=-1, method='GFN2-xTB', charge=None, uhf=None,
+                   xtb_library=None, keep_overlap=False, max_iterations=250,
+                   accuracy=1.0, electronic_temperature=300.0):
+    """Run an independently initialized gas-phase libxtb single point."""
+    return _run_xtb_native(mol, conf_id=conf_id, method=method, charge=charge, uhf=uhf,
+        xtb_library=xtb_library, keep_overlap=keep_overlap, max_iterations=max_iterations,
+        accuracy=accuracy, electronic_temperature=electronic_temperature)
+
+
+def _native_charge_states(mol, configurations):
+    """Scoped reference restart; callers must close this iterator on early exit.
+
+    The fixed-geometry/settings configurations are validated by run_reactivity.
+    Each neighbor receives its own deep copy of the untouched reference.
+    """
+    saved = []
+    with _native_lock:
+        try:
+            for index, config in enumerate(configurations):
+                options = config.to_dict()
+                options.pop('backend')
+                yield _run_xtb_native(mol, **options,
+                    _restart=saved[0][1] if index else None,
+                    _save_restart=saved if not index else None)
+        finally:
+            for library, handle in saved:
+                library._delete(library.del_results, handle)

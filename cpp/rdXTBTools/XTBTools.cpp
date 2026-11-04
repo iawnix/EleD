@@ -84,7 +84,7 @@ struct API {
   XTB_FUNCTION(newCalculator); XTB_FUNCTION(delCalculator);
   XTB_FUNCTION(loadGFN0xTB); XTB_FUNCTION(loadGFN1xTB); XTB_FUNCTION(loadGFN2xTB);
   XTB_FUNCTION(setMaxIter); XTB_FUNCTION(setAccuracy); XTB_FUNCTION(setElectronicTemp);
-  XTB_FUNCTION(newResults); XTB_FUNCTION(delResults); XTB_FUNCTION(singlepoint);
+  XTB_FUNCTION(newResults); XTB_FUNCTION(copyResults); XTB_FUNCTION(delResults); XTB_FUNCTION(singlepoint);
   XTB_FUNCTION(getEnergy); XTB_FUNCTION(getNao); XTB_FUNCTION(getDipole);
   XTB_FUNCTION(getCharges); XTB_FUNCTION(getBondOrders);
   XTB_FUNCTION(getOrbitalEigenvalues); XTB_FUNCTION(getOrbitalOccupations);
@@ -113,7 +113,7 @@ struct API {
     BIND(newCalculator); BIND(delCalculator);
     BIND(loadGFN0xTB); BIND(loadGFN1xTB); BIND(loadGFN2xTB);
     BIND(setMaxIter); BIND(setAccuracy); BIND(setElectronicTemp);
-    BIND(newResults); BIND(delResults); BIND(singlepoint);
+    BIND(newResults); BIND(copyResults); BIND(delResults); BIND(singlepoint);
     BIND(getEnergy); BIND(getNao); BIND(getDipole); BIND(getCharges); BIND(getBondOrders);
     BIND(getOrbitalEigenvalues); BIND(getOrbitalOccupations); BIND(getOrbitalCoefficients);
 #undef BIND
@@ -241,8 +241,8 @@ void requireFinite(const std::vector<double> &values, const char *name) {
 }
 }  // namespace
 
-bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
-  std::lock_guard<std::mutex> lock(calculationMutex);
+static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &options,
+                       xtb_TResults restart = nullptr, xtb_TResults *saveRestart = nullptr) {
   result = XTBResults{};
   const int method = methodNumber(options.method);
   if (!mol.getNumAtoms()) throw std::invalid_argument("Molecule must contain atoms");
@@ -293,6 +293,7 @@ bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
   result.accuracy = options.accuracy;
   result.electronicTemperature = options.electronicTemperature;
   result.effectiveElectronicTemperature = std::max(options.electronicTemperature, 1e-6);
+  result.initialization = restart ? "reference" : "independent";
   result.method = "GFN" + std::to_string(method) + "-xTB";
   result.numAtoms = n;
   result.conformerId = conf->getId();
@@ -327,8 +328,8 @@ bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
     api.setAccuracy(h.env, h.calc, options.accuracy);
     api.setElectronicTemp(h.env, h.calc, options.electronicTemperature);
     api.check(h.env, "Calculator settings");
-    h.res = api.newResults();
-    if (!h.res) throw EngineError("Cannot allocate xTB results");
+    h.res = restart ? api.copyResults(restart) : api.newResults();
+    if (!h.res) throw EngineError(restart ? "Cannot copy reference wavefunction" : "Cannot allocate xTB results");
     if (options.keepOverlap) {
       api.setKeepOverlap(h.env, h.res, true);
       api.check(h.env, "Basis retention setup");
@@ -401,10 +402,50 @@ bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
       throw EngineError("Invalid orbital electron count");
     result.numElectrons = static_cast<int>(std::round(occupied));
     result.success = true;
+    if (saveRestart) {
+      *saveRestart = h.res;
+      h.res = nullptr;
+    }
     return true;
   } catch (const EngineError &error) {
     result.errorMessage = error.what();
     return false;
   }
+}
+
+bool runMol(const ROMol &mol, XTBResults &result, const XTBOptions &options) {
+  std::lock_guard<std::mutex> lock(calculationMutex);
+  return runMolImpl(mol, result, options);
+}
+
+std::vector<XTBResults> runChargeStates(const ROMol &mol, const XTBOptions &options,
+    int ionizedUnpaired, int attachedUnpaired, bool reuseReference) {
+  std::lock_guard<std::mutex> lock(calculationMutex);
+  if (methodNumber(options.method) == 0)
+    throw std::invalid_argument("Charge-state SCF requires GFN1/2");
+  auto &api = loadAPI(options.libraryPath);
+  Handles reference(api);
+  std::vector<XTBResults> results;
+  for (int index = 0; index < 3; ++index) {
+    auto selected = options;
+    if (index) {
+      const long long q = static_cast<long long>(results.front().charge) + (index == 1 ? 1 : -1);
+      if (q < std::numeric_limits<int>::min() || q > std::numeric_limits<int>::max())
+        throw std::invalid_argument("Adjacent charge is out of range");
+      selected.charge = static_cast<int>(q);
+      selected.numUnpairedElectrons = index == 1 ? ionizedUnpaired : attachedUnpaired;
+    }
+    results.emplace_back();
+    try {
+      if (!runMolImpl(mol, results.back(), selected,
+          index && reuseReference ? reference.res : nullptr,
+          !index && reuseReference ? &reference.res : nullptr)) break;
+    } catch (const std::exception &error) {
+      results.back().success = false;
+      results.back().errorMessage = error.what();
+      break;
+    }
+  }
+  return results;
 }
 }  // namespace RDKit::XTBTools

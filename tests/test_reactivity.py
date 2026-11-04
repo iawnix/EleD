@@ -73,17 +73,17 @@ def test_failed_required_state_never_yields_partial_reactivity():
     mol,r=states()
     with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
          patch('rdkit_eth.reactivity.run_xtb',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
-        report=run_reactivity(mol,return_errors=True)
+        report=run_reactivity(mol,return_errors=True,initialization="independent")
     assert calculate.call_count==2
     assert report['states']['attached']['status']=='not_run'
     assert report['states']['reference']['energy_hartree']==-10.
     assert report['quality']['status']=='error'
     assert report['analysis_settings']['unpaired_electrons']=={'reference':0,'ionized':1,'attached':1}
-    assert report['analysis_settings']['requested_options']['electronic_temperature']==0.
+    assert report['analysis_settings']['requested_options']['electronic_temperature']==300.
     assert all(v is None for v in report['values'].values())
     with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
          patch('rdkit_eth.reactivity.run_xtb',side_effect=[r[0],XTBRunError('SCF failure')]):
-        with pytest.raises(ChargeStateCalculationError) as error:run_reactivity(mol)
+        with pytest.raises(ChargeStateCalculationError) as error:run_reactivity(mol,initialization="independent")
     assert error.value.state=='ionized'
 
 
@@ -118,3 +118,20 @@ def test_open_shell_and_gfn0_policies_are_checked_before_engine_lookup():
             run_reactivity(mol,options=XTBOptions(method='gfn0'))
         with pytest.raises(ValueError,match='electron count'):
             run_reactivity(mol,ionized_uhf=0)
+        with pytest.raises(ValueError,match='initialization'):
+            run_reactivity(mol,initialization='auto')
+
+
+def test_default_protocol_uses_300k_reference_copies_and_records_version():
+    mol,r=states()
+    r=[replace(v,metadata={**v.metadata,'calculation_settings':calculation_settings()}) for v in r]
+    with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
+         patch('rdkit_eth.reactivity._charge_state_results',return_value=iter(r)) as calculate:
+        # A generator is required because early returns explicitly close it.
+        calculate.return_value=(v for v in r)
+        report=run_reactivity(mol)
+    _,configs,interface,initialization=calculate.call_args.args
+    assert all(v.electronic_temperature==300. for v in configs)
+    assert initialization=='reference' and interface=='native'
+    assert report['analysis_settings']['protocol_version']=='2.0'
+    assert report['analysis_settings']['initialization']=='reference'

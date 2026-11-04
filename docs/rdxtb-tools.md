@@ -245,3 +245,16 @@ ctypes options and are retained on compiled results, together with
 `effectiveElectronicTemperature`. Recompile C++ consumers when upgrading.
 See [descriptor reports](descriptor-reports.md) for ranges, units, batch export
 and the GFN1/2 charge-state workflow accepting compiled results.
+
+## Charge-state restart protocol (0.7)
+
+The standalone C++ `runChargeStates(mol, options, ionizedUnpaired,
+attachedUnpaired, reuseReference=true)` returns reference, ionized and attached
+results in order, stopping at the first failure (which remains in the vector).
+Only GFN1/2 are supported; adjacent spin counts are explicit. Both neighbors
+receive deep copies of the unchanged reference. Engine handles are scoped to
+the call, which holds the calculation lock. `XTBResults.initialization` records
+`independent` or `reference`. Recompile consumers after upgrading.
+
+Python users call `run_reactivity(..., interface="compiled")`; its internal
+compiled bridge also holds the shared ctypes lock while releasing the GIL.

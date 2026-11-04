@@ -1,0 +1,834 @@
+{
+  "wheel": "/home/iaw/project/rdkit_eth/dist/0.7.0/pure/rdkit_eth-0.7.0-py3-none-any.whl",
+  "kind": "pure",
+  "inventory": {
+    "schema_version": 1,
+    "python": "/tmp/rdkit-eth-wheel-a51tamik/venv/bin/python",
+    "python_version": "3.11.18",
+    "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
+    "package_path": "/tmp/rdkit-eth-wheel-a51tamik/venv/lib/python3.11/site-packages/rdkit_eth/__init__.py",
+    "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+    "versions": {
+      "rdkit-eth": "0.7.0",
+      "rdkit": "2026.9.1",
+      "numpy": "2.4.6"
+    },
+    "compiled_module_path": null,
+    "compiled_module_import_checked": false,
+    "status": "inventory"
+  },
+  "checks": [
+    {
+      "schema_version": 1,
+      "python": "/tmp/rdkit-eth-wheel-a51tamik/venv/bin/python",
+      "python_version": "3.11.18",
+      "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
+      "package_path": "/tmp/rdkit-eth-wheel-a51tamik/venv/lib/python3.11/site-packages/rdkit_eth/__init__.py",
+      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "versions": {
+        "rdkit-eth": "0.7.0",
+        "rdkit": "2026.9.1",
+        "numpy": "2.4.6"
+      },
+      "compiled_module_path": null,
+      "compiled_module_import_checked": false,
+      "status": "ok",
+      "check": {
+        "backend": "native",
+        "method": "GFN2-xTB",
+        "molecule": "water",
+        "total_energy_hartree": -5.070371678146143,
+        "num_orbitals": 6,
+        "charge_sum_e": -1.8318679906315083e-15,
+        "engine": {
+          "backend": "native",
+          "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+          "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+          "version": "6.7.1",
+          "native_gfn0": null,
+          "orbital_basis": null
+        },
+        "descriptors": {
+          "xtb_method": "GFN2-xTB",
+          "xtb_backend": "native",
+          "xtb_version": "6.7.1",
+          "xtb_total_energy_Eh": -5.070371678146143,
+          "xtb_homo_eV": -12.176962188475445,
+          "xtb_lumo_eV": 2.462262089430638,
+          "xtb_gap_eV": 14.639224277906083,
+          "xtb_num_orbitals": 6,
+          "xtb_num_electrons": 8,
+          "xtb_num_unpaired_electrons": 0,
+          "xtb_occupation_threshold": 1e-07,
+          "xtb_homo_index": 3,
+          "xtb_lumo_index": 4,
+          "xtb_homo_minus_1_eV": -14.004945394995598,
+          "xtb_lumo_plus_1_eV": 6.699837628867426,
+          "xtb_homo_minus_2_eV": -15.41559810761428,
+          "xtb_lumo_plus_2_eV": null,
+          "xtb_dipole_x_au": 0.5467184985722804,
+          "xtb_dipole_y_au": 0.7063625587371953,
+          "xtb_dipole_z_au": 3.5113716328455214e-16,
+          "xtb_dipole_norm_au": 0.8932240374435108,
+          "xtb_dipole_norm_debye": 2.270349046770863,
+          "xtb_charge_sum_e": -1.8318679906315083e-15,
+          "xtb_charge_min_e": -0.5635674430661549,
+          "xtb_charge_max_e": 0.2818001115301935,
+          "xtb_charge_mean_e": -6.106226635438361e-16,
+          "xtb_charge_std_e": 0.3985023608727426,
+          "xtb_charge_abs_sum_e": 1.1271348861323078,
+          "xtb_wiberg_pair_sum": 1.8407990262607195
+        },
+        "fragment_descriptors": {
+          "fragments": {
+            "oxygen": {
+              "atom_indices": [
+                0
+              ],
+              "num_atoms": 1,
+              "charge_e": -0.5635674430661549,
+              "charge_min_e": -0.5635674430661549,
+              "charge_max_e": -0.5635674430661549,
+              "charge_std_e": 0.0,
+              "internal_wiberg_sum": 0.0,
+              "external_wiberg_sum": 1.8404017948531282
+            },
+            "hydrogens": {
+              "atom_indices": [
+                1,
+                2
+              ],
+              "num_atoms": 2,
+              "charge_e": 0.563567443066153,
+              "charge_min_e": 0.28176733153595956,
+              "charge_max_e": 0.2818001115301935,
+              "charge_std_e": 1.638999711697786e-05,
+              "internal_wiberg_sum": 0.0003972314075913888,
+              "external_wiberg_sum": 1.8404017948531282
+            }
+          },
+          "pairs": [
+            {
+              "fragment_a": "oxygen",
+              "fragment_b": "hydrogens",
+              "wiberg_sum": 1.8404017948531282
+            }
+          ],
+          "unassigned_atom_indices": []
+        },
+        "population_check": null,
+        "descriptor_report": {
+          "schema_version": 1,
+          "descriptor_version": "1.0",
+          "report_type": "single_point",
+          "record_id": null,
+          "units": {
+            "xtb_method": null,
+            "xtb_backend": null,
+            "xtb_version": null,
+            "xtb_total_energy_Eh": "Hartree",
+            "xtb_homo_eV": "eV",
+            "xtb_lumo_eV": "eV",
+            "xtb_gap_eV": "eV",
+            "xtb_num_orbitals": "count",
+            "xtb_num_electrons": "count",
+            "xtb_num_unpaired_electrons": "count",
+            "xtb_occupation_threshold": "e",
+            "xtb_homo_index": "index",
+            "xtb_lumo_index": "index",
+            "xtb_homo_minus_1_eV": "eV",
+            "xtb_lumo_plus_1_eV": "eV",
+            "xtb_homo_minus_2_eV": "eV",
+            "xtb_lumo_plus_2_eV": "eV",
+            "xtb_dipole_x_au": "e*Bohr",
+            "xtb_dipole_y_au": "e*Bohr",
+            "xtb_dipole_z_au": "e*Bohr",
+            "xtb_dipole_norm_au": "e*Bohr",
+            "xtb_dipole_norm_debye": "Debye",
+            "xtb_charge_sum_e": "e",
+            "xtb_charge_min_e": "e",
+            "xtb_charge_max_e": "e",
+            "xtb_charge_mean_e": "e",
+            "xtb_charge_std_e": "e",
+            "xtb_charge_abs_sum_e": "e",
+            "xtb_wiberg_pair_sum": "dimensionless",
+            "frontier_homo_num_orbitals": "count",
+            "frontier_homo_energy_min_ev": "eV",
+            "frontier_homo_energy_max_ev": "eV",
+            "frontier_homo_inverse_participation_ratio": "dimensionless",
+            "frontier_homo_participation_ratio": "dimensionless",
+            "frontier_homo_entropy_nats": "nat",
+            "frontier_homo_centroid_x_angstrom": "angstrom",
+            "frontier_homo_centroid_y_angstrom": "angstrom",
+            "frontier_homo_centroid_z_angstrom": "angstrom",
+            "frontier_lumo_num_orbitals": "count",
+            "frontier_lumo_energy_min_ev": "eV",
+            "frontier_lumo_energy_max_ev": "eV",
+            "frontier_lumo_inverse_participation_ratio": "dimensionless",
+            "frontier_lumo_participation_ratio": "dimensionless",
+            "frontier_lumo_entropy_nats": "nat",
+            "frontier_lumo_centroid_x_angstrom": "angstrom",
+            "frontier_lumo_centroid_y_angstrom": "angstrom",
+            "frontier_lumo_centroid_z_angstrom": "angstrom",
+            "frontier_homo_lumo_atom_overlap": "dimensionless",
+            "frontier_homo_lumo_atom_centroid_separation_angstrom": "angstrom"
+          },
+          "values": {
+            "xtb_method": "GFN2-xTB",
+            "xtb_backend": "native",
+            "xtb_version": "6.7.1",
+            "xtb_total_energy_Eh": -5.070371678146143,
+            "xtb_homo_eV": -12.176962188475445,
+            "xtb_lumo_eV": 2.462262089430638,
+            "xtb_gap_eV": 14.639224277906083,
+            "xtb_num_orbitals": 6,
+            "xtb_num_electrons": 8,
+            "xtb_num_unpaired_electrons": 0,
+            "xtb_occupation_threshold": 1e-07,
+            "xtb_homo_index": 3,
+            "xtb_lumo_index": 4,
+            "xtb_homo_minus_1_eV": -14.004945394995598,
+            "xtb_lumo_plus_1_eV": 6.699837628867426,
+            "xtb_homo_minus_2_eV": -15.41559810761428,
+            "xtb_lumo_plus_2_eV": null,
+            "xtb_dipole_x_au": 0.5467184985722804,
+            "xtb_dipole_y_au": 0.7063625587371953,
+            "xtb_dipole_z_au": 3.5113716328455214e-16,
+            "xtb_dipole_norm_au": 0.8932240374435108,
+            "xtb_dipole_norm_debye": 2.270349046770863,
+            "xtb_charge_sum_e": -1.8318679906315083e-15,
+            "xtb_charge_min_e": -0.5635674430661549,
+            "xtb_charge_max_e": 0.2818001115301935,
+            "xtb_charge_mean_e": -6.106226635438361e-16,
+            "xtb_charge_std_e": 0.3985023608727426,
+            "xtb_charge_abs_sum_e": 1.1271348861323078,
+            "xtb_wiberg_pair_sum": 1.8407990262607195,
+            "frontier_homo_num_orbitals": null,
+            "frontier_homo_energy_min_ev": null,
+            "frontier_homo_energy_max_ev": null,
+            "frontier_homo_inverse_participation_ratio": null,
+            "frontier_homo_participation_ratio": null,
+            "frontier_homo_entropy_nats": null,
+            "frontier_homo_centroid_x_angstrom": null,
+            "frontier_homo_centroid_y_angstrom": null,
+            "frontier_homo_centroid_z_angstrom": null,
+            "frontier_lumo_num_orbitals": null,
+            "frontier_lumo_energy_min_ev": null,
+            "frontier_lumo_energy_max_ev": null,
+            "frontier_lumo_inverse_participation_ratio": null,
+            "frontier_lumo_participation_ratio": null,
+            "frontier_lumo_entropy_nats": null,
+            "frontier_lumo_centroid_x_angstrom": null,
+            "frontier_lumo_centroid_y_angstrom": null,
+            "frontier_lumo_centroid_z_angstrom": null,
+            "frontier_homo_lumo_atom_overlap": null,
+            "frontier_homo_lumo_atom_centroid_separation_angstrom": null
+          },
+          "analysis_settings": {
+            "frontier_depth": 2,
+            "include_orbitals": false,
+            "occupation_threshold": 1e-07,
+            "degeneracy_ev": 0.001,
+            "occupation_tolerance": 1e-06,
+            "fractional_tolerance": 0.0001,
+            "conservation_tolerance": 1e-05
+          },
+          "provenance": {
+            "atom_count": 3,
+            "atomic_numbers": [
+              8,
+              1,
+              1
+            ],
+            "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+            "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+            "charge": 0,
+            "uhf": 0,
+            "conformer_id": 0,
+            "calculation_settings": {
+              "max_iterations": 250,
+              "accuracy": 1.0,
+              "electronic_temperature": 300.0,
+              "effective_electronic_temperature": 300.0
+            },
+            "calculation_status": "success",
+            "initialization": "independent",
+            "optimize": false,
+            "solvent": null,
+            "engine": {
+              "backend": "native",
+              "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+              "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+              "version": "6.7.1",
+              "native_gfn0": null,
+              "orbital_basis": null
+            },
+            "parameter_file": {
+              "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+              "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+            },
+            "native_api_version": 10000,
+            "elapsed_seconds": 0.009666795027442276,
+            "coefficient_axes": [
+              "AO",
+              "MO"
+            ],
+            "overlap_source": null
+          },
+          "quality": {
+            "status": "ok",
+            "flags": [],
+            "fractional_orbital_indices": [],
+            "occupied_counts_threshold_window": [
+              4,
+              4,
+              4
+            ],
+            "charge_sum_error_e": -1.8318679906315083e-15,
+            "electron_sum_error_e": 0.0,
+            "scf_iterations": null,
+            "scf_residual": null,
+            "scf_details_unavailable_reason": "not_exposed_by_libxtb_c_api",
+            "calculation_status": "success"
+          },
+          "missing": {
+            "xtb_lumo_plus_2_eV": "unavailable_from_result_or_orbital_range",
+            "fragments": "not_requested",
+            "populations": "not_requested",
+            "frontier": "not_requested",
+            "frontier_homo_num_orbitals": "not_requested",
+            "frontier_homo_energy_min_ev": "not_requested",
+            "frontier_homo_energy_max_ev": "not_requested",
+            "frontier_homo_inverse_participation_ratio": "not_requested",
+            "frontier_homo_participation_ratio": "not_requested",
+            "frontier_homo_entropy_nats": "not_requested",
+            "frontier_homo_centroid_x_angstrom": "not_requested",
+            "frontier_homo_centroid_y_angstrom": "not_requested",
+            "frontier_homo_centroid_z_angstrom": "not_requested",
+            "frontier_lumo_num_orbitals": "not_requested",
+            "frontier_lumo_energy_min_ev": "not_requested",
+            "frontier_lumo_energy_max_ev": "not_requested",
+            "frontier_lumo_inverse_participation_ratio": "not_requested",
+            "frontier_lumo_participation_ratio": "not_requested",
+            "frontier_lumo_entropy_nats": "not_requested",
+            "frontier_lumo_centroid_x_angstrom": "not_requested",
+            "frontier_lumo_centroid_y_angstrom": "not_requested",
+            "frontier_lumo_centroid_z_angstrom": "not_requested",
+            "frontier_homo_lumo_atom_overlap": "not_requested",
+            "frontier_homo_lumo_atom_centroid_separation_angstrom": "not_requested"
+          },
+          "error": null,
+          "atoms": [
+            {
+              "atom_index": 0,
+              "partial_charge_e": -0.5635674430661549,
+              "wiberg_sum": 1.8404017948531282
+            },
+            {
+              "atom_index": 1,
+              "partial_charge_e": 0.2818001115301935,
+              "wiberg_sum": 0.9205889041949868
+            },
+            {
+              "atom_index": 2,
+              "partial_charge_e": 0.28176733153595956,
+              "wiberg_sum": 0.9206073534733242
+            }
+          ],
+          "bonds": [
+            {
+              "bond_index": 0,
+              "begin_atom_index": 0,
+              "end_atom_index": 1,
+              "wiberg_order": 0.9201916727873954
+            },
+            {
+              "bond_index": 1,
+              "begin_atom_index": 0,
+              "end_atom_index": 2,
+              "wiberg_order": 0.9202101220657328
+            }
+          ],
+          "fragments": null,
+          "populations": null,
+          "frontier": null
+        },
+        "reactivity_report": {
+          "schema_version": 1,
+          "descriptor_version": "1.0",
+          "report_type": "vertical_reactivity",
+          "record_id": null,
+          "values": {
+            "vertical_ip_eV": 18.324643688885963,
+            "vertical_ea_eV": -6.925507615544104,
+            "chemical_potential_eV": -5.69956803667093,
+            "electronegativity_eV": 5.69956803667093,
+            "hardness_eV": 12.625075652215035,
+            "softness_per_eV": 0.039603723080445574,
+            "electrophilicity_eV": 1.2865299464142814
+          },
+          "units": {
+            "vertical_ip_eV": "eV",
+            "vertical_ea_eV": "eV",
+            "chemical_potential_eV": "eV",
+            "electronegativity_eV": "eV",
+            "hardness_eV": "eV",
+            "softness_per_eV": "1/eV",
+            "electrophilicity_eV": "eV"
+          },
+          "analysis_settings": {
+            "geometry": "fixed_reference_geometry",
+            "population_scheme": "charges",
+            "energy_definition": "libxtb_total_energy",
+            "hardness": "(IP-EA)/2",
+            "softness": "1/(IP-EA)",
+            "electrophilicity": "mu^2/(2*hardness)",
+            "f_plus": "population(N+1)-population(N)",
+            "f_minus": "population(N)-population(N-1)",
+            "dual": "f_plus-f_minus",
+            "spin_search": false,
+            "requested_options": {
+              "conf_id": -1,
+              "method": "GFN2-xTB",
+              "charge": 0,
+              "uhf": 0,
+              "xtb_library": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+              "backend": "native",
+              "keep_overlap": false,
+              "max_iterations": 250,
+              "accuracy": 1.0,
+              "electronic_temperature": 300.0
+            },
+            "interface": "native",
+            "protocol_version": "2.0",
+            "initialization": "reference",
+            "charge_states": {
+              "reference": 0,
+              "ionized": 1,
+              "attached": -1
+            },
+            "unpaired_electrons": {
+              "reference": 0,
+              "ionized": 1,
+              "attached": 1
+            },
+            "spin_selection": "closed_shell_doublet_defaults"
+          },
+          "states": {
+            "reference": {
+              "status": "success",
+              "method": "GFN2-xTB",
+              "charge": 0,
+              "uhf": 0,
+              "energy_hartree": -5.070371678146143,
+              "num_electrons": 8,
+              "partial_charges_e": [
+                -0.5635674430661549,
+                0.2818001115301935,
+                0.28176733153595956
+              ],
+              "provenance": {
+                "atom_count": 3,
+                "atomic_numbers": [
+                  8,
+                  1,
+                  1
+                ],
+                "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+                "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+                "charge": 0,
+                "uhf": 0,
+                "conformer_id": 0,
+                "calculation_settings": {
+                  "max_iterations": 250,
+                  "accuracy": 1.0,
+                  "electronic_temperature": 300.0,
+                  "effective_electronic_temperature": 300.0
+                },
+                "calculation_status": "success",
+                "initialization": "independent",
+                "optimize": false,
+                "solvent": null,
+                "engine": {
+                  "backend": "native",
+                  "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+                  "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+                  "version": "6.7.1",
+                  "native_gfn0": null,
+                  "orbital_basis": null
+                },
+                "parameter_file": {
+                  "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+                },
+                "native_api_version": 10000,
+                "elapsed_seconds": 0.009002270991913974,
+                "coefficient_axes": [
+                  "AO",
+                  "MO"
+                ],
+                "overlap_source": null
+              }
+            },
+            "ionized": {
+              "status": "success",
+              "method": "GFN2-xTB",
+              "charge": 1,
+              "uhf": 1,
+              "energy_hartree": -4.39695344346919,
+              "num_electrons": 7,
+              "partial_charges_e": [
+                0.03462758335482133,
+                0.4826041224697798,
+                0.4827682894541559
+              ],
+              "provenance": {
+                "atom_count": 3,
+                "atomic_numbers": [
+                  8,
+                  1,
+                  1
+                ],
+                "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+                "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+                "charge": 1,
+                "uhf": 1,
+                "conformer_id": 0,
+                "calculation_settings": {
+                  "max_iterations": 250,
+                  "accuracy": 1.0,
+                  "electronic_temperature": 300.0,
+                  "effective_electronic_temperature": 300.0
+                },
+                "calculation_status": "success",
+                "initialization": "reference",
+                "optimize": false,
+                "solvent": null,
+                "engine": {
+                  "backend": "native",
+                  "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+                  "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+                  "version": "6.7.1",
+                  "native_gfn0": null,
+                  "orbital_basis": null
+                },
+                "parameter_file": {
+                  "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+                },
+                "native_api_version": 10000,
+                "elapsed_seconds": 0.006204028963111341,
+                "coefficient_axes": [
+                  "AO",
+                  "MO"
+                ],
+                "overlap_source": null
+              }
+            },
+            "attached": {
+              "status": "success",
+              "method": "GFN2-xTB",
+              "charge": -1,
+              "uhf": 1,
+              "energy_hartree": -4.815863967552561,
+              "num_electrons": 9,
+              "partial_charges_e": [
+                -0.7979096730921672,
+                -0.09935369246522165,
+                -0.1027366237302391
+              ],
+              "provenance": {
+                "atom_count": 3,
+                "atomic_numbers": [
+                  8,
+                  1,
+                  1
+                ],
+                "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+                "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+                "charge": -1,
+                "uhf": 1,
+                "conformer_id": 0,
+                "calculation_settings": {
+                  "max_iterations": 250,
+                  "accuracy": 1.0,
+                  "electronic_temperature": 300.0,
+                  "effective_electronic_temperature": 300.0
+                },
+                "calculation_status": "success",
+                "initialization": "reference",
+                "optimize": false,
+                "solvent": null,
+                "engine": {
+                  "backend": "native",
+                  "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+                  "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+                  "version": "6.7.1",
+                  "native_gfn0": null,
+                  "orbital_basis": null
+                },
+                "parameter_file": {
+                  "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+                },
+                "native_api_version": 10000,
+                "elapsed_seconds": 0.006236326997168362,
+                "coefficient_axes": [
+                  "AO",
+                  "MO"
+                ],
+                "overlap_source": null
+              }
+            }
+          },
+          "provenance": {
+            "states": {
+              "reference": {
+                "status": "success",
+                "method": "GFN2-xTB",
+                "charge": 0,
+                "uhf": 0,
+                "energy_hartree": -5.070371678146143,
+                "num_electrons": 8,
+                "partial_charges_e": [
+                  -0.5635674430661549,
+                  0.2818001115301935,
+                  0.28176733153595956
+                ],
+                "provenance": {
+                  "atom_count": 3,
+                  "atomic_numbers": [
+                    8,
+                    1,
+                    1
+                  ],
+                  "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+                  "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+                  "charge": 0,
+                  "uhf": 0,
+                  "conformer_id": 0,
+                  "calculation_settings": {
+                    "max_iterations": 250,
+                    "accuracy": 1.0,
+                    "electronic_temperature": 300.0,
+                    "effective_electronic_temperature": 300.0
+                  },
+                  "calculation_status": "success",
+                  "initialization": "independent",
+                  "optimize": false,
+                  "solvent": null,
+                  "engine": {
+                    "backend": "native",
+                    "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+                    "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+                    "version": "6.7.1",
+                    "native_gfn0": null,
+                    "orbital_basis": null
+                  },
+                  "parameter_file": {
+                    "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+                  },
+                  "native_api_version": 10000,
+                  "elapsed_seconds": 0.009002270991913974,
+                  "coefficient_axes": [
+                    "AO",
+                    "MO"
+                  ],
+                  "overlap_source": null
+                }
+              },
+              "ionized": {
+                "status": "success",
+                "method": "GFN2-xTB",
+                "charge": 1,
+                "uhf": 1,
+                "energy_hartree": -4.39695344346919,
+                "num_electrons": 7,
+                "partial_charges_e": [
+                  0.03462758335482133,
+                  0.4826041224697798,
+                  0.4827682894541559
+                ],
+                "provenance": {
+                  "atom_count": 3,
+                  "atomic_numbers": [
+                    8,
+                    1,
+                    1
+                  ],
+                  "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+                  "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+                  "charge": 1,
+                  "uhf": 1,
+                  "conformer_id": 0,
+                  "calculation_settings": {
+                    "max_iterations": 250,
+                    "accuracy": 1.0,
+                    "electronic_temperature": 300.0,
+                    "effective_electronic_temperature": 300.0
+                  },
+                  "calculation_status": "success",
+                  "initialization": "reference",
+                  "optimize": false,
+                  "solvent": null,
+                  "engine": {
+                    "backend": "native",
+                    "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+                    "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+                    "version": "6.7.1",
+                    "native_gfn0": null,
+                    "orbital_basis": null
+                  },
+                  "parameter_file": {
+                    "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+                  },
+                  "native_api_version": 10000,
+                  "elapsed_seconds": 0.006204028963111341,
+                  "coefficient_axes": [
+                    "AO",
+                    "MO"
+                  ],
+                  "overlap_source": null
+                }
+              },
+              "attached": {
+                "status": "success",
+                "method": "GFN2-xTB",
+                "charge": -1,
+                "uhf": 1,
+                "energy_hartree": -4.815863967552561,
+                "num_electrons": 9,
+                "partial_charges_e": [
+                  -0.7979096730921672,
+                  -0.09935369246522165,
+                  -0.1027366237302391
+                ],
+                "provenance": {
+                  "atom_count": 3,
+                  "atomic_numbers": [
+                    8,
+                    1,
+                    1
+                  ],
+                  "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+                  "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+                  "charge": -1,
+                  "uhf": 1,
+                  "conformer_id": 0,
+                  "calculation_settings": {
+                    "max_iterations": 250,
+                    "accuracy": 1.0,
+                    "electronic_temperature": 300.0,
+                    "effective_electronic_temperature": 300.0
+                  },
+                  "calculation_status": "success",
+                  "initialization": "reference",
+                  "optimize": false,
+                  "solvent": null,
+                  "engine": {
+                    "backend": "native",
+                    "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/libxtb.so.6.7.1",
+                    "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
+                    "version": "6.7.1",
+                    "native_gfn0": null,
+                    "orbital_basis": null
+                  },
+                  "parameter_file": {
+                    "path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+                  },
+                  "native_api_version": 10000,
+                  "elapsed_seconds": 0.006236326997168362,
+                  "coefficient_axes": [
+                    "AO",
+                    "MO"
+                  ],
+                  "overlap_source": null
+                }
+              }
+            }
+          },
+          "quality": {
+            "status": "warning",
+            "flags": [
+              {
+                "code": "open_shell_spin_summed",
+                "severity": "info",
+                "detail": "No separate alpha/beta population analysis or spin-state search.",
+                "state": "ionized"
+              },
+              {
+                "code": "charged_dipole_origin_dependent",
+                "severity": "info",
+                "detail": "Dipole components and norm depend on the coordinate origin.",
+                "state": "ionized"
+              },
+              {
+                "code": "open_shell_spin_summed",
+                "severity": "info",
+                "detail": "No separate alpha/beta population analysis or spin-state search.",
+                "state": "attached"
+              },
+              {
+                "code": "charged_dipole_origin_dependent",
+                "severity": "info",
+                "detail": "Dipole components and norm depend on the coordinate origin.",
+                "state": "attached"
+              },
+              {
+                "code": "negative_vertical_ea",
+                "severity": "warning",
+                "detail": "Attachment is energetically unfavorable at this geometry; no bound-anion claim."
+              },
+              {
+                "code": "finite_electronic_temperature",
+                "severity": "warning",
+                "detail": "Energy differences use the configured finite-temperature libxtb energies."
+              }
+            ],
+            "fukui_sum_errors": {
+              "f_plus": -1.0712373876842207e-08,
+              "f_minus": -4.721241175786872e-09,
+              "dual": -5.991132701055335e-09
+            },
+            "spin_states_verified_as_ground_states": false
+          },
+          "missing": {},
+          "error": null,
+          "atoms": [
+            {
+              "atom_index": 0,
+              "f_plus": 0.2343422300260123,
+              "f_minus": 0.5981950264209762,
+              "f_radical": 0.41626862822349425,
+              "dual": -0.36385279639496393
+            },
+            {
+              "atom_index": 1,
+              "f_plus": 0.38115380399541515,
+              "f_minus": 0.20080401093958627,
+              "f_radical": 0.2909789074675007,
+              "dual": 0.18034979305582888
+            },
+            {
+              "atom_index": 2,
+              "f_plus": 0.3845039552661987,
+              "f_minus": 0.20100095791819633,
+              "f_radical": 0.2927524565921975,
+              "dual": 0.18350299734800235
+            }
+          ],
+          "fragments": {},
+          "unassigned_atom_indices": [
+            0,
+            1,
+            2
+          ]
+        }
+      }
+    }
+  ],
+  "verification": "fresh venv, neutral working directory, isolated Python, package origin asserted"
+}

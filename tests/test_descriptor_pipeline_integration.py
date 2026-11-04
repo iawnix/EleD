@@ -62,12 +62,13 @@ def test_cache_distinguishes_each_numerical_setting(library):
 
 @pytest.mark.parametrize('method',['gfn1','gfn2'])
 @pytest.mark.parametrize('smiles',['O','CCO','[CH3]','[NH4+]'])
-def test_vertical_states_interfaces_and_population_definitions(library,method,smiles):
+@pytest.mark.parametrize('initialization',['reference','independent'])
+def test_vertical_states_interfaces_and_population_definitions(library,method,smiles,initialization):
     pytest.importorskip('rdkit_eth.rdXTBTools');m=molecule(smiles);original=m.ToBinary()
     opts=XTBOptions(method=method,xtb_library=library,accuracy=.1,electronic_temperature=300.)
     spins={'ionized_uhf':0,'attached_uhf':0} if smiles=='[CH3]' else {}
-    a=run_reactivity(m,options=opts,population_scheme='mulliken',**spins)
-    b=run_reactivity(m,options=opts,population_scheme='charges',interface='compiled',**spins)
+    a=run_reactivity(m,options=opts,population_scheme='mulliken',initialization=initialization,**spins)
+    b=run_reactivity(m,options=opts,population_scheme='charges',interface='compiled',initialization=initialization,**spins)
     assert a['values']==pytest.approx(b['values'],abs=1e-8)
     for key in ['f_plus','f_minus','f_radical','dual']:
         np.testing.assert_allclose([v[key] for v in a['atoms']],[v[key] for v in b['atoms']],atol=1e-7,rtol=0)
@@ -75,6 +76,64 @@ def test_vertical_states_interfaces_and_population_definitions(library,method,sm
     assert sum(r['f_minus'] for r in a['atoms'])==pytest.approx(1,abs=1e-7)
     assert m.ToBinary()==original
     assert len({s['provenance']['geometry_sha256'] for s in a['states'].values()})==1
+    for report in (a,b):
+        assert report['analysis_settings']['initialization']==initialization
+        for state,details in report['states'].items():
+            assert details['provenance']['initialization']==('independent' if state=='reference' else initialization)
+
+
+def test_reference_restart_is_copied_for_each_neighbor_and_freed(library):
+    from rdkit_eth.backends.native import _NativeXTB, _native_charge_states
+    original=_NativeXTB._bind
+    copies,deleted=[],[]
+    def bind(instance,name,*args):
+        fn=original(instance,name,*args)
+        if name=='xtb_copyResults':
+            def copy(source):
+                result=fn(source);copies.append((source,result));return result
+            return copy
+        if name=='xtb_delResults':
+            def delete(pointer):
+                deleted.append(pointer._obj.value);return fn(pointer)
+            return delete
+        return fn
+    m=molecule();base=XTBOptions(xtb_library=library)
+    configs=[replace(base,charge=q,uhf=spin) for q,spin in [(0,0),(1,1),(-1,1)]]
+    with patch.object(_NativeXTB,'_bind',bind):
+        results=list(_native_charge_states(m,configs))
+    assert len(copies)==3 and copies[1][0]==copies[2][0]==copies[0][1]
+    assert copies[0][1] in deleted and len(deleted)==4
+    # Reversing neighboring calculations must not turn this into a sequential restart.
+    reversed_results=list(_native_charge_states(m,[configs[0],configs[2],configs[1]]))
+    for a,b in zip(results,[reversed_results[i] for i in [0,2,1]]):
+        np.testing.assert_allclose(a.partial_charges,b.partial_charges,atol=1e-10,rtol=0)
+    copies.clear();deleted.clear()
+    with patch.object(_NativeXTB,'_bind',bind):
+        iterator=_native_charge_states(m,configs)
+        next(iterator);iterator.close()
+    assert copies[0][1] in deleted and len(deleted)==2
+
+
+@pytest.mark.parametrize('fail_on,state',[(1,'reference'),(2,'ionized'),(3,'attached')])
+def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_on,state):
+    from rdkit_eth.backends.native import _NativeXTB
+    original=_NativeXTB._bind
+    count=0
+    def bind(instance,name,*args):
+        fn=original(instance,name,*args)
+        if name=='xtb_copyResults':
+            def copy(source):
+                nonlocal count
+                count+=1
+                return None if count==fail_on else fn(source)
+            return copy
+        return fn
+    with patch.object(_NativeXTB,'_bind',bind):
+        report=run_reactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
+    assert report['error']['state']==state
+    assert 'copy' in report['error']['message']
+    assert all(v is None for v in report['values'].values())
+    assert run_reactivity(molecule(),options=XTBOptions(xtb_library=library))['error'] is None
 
 
 @pytest.mark.parametrize('interface',['native','compiled'])

@@ -1,7 +1,24 @@
 # Local validation — 2026-11-04
 
 
-## Current scope: 0.6 descriptor reports and vertical reactivity
+## Current scope: 0.7 reference wavefunctions and unified temperature
+
+Reactivity now defaults to 300 K and separate reference-wavefunction copies for
+both adjacent states. Independent initialization and explicit cold settings
+remain available; open-shell adjacent spins stay explicit. No libxtb patch or
+new production backend is needed. The [0.7 evidence](validation/0.7.0/README.md)
+records **287 passed, 1 skipped** for both development and installed-wheel suites,
+and **173 passed, 115 skipped** with official libxtb. Standalone C++, installer
+upgrade and fresh-venv wheel checks passed.
+
+Eight matched-settings GFN1/2 cases agree with original `--vfukui` to its printed
+three-decimal precision (absolute tolerance 0.00051). Full logs, exact geometries
+and both initialization reports are archived. Maximum initialization-dependent
+Fukui difference on this corpus was 7.97e-6; this is not a guarantee that both
+initializations always find the same SCF solution. Protocol version 2.0 records
+the new defaults; descriptor formulas and schema are unchanged.
+
+## 0.6 descriptor reports and vertical reactivity baseline
 
 Version 0.6 retains the 0.5 extended engine and adds shared numerical settings,
 versioned reports, CSV/JSONL export, observable quality flags and fixed-geometry

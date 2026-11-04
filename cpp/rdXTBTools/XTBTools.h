@@ -55,6 +55,7 @@ struct XTBResults {
   std::vector<double> wibergBondOrders;      // row-major [atom][atom]
   bool basisExportVerified = false;
   std::string inputProvenanceJSON;  // Python wrapper snapshot; empty for standalone C++.
+  std::string initialization = "independent";
   std::vector<double> overlapMatrix;
   std::vector<int> aoAtomMap, aoShellMap, shellAtomMap, shellAngularMomenta;
   std::vector<double> orbitalCoefficients;   // row-major [AO][MO], optional
@@ -66,5 +67,12 @@ struct XTBResults {
 // Calls through this C++ library are serialized. The molecule is never changed.
 bool runMol(const ROMol &mol, XTBResults &result,
             const XTBOptions &options = XTBOptions{});
+
+// Fixed-geometry reference, ionized, attached states. Each neighbor starts from
+// its own copy of the reference when requested. Stops at the first failed state;
+// returned entries include that failure, but no unattempted states. No raw
+// engine handles escape this call. Only GFN1/2; adjacent spins are explicit.
+std::vector<XTBResults> runChargeStates(const ROMol &mol, const XTBOptions &options,
+    int ionizedUnpaired, int attachedUnpaired, bool reuseReference = true);
 
 }  // namespace RDKit::XTBTools
