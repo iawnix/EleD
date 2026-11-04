@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(RDKitXTB VERSION 0.9.0 LANGUAGES CXX)
+project(RDKitXTB VERSION 0.9.1 LANGUAGES CXX)
 if(POLICY CMP0167)
   cmake_policy(SET CMP0167 NEW)
 endif()

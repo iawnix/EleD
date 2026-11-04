@@ -116,7 +116,27 @@ def split_indices(rows, kind, seed):
     return train, test
 
 
-def fit_ablation(rows, output):
+def validate_splits(rows, splits):
+    """Validate frozen, exhaustive partitions without resampling missing records."""
+    index = {r['id']: i for i, r in enumerate(rows)}
+    if len(index) != len(rows): raise ValueError('duplicate row IDs')
+    seen = set()
+    for split in splits:
+        key = split['kind'], split['seed']
+        if key in seen or split['kind'] not in ('random', 'scaffold'):
+            raise ValueError('invalid or repeated split')
+        seen.add(key)
+        train, test = split['train'], split['test']
+        if (not train or not test or len(set(train)) != len(train) or len(set(test)) != len(test)
+                or set(train) & set(test) or set(train) | set(test) != set(index)):
+            raise ValueError('split must partition the exact cohort without duplicates')
+        group = 'identity' if split['kind'] == 'random' else 'scaffold'
+        if {rows[index[i]][group] for i in train} & {rows[index[i]][group] for i in test}:
+            raise ValueError('chemical group crosses train/test')
+    if not seen: raise ValueError('at least one split is required')
+
+
+def fit_ablation(rows, output, *, splits=None):
     import sklearn
     import scipy
     from sklearn.ensemble import ExtraTreesRegressor
@@ -127,24 +147,32 @@ def fit_ablation(rows, output):
     arrays.append(np.column_stack([arrays[0], [r['basic'] for r in rows]]))
     arrays.append(np.column_stack([arrays[1], [r['orbital'] for r in rows]]))
     y = np.array([r['target_eV'] for r in rows])
-    metrics, splits, predictions = [], [], []
-    for kind in ('random', 'scaffold'):
-        for seed in SEEDS:
-            train, test = split_indices(rows, kind, seed)
-            splits.append({'kind': kind, 'seed': seed, 'train': [rows[i]['id'] for i in train],
-                           'test': [rows[i]['id'] for i in test]})
-            for name, x in zip(features, arrays):
-                model = make_pipeline(SimpleImputer(strategy='median', keep_empty_features=True),
-                    ExtraTreesRegressor(n_estimators=256, min_samples_leaf=2, max_features=1.,
-                                        random_state=seed, n_jobs=2))
-                started = time.perf_counter(); model.fit(x[train], y[train]); pred = model.predict(x[test])
-                metrics.append({'split': kind, 'seed': seed, 'features': name, 'n_features': x.shape[1],
-                    'n_train': len(train), 'n_test': len(test), 'mae_eV': float(np.mean(abs(pred-y[test]))),
-                    'rmse_eV': float(np.sqrt(np.mean((pred-y[test])**2))),
-                    'fit_predict_seconds': time.perf_counter()-started})
-                predictions.extend({'split': kind, 'seed': seed, 'features': name, 'id': rows[i]['id'],
-                                    'target_eV': y[i], 'prediction_eV': float(p)} for i, p in zip(test, pred))
-                print(json.dumps(metrics[-1]), flush=True)
+    if splits is None:
+        splits = []
+        for kind in ('random', 'scaffold'):
+            for seed in SEEDS:
+                train, test = split_indices(rows, kind, seed)
+                splits.append({'kind': kind, 'seed': seed, 'train': [rows[i]['id'] for i in train],
+                               'test': [rows[i]['id'] for i in test]})
+    validate_splits(rows, splits)
+    index = {r['id']: i for i, r in enumerate(rows)}
+    metrics, predictions = [], []
+    for split in splits:
+        kind, seed = split['kind'], split['seed']
+        train = np.array([index[i] for i in split['train']])
+        test = np.array([index[i] for i in split['test']])
+        for name, x in zip(features, arrays):
+            model = make_pipeline(SimpleImputer(strategy='median', keep_empty_features=True),
+                ExtraTreesRegressor(n_estimators=256, min_samples_leaf=2, max_features=1.,
+                                    random_state=seed, n_jobs=2))
+            started = time.perf_counter(); model.fit(x[train], y[train]); pred = model.predict(x[test])
+            metrics.append({'split': kind, 'seed': seed, 'features': name, 'n_features': x.shape[1],
+                'n_train': len(train), 'n_test': len(test), 'mae_eV': float(np.mean(abs(pred-y[test]))),
+                'rmse_eV': float(np.sqrt(np.mean((pred-y[test])**2))),
+                'fit_predict_seconds': time.perf_counter()-started})
+            predictions.extend({'split': kind, 'seed': seed, 'features': name, 'id': rows[i]['id'],
+                                'target_eV': y[i], 'prediction_eV': float(p)} for i, p in zip(test, pred))
+            print(json.dumps(metrics[-1]), flush=True)
     write_json(output/'splits.json', splits)
     write_json(output/'predictions.json', predictions)
     return {'model': 'ExtraTreesRegressor; 256 trees, min_samples_leaf=2, max_features=1.0; no tuning',

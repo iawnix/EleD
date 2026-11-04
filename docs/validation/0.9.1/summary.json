@@ -1,0 +1,434 @@
+{
+  "n_selected": 1024,
+  "n_common": 983,
+  "n_failed": 41,
+  "failure_counts": {
+    "embedding_failed": 41
+  },
+  "featurization_wall_seconds": 113.33428588300012,
+  "geometry_seconds_all_attempts": 91.92575732758269,
+  "xtb_seconds_successful": 16.916379807167687,
+  "analysis_seconds_successful": 3.309252938022837,
+  "source": {
+    "model": "ExtraTreesRegressor; 256 trees, min_samples_leaf=2, max_features=1.0; no tuning",
+    "imputation": "train-only median, keep_empty_features=True",
+    "metrics": [
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 786,
+        "n_test": 197,
+        "mae_eV": 0.3437307946604789,
+        "rmse_eV": 0.5251269665839899,
+        "fit_predict_seconds": 2.2550972839817405
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 786,
+        "n_test": 197,
+        "mae_eV": 0.20433797499912168,
+        "rmse_eV": 0.2921416309685185,
+        "fit_predict_seconds": 2.0376545729814097
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 786,
+        "n_test": 197,
+        "mae_eV": 0.19482938292422666,
+        "rmse_eV": 0.27667231565496225,
+        "fit_predict_seconds": 2.30897295800969
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 788,
+        "n_test": 195,
+        "mae_eV": 0.35849476840415523,
+        "rmse_eV": 0.5403362191004983,
+        "fit_predict_seconds": 2.308181659085676
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 788,
+        "n_test": 195,
+        "mae_eV": 0.21957223664286202,
+        "rmse_eV": 0.32236880166679094,
+        "fit_predict_seconds": 2.144771199906245
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 788,
+        "n_test": 195,
+        "mae_eV": 0.2144734723650465,
+        "rmse_eV": 0.31538747889185,
+        "fit_predict_seconds": 2.3836846170015633
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 791,
+        "n_test": 192,
+        "mae_eV": 0.3533674119347427,
+        "rmse_eV": 0.5341221264242423,
+        "fit_predict_seconds": 2.3082529740640894
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 791,
+        "n_test": 192,
+        "mae_eV": 0.2175450544802021,
+        "rmse_eV": 0.33066830547702714,
+        "fit_predict_seconds": 2.1297714279498905
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 791,
+        "n_test": 192,
+        "mae_eV": 0.20515440149598785,
+        "rmse_eV": 0.3173454635303205,
+        "fit_predict_seconds": 2.120941034052521
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 774,
+        "n_test": 209,
+        "mae_eV": 0.3613015565143621,
+        "rmse_eV": 0.4986830613868634,
+        "fit_predict_seconds": 2.1869941799668595
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 774,
+        "n_test": 209,
+        "mae_eV": 0.22771177205047802,
+        "rmse_eV": 0.3146570508990795,
+        "fit_predict_seconds": 2.2243483010679483
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 774,
+        "n_test": 209,
+        "mae_eV": 0.2286097374307653,
+        "rmse_eV": 0.3127472379794125,
+        "fit_predict_seconds": 2.059401844977401
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 778,
+        "n_test": 205,
+        "mae_eV": 0.3516405997748917,
+        "rmse_eV": 0.5034247483168081,
+        "fit_predict_seconds": 2.476713548065163
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 778,
+        "n_test": 205,
+        "mae_eV": 0.2138704390624089,
+        "rmse_eV": 0.3015944140556533,
+        "fit_predict_seconds": 2.133427995024249
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 778,
+        "n_test": 205,
+        "mae_eV": 0.21476143275466045,
+        "rmse_eV": 0.2986209594957959,
+        "fit_predict_seconds": 2.0705253169871867
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 784,
+        "n_test": 199,
+        "mae_eV": 0.3169824319568393,
+        "rmse_eV": 0.4509727998552977,
+        "fit_predict_seconds": 2.3037411409895867
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 784,
+        "n_test": 199,
+        "mae_eV": 0.18360590902230992,
+        "rmse_eV": 0.2583390365723796,
+        "fit_predict_seconds": 2.3647211069473997
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 784,
+        "n_test": 199,
+        "mae_eV": 0.17766339442366424,
+        "rmse_eV": 0.25314696620721966,
+        "fit_predict_seconds": 2.378664041054435
+      }
+    ],
+    "versions": {
+      "python": "3.11.18",
+      "rdkit": "2026.09.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.7.2",
+      "scipy": "1.16.3"
+    }
+  },
+  "generated": {
+    "model": "ExtraTreesRegressor; 256 trees, min_samples_leaf=2, max_features=1.0; no tuning",
+    "imputation": "train-only median, keep_empty_features=True",
+    "metrics": [
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 786,
+        "n_test": 197,
+        "mae_eV": 0.34373079466047884,
+        "rmse_eV": 0.5251269665839899,
+        "fit_predict_seconds": 2.1620202059857547
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 786,
+        "n_test": 197,
+        "mae_eV": 0.22510572035609047,
+        "rmse_eV": 0.3146870778333374,
+        "fit_predict_seconds": 2.2550631870981306
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 786,
+        "n_test": 197,
+        "mae_eV": 0.21588749463565454,
+        "rmse_eV": 0.29756455751747357,
+        "fit_predict_seconds": 2.3418088098987937
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 788,
+        "n_test": 195,
+        "mae_eV": 0.35849476840415523,
+        "rmse_eV": 0.5403362191004983,
+        "fit_predict_seconds": 2.342402838054113
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 788,
+        "n_test": 195,
+        "mae_eV": 0.241473972979565,
+        "rmse_eV": 0.3490335722412818,
+        "fit_predict_seconds": 2.2531356940744445
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 788,
+        "n_test": 195,
+        "mae_eV": 0.23860968156145676,
+        "rmse_eV": 0.33624700416233405,
+        "fit_predict_seconds": 2.2745916839921847
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 791,
+        "n_test": 192,
+        "mae_eV": 0.3533674119347426,
+        "rmse_eV": 0.5341221264242423,
+        "fit_predict_seconds": 2.4244571479503065
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 791,
+        "n_test": 192,
+        "mae_eV": 0.24915726858518483,
+        "rmse_eV": 0.3800072097730033,
+        "fit_predict_seconds": 2.125520739937201
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 791,
+        "n_test": 192,
+        "mae_eV": 0.2405895054435471,
+        "rmse_eV": 0.3744925118592141,
+        "fit_predict_seconds": 2.345677518984303
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 774,
+        "n_test": 209,
+        "mae_eV": 0.36130155651436213,
+        "rmse_eV": 0.49868306138686347,
+        "fit_predict_seconds": 2.334183315979317
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 774,
+        "n_test": 209,
+        "mae_eV": 0.24982476924443747,
+        "rmse_eV": 0.3428383836533785,
+        "fit_predict_seconds": 2.0298513440648094
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 774,
+        "n_test": 209,
+        "mae_eV": 0.2520282632927045,
+        "rmse_eV": 0.34153780219865815,
+        "fit_predict_seconds": 2.098930527921766
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 778,
+        "n_test": 205,
+        "mae_eV": 0.3516405997748917,
+        "rmse_eV": 0.5034247483168081,
+        "fit_predict_seconds": 2.4621401970507577
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 778,
+        "n_test": 205,
+        "mae_eV": 0.23591048552610952,
+        "rmse_eV": 0.3298181309057696,
+        "fit_predict_seconds": 2.1706511720549315
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 778,
+        "n_test": 205,
+        "mae_eV": 0.2369761556779192,
+        "rmse_eV": 0.3303206103213845,
+        "fit_predict_seconds": 2.3136151200160384
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 784,
+        "n_test": 199,
+        "mae_eV": 0.3169824319568393,
+        "rmse_eV": 0.45097279985529765,
+        "fit_predict_seconds": 2.3139864910626784
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 784,
+        "n_test": 199,
+        "mae_eV": 0.2064484635857078,
+        "rmse_eV": 0.29201340835084594,
+        "fit_predict_seconds": 2.303140816045925
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 784,
+        "n_test": 199,
+        "mae_eV": 0.20229809309123417,
+        "rmse_eV": 0.28812913688959363,
+        "fit_predict_seconds": 2.1082057560561225
+      }
+    ],
+    "versions": {
+      "python": "3.11.18",
+      "rdkit": "2026.09.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.7.2",
+      "scipy": "1.16.3"
+    }
+  }
+}

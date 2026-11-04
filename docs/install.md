@@ -1,4 +1,4 @@
-# Installing rdkit-eth 0.8
+# Installing rdkit-eth 0.9.1
 
 The standard profile uses **one extended libxtb for GFN0/1/2 and all current
 descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux
@@ -46,6 +46,22 @@ If an older shell has `XTB_LIBRARY`, `XTBPATH` or `XTB_PREFIX` set, unset those
 explicit overrides before using the new environment. The installer clears
 these overrides for its own checks. Explicit library selection remains
 available for diagnostics, but ordinary use needs only conda activation.
+
+## Isolated research environments
+
+Since 0.9.1, a venv created from the standard runtime with
+`--system-site-packages` can find the base runtime's native libxtb automatically.
+This supports isolated research dependencies without modifying the locked runtime:
+
+```bash
+.rdkit-eth/runtime/bin/python -m venv --system-site-packages build/research-env
+build/research-env/bin/python -I -m rdkit_eth doctor --check native --keep-overlap
+```
+
+Library discovery checks the venv, then its base Python prefix, then environment
+prefixes and system lookup. Explicit `xtb_library`/`XTB_LIBRARY` selections still
+take priority; a broken explicit selection raises rather than silently falling
+back. The base runtime must already have been installed.
 
 ## First calculation
 

@@ -1,5 +1,18 @@
 # Changes
 
+## 0.9.1 — inherited native runtime and matched geometry benchmark
+
+- Native library discovery now checks `sys.base_prefix` after `sys.prefix`,
+  so a venv inheriting the standard runtime can use its libxtb without manual
+  overrides. Explicit library selections retain priority and fail without
+  falling back silently.
+- Added a matched QM8 source-vs-SMILES geometry study: deterministic ETKDGv3
+  embedding, explicit MMFF94 convergence/selection, shared successful cohort,
+  frozen train/test IDs and paired test-group bootstrap intervals. No tuning,
+  new backend or machine-learning runtime dependency.
+- The original pilot's model runner now accepts and validates frozen splits;
+  tests cover data leakage, failures, selection and clustered uncertainty.
+
 ## 0.9.0 — conformer sensitivity and QM8 pilot
 
 - Added `run_conformer_analysis` and `conformer_descriptor_columns`: immutable

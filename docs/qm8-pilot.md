@@ -1,5 +1,10 @@
 # QM8 first-excitation prediction pilot (0.9)
 
+The subsequent [matched geometry study](qm8-geometry-study.md) compares source
+and SMILES-generated geometries on a common successful cohort with fixed split
+memberships and paired uncertainty intervals. It preserves this original pilot
+as the frozen reference rather than replacing its results.
+
 This experiment asks whether **ground-state xTB descriptors** improve a small
 supervised prediction task. It does not calculate excited states with xTB and
 does not identify the xTB HOMO–LUMO gap with an optical excitation energy.

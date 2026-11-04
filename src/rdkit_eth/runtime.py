@@ -97,7 +97,9 @@ def _find_xtb_library(library=None) -> str:
         else:
             candidates = [candidate]
     else:
-        for prefix in (sys.prefix, os.environ.get('CONDA_PREFIX'), os.environ.get('XTB_PREFIX')):
+        # venvs can inherit this package from their base runtime. Search that
+        # runtime's native dependencies before unrelated activated environments.
+        for prefix in (sys.prefix, sys.base_prefix, os.environ.get('CONDA_PREFIX'), os.environ.get('XTB_PREFIX')):
             if prefix:
                 for subdir in ('lib', 'Library/bin', 'bin'):
                     for pattern in patterns:

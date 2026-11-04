@@ -17,6 +17,11 @@ from basic xTB features on its fixed cohort; additional orbital distribution
 features show only small, split-dependent gains. Machine-learning tools remain
 optional developer dependencies in a separate environment.
 
+0.9.1 fixes automatic libxtb discovery in venvs inheriting the standard runtime.
+A [matched geometry study](docs/qm8-geometry-study.md) confirms that basic xTB
+features remain useful with SMILES-generated geometries on the common successful
+QM8 cohort; it retains embedding failures and paired uncertainty intervals.
+
 ## Installation
 
 The standard profile is Linux x86-64 / Python 3.11. With conda available, run:

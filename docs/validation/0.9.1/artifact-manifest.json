@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+  "source": {
+    "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-pw6980h0/rdkit_eth-0.9.1.tar.gz",
+    "sha256": "68506762df47282f6bb0862491a1f078f44941494d1aeb4eec8ac6b9fe1444ba"
+  },
+  "wheels": [
+    {
+      "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-pw6980h0/pure/rdkit_eth-0.9.1-py3-none-any.whl",
+      "sha256": "b09ce5cc3c1a04397c495b14250223e7f84955b7553ac9ec0ae68908ed0f1ce4",
+      "compiled": false,
+      "version": "0.9.1",
+      "requirements": [
+        "rdkit>=2024.03",
+        "numpy<3,>=1.23",
+        "pytest>=8; extra == \"test\""
+      ]
+    },
+    {
+      "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-pw6980h0/compiled/rdkit_eth-0.9.1-cp311-cp311-linux_x86_64.whl",
+      "sha256": "f8b2241179cd0f04e8c1032ce7daec901e40cf4332aa7853c7975115e6d556b8",
+      "compiled": true,
+      "version": "0.9.1",
+      "requirements": [
+        "rdkit>=2024.03",
+        "numpy<3,>=1.23",
+        "pytest>=8; extra == \"test\""
+      ]
+    }
+  ],
+  "build_packages": {
+    "rdkit": "2026.9.1",
+    "numpy": "2.4.6",
+    "setuptools": "84.2.1",
+    "wheel": "0.48.0",
+    "build": "1.2.2.post1",
+    "pyproject-hooks": "1.2.0"
+  },
+  "lock_sha256": {
+    "locks/linux-64/rdxtb-sdk.txt": "8947d29d0459859d2c174414327ac20bb307fcc932fa925b075262c3f16befbf",
+    "locks/linux-64/release-tools-py311.txt": "3faf3ed75742ace3eaa7b6a4e931a62f183bf7fb7f4b97586b1123f39dbef0e7",
+    "locks/linux-64/runtime.txt": "217a042a9ad3082b26e4d7f5f9621d1c036606f8fdeef4da73209554873ab0f9",
+    "locks/linux-64/xtb-toolchain.txt": "de5b9de44f2360ad254a0f0b08709e8844958bdae41a97bc3045367c1bb96ae6"
+  },
+  "xtb_source_lock_sha256": "5876a8aa64daf9c9dc90a397964340d9cfb4922608acc6d161e56ea4858d39fa",
+  "compiled_wheel_scope": "local Linux SDK/prefix; external libraries are not bundled",
+  "compiled_default_xtb": {
+    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so",
+    "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223"
+  }
+}

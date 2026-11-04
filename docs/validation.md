@@ -1,7 +1,26 @@
-# Local validation — 2026-11-04
+# Local validation — 2026-11-05
 
 
-## Current scope: 0.9 conformer sensitivity and QM8 pilot
+## Current scope: 0.9.1 inherited runtime and matched geometry study
+
+The [0.9.1 evidence](validation/0.9.1/README.md) records **359 passed, 4 skipped**
+in development and isolated installed-wheel suites, **243 passed, 120 skipped**
+with the official engine and **23 passed** for optional benchmark/discovery
+tests. A research venv now automatically finds its base runtime's libxtb;
+native and compiled population checks pass with library/prefix overrides unset.
+
+The [matched QM8 geometry study](qm8-geometry-study.md) keeps the 0.9.0 selected
+IDs, model and split memberships. 41 embedding failures leave 983 common
+successful molecules. Both geometry protocols are refitted on this cohort.
+Generated-geometry basic xTB features retain a useful pilot benefit but have
+higher error than source geometries. Additional orbital-distribution gains
+remain small; all three generated-geometry scaffold paired intervals include
+zero. Evidence includes every attempted geometry and all matched comparisons.
+
+All three 0.9.0 remote CI workflows passed; current-commit remote status must
+be distinguished from these local checks.
+
+## 0.9 conformer sensitivity and QM8 pilot
 
 The [0.9 evidence](validation/0.9.0/README.md) includes **340 passed, 3 skipped**
 in both the development and isolated installed-wheel suites. Official libxtb

@@ -1,0 +1,520 @@
+{
+  "schema_version": 1,
+  "python": "/home/iaw/project/rdkit_eth/build/benchmark-env/bin/python",
+  "python_version": "3.11.18",
+  "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
+  "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+  "versions": {
+    "rdkit-eth": "0.9.1",
+    "rdkit": "2026.9.1",
+    "numpy": "2.4.6"
+  },
+  "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+  "compiled_module_import_checked": false,
+  "status": "ok",
+  "check": {
+    "backend": "native",
+    "method": "GFN2-xTB",
+    "molecule": "water",
+    "total_energy_hartree": -5.070371680847339,
+    "num_orbitals": 6,
+    "charge_sum_e": -6.217248937900877e-15,
+    "engine": {
+      "backend": "native",
+      "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+      "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+      "version": null,
+      "native_gfn0": {
+        "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+        "manifest_sha256": "21ed3500b06027891987606cde3ebd8eddb344e8858b060479ae6e57d85c213f",
+        "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+        "patch_sha256": null,
+        "fix_kind": "upstream",
+        "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
+      },
+      "orbital_basis": {
+        "api_version": 1,
+        "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+        "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
+        "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+        "manifest_sha256": "21ed3500b06027891987606cde3ebd8eddb344e8858b060479ae6e57d85c213f",
+        "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
+      }
+    },
+    "descriptors": {
+      "xtb_method": "GFN2-xTB",
+      "xtb_backend": "native",
+      "xtb_version": null,
+      "xtb_total_energy_Eh": -5.070371680847339,
+      "xtb_homo_eV": -12.176962416831758,
+      "xtb_lumo_eV": 2.462262317247677,
+      "xtb_gap_eV": 14.639224734079434,
+      "xtb_num_orbitals": 6,
+      "xtb_num_electrons": 8,
+      "xtb_num_unpaired_electrons": 0,
+      "xtb_occupation_threshold": 1e-07,
+      "xtb_homo_index": 3,
+      "xtb_lumo_index": 4,
+      "xtb_homo_minus_1_eV": -14.004945566395863,
+      "xtb_lumo_plus_1_eV": 6.699837596719988,
+      "xtb_homo_minus_2_eV": -15.41559821609158,
+      "xtb_lumo_plus_2_eV": null,
+      "xtb_dipole_x_au": 0.5467185203922158,
+      "xtb_dipole_y_au": 0.7063625869498278,
+      "xtb_dipole_z_au": 1.1727764858126254e-16,
+      "xtb_dipole_norm_au": 0.8932240731094895,
+      "xtb_dipole_norm_debye": 2.270349137424739,
+      "xtb_charge_sum_e": -6.217248937900877e-15,
+      "xtb_charge_min_e": -0.563566771762249,
+      "xtb_charge_max_e": 0.2817997541772912,
+      "xtb_charge_mean_e": -2.0724163126336257e-15,
+      "xtb_charge_std_e": 0.39850188618860305,
+      "xtb_charge_abs_sum_e": 1.1271335435244918,
+      "xtb_wiberg_pair_sum": 1.8407990147947642
+    },
+    "fragment_descriptors": {
+      "fragments": {
+        "oxygen": {
+          "atom_indices": [
+            0
+          ],
+          "num_atoms": 1,
+          "charge_e": -0.563566771762249,
+          "charge_min_e": -0.563566771762249,
+          "charge_max_e": -0.563566771762249,
+          "charge_std_e": 0.0,
+          "internal_wiberg_sum": 0.0,
+          "external_wiberg_sum": 1.8404017832426263
+        },
+        "hydrogens": {
+          "atom_indices": [
+            1,
+            2
+          ],
+          "num_atoms": 2,
+          "charge_e": 0.5635667717622428,
+          "charge_min_e": 0.2817670175849516,
+          "charge_max_e": 0.2817997541772912,
+          "charge_std_e": 1.6368296169799734e-05,
+          "internal_wiberg_sum": 0.0003972315521379532,
+          "external_wiberg_sum": 1.8404017832426263
+        }
+      },
+      "pairs": [
+        {
+          "fragment_a": "oxygen",
+          "fragment_b": "hydrogens",
+          "wiberg_sum": 1.8404017832426263
+        }
+      ],
+      "unassigned_atom_indices": []
+    },
+    "population_check": {
+      "electron_sum_e": 8.000000000000005,
+      "orthonormality_error": 1.1102230246251565e-15,
+      "homo_lumo_atom_overlap": 0.651783332806826
+    },
+    "descriptor_report": {
+      "schema_version": 1,
+      "descriptor_version": "1.0",
+      "report_type": "single_point",
+      "record_id": null,
+      "units": {
+        "xtb_method": null,
+        "xtb_backend": null,
+        "xtb_version": null,
+        "xtb_total_energy_Eh": "Hartree",
+        "xtb_homo_eV": "eV",
+        "xtb_lumo_eV": "eV",
+        "xtb_gap_eV": "eV",
+        "xtb_num_orbitals": "count",
+        "xtb_num_electrons": "count",
+        "xtb_num_unpaired_electrons": "count",
+        "xtb_occupation_threshold": "e",
+        "xtb_homo_index": "index",
+        "xtb_lumo_index": "index",
+        "xtb_homo_minus_1_eV": "eV",
+        "xtb_lumo_plus_1_eV": "eV",
+        "xtb_homo_minus_2_eV": "eV",
+        "xtb_lumo_plus_2_eV": "eV",
+        "xtb_dipole_x_au": "e*Bohr",
+        "xtb_dipole_y_au": "e*Bohr",
+        "xtb_dipole_z_au": "e*Bohr",
+        "xtb_dipole_norm_au": "e*Bohr",
+        "xtb_dipole_norm_debye": "Debye",
+        "xtb_charge_sum_e": "e",
+        "xtb_charge_min_e": "e",
+        "xtb_charge_max_e": "e",
+        "xtb_charge_mean_e": "e",
+        "xtb_charge_std_e": "e",
+        "xtb_charge_abs_sum_e": "e",
+        "xtb_wiberg_pair_sum": "dimensionless",
+        "frontier_homo_num_orbitals": "count",
+        "frontier_homo_energy_min_ev": "eV",
+        "frontier_homo_energy_max_ev": "eV",
+        "frontier_homo_inverse_participation_ratio": "dimensionless",
+        "frontier_homo_participation_ratio": "dimensionless",
+        "frontier_homo_entropy_nats": "nat",
+        "frontier_homo_centroid_x_angstrom": "angstrom",
+        "frontier_homo_centroid_y_angstrom": "angstrom",
+        "frontier_homo_centroid_z_angstrom": "angstrom",
+        "frontier_lumo_num_orbitals": "count",
+        "frontier_lumo_energy_min_ev": "eV",
+        "frontier_lumo_energy_max_ev": "eV",
+        "frontier_lumo_inverse_participation_ratio": "dimensionless",
+        "frontier_lumo_participation_ratio": "dimensionless",
+        "frontier_lumo_entropy_nats": "nat",
+        "frontier_lumo_centroid_x_angstrom": "angstrom",
+        "frontier_lumo_centroid_y_angstrom": "angstrom",
+        "frontier_lumo_centroid_z_angstrom": "angstrom",
+        "frontier_homo_lumo_atom_overlap": "dimensionless",
+        "frontier_homo_lumo_atom_centroid_separation_angstrom": "angstrom"
+      },
+      "values": {
+        "xtb_method": "GFN2-xTB",
+        "xtb_backend": "native",
+        "xtb_version": null,
+        "xtb_total_energy_Eh": -5.070371680847339,
+        "xtb_homo_eV": -12.176962416831758,
+        "xtb_lumo_eV": 2.462262317247677,
+        "xtb_gap_eV": 14.639224734079434,
+        "xtb_num_orbitals": 6,
+        "xtb_num_electrons": 8,
+        "xtb_num_unpaired_electrons": 0,
+        "xtb_occupation_threshold": 1e-07,
+        "xtb_homo_index": 3,
+        "xtb_lumo_index": 4,
+        "xtb_homo_minus_1_eV": -14.004945566395863,
+        "xtb_lumo_plus_1_eV": 6.699837596719988,
+        "xtb_homo_minus_2_eV": -15.41559821609158,
+        "xtb_lumo_plus_2_eV": null,
+        "xtb_dipole_x_au": 0.5467185203922158,
+        "xtb_dipole_y_au": 0.7063625869498278,
+        "xtb_dipole_z_au": 1.1727764858126254e-16,
+        "xtb_dipole_norm_au": 0.8932240731094895,
+        "xtb_dipole_norm_debye": 2.270349137424739,
+        "xtb_charge_sum_e": -6.217248937900877e-15,
+        "xtb_charge_min_e": -0.563566771762249,
+        "xtb_charge_max_e": 0.2817997541772912,
+        "xtb_charge_mean_e": -2.0724163126336257e-15,
+        "xtb_charge_std_e": 0.39850188618860305,
+        "xtb_charge_abs_sum_e": 1.1271335435244918,
+        "xtb_wiberg_pair_sum": 1.8407990147947642,
+        "frontier_homo_num_orbitals": 1,
+        "frontier_homo_energy_min_ev": -12.176962416831758,
+        "frontier_homo_energy_max_ev": -12.176962416831758,
+        "frontier_homo_inverse_participation_ratio": 0.9999999999999996,
+        "frontier_homo_participation_ratio": 1.0000000000000004,
+        "frontier_homo_entropy_nats": 2.2204460492503446e-16,
+        "frontier_homo_centroid_x_angstrom": 3.8781662477279025e-32,
+        "frontier_homo_centroid_y_angstrom": 2.137772330694113e-33,
+        "frontier_homo_centroid_z_angstrom": 0.0,
+        "frontier_lumo_num_orbitals": 1,
+        "frontier_lumo_energy_min_ev": 2.462262317247677,
+        "frontier_lumo_energy_max_ev": 2.462262317247677,
+        "frontier_lumo_inverse_participation_ratio": 0.3458992855902163,
+        "frontier_lumo_participation_ratio": 2.8910149331290924,
+        "frontier_lumo_entropy_nats": 1.080465122154053,
+        "frontier_lumo_centroid_x_angstrom": 0.20347793308655104,
+        "frontier_lumo_centroid_y_angstrom": 0.2688376549289122,
+        "frontier_lumo_centroid_z_angstrom": 0.0,
+        "frontier_homo_lumo_atom_overlap": 0.651783332806826,
+        "frontier_homo_lumo_atom_centroid_separation_angstrom": 0.3371601310369478
+      },
+      "analysis_settings": {
+        "frontier_depth": 2,
+        "include_orbitals": true,
+        "occupation_threshold": 1e-07,
+        "degeneracy_ev": 0.001,
+        "occupation_tolerance": 1e-06,
+        "fractional_tolerance": 0.0001,
+        "conservation_tolerance": 1e-05
+      },
+      "provenance": {
+        "atom_count": 3,
+        "atomic_numbers": [
+          8,
+          1,
+          1
+        ],
+        "ordered_structure_sha256": "c9cd88ba228bacf54f728647ccc5e9f32880fb4d9efa96a7d626bd36d6da9d76",
+        "geometry_sha256": "593e7624e673f82680a91d3b13903a3c7dc965a7754375e63609bcf98a77bf30",
+        "charge": 0,
+        "uhf": 0,
+        "conformer_id": 0,
+        "calculation_settings": {
+          "max_iterations": 250,
+          "accuracy": 1.0,
+          "electronic_temperature": 300.0,
+          "effective_electronic_temperature": 300.0
+        },
+        "calculation_status": "success",
+        "initialization": "independent",
+        "optimize": false,
+        "solvent": null,
+        "engine": {
+          "backend": "native",
+          "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+          "version": null,
+          "native_gfn0": {
+            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest_sha256": "21ed3500b06027891987606cde3ebd8eddb344e8858b060479ae6e57d85c213f",
+            "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+            "patch_sha256": null,
+            "fix_kind": "upstream",
+            "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
+          },
+          "orbital_basis": {
+            "api_version": 1,
+            "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+            "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
+            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest_sha256": "21ed3500b06027891987606cde3ebd8eddb344e8858b060479ae6e57d85c213f",
+            "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
+          }
+        },
+        "parameter_file": {
+          "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+          "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+        },
+        "native_api_version": 20000,
+        "elapsed_seconds": 0.0040703240083530545,
+        "coefficient_axes": [
+          "AO",
+          "MO"
+        ],
+        "overlap_source": "same libxtb calculation"
+      },
+      "quality": {
+        "status": "ok",
+        "flags": [],
+        "fractional_orbital_indices": [],
+        "occupied_counts_threshold_window": [
+          4,
+          4,
+          4
+        ],
+        "charge_sum_error_e": -6.217248937900877e-15,
+        "electron_sum_error_e": 0.0,
+        "scf_iterations": null,
+        "scf_residual": null,
+        "scf_details_unavailable_reason": "not_exposed_by_libxtb_c_api",
+        "calculation_status": "success"
+      },
+      "missing": {
+        "xtb_version": "unavailable_from_result_or_orbital_range",
+        "xtb_lumo_plus_2_eV": "unavailable_from_result_or_orbital_range",
+        "fragments": "not_requested"
+      },
+      "error": null,
+      "atoms": [
+        {
+          "atom_index": 0,
+          "partial_charge_e": -0.563566771762249,
+          "wiberg_sum": 1.8404017832426263
+        },
+        {
+          "atom_index": 1,
+          "partial_charge_e": 0.2817997541772912,
+          "wiberg_sum": 0.9205888985456195
+        },
+        {
+          "atom_index": 2,
+          "partial_charge_e": 0.2817670175849516,
+          "wiberg_sum": 0.9206073478012827
+        }
+      ],
+      "bonds": [
+        {
+          "bond_index": 0,
+          "begin_atom_index": 0,
+          "end_atom_index": 1,
+          "wiberg_order": 0.9201916669934815
+        },
+        {
+          "bond_index": 1,
+          "begin_atom_index": 0,
+          "end_atom_index": 2,
+          "wiberg_order": 0.9202101162491447
+        }
+      ],
+      "fragments": null,
+      "populations": {
+        "lowdin": {
+          "scheme": "lowdin",
+          "axes": [
+            "atom",
+            "orbital"
+          ],
+          "orbital_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "orbital_occupations": [
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            0.0,
+            0.0
+          ],
+          "atom_populations": [
+            [
+              0.7037408270863087,
+              0.6478240411581903,
+              0.8714364236383092,
+              0.9999999999999998,
+              0.42482151292477366,
+              0.35217719519242036
+            ],
+            [
+              0.14828802045408396,
+              0.1759823591815423,
+              0.06424547793986256,
+              4.1093735691422393e-32,
+              0.2852631148385955,
+              0.32622102758591626
+            ],
+            [
+              0.14797115245960882,
+              0.17619359966026762,
+              0.06431809842182923,
+              2.3053804020654795e-33,
+              0.28991537223663205,
+              0.32160177722166366
+            ]
+          ],
+          "electron_populations_e": [
+            6.446002583765616,
+            0.7770317151509777,
+            0.7769657010834113
+          ],
+          "orthonormality_error": 1.1102230246251565e-15,
+          "normalization": "unit norm per MO; electron populations include occupations"
+        },
+        "mulliken": {
+          "scheme": "mulliken",
+          "axes": [
+            "atom",
+            "orbital"
+          ],
+          "orbital_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "orbital_occupations": [
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            0.0,
+            0.0
+          ],
+          "atom_populations": [
+            [
+              0.7745006617535803,
+              0.6508570795264517,
+              0.85642564460109,
+              1.0,
+              0.3690734282308339,
+              0.3491431858880445
+            ],
+            [
+              0.1128742276037335,
+              0.17447239675557857,
+              0.07175349855204195,
+              2.7112965365628634e-32,
+              0.3130273932242865,
+              0.32787248386435863
+            ],
+            [
+              0.11262511064268617,
+              0.17467052371796987,
+              0.07182085684686786,
+              6.088299490331407e-33,
+              0.3178991785448796,
+              0.3229843302475968
+            ]
+          ],
+          "electron_populations_e": [
+            6.563566771762244,
+            0.718200245822708,
+            0.7182329824150477
+          ],
+          "orthonormality_error": 1.1102230246251565e-15,
+          "normalization": "unit norm per MO; electron populations include occupations"
+        }
+      },
+      "frontier": {
+        "scheme": "lowdin",
+        "occupation_threshold": 1e-07,
+        "degeneracy_ev": 0.001,
+        "occupation_tolerance": 1e-06,
+        "homo": {
+          "orbital_indices": [
+            3
+          ],
+          "num_orbitals": 1,
+          "energy_min_ev": -12.176962416831758,
+          "energy_max_ev": -12.176962416831758,
+          "atom_populations": [
+            0.9999999999999998,
+            4.1093735691422393e-32,
+            2.3053804020654795e-33
+          ],
+          "fragment_populations": {},
+          "inverse_participation_ratio": 0.9999999999999996,
+          "participation_ratio": 1.0000000000000004,
+          "entropy_nats": 2.2204460492503446e-16,
+          "atom_centroid_angstrom": [
+            3.8781662477279025e-32,
+            2.137772330694113e-33,
+            0.0
+          ]
+        },
+        "lumo": {
+          "orbital_indices": [
+            4
+          ],
+          "num_orbitals": 1,
+          "energy_min_ev": 2.462262317247677,
+          "energy_max_ev": 2.462262317247677,
+          "atom_populations": [
+            0.42482151292477366,
+            0.2852631148385955,
+            0.28991537223663205
+          ],
+          "fragment_populations": {},
+          "inverse_participation_ratio": 0.3458992855902163,
+          "participation_ratio": 2.8910149331290924,
+          "entropy_nats": 1.080465122154053,
+          "atom_centroid_angstrom": [
+            0.20347793308655104,
+            0.2688376549289122,
+            0.0
+          ]
+        },
+        "homo_lumo_atom_overlap": 0.651783332806826,
+        "homo_lumo_atom_centroid_separation_angstrom": 0.3371601310369478,
+        "unassigned_atom_indices": [
+          0,
+          1,
+          2
+        ],
+        "orthonormality_error": 1.1102230246251565e-15,
+        "interpretation": "ground-state frontier subspace populations and atom-centroid proxies; not excitation or transition-density descriptors"
+      }
+    },
+    "reactivity_report": null
+  }
+}
