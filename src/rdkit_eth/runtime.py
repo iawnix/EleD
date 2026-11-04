@@ -15,6 +15,10 @@ from .errors import XTBNativeNotFoundError, XTBRunError
 
 # The reviewed D4 repair, independent of a particular compiled binary. A
 # matching build record is emitted only after installed-library regression.
+_UPSTREAM_GFN0_COMMIT = '33fe381adde775c4992610c0f90d8914b7572bb5'
+_UPSTREAM_D4_SHA256 = '5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c'
+
+# Accept previously verified 0.4 installations for reproducibility.
 _D4_LOCAL_REFERENCES_PATCH = '2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859'
 
 
@@ -37,8 +41,12 @@ def _native_gfn0_build(path: str) -> dict | None:
         files = data.get('files')
         if not all(isinstance(value, dict) for value in (capabilities, source, files)):
             return None
-        if (capabilities.get('native_gfn0') is not True
-                or source.get('patch_sha256') != _D4_LOCAL_REFERENCES_PATCH):
+        fix = source.get('gfn0_fix', {})
+        upstream = (isinstance(fix, dict) and fix.get('kind') == 'upstream'
+                    and fix.get('commit') == source.get('commit') == _UPSTREAM_GFN0_COMMIT
+                    and fix.get('file_sha256') == _UPSTREAM_D4_SHA256)
+        legacy = source.get('patch_sha256') == _D4_LOCAL_REFERENCES_PATCH
+        if capabilities.get('native_gfn0') is not True or not (upstream or legacy):
             return None
         if (prefix / 'lib/libxtb.so').resolve(strict=True) != library:
             return None
@@ -46,7 +54,8 @@ def _native_gfn0_build(path: str) -> dict | None:
         if files.get('lib/libxtb.so') != library_hash:
             return None
         return {'manifest': str(record), 'manifest_sha256': _fingerprint(record),
-                'library_sha256': library_hash, 'patch_sha256': source['patch_sha256'],
+                'library_sha256': library_hash, 'patch_sha256': source.get('patch_sha256'),
+                'fix_kind': 'upstream' if upstream else 'local-patch',
                 'source_commit': source.get('commit')}
     except (OSError, ValueError):
         return None

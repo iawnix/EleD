@@ -1,5 +1,18 @@
 # Changes
 
+## 0.5.0 — standard native installation and upstream GFN0 repair
+
+- Pinned upstream PR #1490 at `33fe381`; new engine builds apply only the basis
+  export patch. Python/C++ verify the upstream repair identity and binary hash;
+  previously verified 0.4 local-patch engines remain usable explicitly.
+- Added `tools/install_native.py`: locked RDKit and toolchain prefixes, native
+  engine build, clean source-to-wheel build, installation and all-method
+  population checks from outside the checkout. The engine shares the runtime
+  prefix, so no separate xTB activation is needed for ordinary use.
+- Added frozen-geometry comparison across 33 molecules × GFN0/1/2 in separate
+  processes, plus upstream identity and installer environment-drift tests.
+
+
 ## 0.4.0 — native basis and descriptors
 
 - Removed the tblite backend, Python extra and current comparison test path;

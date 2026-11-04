@@ -32,6 +32,8 @@ namespace {
 namespace fs = std::filesystem;
 constexpr double angstromToBohr = 1.8897261254578281;
 constexpr double hartreeToEV = 27.211386245988;
+constexpr const char *upstreamGFN0Commit = "33fe381adde775c4992610c0f90d8914b7572bb5";
+constexpr const char *upstreamD4SHA256 = "5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c";
 constexpr const char *d4PatchSHA256 =
     "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859";
 constexpr const char *basisPatchSHA256 = "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2";
@@ -149,9 +151,14 @@ bool verifyGFN0(const API &api, std::string &commit) {
     const auto prefix = fs::path(api.path).parent_path().parent_path();
     boost::property_tree::ptree record;
     boost::property_tree::read_json((prefix / "share/xtb/rdkit-eth/build.json").string(), record);
+    const bool upstream = record.get<std::string>("source.commit", "") == upstreamGFN0Commit &&
+      record.get<std::string>("source.gfn0_fix.kind", "") == "upstream" &&
+      record.get<std::string>("source.gfn0_fix.commit", "") == upstreamGFN0Commit &&
+      record.get<std::string>("source.gfn0_fix.file_sha256", "") == upstreamD4SHA256;
+    const bool legacy = record.get<std::string>("source.patch_sha256", "") == d4PatchSHA256;
     if (record.get<int>("schema_version", 0) != 1 ||
         record.get<std::string>("capabilities.native_gfn0", "") != "true" ||
-        record.get<std::string>("source.patch_sha256", "") != d4PatchSHA256 ||
+        (!upstream && !legacy) ||
         fs::canonical(prefix / "lib/libxtb.so") != fs::path(api.path)) return false;
     // A slash is literal in ptree paths, but dots in libxtb.so are not.
     const auto &files = record.get_child("files");

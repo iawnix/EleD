@@ -1,4 +1,4 @@
-# Locked environment snapshots (0.4)
+# Locked environment snapshots (0.5)
 
 These locks target **Linux x86-64 / CPython 3.11**. Conda explicit files pin
 package URLs, versions, build variants and SHA256 hashes. They are snapshots
@@ -33,8 +33,13 @@ prefix and repeat source, installed-wheel, and numerical checks before
 accepting the update. Do not just change a version string in an explicit file.
 Pip wheel hashes must likewise come from the exact downloaded artifacts.
 
-The source revision and reviewed D4 and basis-export patches are separately locked in
+The upstream-fixed source revision, D4 file identity and basis-export patch are locked in
 `tools/xtb-source.json`. Its installed binary manifest records the actual
 library hash. The locks do not imply that compiler outputs are bit-for-bit
 identical, that package hosting is permanent, or that other platforms/ABIs
 have been tested.
+
+The standard `tools/install_native.py` uses `rdxtb-sdk.txt` for its runtime
+and `xtb-toolchain.txt` for its separate compiler prefix. It adds the built
+extended libxtb directly to that runtime. `runtime.txt` remains an official
+xTB compatibility profile, not the recommended full installation.

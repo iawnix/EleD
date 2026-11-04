@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "capabilities": {
+    "native_gfn0": true,
+    "orbital_basis_api": 1
+  },
+  "source": {
+    "repository": "https://github.com/grimme-lab/xtb.git",
+    "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
+    "upstream_version": "6.7.1",
+    "description": "Pinned upstream GFN0 repair (#1490) with only the opt-in native basis export patch",
+    "basis_extension": {
+      "api_version": 1,
+      "patch": "diagnostics/xtb_basis_export.patch",
+      "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
+      "patched_files": {
+        "include/xtb.h": "2f7174839f177226223a8b80b38a25ac4af4dbc5bdfab71d3e1c32db317d8eba",
+        "src/api/interface.f90": "79c7ffd35cd2e315eb63f32dcedc851604948f96691c3558d3c995d181beebab",
+        "src/api/results.f90": "76a976414a80d2fe673c318834a5e2f1372329a9099e397da42a77312b2a112b",
+        "src/peeq_module.f90": "907fdff1a9b37764263cef86496415c345e781b3b7e56935fb1a55602d571157",
+        "src/scf_module.F90": "246f06c57954ba8f18c67a828b62d7a37a54a0c3654a67832c9ac5b1903eee66",
+        "src/type/wavefunction.f90": "878926c1b59e28d99fb66107eb877cb16d862fe724f626d97863a1bbb7adc069"
+      }
+    },
+    "gfn0_fix": {
+      "kind": "upstream",
+      "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
+      "pull_request": "https://github.com/grimme-lab/xtb/pull/1490",
+      "file": "src/disp/dftd4.F90",
+      "file_sha256": "5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c"
+    }
+  },
+  "source_directory": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/source",
+  "prefix": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime",
+  "built_at": "2026-11-04T13:03:14.857102+00:00",
+  "source_diff_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
+  "configure_command": [
+    "cmake",
+    "-S",
+    "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/source",
+    "-B",
+    "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/build",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_INSTALL_PREFIX=/home/iaw/project/rdkit_eth/.rdkit-eth/runtime",
+    "-DCMAKE_INSTALL_LIBDIR=lib",
+    "-DBUILD_SHARED_LIBS=ON",
+    "-DWITH_OBJECT=ON",
+    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+    "-DWITH_TESTS=ON",
+    "-DWITH_TBLITE=OFF",
+    "-DWITH_CPCMX=OFF",
+    "-DCMAKE_C_STANDARD=17",
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
+    "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON",
+    "-DCMAKE_PREFIX_PATH=/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain",
+    "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/lib",
+    "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/lib"
+  ],
+  "dependency_prefix": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain",
+  "compilers": {
+    "CMAKE_C_COMPILER": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/bin/x86_64-conda-linux-gnu-cc",
+    "CMAKE_Fortran_COMPILER": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/bin/x86_64-conda-linux-gnu-gfortran"
+  },
+  "cli_version_output": "-----------------------------------------------------------      \n     |                   =====================                   |     \n     |                           x T B                           |     \n     |                   =====================                   |     \n     |                         S. Grimme                         |     \n     |          Mulliken Center for Theoretical Chemistry        |     \n     |                    University of Bonn                     |     \n      -----------------------------------------------------------      \n\n   * xtb version 6.7.1 (33fe381adde775c4992610c0f90d8914b7572bb5) compiled by '@Linux' on 2026/11/04",
+  "files": {
+    "lib/libxtb.so": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
+    "bin/xtb": "ebb16ea0ad87a450ce5d647c0ff3e6160ce33486158ebc3fcfd5f4c87e4de290",
+    "share/xtb/param_gfn0-xtb.txt": "278461cabbf89b14379aedc78ef3e141c8cef1f911f3a3c72530aec7a52b6d34",
+    "share/xtb/param_gfn1-xtb.txt": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399",
+    "share/xtb/param_gfn2-xtb.txt": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
+  },
+  "state_checks": [
+    {
+      "molecule": "ethanol",
+      "method": 0,
+      "action": "load",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "ethanol",
+      "method": 0,
+      "action": "singlepoint",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "intermediate_calculation",
+          "method": 0,
+          "energy_Eh": -10.82855707084973
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "ethanol",
+      "method": 1,
+      "action": "load",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "ethanol",
+      "method": 1,
+      "action": "singlepoint",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "intermediate_calculation",
+          "method": 1,
+          "energy_Eh": -12.15844123059335
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "ethanol",
+      "method": 2,
+      "action": "load",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "ethanol",
+      "method": 2,
+      "action": "singlepoint",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "intermediate_calculation",
+          "method": 2,
+          "energy_Eh": -11.38860400741796
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -11.38860400741796,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "water",
+      "method": 0,
+      "action": "load",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "water",
+      "method": 0,
+      "action": "singlepoint",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "intermediate_calculation",
+          "method": 0,
+          "energy_Eh": -4.366763625955626
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "water",
+      "method": 1,
+      "action": "load",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "water",
+      "method": 1,
+      "action": "singlepoint",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "intermediate_calculation",
+          "method": 1,
+          "energy_Eh": -5.768629100356095
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "water",
+      "method": 2,
+      "action": "load",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    },
+    {
+      "molecule": "water",
+      "method": 2,
+      "action": "singlepoint",
+      "values": [
+        {
+          "stage": "gfn2_before",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        },
+        {
+          "stage": "intermediate_calculation",
+          "method": 2,
+          "energy_Eh": -5.070357543896313
+        },
+        {
+          "stage": "gfn2_after_parameter_load",
+          "energy_Eh": -5.070357543896313,
+          "delta_energy_Eh": 0,
+          "max_orbital_delta_eV": 0
+        }
+      ]
+    }
+  ],
+  "basis_checks": {
+    "basis_api_version": 1,
+    "methods": 3,
+    "max_orthonormality_error": 1.33226762955019e-15,
+    "lifecycle_checks": true
+  }
+}

@@ -1,5 +1,9 @@
 # Upstream GFN0 state fix — checked 2026-11-04 (Asia/Shanghai)
 
+> 0.5 migration: the current source lock now pins the merged repair and applies
+> only the native basis-export patch. The historical status check below describes
+> 0.4; see [current validation](../validation.md) for the migration results.
+
 Our [issue #1486](https://github.com/grimme-lab/xtb/issues/1486) is closed as
 completed. Maintainer Thomas Froitzheim's
 [PR #1490](https://github.com/grimme-lab/xtb/pull/1490) was merged on

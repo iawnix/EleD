@@ -6,6 +6,10 @@ returns `(success, XTBResults)` in the style of `rdEHTTools.RunMol`. The C++
 namespace is `RDKit::XTBTools`. It is independent of YAeHMOP and is not part of
 the upstream RDKit distribution.
 
+The recommended complete profile is `python tools/install_native.py` followed
+by `conda activate "$PWD/.rdkit-eth/runtime"`. It installs the extended libxtb
+in the same prefix; the manual build below remains available for development.
+
 ## Build and install
 
 The supported development platform is Linux x86-64 with Python 3.11 and the
@@ -46,7 +50,8 @@ then select its installation before launching Python:
 source .xtb-native/activate.sh
 ```
 
-The C++ core verifies the build manifest, reviewed patch digest, and selected
+The C++ core verifies the build manifest, reviewed upstream repair identity (or
+legacy local patch digest), and selected
 binary digest **before loading GFN0 parameters**. Official unpatched 6.7.1
 can run GFN1/2; GFN0 raises `ValueError`. `rdXTBTools` always uses the native
 library. The separate `run_xtb()` API defaults to ctypes/libxtb and also

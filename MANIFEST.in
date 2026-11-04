@@ -8,3 +8,4 @@ recursive-include examples *.py
 recursive-include tools *.py *.sh *.json *.csv *.patch *.c *.md *.txt
 recursive-include tools/diagnostics/evidence *.log
 recursive-include tests *.py *.json
+recursive-include conda.recipe *.yaml *.md

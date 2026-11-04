@@ -1,7 +1,48 @@
-# Local validation — 2026-11-03
+# Local validation — 2026-11-04
 
 
-## Current scope: 0.4 native basis export
+## Current scope: 0.5 standard native installation
+
+The native dependency now pins upstream PR #1490's merged commit `33fe381`.
+Only the basis-export patch is applied; the local D4 repair is retained as
+historical evidence and for explicitly selected 0.4 libraries.
+
+| Local check | Result |
+| --- | --- |
+| New extended engine upstream tests | 45 passed |
+| Installed method-switch sequences | 12 passed |
+| Native basis/lifecycle diagnostic | GFN0/1/2 passed |
+| Adapter suite, new upstream-fixed engine | 216 passed, 1 official-only skip |
+| Adapter suite, previously verified 0.4 engine | 216 passed, 1 official-only skip |
+| Adapter suite, official conda 6.7.1 | 133 passed, 84 capability-dependent skips |
+| Standard installer from fresh locked prefixes and incremental rerun | Both passed six installed checks: native/compiled × GFN0/1/2, all with populations |
+| Full tests against the installed wheel outside the checkout | 216 passed, 1 official-only skip |
+| Standalone C++ core against the standard engine | Passed |
+
+The [migration comparison](validation/0.5.0/migration-comparison.json) covers
+33 fixed conformers × GFN0/1/2 (99 cases), with each engine loaded in a separate
+process. Maximum differences were zero in this environment for total energy,
+orbital energies, charges, dipoles and Wiberg matrices. Both builds' populations
+also passed overlap/electron checks. This is evidence for the tested corpus,
+not a claim of numerical identity on all elements or calculation modes.
+The upstream repair and our old local patch differ in how secondary D4 charges
+are selected, so the comparison was measured rather than assumed.
+
+`tools/install_native.py` installs libxtb directly into its matched RDKit
+runtime prefix. Its checks use isolated Python outside the source tree with
+all xTB path overrides removed. Both interfaces resolve the installed library
+and verify native populations. Runtime/toolchain locks are checked before
+reuse; drifted or unmanaged environments are rejected without resetting them.
+
+The [0.5 evidence directory](validation/0.5.0/README.md) retains installation,
+build and migration records. Existing 0.4 binaries and reports are preserved.
+The [standard-install CI](../.github/workflows/standard-install.yml) repeats
+fresh installation and installed-wheel checks. Local results here do not imply
+that a new remote CI run has completed. Portable package distribution is still
+separate from this tested local source-install workflow.
+
+
+## Historical 0.4 native basis export
 
 All production calculations use libxtb. The reviewed native extension exports
 S and AO/shell/atom maps from the same successful calculation as C; tblite is

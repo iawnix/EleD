@@ -76,3 +76,24 @@ def test_gfn0_routing_changes_with_library_verification(verified_install, monkey
         _resolve_options(XTBOptions(method='gfn0', backend='native'))
     # GFN1/2 do not require a GFN0 capability record.
     assert _resolve_options(XTBOptions(method='gfn2', backend='native')).backend == 'native'
+
+
+@pytest.mark.parametrize('damage', [None, 'commit', 'fix-commit', 'kind', 'file-hash', 'malformed'])
+def test_upstream_fix_requires_reviewed_identity(verified_install, damage):
+    from rdkit_eth.runtime import _UPSTREAM_GFN0_COMMIT, _UPSTREAM_D4_SHA256
+    library, manifest, record = verified_install
+    record['source'] = {'commit': _UPSTREAM_GFN0_COMMIT,
+                        'gfn0_fix': {'kind': 'upstream', 'commit': _UPSTREAM_GFN0_COMMIT,
+                                     'file_sha256': _UPSTREAM_D4_SHA256}}
+    if damage == 'commit': record['source']['commit'] = 'another-commit'
+    elif damage == 'fix-commit': record['source']['gfn0_fix']['commit'] = 'another-commit'
+    elif damage == 'kind': record['source']['gfn0_fix']['kind'] = 'version-only'
+    elif damage == 'file-hash': record['source']['gfn0_fix']['file_sha256'] = 'unknown'
+    elif damage == 'malformed': record['source']['gfn0_fix'] = []
+    manifest.write_text(json.dumps(record))
+    result = _native_gfn0_build(str(library))
+    if damage is None:
+        assert result['fix_kind'] == 'upstream'
+        assert result['patch_sha256'] is None
+    else:
+        assert result is None

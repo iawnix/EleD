@@ -99,3 +99,28 @@ def test_native_capability_constants_match_reviewed_patch():
     lock = json.loads((root / 'tools/xtb-source.json').read_text())['basis_extension']
     assert lock['patch_sha256'] == _BASIS_EXPORT_PATCH == builder.digest(root / 'tools' / lock['patch'])
     assert _BASIS_EXPORT_PATCH in (root / 'cpp/rdXTBTools/XTBTools.cpp').read_text()
+
+
+def test_upstream_source_is_verified_without_d4_patch(source_case, tmp_path):
+    source, old, _ = source_case
+    lock = {'commit': old['commit'], 'gfn0_fix': {
+        'kind': 'upstream', 'commit': old['commit'], 'file': 'model.txt',
+        'file_sha256': builder.digest(source / 'model.txt')}}
+    assert builder.source_tree(tmp_path, source, lock) == source
+    assert builder.git_output(source, 'diff', '--name-only') == ''
+    lock['gfn0_fix']['file_sha256'] = 'wrong'
+    with pytest.raises(ValueError, match='reviewed upstream'):
+        builder.source_tree(tmp_path, source, lock)
+    assert (source / 'model.txt').read_text() == 'global references\n'
+
+
+def test_upstream_capability_constants_match_source_lock():
+    import json
+    from rdkit_eth.runtime import _UPSTREAM_GFN0_COMMIT, _UPSTREAM_D4_SHA256
+    root = Path(__file__).resolve().parents[1]
+    lock = json.loads((root / 'tools/xtb-source.json').read_text())
+    assert 'patch' not in lock
+    assert lock['commit'] == lock['gfn0_fix']['commit'] == _UPSTREAM_GFN0_COMMIT
+    assert lock['gfn0_fix']['file_sha256'] == _UPSTREAM_D4_SHA256
+    code = (root / 'cpp/rdXTBTools/XTBTools.cpp').read_text()
+    assert _UPSTREAM_GFN0_COMMIT in code and _UPSTREAM_D4_SHA256 in code

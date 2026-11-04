@@ -1,8 +1,7 @@
 # Independent GFN0 state-contamination verification
 
 > Upstream update (2026-11-04): issue #1486 was fixed by merged PR #1490.
-> The current source lock predates that repair and still uses its verified
-> local patch. See [fix status and migration implications](upstream/xtb-gfn0-upstream-fix.md).
+> The 0.4 source lock predates that repair; 0.5 uses the upstream fix. See [fix status and migration implications](upstream/xtb-gfn0-upstream-fix.md).
 
 On 2026-11-01, the issue was reproduced with both the conda-forge xTB 6.7.1
 library and independently compiled upstream source. A small D4 source patch

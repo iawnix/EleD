@@ -1,8 +1,7 @@
 # GFN0 C API state contamination: root cause and standalone reproducer
 
 > Upstream update (2026-11-04): issue #1486 was fixed by merged PR #1490.
-> The current source lock predates that repair and still uses its verified
-> local patch. See [fix status and migration implications](upstream/xtb-gfn0-upstream-fix.md).
+> The 0.4 source lock predates that repair; 0.5 uses the upstream fix. See [fix status and migration implications](upstream/xtb-gfn0-upstream-fix.md).
 
 Investigated on 2026-11-01 using conda-forge xTB 6.7.1
 (`gfortran_ha02e54d_5`, Linux x86-64) and upstream tag `v6.7.1` source.

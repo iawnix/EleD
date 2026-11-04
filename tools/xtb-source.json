@@ -1,12 +1,8 @@
 {
   "repository": "https://github.com/grimme-lab/xtb.git",
-  "commit": "a9040512dd7c15793472aa20f9647d36a266f7cd",
+  "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
   "upstream_version": "6.7.1",
-  "description": "Pinned upstream with local D4 state fix and opt-in same-calculation native basis export",
-  "patch": "diagnostics/xtb_d4_local_references.patch",
-  "patch_sha256": "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859",
-  "patched_file": "src/disp/dftd4.F90",
-  "patched_file_sha256": "f921bef5fb49be1e5b3eb904f8a257c8b2ae04ecdf228033acdaecf5cd291ad7",
+  "description": "Pinned upstream GFN0 repair (#1490) with only the opt-in native basis export patch",
   "basis_extension": {
     "api_version": 1,
     "patch": "diagnostics/xtb_basis_export.patch",
@@ -19,5 +15,12 @@
       "src/scf_module.F90": "246f06c57954ba8f18c67a828b62d7a37a54a0c3654a67832c9ac5b1903eee66",
       "src/type/wavefunction.f90": "878926c1b59e28d99fb66107eb877cb16d862fe724f626d97863a1bbb7adc069"
     }
+  },
+  "gfn0_fix": {
+    "kind": "upstream",
+    "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
+    "pull_request": "https://github.com/grimme-lab/xtb/pull/1490",
+    "file": "src/disp/dftd4.F90",
+    "file_sha256": "5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c"
   }
 }

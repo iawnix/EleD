@@ -231,7 +231,10 @@ def test_gfn0_verification_rejects_missing_or_mismatched_manifest(library, tmp_p
         if damage == 'capability':
             damaged['capabilities']['native_gfn0'] = False
         elif damage == 'patch':
-            damaged['source']['patch_sha256'] = 'different-patch'
+            if 'gfn0_fix' in damaged['source']:
+                damaged['source']['gfn0_fix']['file_sha256'] = 'different-source'
+            else:
+                damaged['source']['patch_sha256'] = 'different-patch'
         elif damage == 'hash':
             damaged['files']['lib/libxtb.so'] = 'different-binary'
         if damage == 'json':

@@ -5,39 +5,35 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.4 supports **gas-phase single points through libxtb only**.
+Version 0.5 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
 
 ## Installation
 
-Python 3.10+ is required; the locked installation profile is Linux x86-64 /
-Python 3.11. The runtime lock installs RDKit and xTB's shared library and
-parameter files. The conda xTB package also includes an executable, which
-this adapter does not use.
+The standard profile is Linux x86-64 / Python 3.11. With conda available, run:
 
 ```bash
-conda create --yes --prefix "$PWD/.runtime-env" --file locks/linux-64/runtime.txt
-conda activate "$PWD/.runtime-env"
-python -m pip install --no-deps --no-build-isolation .
-python -m rdkit_eth doctor --check native
+python tools/install_native.py --jobs 6
+conda activate "$PWD/.rdkit-eth/runtime"
+python -m rdkit_eth doctor --check compiled --keep-overlap
 ```
 
-Installing this project with pip installs the Python adapter and RDKit;
-libxtb must already be installed separately. The supplied conda recipe declares
-`rdkit` and `xtb` as runtime dependencies; it has not yet been published or
-validated with `conda build`.
+This installs matched RDKit dependencies, builds our extended libxtb and the
+C++/Python adapter, then checks GFN0/1/2 and population descriptors through
+both interfaces. The shared library and parameters live in the Python runtime
+prefix, so ordinary use needs no separate xTB activation or executable lookup.
+Keep `.rdkit-eth/runtime` and `.rdkit-eth/toolchain` in place; the build is tied
+to these local native-library prefixes.
 
-The reported GFN0 state bug is now [fixed upstream in PR #1490](https://github.com/grimme-lab/xtb/pull/1490).
-Our current source lock predates the fix and retains its verified local patch;
-see [upstream status and migration implications](docs/upstream/xtb-gfn0-upstream-fix.md).
-The native basis-export extension remains a separate project capability.
+The pinned source includes the official [GFN0 repair, PR #1490](https://github.com/grimme-lab/xtb/pull/1490).
+Only our native basis-export patch is applied. Previously verified 0.4 engines
+remain usable explicitly; official libraries retain basic GFN1/2 compatibility.
 
-See the [installation guide](docs/install.md) for the compiled profile,
-native GFN0, orbital populations and installed-wheel checks. YAML environment
-files remain development specifications; the explicit locks select tested
-package builds. This package has not been published to PyPI or conda-forge.
+See the [installation guide](docs/install.md) for upgrades, manual builds and
+artifact checks. This is a local source installer; plain pip installation does
+not install libxtb, and no PyPI/conda-forge full-runtime package is published.
 
 ## RDKit-style C++/Python interface
 
@@ -81,14 +77,14 @@ print(annotated.GetBondWithIdx(0).GetDoubleProp("xtb_wiberg_order"))
 calculation raises an error. Geometry optimization, solvation and GFN-FF are
 outside the current API. Calculations do not create temporary work directories.
 
-Native GFN0 requires the build's capability record, the reviewed D4 patch hash,
+Native GFN0 requires the build's capability record, the reviewed upstream fix identity,
 and a matching SHA-256 of the selected library. An xTB/API version alone cannot
 identify the fix. Missing or mismatched verification raises an error before
 GFN0 initialization. See the [root-cause analysis](docs/gfn0-native-state.md).
-After selecting a [patched installation](docs/xtb-patched-build.md):
+After activating the standard installation:
 
 ```bash
-source .xtb-native/activate.sh
+conda activate "$PWD/.rdkit-eth/runtime"
 ```
 
 ```python
@@ -218,7 +214,7 @@ references differ; the EHT total energy uses eV and xTB uses Hartree.
 ## Development and validation
 
 ```bash
-conda activate "$PWD/.runtime-env"
+conda activate "$PWD/.rdkit-eth/runtime"
 python -m pip install --no-deps --no-build-isolation -e .
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest -q
 python examples/rdkit_workflow.py
@@ -230,7 +226,7 @@ runs without xTB. Shared-library tests explicitly disable subprocess execution.
 See [validation notes](docs/validation.md) for the locally verified scope.
 
 `tools/build_patched_xtb.sh PREFIX` fetches the pinned xTB commit, applies
-the D4 fix and native basis-export patch, builds libxtb, installs parameters
+the native basis-export patch on the upstream-fixed source, builds libxtb, installs parameters
 and runs upstream and installed-library tests.
 The upstream build also produces an executable used for build provenance;
 it is not a calculation backend in this package. See the

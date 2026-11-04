@@ -1,0 +1,930 @@
+{
+  "reference": {
+    "library": "/home/iaw/project/rdkit_eth/.xtb-native/lib/libxtb.so.6.7.1",
+    "sha256": "6a8e2c7f01c6c95e29096369fb6130e97aefa3c2bcbf91982ede695c4aa48428"
+  },
+  "candidate": {
+    "library": "/home/iaw/project/rdkit_eth/build/upstream-1490-native/lib/libxtb.so.6.7.1",
+    "sha256": "6537b498674650d17ea37c665b6b15c7d556955b1329ba7ce633ea1fc1562869"
+  },
+  "comparison": "frozen geometry; separate processes; candidate minus reference",
+  "summary_max_abs": {
+    "GFN0-xTB": {
+      "cases": 33,
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    "GFN1-xTB": {
+      "cases": 33,
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    "GFN2-xTB": {
+      "cases": 33,
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    }
+  },
+  "cases": [
+    {
+      "name": "water",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "water",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "water",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ammonia",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ammonia",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ammonia",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methane",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methane",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methane",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethane",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethane",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethane",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethene",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethene",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethene",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethyne",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethyne",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethyne",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methanol",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methanol",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methanol",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethanol",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethanol",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ethanol",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetone",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetone",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetone",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetic_acid",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetic_acid",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetic_acid",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetate",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetate",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetate",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methylammonium",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methylammonium",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "methylammonium",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ammonium",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ammonium",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "ammonium",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "benzene",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "benzene",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "benzene",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "pyridine",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "pyridine",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "pyridine",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "pyrrole",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "pyrrole",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "pyrrole",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "furan",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "furan",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "furan",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "thiophene",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "thiophene",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "thiophene",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "phenol",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "phenol",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "phenol",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "aniline",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "aniline",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "aniline",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetonitrile",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetonitrile",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "acetonitrile",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "formamide",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "formamide",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "formamide",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfide",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfide",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfide",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfoxide",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfoxide",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfoxide",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfone",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfone",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dimethyl_sulfone",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "phosphine",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "phosphine",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "phosphine",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "trimethylphosphine",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "trimethylphosphine",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "trimethylphosphine",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dihydrogen_phosphate",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dihydrogen_phosphate",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "dihydrogen_phosphate",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "hydrogen_fluoride",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "hydrogen_fluoride",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "hydrogen_fluoride",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "fluoromethane",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "fluoromethane",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "fluoromethane",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "chloromethane",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "chloromethane",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "chloromethane",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "bromomethane",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "bromomethane",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "bromomethane",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "iodomethane",
+      "method": "GFN0-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "iodomethane",
+      "method": "GFN1-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    },
+    {
+      "name": "iodomethane",
+      "method": "GFN2-xTB",
+      "delta_energy_eh": 0.0,
+      "max_abs_orbital_energies_ev": 0.0,
+      "max_abs_charges_e": 0.0,
+      "max_abs_dipole_au": 0.0,
+      "max_abs_wiberg": 0.0
+    }
+  ]
+}

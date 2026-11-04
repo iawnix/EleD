@@ -30,7 +30,7 @@ def git_output(source, *args):
     return subprocess.check_output(['git', '-C', str(source), *args], text=True).strip()
 
 
-def source_tree(prefix, supplied, lock, patch):
+def source_tree(prefix, supplied, lock, patch=None):
     source = supplied.resolve() if supplied else prefix / 'source'
     if not source.exists():
         if supplied:
@@ -39,7 +39,7 @@ def source_tree(prefix, supplied, lock, patch):
         run(['git', 'init', source])
         run(['git', '-C', source, 'remote', 'add', 'origin', lock['repository']])
         run(['git', '-C', source, 'fetch', '--depth=1', 'origin', lock['commit']])
-        run(['git', '-C', source, 'checkout', '-b', 'rdkit-eth/d4-state-fix', 'FETCH_HEAD'])
+        run(['git', '-C', source, 'checkout', '-b', 'rdkit-eth/native-basis', 'FETCH_HEAD'])
     actual = git_output(source, 'rev-parse', 'HEAD')
     if actual != lock['commit']:
         raise ValueError(f'Source HEAD is {actual}, expected {lock["commit"]}. '
@@ -47,16 +47,23 @@ def source_tree(prefix, supplied, lock, patch):
     changes = git_output(source, 'diff', 'HEAD', '--name-only').splitlines()
     untracked = git_output(source, 'ls-files', '--others', '--exclude-standard')
     extension = lock.get('basis_extension')
-    allowed = {lock['patched_file']} | (set(extension['patched_files']) if extension else set())
+    allowed = ({lock['patched_file']} if patch else set()) | (set(extension['patched_files']) if extension else set())
     if set(changes) - allowed or untracked:
         raise ValueError('Source contains unrelated changes; use a separate checkout. '
                          'The builder never resets or discards source changes.')
-    check = subprocess.run(['git', '-C', str(source), 'apply', '--check', str(patch)],
-                           capture_output=True, text=True)
-    if check.returncode == 0:
-        run(['git', '-C', source, 'apply', patch])
-    if digest(source / lock['patched_file']) != lock['patched_file_sha256']:
-        raise ValueError('Source does not match the reviewed D4 patch.')
+    if patch:
+        # Historical source locks remain reproducible; current builds use the upstream fix.
+        check = subprocess.run(['git', '-C', str(source), 'apply', '--check', str(patch)],
+                               capture_output=True, text=True)
+        if check.returncode == 0:
+            run(['git', '-C', source, 'apply', patch])
+        if digest(source / lock['patched_file']) != lock['patched_file_sha256']:
+            raise ValueError('Source does not match the reviewed D4 patch.')
+    else:
+        fix = lock['gfn0_fix']
+        if (fix['kind'] != 'upstream' or fix['commit'] != lock['commit']
+                or digest(source / fix['file']) != fix['file_sha256']):
+            raise ValueError('Source does not match the reviewed upstream GFN0 repair.')
     if extension:
         extra_patch = (TOOLS / extension['patch']).resolve()
         if digest(extra_patch) != extension['patch_sha256']:
@@ -148,8 +155,8 @@ def main():
             parser.error(f'{command} is required; see environment-xtb-build.yml')
 
     lock = json.loads((TOOLS / 'xtb-source.json').read_text())
-    patch = (TOOLS / lock['patch']).resolve()
-    if digest(patch) != lock['patch_sha256']:
+    patch = (TOOLS / lock['patch']).resolve() if 'patch' in lock else None
+    if patch and digest(patch) != lock['patch_sha256']:
         raise ValueError('Patch differs from tools/xtb-source.json; review and update the source lock.')
     prefix = args.prefix.resolve()
     dependency_prefix = args.dependency_prefix.resolve() if args.dependency_prefix else None
@@ -173,8 +180,9 @@ def main():
     cache = read_cache(build)
     # Keep the installation layout used by the verifier/activation file explicit.
     if (Path(cache['CMAKE_INSTALL_PREFIX']).resolve() != prefix
-            or cache['CMAKE_INSTALL_LIBDIR'] != 'lib' or cache['WITH_TESTS'] != 'ON'):
-        raise ValueError('Do not override the installation prefix, lib directory, or required tests.')
+            or cache['CMAKE_INSTALL_LIBDIR'] != 'lib' or cache['WITH_TESTS'] != 'ON'
+            or cache['WITH_TBLITE'] != 'OFF' or cache['WITH_CPCMX'] != 'OFF'):
+        raise ValueError('Do not override prefix/lib layout, required tests, or the disabled tblite/CPCM-X dependencies.')
     run(['cmake', '--build', build, '--parallel', str(args.jobs)])
     env = os.environ.copy()
     for name in ('LD_LIBRARY_PATH', 'LD_PRELOAD', 'XTBPATH', 'XTBHOME'):
@@ -199,7 +207,8 @@ def main():
     record_dir.mkdir(exist_ok=True)
     for filename in ('COPYING', 'COPYING.LESSER'):
         shutil.copy2(source / filename, record_dir / filename)
-    shutil.copy2(patch, record_dir / patch.name)
+    if patch:
+        shutil.copy2(patch, record_dir / patch.name)
     basis_patch = TOOLS / lock["basis_extension"]["patch"]
     shutil.copy2(basis_patch, record_dir / basis_patch.name)
     source_diff = git_output(source, 'diff', 'HEAD', '--binary') + '\n'

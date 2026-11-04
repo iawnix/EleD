@@ -1,0 +1,35 @@
+name: standard extended-libxtb installation
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ''
+          auto-activate-base: true
+      - name: Build and install the complete locked profile
+        run: python tools/install_native.py --jobs 2
+      - name: Check installed workflows without library overrides
+        run: |
+          .rdkit-eth/runtime/bin/python -I examples/electronic_descriptors.py --populations
+          .rdkit-eth/runtime/bin/python -I examples/rdxtb_tools.py
+      - name: Check the installed compiled wheel outside checkout
+        run: |
+          .rdkit-eth/runtime/bin/python tools/check_wheel.py .rdkit-eth/artifacts/build-*/compiled/*.whl --kind compiled --library "$PWD/.rdkit-eth/runtime/lib/libxtb.so" --check native --check compiled --method GFN0-xTB --keep-overlap --output .rdkit-eth/installed-wheel.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: standard-native-0.5.0
+          include-hidden-files: true
+          path: |
+            .rdkit-eth/installation.json
+            .rdkit-eth/installed-wheel.json
+            .rdkit-eth/runtime/share/xtb/rdkit-eth/
+            .rdkit-eth/artifacts/

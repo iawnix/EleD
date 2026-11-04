@@ -12,3 +12,5 @@ dist/
 src/rdkit_eth/rdXTBTools*.so
 .venv/
 .xtb-native/
+.rdkit-eth/
+.xtb-native-0.5/

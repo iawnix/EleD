@@ -1,3 +1,4 @@
+# Official-library compatibility environment; standard full profile: tools/install_native.py
 name: rdkit-eth
 channels:
   - conda-forge

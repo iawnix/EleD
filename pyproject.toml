@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rdkit-eth"
-version = "0.4.0"
+version = "0.5.0"
 description = "RDKit electronic-structure descriptors with an optional xTB backend"
 readme = "README.md"
 requires-python = ">=3.10"
