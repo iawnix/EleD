@@ -1,7 +1,30 @@
 # Local validation — 2026-11-04
 
 
-## Current scope: 0.8 persistent reactivity datasets
+## Current scope: 0.9 conformer sensitivity and QM8 pilot
+
+The [0.9 evidence](validation/0.9.0/README.md) includes **340 passed, 3 skipped**
+in both the development and isolated installed-wheel suites. Official libxtb
+compatibility reports **224 passed, 119 skipped**. Optional benchmark protocol
+tests all pass (3) in a separate sklearn environment. Standard installation,
+both wheel variants and standalone C++ checks pass locally.
+
+[Conformer sensitivity](conformer-sensitivity.md) covers per-field missing and
+failure accounting, actual conformer IDs, rigid-transform invariance, unchanged
+inputs, cache reuse and protocol consistency. The installed example retains
+11 conformers over five molecules with auditable ETKDG/MMFF preparation.
+
+The separate [QM8 pilot](qm8-pilot.md) uses 1,024 complete source geometries,
+three fixed random/scaffold splits and three nested feature groups. Basic xTB
+features improve this small prediction task; additional orbital distributions
+show only small, split-dependent gains. This is neither a full QM8 result nor
+evidence that xTB directly calculates excited states. All selected IDs, splits,
+features, predictions, exclusions, metrics and timings are archived.
+
+The preceding 0.8 commit's three remote CI workflows were confirmed successful.
+New-commit CI status must be checked on GitHub separately from these local logs.
+
+## 0.8 persistent reactivity datasets
 
 The [0.8 evidence](validation/0.8.0/README.md) covers transactional disk caching,
 exact-dataset checkpoint recovery, explicit failure retry/history and fatal
@@ -413,11 +436,12 @@ workspace, and no package has been published.
 
 ## Scope
 
-This validates numerical agreement between adapters and an installed xTB
-engine, not the scientific accuracy of xTB against experiment or excited-state
-reference data. Tests do not establish portability across all xTB releases or
-operating systems. macOS/Windows and the conda recipe remain unverified. The
-patched source build is validated on Linux x86-64 as described in
-[the patched-build guide](xtb-patched-build.md). The included Linux GitHub
-Actions workflow has not been run remotely. Persistent caching and AO-to-atom
-mapping are not implemented.
+Adapter regression checks validate numerical agreement and protocol behavior,
+not scientific accuracy against experiment. The 0.9 QM8 pilot is a separate,
+limited prediction experiment with its own stated scope and exclusions.
+Tests do not establish portability across all xTB releases or operating systems.
+macOS/Windows and the conda recipe remain unverified. The extended source build
+is validated on Linux x86-64 as described in
+[the build guide](xtb-patched-build.md). Historical sections describe capabilities
+and CI status at their release date; persistent caching and AO-to-atom mapping
+are now implemented, and the 0.8 Linux CI workflows have passed remotely.

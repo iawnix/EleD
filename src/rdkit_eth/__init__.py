@@ -64,3 +64,7 @@ from .errors import XTBCacheError, XTBEnvironmentError
 
 __all__ += ['XTBDiskCache', 'ReactivityCheckpoint', 'ReactivityJob',
             'run_reactivity_batch', 'XTBCacheError', 'XTBEnvironmentError']
+
+from .conformers import conformer_descriptor_columns, run_conformer_analysis
+
+__all__ += ['conformer_descriptor_columns', 'run_conformer_analysis']

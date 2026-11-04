@@ -1,0 +1,192 @@
+[
+  {
+    "name": "ethanol",
+    "n_conformers": 1,
+    "status": "complete",
+    "gap_eV": {
+      "n_total": 1,
+      "n_valid": 1,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 12.525927116806665,
+      "std": 0.0,
+      "min": 12.525927116806665,
+      "max": 12.525927116806665,
+      "range": 0.0
+    },
+    "homo_participation_ratio": {
+      "n_total": 1,
+      "n_valid": 1,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 2.1888546112843907,
+      "std": 0.0,
+      "min": 2.1888546112843907,
+      "max": 2.1888546112843907,
+      "range": 0.0
+    },
+    "centroid_separation_angstrom": {
+      "n_total": 1,
+      "n_valid": 1,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 0.20909730385873987,
+      "std": 0.0,
+      "min": 0.20909730385873987,
+      "max": 0.20909730385873987,
+      "range": 0.0
+    }
+  },
+  {
+    "name": "ethylene_glycol",
+    "n_conformers": 3,
+    "status": "complete",
+    "gap_eV": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 11.386516969542262,
+      "std": 0.11788707550610347,
+      "min": 11.219799468565263,
+      "max": 11.469878559207261,
+      "range": 0.2500790906419983
+    },
+    "homo_participation_ratio": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 2.8938500392532784,
+      "std": 0.6752523399553048,
+      "min": 2.4163734613073977,
+      "max": 3.84880105644144,
+      "range": 1.4324275951340422
+    },
+    "centroid_separation_angstrom": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 0.8462383096092347,
+      "std": 0.5845933008171248,
+      "min": 0.019498535192322773,
+      "max": 1.2596175881539884,
+      "range": 1.2401190529616657
+    }
+  },
+  {
+    "name": "butane",
+    "n_conformers": 3,
+    "status": "complete",
+    "gap_eV": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 14.143184760643669,
+      "std": 0.1570445663919479,
+      "min": 13.921090204970412,
+      "max": 14.254234291459044,
+      "range": 0.33314408648863214
+    },
+    "homo_participation_ratio": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 8.452754451769227,
+      "std": 0.2726864788645376,
+      "min": 8.259934947940856,
+      "max": 8.838391368453332,
+      "range": 0.5784564205124756
+    },
+    "centroid_separation_angstrom": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 0.09776803547603091,
+      "std": 0.06912459013326541,
+      "min": 1.1102616085797629e-05,
+      "max": 0.14664650805474685,
+      "range": 0.14663540543866105
+    }
+  },
+  {
+    "name": "phenethylamine",
+    "n_conformers": 3,
+    "status": "complete",
+    "gap_eV": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 3.9632852638655436,
+      "std": 0.06296145924634135,
+      "min": 3.896587348961984,
+      "max": 4.047720023026616,
+      "range": 0.15113267406463216
+    },
+    "homo_participation_ratio": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 1.5091648674679998,
+      "std": 0.051305429878020815,
+      "min": 1.4666234182223037,
+      "max": 1.581337846702109,
+      "range": 0.1147144284798054
+    },
+    "centroid_separation_angstrom": {
+      "n_total": 3,
+      "n_valid": 3,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 4.29797567890106,
+      "std": 0.39845397222965495,
+      "min": 3.954265894148794,
+      "max": 4.856542401814544,
+      "range": 0.9022765076657504
+    }
+  },
+  {
+    "name": "benzene",
+    "n_conformers": 1,
+    "status": "complete",
+    "gap_eV": {
+      "n_total": 1,
+      "n_valid": 1,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 4.825873875575268,
+      "std": 0.0,
+      "min": 4.825873875575268,
+      "max": 4.825873875575268,
+      "range": 0.0
+    },
+    "homo_participation_ratio": {
+      "n_total": 1,
+      "n_valid": 1,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 6.00000000023657,
+      "std": 0.0,
+      "min": 6.00000000023657,
+      "max": 6.00000000023657,
+      "range": 0.0
+    },
+    "centroid_separation_angstrom": {
+      "n_total": 1,
+      "n_valid": 1,
+      "n_failed": 0,
+      "n_missing": 0,
+      "mean": 3.3765787179329726e-07,
+      "std": 0.0,
+      "min": 3.3765787179329726e-07,
+      "max": 3.3765787179329726e-07,
+      "range": 0.0
+    }
+  }
+]

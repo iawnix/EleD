@@ -71,24 +71,24 @@ jobs:
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" cmake --build build/core --parallel 2
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" ctest --test-dir build/core --output-on-failure
       - name: Build both wheels from source archive
-        run: conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/build_release.py --compiled --xtb-prefix "$RDXTB_XTB_PREFIX" --output dist/0.8.0
+        run: conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/build_release.py --compiled --xtb-prefix "$RDXTB_XTB_PREFIX" --output dist/0.9.0
       - name: Verify installed compiled wheel
         run: |
-          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.8.0/compiled/*.whl --kind compiled --check compiled --check native --reactivity --output dist/0.8.0/installed-compiled.json
+          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.9.0/compiled/*.whl --kind compiled --check compiled --check native --reactivity --output dist/0.9.0/installed-compiled.json
       - name: Verify installed native population descriptors
         if: matrix.engine == 'patched'
         run: |
-          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.8.0/compiled/*.whl --kind compiled --check compiled --check native --keep-overlap --reactivity --output dist/0.8.0/installed-basis.json
+          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.9.0/compiled/*.whl --kind compiled --check compiled --check native --keep-overlap --reactivity --output dist/0.9.0/installed-basis.json
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python examples/electronic_descriptors.py --populations
       - name: Verify installed GFN0 capability
         if: matrix.engine == 'patched'
         run: |
-          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.8.0/compiled/*.whl --kind compiled --method GFN0-xTB --check compiled --check native --output dist/0.8.0/installed-gfn0.json
+          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.9.0/compiled/*.whl --kind compiled --method GFN0-xTB --check compiled --check native --output dist/0.9.0/installed-gfn0.json
       - uses: actions/upload-artifact@v4
         with:
-          name: local-linux-0.8.0-${{ matrix.engine }}
+          name: local-linux-0.9.0-${{ matrix.engine }}
           include-hidden-files: true
           path: |
-            dist/0.8.0/
+            dist/0.9.0/
             .xtb-rdkit/share/xtb/rdkit-eth/build.json
             .xtb-rdkit/share/xtb/rdkit-eth/ctest.log

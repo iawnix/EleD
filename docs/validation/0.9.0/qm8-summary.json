@@ -1,0 +1,227 @@
+{
+  "scope": "pilot, source geometries; no claim of excited-state xTB or full QM8 accuracy",
+  "n_selected": 1024,
+  "n_common_complete": 1024,
+  "n_failed": 0,
+  "failure_policy": "same complete-case cohort for all groups, no replacement; exclusions retained",
+  "featurization_wall_seconds": 10.006505278986879,
+  "cost_seconds": {
+    "rdkit_seconds": 0.42838540708180517,
+    "xtb_seconds": 6.219538321020082,
+    "analysis_seconds": 2.9515557122649625
+  },
+  "source_exclusion_counts": {
+    "outside_neutral_closed_shell_protocol": 1413,
+    "RDKit_sanitization_failed": 39,
+    "duplicate_nonstereo_identity": 25
+  },
+  "model": "ExtraTreesRegressor; 256 trees, min_samples_leaf=2, max_features=1.0; no tuning",
+  "imputation": "train-only median, keep_empty_features=True",
+  "metrics": [
+    {
+      "split": "random",
+      "seed": 17,
+      "features": "rdkit",
+      "n_features": 1048,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.3405910187139808,
+      "rmse_eV": 0.5280111021659399,
+      "fit_predict_seconds": 2.510207543033175
+    },
+    {
+      "split": "random",
+      "seed": 17,
+      "features": "rdkit_basic",
+      "n_features": 1057,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.19703317694740216,
+      "rmse_eV": 0.28685034977839985,
+      "fit_predict_seconds": 2.1666211580159143
+    },
+    {
+      "split": "random",
+      "seed": 17,
+      "features": "rdkit_basic_orbital",
+      "n_features": 1065,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.1926710213395303,
+      "rmse_eV": 0.2758289743236146,
+      "fit_predict_seconds": 2.350891303969547
+    },
+    {
+      "split": "random",
+      "seed": 29,
+      "features": "rdkit",
+      "n_features": 1048,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.36082521370385495,
+      "rmse_eV": 0.5406364939768424,
+      "fit_predict_seconds": 2.4597377580357715
+    },
+    {
+      "split": "random",
+      "seed": 29,
+      "features": "rdkit_basic",
+      "n_features": 1057,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.22174583506442655,
+      "rmse_eV": 0.32520652894802393,
+      "fit_predict_seconds": 2.202163583948277
+    },
+    {
+      "split": "random",
+      "seed": 29,
+      "features": "rdkit_basic_orbital",
+      "n_features": 1065,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.2169571720393331,
+      "rmse_eV": 0.32399839882210735,
+      "fit_predict_seconds": 2.5016558370552957
+    },
+    {
+      "split": "random",
+      "seed": 43,
+      "features": "rdkit",
+      "n_features": 1048,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.33915047145176624,
+      "rmse_eV": 0.5213525506365331,
+      "fit_predict_seconds": 2.5432047160575166
+    },
+    {
+      "split": "random",
+      "seed": 43,
+      "features": "rdkit_basic",
+      "n_features": 1057,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.20667799953971241,
+      "rmse_eV": 0.3145368236534007,
+      "fit_predict_seconds": 2.7816425720229745
+    },
+    {
+      "split": "random",
+      "seed": 43,
+      "features": "rdkit_basic_orbital",
+      "n_features": 1065,
+      "n_train": 819,
+      "n_test": 205,
+      "mae_eV": 0.19866109441099017,
+      "rmse_eV": 0.31509827200934015,
+      "fit_predict_seconds": 2.423944336012937
+    },
+    {
+      "split": "scaffold",
+      "seed": 17,
+      "features": "rdkit",
+      "n_features": 1048,
+      "n_train": 810,
+      "n_test": 214,
+      "mae_eV": 0.36740588905122495,
+      "rmse_eV": 0.5032185135779781,
+      "fit_predict_seconds": 2.6435250190552324
+    },
+    {
+      "split": "scaffold",
+      "seed": 17,
+      "features": "rdkit_basic",
+      "n_features": 1057,
+      "n_train": 810,
+      "n_test": 214,
+      "mae_eV": 0.23090802762013565,
+      "rmse_eV": 0.3178467535989955,
+      "fit_predict_seconds": 2.505081426934339
+    },
+    {
+      "split": "scaffold",
+      "seed": 17,
+      "features": "rdkit_basic_orbital",
+      "n_features": 1065,
+      "n_train": 810,
+      "n_test": 214,
+      "mae_eV": 0.23065391042268368,
+      "rmse_eV": 0.3162333349174784,
+      "fit_predict_seconds": 2.5186180269811302
+    },
+    {
+      "split": "scaffold",
+      "seed": 29,
+      "features": "rdkit",
+      "n_features": 1048,
+      "n_train": 804,
+      "n_test": 220,
+      "mae_eV": 0.3534134089679992,
+      "rmse_eV": 0.5121873698790533,
+      "fit_predict_seconds": 2.636333041009493
+    },
+    {
+      "split": "scaffold",
+      "seed": 29,
+      "features": "rdkit_basic",
+      "n_features": 1057,
+      "n_train": 804,
+      "n_test": 220,
+      "mae_eV": 0.2128389520473926,
+      "rmse_eV": 0.2989276493501172,
+      "fit_predict_seconds": 2.2740015549352393
+    },
+    {
+      "split": "scaffold",
+      "seed": 29,
+      "features": "rdkit_basic_orbital",
+      "n_features": 1065,
+      "n_train": 804,
+      "n_test": 220,
+      "mae_eV": 0.21472428222944567,
+      "rmse_eV": 0.2998134903355647,
+      "fit_predict_seconds": 2.170363686978817
+    },
+    {
+      "split": "scaffold",
+      "seed": 43,
+      "features": "rdkit",
+      "n_features": 1048,
+      "n_train": 823,
+      "n_test": 201,
+      "mae_eV": 0.32111486035922804,
+      "rmse_eV": 0.45874816645971883,
+      "fit_predict_seconds": 2.465482341009192
+    },
+    {
+      "split": "scaffold",
+      "seed": 43,
+      "features": "rdkit_basic",
+      "n_features": 1057,
+      "n_train": 823,
+      "n_test": 201,
+      "mae_eV": 0.1876261484302387,
+      "rmse_eV": 0.26222142221011036,
+      "fit_predict_seconds": 2.1775780379539356
+    },
+    {
+      "split": "scaffold",
+      "seed": 43,
+      "features": "rdkit_basic_orbital",
+      "n_features": 1065,
+      "n_train": 823,
+      "n_test": 201,
+      "mae_eV": 0.18239687533677165,
+      "rmse_eV": 0.26135995479139457,
+      "fit_predict_seconds": 2.3283381789224222
+    }
+  ],
+  "versions": {
+    "python": "3.11.18",
+    "rdkit": "2026.09.1",
+    "numpy": "2.4.6",
+    "sklearn": "1.7.2",
+    "scipy": "1.16.3"
+  }
+}

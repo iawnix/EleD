@@ -5,10 +5,17 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.8 supports **gas-phase single points through libxtb only**.
+Version 0.9 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
+
+New in 0.9: [conformer sensitivity](docs/conformer-sensitivity.md) with explicit
+coverage/failures and invariant statistics, plus a reproducible
+[QM8 excitation-energy pilot](docs/qm8-pilot.md). The pilot finds a clear benefit
+from basic xTB features on its fixed cohort; additional orbital distribution
+features show only small, split-dependent gains. Machine-learning tools remain
+optional developer dependencies in a separate environment.
 
 ## Installation
 

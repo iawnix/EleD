@@ -1,5 +1,20 @@
 # Changes
 
+## 0.9.0 — conformer sensitivity and QM8 pilot
+
+- Added `run_conformer_analysis` and `conformer_descriptor_columns`: immutable
+  inputs, actual conformer IDs, per-conformer reports/cache, uniform descriptive
+  statistics and explicit field-level missing/failure counts. No Boltzmann
+  interpretation or automatic optimization. Charged dipoles and Cartesian
+  components are excluded from invariant aggregates.
+- Input/protocol/runtime/storage/analysis errors propagate; only calculation
+  failures become rows. Missing GFN0 parameters now raise the environment-error
+  subclass, consistent with other setup failures.
+- Added ETKDG/MMFF sensitivity example and a source-checksummed, ID-joined QM8
+  E1-CC2 pilot with fixed random/scaffold splits, three nested feature sets,
+  paired predictions, failure accounting and measured cost. sklearn/scipy stay
+  in a separate optional benchmark environment, outside package dependencies.
+
 ## 0.8.0 — persistent reactivity datasets
 
 - Added explicit per-molecule jobs, sequential reactivity batches, successful

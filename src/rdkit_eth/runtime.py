@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 import sys
 
-from .errors import XTBNativeNotFoundError, XTBRunError
+from .errors import XTBNativeNotFoundError, XTBEnvironmentError
 
 
 # The reviewed D4 repair, independent of a particular compiled binary. A
@@ -179,5 +179,5 @@ def _parameter_file(method: str, engine_path: str) -> dict | None:
         if path.is_file():
             return {'path': str(path.resolve()), 'sha256': _fingerprint(path)}
     if method == 'GFN0-xTB':
-        raise XTBRunError(f'cannot locate {filename}; set XTBPATH to the xTB parameter directory')
+        raise XTBEnvironmentError(f'cannot locate {filename}; set XTBPATH to the xTB parameter directory')
     return None  # GFN1/2 have built-in parameters as well.

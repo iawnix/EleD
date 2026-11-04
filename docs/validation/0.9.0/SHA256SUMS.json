@@ -1,0 +1,20 @@
+{
+  "README.md": "a376f1cfd93a094c2f3fa5546c12d6b2c259221e61729bcdde7ad92356825b3d",
+  "artifact-manifest.json": "740e246d76cb8966bb54cde850e36dbaf8e3a06d0ae66a4ca70cc7a39de31cdd",
+  "conformer-reports.jsonl.gz": "d7405370ef93be8e83caf296985ccba34dd7987d870c7100da6dde7e3d4c2374",
+  "conformer-summary.json": "3d8342c6c1ce5426b662bd8ff1734fe266b64b7ff1bfce9aa01c8e1077a88173",
+  "cpp.log": "37d42c858f5e7526aad297e0152b905f88389a26c9c6ac3104101dce75edded9",
+  "installation.json": "c8f9e31b2d9703c2d6a688fd4026b1c354781cf63bec569625571301462ee1e1",
+  "installed-compiled.json": "81a0b4735bfabe6c5bd1974fdbda70f596166a5a8ef370dac43ccd7da9cdffc3",
+  "installed-pure.json": "6244b0b6c4c891604bc92d06df3d4496a87083209bafc2d5f56f838cd42157cc",
+  "qm8-failures.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "qm8-features.jsonl.gz": "89d82d39ab510cea7de5f21a85079747f532c17efa893baf7a1fa7fc0c0df7a6",
+  "qm8-manifest.json.gz": "d129c66aea54c09fe973f4c5901363497046fa8034083feb09fd4e151b5638db",
+  "qm8-predictions.json.gz": "b1280425d939d80704cfbd5e27c41eead50534a24410b43ec973623e62178031",
+  "qm8-splits.json.gz": "ac0be21f679f6676c6ee381fb90d71d33bbadc86de39497ce6d514605a9c45c1",
+  "qm8-summary.json": "1ed6881f5684c3a06b4eb3a5b9188f788ca679a82f9b55a6b3f9e0792971813d",
+  "tests-benchmark.log": "319389d62ffcb42399ff48f476acff206e8c19fc59d850999d8325285a0251e9",
+  "tests-development.log": "c14e02fce9033537ea1c0f4848fa924067d2450f63b1da6efa30ade3bd9c2c4e",
+  "tests-installed.log": "e2a864086f5dfdb8a95760ba79161bd8365aa3da25df24267e293c9782a669cc",
+  "tests-official.log": "fa1a7b880d189332d4bf1a9a053914f097dab09cfb0a8b9a7d7da4107d210d3c"
+}

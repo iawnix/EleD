@@ -22,6 +22,7 @@ jobs:
           .rdkit-eth/runtime/bin/python -I examples/electronic_descriptors.py --populations
           .rdkit-eth/runtime/bin/python -I examples/rdxtb_tools.py
           .rdkit-eth/runtime/bin/python -I examples/descriptor_reports.py --output build/descriptor-example
+          .rdkit-eth/runtime/bin/python -I examples/conformer_sensitivity.py --output build/conformer-example
       - name: Compare against native xTB Fukui output
         run: .rdkit-eth/runtime/bin/python -I tools/compare_fukui_cli.py --executable .rdkit-eth/runtime/bin/xtb --library .rdkit-eth/runtime/lib/libxtb.so --cases tests/data/reactivity_cases.json --output build/fukui-comparison
       - name: Verify persistent batches and expanded frozen corpus
@@ -34,7 +35,7 @@ jobs:
           .rdkit-eth/runtime/bin/python tools/check_wheel.py .rdkit-eth/artifacts/build-*/compiled/*.whl --kind compiled --library "$PWD/.rdkit-eth/runtime/lib/libxtb.so" --check native --check compiled --method GFN0-xTB --keep-overlap --output .rdkit-eth/installed-wheel.json
       - uses: actions/upload-artifact@v4
         with:
-          name: standard-native-0.8.0
+          name: standard-native-0.9.0
           include-hidden-files: true
           path: |
             .rdkit-eth/installation.json
@@ -44,3 +45,4 @@ jobs:
             build/fukui-comparison/
             build/reactivity-corpus/
             build/batch-example/
+            build/conformer-example/
