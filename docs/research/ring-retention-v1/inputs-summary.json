@@ -1,0 +1,564 @@
+{
+  "counts": {
+    "specified_mmff/baseline": {
+      "runs": 200,
+      "initial_valid": 0,
+      "post_valid": 0
+    },
+    "specified_mmff/planarity_only": {
+      "runs": 200,
+      "initial_valid": 190,
+      "post_valid": 178
+    },
+    "specified_mmff/combined": {
+      "runs": 200,
+      "initial_valid": 190,
+      "post_valid": 178
+    },
+    "unspecified_uff/combined": {
+      "runs": 200,
+      "initial_valid": 200,
+      "post_valid": 200
+    },
+    "unspecified_uff/baseline": {
+      "runs": 200,
+      "initial_valid": 130,
+      "post_valid": 130
+    },
+    "unspecified_uff/planarity_only": {
+      "runs": 200,
+      "initial_valid": 200,
+      "post_valid": 200
+    },
+    "unspecified_mmff/planarity_only": {
+      "runs": 200,
+      "initial_valid": 195,
+      "post_valid": 195
+    },
+    "unspecified_mmff/combined": {
+      "runs": 200,
+      "initial_valid": 195,
+      "post_valid": 195
+    },
+    "unspecified_mmff/baseline": {
+      "runs": 200,
+      "initial_valid": 115,
+      "post_valid": 115
+    }
+  },
+  "paired_trials": 600,
+  "failures": [
+    {
+      "id": "19263",
+      "stratum": "unspecified_uff",
+      "seed": 42,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.07219794629252974,
+      "gain": false
+    },
+    {
+      "id": "19263",
+      "stratum": "unspecified_uff",
+      "seed": 42,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.07219794692038661,
+      "gain": false
+    },
+    {
+      "id": "19263",
+      "stratum": "unspecified_mmff",
+      "seed": 42,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.07219794663914314,
+      "gain": false
+    },
+    {
+      "id": "19263",
+      "stratum": "unspecified_mmff",
+      "seed": 42,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.07219794663914314,
+      "gain": false
+    },
+    {
+      "id": "11686",
+      "stratum": "unspecified_mmff",
+      "seed": 17,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 56.1755556236388,
+      "gain": false
+    },
+    {
+      "id": "11686",
+      "stratum": "unspecified_mmff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 56.1755556236388,
+      "gain": false
+    },
+    {
+      "id": "16582",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 4.017001623797704,
+      "gain": false
+    },
+    {
+      "id": "16582",
+      "stratum": "unspecified_uff",
+      "seed": 101,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.8621650855927641,
+      "gain": false
+    },
+    {
+      "id": "18454",
+      "stratum": "unspecified_uff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 2.1815043861180285,
+      "gain": false
+    },
+    {
+      "id": "18454",
+      "stratum": "unspecified_uff",
+      "seed": 29,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.15577541816021423,
+      "gain": false
+    },
+    {
+      "id": "10890",
+      "stratum": "unspecified_uff",
+      "seed": 42,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 3.129553256702195,
+      "gain": false
+    },
+    {
+      "id": "10890",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.8459448367950984,
+      "gain": false
+    },
+    {
+      "id": "8102",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.41742049425030103,
+      "gain": false
+    },
+    {
+      "id": "11980",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.45714730712443696,
+      "gain": false
+    },
+    {
+      "id": "11980",
+      "stratum": "unspecified_mmff",
+      "seed": 29,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.45714731840465817,
+      "gain": false
+    },
+    {
+      "id": "11980",
+      "stratum": "unspecified_mmff",
+      "seed": 29,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.45714731840465817,
+      "gain": false
+    },
+    {
+      "id": "10897",
+      "stratum": "unspecified_uff",
+      "seed": 42,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.8718314150398534,
+      "gain": false
+    },
+    {
+      "id": "10897",
+      "stratum": "unspecified_mmff",
+      "seed": 42,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.8718314209495333,
+      "gain": false
+    },
+    {
+      "id": "10897",
+      "stratum": "unspecified_mmff",
+      "seed": 42,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.8718314209495333,
+      "gain": false
+    },
+    {
+      "id": "19261",
+      "stratum": "unspecified_uff",
+      "seed": 29,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 5.437382650154369,
+      "gain": false
+    },
+    {
+      "id": "19261",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 5.8878197776894154,
+      "gain": false
+    },
+    {
+      "id": "19261",
+      "stratum": "unspecified_uff",
+      "seed": 101,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 5.846399168055591,
+      "gain": false
+    },
+    {
+      "id": "19261",
+      "stratum": "unspecified_mmff",
+      "seed": 42,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 5.8878193077690995,
+      "gain": false
+    },
+    {
+      "id": "19261",
+      "stratum": "unspecified_mmff",
+      "seed": 42,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 5.8878193077690995,
+      "gain": false
+    },
+    {
+      "id": "16579",
+      "stratum": "unspecified_uff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.016101935254820177,
+      "gain": false
+    },
+    {
+      "id": "16579",
+      "stratum": "unspecified_mmff",
+      "seed": 17,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.016101934318438538,
+      "gain": false
+    },
+    {
+      "id": "16579",
+      "stratum": "unspecified_mmff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.016101934318438538,
+      "gain": false
+    },
+    {
+      "id": "16579",
+      "stratum": "unspecified_mmff",
+      "seed": 29,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 2.313831075762163,
+      "gain": false
+    },
+    {
+      "id": "16579",
+      "stratum": "unspecified_mmff",
+      "seed": 29,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 2.313831075762163,
+      "gain": false
+    },
+    {
+      "id": "19227",
+      "stratum": "unspecified_uff",
+      "seed": 101,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.5876866604156978,
+      "gain": false
+    },
+    {
+      "id": "19227",
+      "stratum": "unspecified_mmff",
+      "seed": 101,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.5876866601926487,
+      "gain": false
+    },
+    {
+      "id": "19227",
+      "stratum": "unspecified_mmff",
+      "seed": 101,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.5876866601926487,
+      "gain": false
+    },
+    {
+      "id": "18465",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 1.2559445522545545,
+      "gain": false
+    },
+    {
+      "id": "18465",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.7241674143099743,
+      "gain": false
+    },
+    {
+      "id": "18465",
+      "stratum": "unspecified_uff",
+      "seed": 101,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.4867306681596695,
+      "gain": false
+    },
+    {
+      "id": "19276",
+      "stratum": "unspecified_uff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 3.1198721065859516,
+      "gain": false
+    },
+    {
+      "id": "19276",
+      "stratum": "unspecified_uff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 1.2188934817191175,
+      "gain": false
+    },
+    {
+      "id": "19276",
+      "stratum": "unspecified_mmff",
+      "seed": 43,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.44758730152405946,
+      "gain": false
+    },
+    {
+      "id": "19276",
+      "stratum": "unspecified_mmff",
+      "seed": 43,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 0.44758730152405946,
+      "gain": false
+    },
+    {
+      "id": "3211",
+      "stratum": "unspecified_uff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 3.2061131217304535,
+      "gain": false
+    },
+    {
+      "id": "3211",
+      "stratum": "unspecified_mmff",
+      "seed": 17,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 4.35654988455353,
+      "gain": false
+    },
+    {
+      "id": "3211",
+      "stratum": "unspecified_mmff",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 4.35654988455353,
+      "gain": false
+    }
+  ],
+  "verdicts": {
+    "specified_mmff/planarity_only": {
+      "status": "inconclusive_no_affected_baseline_success",
+      "regressed_pairs": 0,
+      "affected_baseline_successes": 0,
+      "gained_pairs": 190,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    },
+    "specified_mmff/combined": {
+      "status": "inconclusive_no_affected_baseline_success",
+      "regressed_pairs": 0,
+      "affected_baseline_successes": 0,
+      "gained_pairs": 190,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    },
+    "unspecified_uff/planarity_only": {
+      "status": "reject_observed_regression",
+      "regressed_pairs": 5,
+      "affected_baseline_successes": 130,
+      "gained_pairs": 70,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    },
+    "unspecified_uff/combined": {
+      "status": "reject_observed_regression",
+      "regressed_pairs": 17,
+      "affected_baseline_successes": 130,
+      "gained_pairs": 70,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    },
+    "unspecified_mmff/planarity_only": {
+      "status": "reject_observed_regression",
+      "regressed_pairs": 10,
+      "affected_baseline_successes": 115,
+      "gained_pairs": 80,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    },
+    "unspecified_mmff/combined": {
+      "status": "reject_observed_regression",
+      "regressed_pairs": 10,
+      "affected_baseline_successes": 115,
+      "gained_pairs": 80,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    }
+  }
+}

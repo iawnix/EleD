@@ -1,0 +1,650 @@
+{
+  "source_count": 21786,
+  "eligible_unique": 20309,
+  "excluded_count": 1477,
+  "rows": [
+    {
+      "id": "17425",
+      "smiles": "O=C1N2[C@@H]3C[C@@]1(O)[C@@H]32",
+      "identity": "O=C1N2C3CC1(O)C32",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "11700",
+      "smiles": "O=C[C@@]12CC(=O)N1C2",
+      "identity": "O=CC12CC(=O)N1C2",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "18416",
+      "smiles": "C#C[C@@H]1[C@@H]2CC(=O)N12",
+      "identity": "C#CC1C2CC(=O)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "3204",
+      "smiles": "C[C@@H]1C(=O)N2C[C@H]12",
+      "identity": "CC1C(=O)N2CC12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11974",
+      "smiles": "CC1(C)C(=O)N2C[C@@H]21",
+      "identity": "CC1(C)C(=O)N2CC21",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19263",
+      "smiles": "CC[C@@H]1C(=O)N2C[C@H]12",
+      "identity": "CCC1C(=O)N2CC12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19216",
+      "smiles": "C#C[C@@H]1C(=O)N2C[C@H]12",
+      "identity": "C#CC1C(=O)N2CC12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "18418",
+      "smiles": "N#C[C@@H]1[C@@H]2CC(=O)N12",
+      "identity": "N#CC1C2CC(=O)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19607",
+      "smiles": "O=C1[C@@H]2[C@@H](O)[C@H]3[C@@H]2N13",
+      "identity": "O=C1C2C(O)C3C2N13",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "7678",
+      "smiles": "CC1(C)[C@H]2CC(=O)N21",
+      "identity": "CC1(C)C2CC(=O)N21",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19393",
+      "smiles": "O=C1N2C[C@H]2[C@@]12CN2",
+      "identity": "O=C1N2CC2C12CN2",
+      "scaffold": "O=C1N2CC2C12CN2",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "11686",
+      "smiles": "N#C[C@@]12CC(=O)N1C2",
+      "identity": "N#CC12CC(=O)N1C2",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "16582",
+      "smiles": "C[C@H]1[C@H]2[C@@H](O)C(=O)N21",
+      "identity": "CC1C2C(O)C(=O)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "18454",
+      "smiles": "CC[C@H]1[C@H]2CC(=O)N21",
+      "identity": "CCC1C2CC(=O)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11685",
+      "smiles": "C#C[C@@]12CC(=O)N1C2",
+      "identity": "C#CC12CC(=O)N1C2",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19272",
+      "smiles": "CO[C@@H]1C(=O)N2C[C@H]12",
+      "identity": "COC1C(=O)N2CC12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "1909",
+      "smiles": "C[C@@]12CC(=O)N1C2",
+      "identity": "CC12CC(=O)N1C2",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "10890",
+      "smiles": "C[C@]12CN1C(=O)[C@H]2O",
+      "identity": "CC12CN1C(=O)C2O",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "8102",
+      "smiles": "C[C@H]1N2C(=O)C[C@@]12C",
+      "identity": "CC1N2C(=O)CC12C",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "682",
+      "smiles": "O=C1C[C@H]2CN12",
+      "identity": "O=C1CC2CN12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19602",
+      "smiles": "C[C@@H]1[C@H]2C(=O)N3[C@H]2[C@H]13",
+      "identity": "CC1C2C(=O)N3C1C23",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "18855",
+      "smiles": "O=C1[C@H]2CC[C@@H]3[C@H]2N13",
+      "identity": "O=C1C2CCC3C2N13",
+      "scaffold": "O=C1C2CCC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "17420",
+      "smiles": "C[C@]12C[C@@H]3[C@H]1N3C2=O",
+      "identity": "CC12CC3C1N3C2=O",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "11742",
+      "smiles": "O=C1C[C@@]2(CO)CN12",
+      "identity": "O=C1CC2(CO)CN12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "14218",
+      "smiles": "C[C@@]12C[C@H]3C(=O)N1[C@H]32",
+      "identity": "CC12CC3C(=O)N1C32",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "11980",
+      "smiles": "C[C@]1(O)C(=O)N2C[C@@H]21",
+      "identity": "CC1(O)C(=O)N2CC21",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "3393",
+      "smiles": "C[C@H]1[C@H]2CC(=O)N21",
+      "identity": "CC1C2CC(=O)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "18856",
+      "smiles": "O=C1[C@H]2OC[C@@H]3[C@H]2N13",
+      "identity": "O=C1C2OCC3C2N13",
+      "scaffold": "O=C1C2OCC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "10897",
+      "smiles": "C[C@H]1C(=O)N2C[C@@]12C",
+      "identity": "CC1C(=O)N2CC12C",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19261",
+      "smiles": "C/N=C1\\[C@@H](O)[C@H]2CN12",
+      "identity": "CN=C1C(O)C2CN12",
+      "scaffold": "N=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "19392",
+      "smiles": "O=C1N2C[C@H]2C12CC2",
+      "identity": "O=C1N2CC2C12CC2",
+      "scaffold": "O=C1N2CC2C12CC2",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "14410",
+      "smiles": "C[C@]12[C@@H]3C[C@H]1N2C3=O",
+      "identity": "CC12C3CC1N2C3=O",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "11734",
+      "smiles": "CC[C@@]12CC(=O)N1C2",
+      "identity": "CCC12CC(=O)N1C2",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "3548",
+      "smiles": "O=C1[C@H]2C[C@@H]3[C@H]2N13",
+      "identity": "O=C1C2CC3C2N13",
+      "scaffold": "O=C1C2CC3C2N13",
+      "group": "affected",
+      "scaffold_seen": false
+    },
+    {
+      "id": "16579",
+      "smiles": "C[C@H]1C(=O)N2[C@H]1[C@@H]2C",
+      "identity": "CC1C(=O)N2C(C)C12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19227",
+      "smiles": "O=C[C@@H]1C(=O)N2C[C@H]12",
+      "identity": "O=CC1C(=O)N2CC12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "18465",
+      "smiles": "O=C1C[C@@H]2[C@H](CO)N12",
+      "identity": "O=C1CC2C(CO)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "18427",
+      "smiles": "O=C[C@H]1[C@H]2CC(=O)N21",
+      "identity": "O=CC1C2CC(=O)N12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19276",
+      "smiles": "O=C1[C@@H](CO)[C@H]2CN12",
+      "identity": "O=C1C(CO)C2CN12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "3211",
+      "smiles": "O=C1[C@@H](O)[C@H]2CN12",
+      "identity": "O=C1C(O)C2CN12",
+      "scaffold": "O=C1CC2CN12",
+      "group": "affected",
+      "scaffold_seen": true
+    },
+    {
+      "id": "13655",
+      "smiles": "C[C@H]1N[C@H]1C#CC=O",
+      "identity": "CC1NC1C#CC=O",
+      "scaffold": "C1CN1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "15789",
+      "smiles": "C[C@@H](NC=O)C1CC1",
+      "identity": "CC(NC=O)C1CC1",
+      "scaffold": "C1CC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "14209",
+      "smiles": "C[C@@]12[C@H]3O[C@@H]1C[C@]32C",
+      "identity": "CC12CC3OC1C32C",
+      "scaffold": "C1C2OC3C1C23",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11945",
+      "smiles": "O=C[C@@]12C[C@]1(O)CN2",
+      "identity": "O=CC12CC1(O)CN2",
+      "scaffold": "C1NC2CC12",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "7422",
+      "smiles": "CC(=O)C(=O)C(C)C",
+      "identity": "CC(=O)C(=O)C(C)C",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "16070",
+      "smiles": "CC[C@]12OC[C@H]1[C@H]2O",
+      "identity": "CCC12OCC1C2O",
+      "scaffold": "C1OC2CC12",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11288",
+      "smiles": "C[C@H]1CN[C@H](C#N)C1",
+      "identity": "CC1CNC(C#N)C1",
+      "scaffold": "C1CCNC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "20675",
+      "smiles": "Cc1conc1CO",
+      "identity": "Cc1conc1CO",
+      "scaffold": "c1cnoc1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "15087",
+      "smiles": "CC[C@@H](OC)[C@H]1CO1",
+      "identity": "CCC(OC)C1CO1",
+      "scaffold": "C1CO1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "2352",
+      "smiles": "NC(=O)C1CCC1",
+      "identity": "NC(=O)C1CCC1",
+      "scaffold": "C1CCC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "15282",
+      "smiles": "C#CC[C@H]1N[C@H]1C#N",
+      "identity": "C#CCC1NC1C#N",
+      "scaffold": "C1CN1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "13095",
+      "smiles": "C[C@H]1OC[C@H]1OC=O",
+      "identity": "CC1OCC1OC=O",
+      "scaffold": "C1COC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "9425",
+      "smiles": "CCCO[C@@H](C)CO",
+      "identity": "CCCOC(C)CO",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11644",
+      "smiles": "CN1[C@H]2C[C@]1(C#N)C2",
+      "identity": "CN1C2CC1(C#N)C2",
+      "scaffold": "C1C2CC1N2",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "20157",
+      "smiles": "C1[C@@H]2O[C@H]3[C@H]4[C@@H]2N4[C@@H]13",
+      "identity": "C1C2OC3C1N1C2C31",
+      "scaffold": "C1C2OC3C1N1C2C31",
+      "group": "control",
+      "scaffold_seen": false
+    },
+    {
+      "id": "16800",
+      "smiles": "NC1=CC(=O)[C@H]2C[C@@H]12",
+      "identity": "NC1=CC(=O)C2CC12",
+      "scaffold": "O=C1C=CC2CC12",
+      "group": "control",
+      "scaffold_seen": false
+    },
+    {
+      "id": "7491",
+      "smiles": "CCC[C@@]1(C)CCO1",
+      "identity": "CCCC1(C)CCO1",
+      "scaffold": "C1COC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19350",
+      "smiles": "O=C[C@]12O[C@H]1[C@H]1C[C@H]12",
+      "identity": "O=CC12OC1C1CC12",
+      "scaffold": "C1C2C1C1OC21",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "8305",
+      "smiles": "O=C1C[C@H](CCO)N1",
+      "identity": "O=C1CC(CCO)N1",
+      "scaffold": "O=C1CCN1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "6841",
+      "smiles": "CC[C@H]1OC[C@]1(C)O",
+      "identity": "CCC1OCC1(C)O",
+      "scaffold": "C1COC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "7486",
+      "smiles": "O=CCC1(O)COC1",
+      "identity": "O=CCC1(O)COC1",
+      "scaffold": "C1COC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "14938",
+      "smiles": "O=C[C@@H]1CC=CCC1",
+      "identity": "O=CC1CC=CCC1",
+      "scaffold": "C1=CCCCC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11236",
+      "smiles": "CC1=CC[C@H](C#N)C1",
+      "identity": "CC1=CCC(C#N)C1",
+      "scaffold": "C1=CCCC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "19592",
+      "smiles": "O[C@H]1[C@H]2C[C@@H]1[C@H]1C[C@H]12",
+      "identity": "OC1C2CC1C1CC21",
+      "scaffold": "C1C2CC1C1CC21",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "5820",
+      "smiles": "C[C@@H](C#N)C(C)(C)C",
+      "identity": "CC(C#N)C(C)(C)C",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "6089",
+      "smiles": "CC(=O)NCC(C)C",
+      "identity": "CC(=O)NCC(C)C",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "11960",
+      "smiles": "CO[C@]12CC[C@@]1(O)C2",
+      "identity": "COC12CCC1(O)C2",
+      "scaffold": "C1CC2CC12",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "679",
+      "smiles": "C1OC[C@H]2O[C@@H]12",
+      "identity": "C1OCC2OC12",
+      "scaffold": "C1OCC2OC12",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "7455",
+      "smiles": "CC(C)C(C)C(C)C",
+      "identity": "CC(C)C(C)C(C)C",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "23743",
+      "smiles": "Nc1ccccc1F",
+      "identity": "Nc1ccccc1F",
+      "scaffold": "c1ccccc1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "9989",
+      "smiles": "C#CC(C#C)CC=O",
+      "identity": "C#CC(C#C)CC=O",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "1966",
+      "smiles": "CCN1CC(=O)C1",
+      "identity": "CCN1CC(=O)C1",
+      "scaffold": "O=C1CNC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "9051",
+      "smiles": "C#CCO[C@H](C)C#C",
+      "identity": "C#CCOC(C)C#C",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "20466",
+      "smiles": "c1cc([C@H]2CO2)on1",
+      "identity": "c1cc(C2CO2)on1",
+      "scaffold": "c1cc(C2CO2)on1",
+      "group": "control",
+      "scaffold_seen": false
+    },
+    {
+      "id": "13585",
+      "smiles": "C[C@H]1CN1C(=O)C=O",
+      "identity": "CC1CN1C(=O)C=O",
+      "scaffold": "C1CN1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "21149",
+      "smiles": "C/N=c1\\onnn1C",
+      "identity": "CN=c1onnn1C",
+      "scaffold": "N=c1[nH]nno1",
+      "group": "control",
+      "scaffold_seen": false
+    },
+    {
+      "id": "16454",
+      "smiles": "C[C@]12C=C[C@@H]3[C@H]1C[C@@H]32",
+      "identity": "CC12C=CC3C1CC32",
+      "scaffold": "C1=CC2C3CC2C13",
+      "group": "control",
+      "scaffold_seen": false
+    },
+    {
+      "id": "10819",
+      "smiles": "O=C1C=C[C@@H](O)CC1",
+      "identity": "O=C1C=CC(O)CC1",
+      "scaffold": "O=C1C=CCCC1",
+      "group": "control",
+      "scaffold_seen": false
+    },
+    {
+      "id": "6837",
+      "smiles": "CC[C@H]1CCC1(C)C",
+      "identity": "CCC1CCC1(C)C",
+      "scaffold": "C1CCC1",
+      "group": "control",
+      "scaffold_seen": true
+    },
+    {
+      "id": "9159",
+      "smiles": "COC(=O)C#CC#N",
+      "identity": "COC(=O)C#CC#N",
+      "scaffold": "",
+      "group": "control",
+      "scaffold_seen": true
+    }
+  ],
+  "selection": "all matching non-development identities; first 40 nonmatching in existing stable hash order",
+  "known_identity_count": 1024,
+  "affected_new_scaffold_molecules": 12
+}

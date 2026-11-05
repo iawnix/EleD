@@ -7,6 +7,12 @@ targeted planarity term, with all specified chirality checks retained, did.
 Combining the two changes improves some presets and worsens another; this is
 an experimental ablation, not a new default or a validated general algorithm.
 
+**Subsequent [success-retention testing](embedding-nonregression.md) rejects both
+direct-replacement candidates under the declared MMFF94 quality gate.** Success
+flags are retained in that larger test, but optimized energies worsen on some
+previously successful inputs. The positive results below do not establish
+regression-free behavior.
+
 ## Source changes
 
 The baseline is RDKit 2026.09.1, source commit

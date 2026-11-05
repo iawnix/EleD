@@ -1,0 +1,30 @@
+{
+  "totals": {
+    "paired_settings": 2600,
+    "baseline_initial_successes": 443,
+    "baseline_post_successes": 433,
+    "combined_flagged_comparisons": 28,
+    "planarity_only_flagged_comparisons": 16
+  },
+  "decision": "reject both direct-replacement candidates under the declared quality gate",
+  "failure_types": {
+    "higher_post_mmff_energy": 44
+  },
+  "distinct_counterexample_source_ids": [
+    "3211",
+    "8102",
+    "10890",
+    "10897",
+    "11686",
+    "11734",
+    "11980",
+    "16579",
+    "16582",
+    "18454",
+    "18465",
+    "19227",
+    "19261",
+    "19263",
+    "19276"
+  ]
+}

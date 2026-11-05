@@ -1,5 +1,9 @@
 # Reproduce the local-ring source experiment
 
+The subsequent [nonregression study](../../docs/embedding-nonregression.md)
+rejects direct replacement under its quality gate. Build instructions below
+reproduce the experimental candidates, not a production recommendation.
+
 Start with the pinned source checkout, SDK and base `embedding_probe` built
 using [the diagnostic instructions](README.md). These commands create isolated
 executables and generated source files; they do not modify the RDKit checkout or

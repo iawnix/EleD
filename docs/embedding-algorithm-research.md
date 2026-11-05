@@ -10,6 +10,10 @@ angle correction and targeted nitrogen planarity removal separately. It records
 both a negative angle-only result and improvements/regressions in the factorial
 ablation; the patches remain research-only.
 
+The expanded [nonregression study](embedding-nonregression.md) subsequently finds
+optimized-energy regressions on previously successful inputs. Both current
+direct-replacement candidates fail that study's conservative quality gate.
+
 ## What was implemented
 
 A standalone diagnostic executable instruments RDKit 2026.09.1's embedding

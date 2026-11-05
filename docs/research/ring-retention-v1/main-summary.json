@@ -1,0 +1,113 @@
+{
+  "counts": {
+    "affected/baseline": {
+      "runs": 1800,
+      "initial_valid": 8,
+      "post_valid": 8
+    },
+    "affected/planarity_only": {
+      "runs": 1800,
+      "initial_valid": 646,
+      "post_valid": 614
+    },
+    "affected/combined": {
+      "runs": 1800,
+      "initial_valid": 1534,
+      "post_valid": 1458
+    },
+    "control/baseline": {
+      "runs": 200,
+      "initial_valid": 190,
+      "post_valid": 180
+    },
+    "control/planarity_only": {
+      "runs": 200,
+      "initial_valid": 190,
+      "post_valid": 180
+    },
+    "control/combined": {
+      "runs": 200,
+      "initial_valid": 190,
+      "post_valid": 180
+    }
+  },
+  "paired_trials": 2000,
+  "failures": [
+    {
+      "id": "11734",
+      "group": "affected",
+      "preset": "srETKDGv3",
+      "mode": "random",
+      "seed": 17,
+      "variant": "combined",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 1.4020996533875199,
+      "gain": false
+    },
+    {
+      "id": "11734",
+      "group": "affected",
+      "preset": "srETKDGv3",
+      "mode": "internal",
+      "seed": 43,
+      "variant": "planarity_only",
+      "failures": [
+        "higher_post_mmff_energy"
+      ],
+      "post_energy_delta_kcal_mol": 1.4020996470779146,
+      "gain": false
+    }
+  ],
+  "verdicts": {
+    "planarity_only": {
+      "status": "reject_observed_regression",
+      "regressed_pairs": 1,
+      "affected_baseline_successes": 8,
+      "gained_pairs": 638,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    },
+    "combined": {
+      "status": "reject_observed_regression",
+      "regressed_pairs": 1,
+      "affected_baseline_successes": 8,
+      "gained_pairs": 1526,
+      "production_ready": false,
+      "limits": "finite chemistry/seed coverage; diagnostic timings are not a production performance gate"
+    }
+  },
+  "diagnostic_wall_seconds": {
+    "affected/baseline": {
+      "total": 169.66814465040807,
+      "median": 0.08872813795460388,
+      "p95": 0.15021683879313058
+    },
+    "affected/planarity_only": {
+      "total": 142.24075658572838,
+      "median": 0.07848762546200305,
+      "p95": 0.14876641656155695
+    },
+    "affected/combined": {
+      "total": 86.4682607279392,
+      "median": 0.0315326499985531,
+      "p95": 0.13514562938944435
+    },
+    "control/baseline": {
+      "total": 6.503715622588061,
+      "median": 0.02753005997510627,
+      "p95": 0.0500126554165029
+    },
+    "control/planarity_only": {
+      "total": 6.443745606695302,
+      "median": 0.026866289495956153,
+      "p95": 0.04963197678443908
+    },
+    "control/combined": {
+      "total": 6.553949868888594,
+      "median": 0.027486249047797173,
+      "p95": 0.04859500809106903
+    }
+  }
+}
