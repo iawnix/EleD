@@ -1,0 +1,46 @@
+--- a/Code/GraphMol/DistGeomHelpers/BoundsMatrixBuilder.cpp
++++ b/Code/GraphMol/DistGeomHelpers/BoundsMatrixBuilder.cpp
+@@ -556,6 +556,11 @@
+   std::vector<unsigned int> visited(npt, 0u);
+ 
+   DOUBLE_VECT angleTaken(npt, 0.0);
++  // Research prototype: obtain a local angle prior only when the planar
++  // completion rule is inapplicable at a neutral fused-small-ring nitrogen.
++  // Parameterization works on a copy and must not alter molecular chemistry.
++  std::optional<MMFF::MMFFMolProperties> localRingMMFF;
++  bool localRingMMFFAttempted = false;
+   auto nb = mol.getNumBonds();
+   BIT_SET donePaths(nb * nb);
+   // first deal with all rings and atoms in them
+@@ -638,6 +643,31 @@
+             // (and there should only be one)
+             if (ahyb == Atom::SP2) {
+               angle = (2 * M_PI - angleTaken[aid2]) / (n13 - visited[aid2]);
++              if (angle > M_PI && atom->getAtomicNum() == 7 &&
++                  atom->getFormalCharge() == 0 && !atom->getIsAromatic() &&
++                  deg == 3 && rinfo->isAtomInRingOfSize(aid2, 3) &&
++                  rinfo->isAtomInRingOfSize(aid2, 4)) {
++                if (!localRingMMFFAttempted) {
++                  auto [properties, valid] = parametrizeMMFF(mol);
++                  if (valid) {
++                    localRingMMFF = std::move(properties);
++                  }
++                  localRingMMFFAttempted = true;
++                }
++                if (localRingMMFF) {
++                  unsigned int angleType = 0;
++                  MMFF::MMFFAngle angleProperties;
++                  if (localRingMMFF->getMMFFAngleBendParams(
++                          mol, aid1, aid2, aid3, angleType, angleProperties)) {
++                    const double localAngle =
++                        angleProperties.theta0 * std::numbers::pi / 180.0;
++                    if (std::isfinite(localAngle) && localAngle > 0.0 &&
++                        localAngle < M_PI) {
++                      angle = localAngle;
++                    }
++                  }
++                }
++              }
+             } else if (ahyb == Atom::SP3) {
+               // in the case of sp3 we will use the tetrahedral angle mostly
+               // - but with some special cases

@@ -1,0 +1,111 @@
+{
+  "scope": "135 trials per variant on three selected development molecules, not 135 molecules",
+  "aggregate": {
+    "baseline": {
+      "runs": 135,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "candidate": {
+      "runs": 135,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "global_mmff": {
+      "runs": 135,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "planarity_only": {
+      "runs": 135,
+      "initial_valid": 77,
+      "post_mmff_valid_converged": 77
+    },
+    "combined": {
+      "runs": 135,
+      "initial_valid": 109,
+      "post_mmff_valid_converged": 109
+    }
+  },
+  "per_preset": {
+    "ETKDGv3/baseline": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "ETKDGv3/candidate": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "ETKDGv3/global_mmff": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "ETKDGv4/baseline": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "ETKDGv4/candidate": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "ETKDGv4/global_mmff": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "srETKDGv3/baseline": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "srETKDGv3/candidate": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "srETKDGv3/global_mmff": {
+      "runs": 45,
+      "initial_valid": 0,
+      "post_mmff_valid_converged": 0
+    },
+    "ETKDGv3/planarity_only": {
+      "runs": 45,
+      "initial_valid": 15,
+      "post_mmff_valid_converged": 15
+    },
+    "ETKDGv3/combined": {
+      "runs": 45,
+      "initial_valid": 25,
+      "post_mmff_valid_converged": 25
+    },
+    "ETKDGv4/planarity_only": {
+      "runs": 45,
+      "initial_valid": 45,
+      "post_mmff_valid_converged": 45
+    },
+    "ETKDGv4/combined": {
+      "runs": 45,
+      "initial_valid": 39,
+      "post_mmff_valid_converged": 39
+    },
+    "srETKDGv3/planarity_only": {
+      "runs": 45,
+      "initial_valid": 17,
+      "post_mmff_valid_converged": 17
+    },
+    "srETKDGv3/combined": {
+      "runs": 45,
+      "initial_valid": 45,
+      "post_mmff_valid_converged": 45
+    }
+  },
+  "paired_changes": {
+    "combined_gains_vs_planarity_only": 38,
+    "combined_losses_vs_planarity_only": 6
+  }
+}

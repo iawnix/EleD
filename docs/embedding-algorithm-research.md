@@ -5,6 +5,11 @@ for strained ring systems**, alongside sampling. It does not establish a new
 algorithm or an improvement over RDKit. In particular, existing RDKit options
 already address part of the observed difficulty and must be included as baselines.
 
+A subsequent [local-ring source-patch experiment](local-ring-prototype.md) tests
+angle correction and targeted nitrogen planarity removal separately. It records
+both a negative angle-only result and improvements/regressions in the factorial
+ablation; the patches remain research-only.
+
 ## What was implemented
 
 A standalone diagnostic executable instruments RDKit 2026.09.1's embedding

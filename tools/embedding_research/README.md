@@ -5,6 +5,11 @@ conformer generator and are not part of the installed `rdkit_eth` API.
 The initial findings and proposed experiments are in
 [the research report](../../docs/embedding-algorithm-research.md).
 
+The later [local-ring prototype experiment](ring-prototype.md) adds isolated
+source-patch builds and a paired angle/planarity ablation. Its patches do change
+embedding behavior in the experimental executables; the original probe below
+remains read-only.
+
 The probe builds one executable from the **unmodified, pinned** upstream
 `Embedder.cpp`, inserting read-only logging hooks into a generated copy. It links
 against an existing RDKit 2026.09.1 SDK. Installed libraries are not replaced.

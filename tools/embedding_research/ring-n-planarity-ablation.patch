@@ -1,0 +1,21 @@
+--- a/Code/GraphMol/DistGeomHelpers/Embedder.cpp
++++ b/Code/GraphMol/DistGeomHelpers/Embedder.cpp
+@@ -1375,6 +1375,18 @@
+         *mol, etkdgDetails, params.useExpTorsionAnglePrefs,
+         params.useSmallRingTorsions, params.useMacrocycleTorsions,
+         params.useBasicKnowledge, params.ETversion, params.verbose);
++    // Diagnostic ablation only: test whether the SP2 nitrogen improper
++    // conflicts with nonplanar local geometry in fused 3/4-membered rings.
++    // This does not remove chiral-volume or final stereochemical checks.
++    std::erase_if(etkdgDetails.improperAtoms, [mol](const auto &term) {
++      const auto *atom = mol->getAtomWithIdx(term[1]);
++      const auto *rings = mol->getRingInfo();
++      return atom->getAtomicNum() == 7 && atom->getFormalCharge() == 0 &&
++             atom->getDegree() == 3 && !atom->getIsAromatic() &&
++             atom->getHybridization() == Atom::SP2 &&
++             rings->isAtomInRingOfSize(atom->getIdx(), 3) &&
++             rings->isAtomInRingOfSize(atom->getIdx(), 4);
++    });
+     etkdgDetails.atomNums.resize(nAtoms);
+     for (unsigned int i = 0; i < nAtoms; ++i) {
+       etkdgDetails.atomNums[i] = mol->getAtomWithIdx(i)->getAtomicNum();

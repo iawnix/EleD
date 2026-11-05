@@ -1,0 +1,13 @@
+{
+  "README.md": "98fc91559c5a7d4a56997529faa1bdd5d2da6b3d8e71a541b1529f8fff6b26a0",
+  "ablation-manifest.json": "33d38cf1e55e576d3817a36be05a185973505ccfabc51a78c95dc151de59d33b",
+  "ablation-screen.jsonl.gz": "c864a719d3107da1926a75ac3770cbaf20020ce9845a5ff84d24a7d1b08369d9",
+  "ablation-summary.json": "86137344813e3292aaaff1c9cc447868ea279b0cc69d16e44b98d909beab9a66",
+  "ablation-sweep.jsonl.gz": "aa47fc7fd8c0d8c70043d1ab8fab5f2859f09e211a336b986b9b97a1ba842ef5",
+  "analysis.json": "5802c5c6bd6dd559ad938284a908b4b679ed27287c6abab6ce451e3cb4e6a58a",
+  "angle-manifest.json": "3e16234381820116825b6fb68c1f1637e487c0d40f69683135fd50fa439a34bc",
+  "angle-screen.jsonl.gz": "5659eb53b202b7e1cbd33861eeb53168db5c88ab2e51d53235aaa6b4b4da6a45",
+  "angle-summary.json.gz": "831573a73ad16d89d07df768c2020b3aa49d7c6838304e33d624d757ed1d38b6",
+  "angle-sweep.jsonl.gz": "0ff06f8e2ab3eff18dbe0123c1726bb8362a6e75bf9876dc941fb0db4e11986c",
+  "tests.log": "6314f53dd211433c03d0d0547251f0520a1ba273cf240e25c0e8b2914b330fdf"
+}
