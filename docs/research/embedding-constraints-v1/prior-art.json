@@ -1,0 +1,65 @@
+{
+  "scope": "targeted source and issue review; not a systematic novelty search",
+  "references": [
+    {
+      "title": "Better Informed Distance Geometry: Using What We Know To Improve Conformation Generation",
+      "url": "https://doi.org/10.1021/acs.jcim.5b00654",
+      "review_scope": "Crossref metadata",
+      "abstract": null
+    },
+    {
+      "title": "Improving Conformer Generation for Small Rings and Macrocycles Based on Distance Geometry and Experimental Torsional-Angle Preferences",
+      "url": "https://doi.org/10.1021/acs.jcim.0c00025",
+      "review_scope": "Crossref metadata",
+      "abstract": null
+    },
+    {
+      "title": "A Branch\u2010and\u2010Prune algorithm for the Molecular Distance Geometry Problem",
+      "url": "https://doi.org/10.1111/j.1475-3995.2007.00622.x",
+      "review_scope": "Crossref metadata; abstract",
+      "abstract": "<jats:title>Abstract</jats:title>\n                  <jats:p>\n                    The Molecular Distance Geometry Problem consists in finding the positions in\n                    <jats:inline-graphic xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"graphic/ITOR_622_mu8.gif\" xlink:title=\"inline image\"/>\n                    of the atoms of a molecule, given some of the inter\u2010atomic distances. We show that under an additional requirement on the given distances this can be transformed to a combinatorial problem. We propose a Branch\u2010and\u2010Prune algorithm for the solution of this problem and report on very promising computational results.\n                  </jats:p>"
+    },
+    {
+      "title": "Conformer Generation Fails for three-coordinate Ns with specified stereo",
+      "html_url": "https://github.com/rdkit/rdkit/issues/5883",
+      "state": "closed",
+      "created_at": "2022-12-17T17:26:44Z",
+      "closed_at": "2023-03-14T03:54:19Z"
+    },
+    {
+      "title": "Allow chiral volume constraints to be provided to the conformer generator",
+      "html_url": "https://github.com/rdkit/rdkit/pull/9740",
+      "state": "open",
+      "created_at": "2026-10-23T12:23:32Z",
+      "closed_at": null
+    },
+    {
+      "title": "3D tetrahedral assignment flips under an even neighbor-order permutation for unchanged distorted coordinates",
+      "html_url": "https://github.com/rdkit/rdkit/issues/9760",
+      "state": "open",
+      "created_at": "2026-10-29T10:14:28Z",
+      "closed_at": null
+    },
+    {
+      "title": "Trigonal Pyramid Carbon may or not have a parity depending on atom ordering",
+      "html_url": "https://github.com/rdkit/rdkit/issues/7346",
+      "state": "closed",
+      "created_at": "2024-04-10T17:56:17Z",
+      "closed_at": "2024-04-11T14:16:49Z"
+    },
+    {
+      "title": "Potentially incorrect gradient for ETKDG torsion term.",
+      "html_url": "https://github.com/rdkit/rdkit/issues/8715",
+      "state": "closed",
+      "created_at": "2025-08-19T12:48:13Z",
+      "closed_at": "2026-10-16T04:55:30Z"
+    },
+    {
+      "title": "Speed up distance geometry embedding (DG)",
+      "html_url": "https://github.com/rdkit/rdkit/pull/9786",
+      "state": "open",
+      "created_at": "2026-11-02T14:29:56Z",
+      "closed_at": null
+    }
+  ]
+}

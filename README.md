@@ -23,6 +23,10 @@ SMILES-generated geometry results, failures and paired uncertainty intervals.
 The subsequent coordinate audit found nine stereo mismatches in its historical
 cohort; that limitation is recorded alongside the original results.
 
+An [embedding algorithm investigation](docs/embedding-algorithm-research.md)
+records source-level constraint diagnostics and comparisons with existing RDKit
+initialization/bounds options. It is research tooling, not a new embedding API.
+
 ## Installation
 
 0.10 adds [`prepare_conformers`](docs/geometry-preparation.md): deterministic

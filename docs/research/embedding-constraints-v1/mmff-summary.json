@@ -1,0 +1,353 @@
+{
+  "groups": {
+    "recovered_22": {
+      "ETKDGv3/dg": {
+        "total": 22,
+        "returned": 9,
+        "stereo_valid": 9,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 1.9370556933572516,
+        "failure_counts": {
+          "INITIAL_COORDS": 134,
+          "FIRST_MINIMIZATION": 28,
+          "FINAL_CENTER_IN_VOLUME": 1487,
+          "FINAL_CHIRAL_BOUNDS": 91,
+          "CHECK_TETRAHEDRAL_CENTERS": 1,
+          "ETK_MINIMIZATION": 6
+        }
+      },
+      "ETKDGv3/internal": {
+        "total": 22,
+        "returned": 6,
+        "stereo_valid": 6,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 2.027201334829442,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 1757,
+          "FIRST_MINIMIZATION": 5,
+          "FINAL_CHIRAL_BOUNDS": 106,
+          "ETK_MINIMIZATION": 11
+        }
+      },
+      "ETKDGv4/dg": {
+        "total": 22,
+        "returned": 20,
+        "stereo_valid": 20,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.31158121139742434,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 87,
+          "MINIMIZATION": 200,
+          "INITIAL_COORDS": 20
+        }
+      },
+      "ETKDGv4/internal": {
+        "total": 22,
+        "returned": 20,
+        "stereo_valid": 20,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.2721276981756091,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 78,
+          "MINIMIZATION": 209
+        }
+      },
+      "srETKDGv3/dg": {
+        "total": 22,
+        "returned": 12,
+        "stereo_valid": 12,
+        "optimizer_exceptions": 1,
+        "installed_embedding_seconds": 1.210363068152219,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 697,
+          "INITIAL_COORDS": 85,
+          "FIRST_MINIMIZATION": 10,
+          "FINAL_CHIRAL_BOUNDS": 125,
+          "ETK_MINIMIZATION": 216,
+          "CHECK_TETRAHEDRAL_CENTERS": 1
+        }
+      },
+      "srETKDGv3/internal": {
+        "total": 22,
+        "returned": 11,
+        "stereo_valid": 11,
+        "optimizer_exceptions": 1,
+        "installed_embedding_seconds": 1.2090957820182666,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 759,
+          "ETK_MINIMIZATION": 210,
+          "FINAL_CHIRAL_BOUNDS": 118,
+          "FIRST_MINIMIZATION": 3
+        }
+      }
+    },
+    "remaining_19": {
+      "ETKDGv3/dg": {
+        "total": 19,
+        "returned": 4,
+        "stereo_valid": 4,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 1.856362392893061,
+        "failure_counts": {
+          "INITIAL_COORDS": 120,
+          "FIRST_MINIMIZATION": 17,
+          "FINAL_CENTER_IN_VOLUME": 575,
+          "CHECK_TETRAHEDRAL_CENTERS": 98,
+          "FINAL_CHIRAL_BOUNDS": 705,
+          "ETK_MINIMIZATION": 116
+        }
+      },
+      "ETKDGv3/internal": {
+        "total": 19,
+        "returned": 1,
+        "stereo_valid": 1,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 2.2088960338151082,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 647,
+          "CHECK_TETRAHEDRAL_CENTERS": 103,
+          "FINAL_CHIRAL_BOUNDS": 905,
+          "FIRST_MINIMIZATION": 4,
+          "ETK_MINIMIZATION": 141
+        }
+      },
+      "ETKDGv4/dg": {
+        "total": 19,
+        "returned": 9,
+        "stereo_valid": 9,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.7278707689838484,
+        "failure_counts": {
+          "INITIAL_COORDS": 58,
+          "MINIMIZATION": 370,
+          "FINAL_CHIRAL_BOUNDS": 377,
+          "FINAL_CENTER_IN_VOLUME": 134,
+          "CHECK_TETRAHEDRAL_CENTERS": 89
+        }
+      },
+      "ETKDGv4/internal": {
+        "total": 19,
+        "returned": 9,
+        "stereo_valid": 9,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.7360972231253982,
+        "failure_counts": {
+          "MINIMIZATION": 336,
+          "FINAL_CHIRAL_BOUNDS": 438,
+          "FINAL_CENTER_IN_VOLUME": 140,
+          "CHECK_TETRAHEDRAL_CENTERS": 100
+        }
+      },
+      "srETKDGv3/dg": {
+        "total": 19,
+        "returned": 7,
+        "stereo_valid": 7,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 1.5605242875171825,
+        "failure_counts": {
+          "INITIAL_COORDS": 92,
+          "FIRST_MINIMIZATION": 15,
+          "ETK_MINIMIZATION": 300,
+          "CHECK_CHIRAL_CENTERS2": 8,
+          "CHECK_TETRAHEDRAL_CENTERS": 98,
+          "FINAL_CHIRAL_BOUNDS": 748,
+          "FINAL_CENTER_IN_VOLUME": 122
+        }
+      },
+      "srETKDGv3/internal": {
+        "total": 19,
+        "returned": 4,
+        "stereo_valid": 4,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 1.8218277371488512,
+        "failure_counts": {
+          "ETK_MINIMIZATION": 333,
+          "CHECK_CHIRAL_CENTERS2": 8,
+          "CHECK_TETRAHEDRAL_CENTERS": 103,
+          "FINAL_CHIRAL_BOUNDS": 963,
+          "FIRST_MINIMIZATION": 4,
+          "FINAL_CENTER_IN_VOLUME": 126
+        }
+      }
+    },
+    "control_40": {
+      "ETKDGv3/dg": {
+        "total": 40,
+        "returned": 37,
+        "stereo_valid": 37,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.4394700287375599,
+        "failure_counts": {
+          "CHECK_TETRAHEDRAL_CENTERS": 1,
+          "INITIAL_COORDS": 38,
+          "FINAL_CENTER_IN_VOLUME": 374,
+          "FIRST_MINIMIZATION": 4
+        }
+      },
+      "ETKDGv3/internal": {
+        "total": 40,
+        "returned": 36,
+        "stereo_valid": 36,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.4243179971817881,
+        "failure_counts": {
+          "FIRST_MINIMIZATION": 6,
+          "FINAL_CENTER_IN_VOLUME": 450,
+          "FINAL_CHIRAL_BOUNDS": 3,
+          "ETK_MINIMIZATION": 1
+        }
+      },
+      "ETKDGv4/dg": {
+        "total": 40,
+        "returned": 39,
+        "stereo_valid": 39,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.2154842271702364,
+        "failure_counts": {
+          "MINIMIZATION": 3,
+          "FINAL_CENTER_IN_VOLUME": 90,
+          "INITIAL_COORDS": 19,
+          "FINAL_CHIRAL_BOUNDS": 1,
+          "LINEAR_DOUBLE_BOND": 1
+        }
+      },
+      "ETKDGv4/internal": {
+        "total": 40,
+        "returned": 39,
+        "stereo_valid": 39,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.20981542812660336,
+        "failure_counts": {
+          "FINAL_CENTER_IN_VOLUME": 95,
+          "MINIMIZATION": 5
+        }
+      },
+      "srETKDGv3/dg": {
+        "total": 40,
+        "returned": 39,
+        "stereo_valid": 39,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.1865144259063527,
+        "failure_counts": {
+          "CHECK_TETRAHEDRAL_CENTERS": 1,
+          "INITIAL_COORDS": 17,
+          "ETK_MINIMIZATION": 7,
+          "FINAL_CENTER_IN_VOLUME": 135,
+          "FIRST_MINIMIZATION": 3
+        }
+      },
+      "srETKDGv3/internal": {
+        "total": 40,
+        "returned": 38,
+        "stereo_valid": 38,
+        "optimizer_exceptions": 0,
+        "installed_embedding_seconds": 0.21783043211326003,
+        "failure_counts": {
+          "ETK_MINIMIZATION": 7,
+          "FINAL_CENTER_IN_VOLUME": 200,
+          "FIRST_MINIMIZATION": 1,
+          "FINAL_CHIRAL_BOUNDS": 3
+        }
+      }
+    }
+  },
+  "parity_checks": 486,
+  "snapshot_replays": 1276,
+  "source_geometry_rejections": [],
+  "source_predicate_failures": {
+    "recovered_22/ETKDGv3/dg": {
+      "FINAL_CHIRAL_BOUNDS": 3
+    },
+    "recovered_22/ETKDGv3/internal": {
+      "FINAL_CHIRAL_BOUNDS": 3
+    },
+    "recovered_22/ETKDGv4/dg": {
+      "FINAL_CHIRAL_BOUNDS": 3
+    },
+    "recovered_22/ETKDGv4/internal": {
+      "FINAL_CHIRAL_BOUNDS": 3
+    },
+    "recovered_22/srETKDGv3/dg": {
+      "FINAL_CHIRAL_BOUNDS": 3
+    },
+    "recovered_22/srETKDGv3/internal": {
+      "FINAL_CHIRAL_BOUNDS": 3
+    },
+    "remaining_19/ETKDGv3/dg": {
+      "FINAL_CHIRAL_BOUNDS": 8,
+      "FINAL_CENTER_IN_VOLUME": 2,
+      "CHECK_TETRAHEDRAL_CENTERS": 1
+    },
+    "remaining_19/ETKDGv3/internal": {
+      "FINAL_CHIRAL_BOUNDS": 8,
+      "FINAL_CENTER_IN_VOLUME": 2,
+      "CHECK_TETRAHEDRAL_CENTERS": 1
+    },
+    "remaining_19/ETKDGv4/dg": {
+      "FINAL_CHIRAL_BOUNDS": 8,
+      "FINAL_CENTER_IN_VOLUME": 2,
+      "CHECK_TETRAHEDRAL_CENTERS": 1
+    },
+    "remaining_19/ETKDGv4/internal": {
+      "FINAL_CHIRAL_BOUNDS": 8,
+      "FINAL_CENTER_IN_VOLUME": 2,
+      "CHECK_TETRAHEDRAL_CENTERS": 1
+    },
+    "remaining_19/srETKDGv3/dg": {
+      "FINAL_CHIRAL_BOUNDS": 8,
+      "FINAL_CENTER_IN_VOLUME": 2,
+      "CHECK_TETRAHEDRAL_CENTERS": 1
+    },
+    "remaining_19/srETKDGv3/internal": {
+      "FINAL_CHIRAL_BOUNDS": 8,
+      "FINAL_CENTER_IN_VOLUME": 2,
+      "CHECK_TETRAHEDRAL_CENTERS": 1
+    },
+    "control_40/ETKDGv3/dg": {
+      "FINAL_CHIRAL_BOUNDS": 1
+    },
+    "control_40/ETKDGv3/internal": {
+      "FINAL_CHIRAL_BOUNDS": 1
+    },
+    "control_40/ETKDGv4/dg": {
+      "FINAL_CHIRAL_BOUNDS": 1
+    },
+    "control_40/ETKDGv4/internal": {
+      "FINAL_CHIRAL_BOUNDS": 1
+    },
+    "control_40/srETKDGv3/dg": {
+      "FINAL_CHIRAL_BOUNDS": 1
+    },
+    "control_40/srETKDGv3/internal": {
+      "FINAL_CHIRAL_BOUNDS": 1
+    }
+  },
+  "source_failure_ids": {
+    "remaining_19/FINAL_CHIRAL_BOUNDS": [
+      "6595",
+      "6596",
+      "8594",
+      "8596",
+      "14505",
+      "17763",
+      "18847",
+      "18970"
+    ],
+    "remaining_19/FINAL_CENTER_IN_VOLUME": [
+      "8594",
+      "19214"
+    ],
+    "remaining_19/CHECK_TETRAHEDRAL_CENTERS": [
+      "8596"
+    ],
+    "recovered_22/FINAL_CHIRAL_BOUNDS": [
+      "18185",
+      "18511",
+      "19413"
+    ],
+    "control_40/FINAL_CHIRAL_BOUNDS": [
+      "12064"
+    ]
+  },
+  "source_sign_mismatch_ids": []
+}

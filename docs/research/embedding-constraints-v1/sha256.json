@@ -1,0 +1,12 @@
+{
+  "README.md": "fc3d3c9f2d2c4dfdd9763c5a77cd4d9d3df068b4e0539536d305323a3df4e1c3",
+  "environment.json": "2305aadce97198e88f48bc6cccb557880aaaab6b974c156d11835ee92f286ea4",
+  "mmff-manifest.json": "98b9a6ab12378599ae202b0ec1a5839aa47c1a36eda5dade0801e90608023f27",
+  "mmff-records.jsonl.gz": "2ace0a7c2599ec6f04b60d9e2712c9f37055020fdeedcb80b203e8026f8d0d04",
+  "mmff-summary.json": "6c12fa011bf485c1b0b690838ae8c2971c962fe80a87cca35a08d73cd1d6320b",
+  "prior-art.json": "c82a7235efb6f3a9b814cd11d1e59a661858c0a454bb0e5f02c919d61009f6a1",
+  "references.json.gz": "0e0930c461d3644a68ee9bc983d3228d69b7b13e9d314763bfd12af9becf64a1",
+  "uff-manifest.json": "deaa162d3cdc3356ebafd1d1661035b4bc042ce3e1af67aeb6a82499e644a617",
+  "uff-records.jsonl.gz": "0e075e672a97cfaf49ddda2d184fc2dec9b34245f2acf73b72a618fc3f2ff92c",
+  "uff-summary.json": "b31d5ef53905429bc831cee567969ae46bd01de64ca6aaac08be53eff18eecbe"
+}
