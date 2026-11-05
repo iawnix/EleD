@@ -34,7 +34,15 @@ if(RDXTB_BUILD_PYTHON)
   target_link_libraries(rdXTBTools PRIVATE RDKitXTB RDKit::RDBoost Python::NumPy)
   target_compile_definitions(rdXTBTools PRIVATE RDXTB_RDKIT_VERSION="${RDKit_VERSION}")
   target_compile_options(rdXTBTools PRIVATE -Wall -Wextra)
-  set_target_properties(rdXTBTools PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+  # Keep the wheel relocatable.  An absolute SDK path here is rewritten by
+  # conda-pack during offline bundle installation; patchelf 0.17 can corrupt
+  # extension program headers when the replacement path is longer.  The
+  # extension always lives below <prefix>/lib/python*/site-packages, so this
+  # relative path resolves to the matching RDKit/Boost libraries.
+  set_target_properties(rdXTBTools PROPERTIES
+    INSTALL_RPATH "$ORIGIN/../../../../lib"
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH_USE_LINK_PATH FALSE)
 endif()
 
 install(TARGETS RDKitXTB EXPORT RDKitXTBTargets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
