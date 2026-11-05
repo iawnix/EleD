@@ -1,5 +1,13 @@
 # Matched QM8 geometry study (0.9.1)
 
+**Subsequent 0.10 audit:** coordinate-derived stereo checking rejects 9 of the
+983 generated geometries because they do not reproduce the specified input
+tetrahedral stereo. The original protocol enforced chirality during embedding
+but did not independently recheck it after MMFF. The results below are preserved
+as historical evidence and include those nine rows; they are not a fully
+stereochemically validated benchmark. See [the audit](validation/0.10.0/README.md).
+The new preparation API checks coordinates before and after optimization.
+
 The [original pilot](qm8-pilot.md) used dataset-provided ground-state geometries.
 This follow-up tests a practical input pipeline: canonical SMILES → ETKDGv3 →
 MMFF94 → ground-state GFN2 descriptors → the same fixed regression model.

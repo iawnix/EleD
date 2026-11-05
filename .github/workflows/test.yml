@@ -27,7 +27,7 @@ jobs:
           conda run --no-capture-output -p "$PWD/.runtime-env" python examples/rdkit_workflow.py
           conda run --no-capture-output -p "$PWD/.runtime-env" python examples/electronic_descriptors.py
       - name: Build source archive and pure wheel
-        run: conda run --no-capture-output -p "$PWD/.runtime-env" python tools/build_release.py --output dist/0.9.1
+        run: conda run --no-capture-output -p "$PWD/.runtime-env" python tools/build_release.py --output dist/0.10.0
       - name: Verify optional benchmark data joins and group splits in a separate environment
         run: |
           conda run --no-capture-output -p "$PWD/.runtime-env" python -m venv --system-site-packages build/benchmark-env
@@ -35,8 +35,8 @@ jobs:
           build/benchmark-env/bin/python -m pytest -q tests/test_qm8_protocol.py tests/test_qm8_geometry.py
       - name: Verify installed wheel outside checkout
         run: |
-          conda run --no-capture-output -p "$PWD/.runtime-env" python tools/check_wheel.py dist/0.9.1/pure/*.whl --kind pure --check native --reactivity --output dist/0.9.1/installed-pure.json
+          conda run --no-capture-output -p "$PWD/.runtime-env" python tools/check_wheel.py dist/0.10.0/pure/*.whl --kind pure --check native --reactivity --output dist/0.10.0/installed-pure.json
       - uses: actions/upload-artifact@v4
         with:
-          name: pure-python-0.9.1
-          path: dist/0.9.1/
+          name: pure-python-0.10.0
+          path: dist/0.10.0/

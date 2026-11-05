@@ -1,5 +1,17 @@
 # Changes
 
+## 0.10.0 — checked geometry preparation
+
+- Added `prepare_conformers` and `ConformerGenerationResult`: copied SMILES/Mol
+  input, explicit hydrogens, deterministic preset/seed/initialization retries,
+  bounded embedding, per-stage failure counters and explicit partial coverage.
+- Check specified tetrahedral and E/Z stereochemistry from coordinates before
+  and after optional MMFF94/UFF optimization. Reject unconverged force fields,
+  invalid/colliding coordinates and stereo changes. No relaxed-stereo or hidden
+  source-coordinate fallback; undefined stereo is flagged or rejected explicitly.
+- Preserve the original QM8 prediction protocols; add a separate audit on the
+  41 frozen embedding failures and 40 prior-success controls.
+
 ## 0.9.1 — inherited native runtime and matched geometry benchmark
 
 - Native library discovery now checks `sys.base_prefix` after `sys.prefix`,

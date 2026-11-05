@@ -1,7 +1,25 @@
 # Local validation — 2026-11-05
 
 
-## Current scope: 0.9.1 inherited runtime and matched geometry study
+## Current scope: 0.10 checked geometry preparation
+
+[`prepare_conformers`](geometry-preparation.md) adds deterministic bounded RDKit
+retries, supported coordinate-derived stereo checks, converged force-field
+selection, provenance and partial/failure accounting. Full extended-engine
+development tests report **389 passed, 4 skipped**. The
+[0.10 evidence](validation/0.10.0/README.md) includes a separate preparation audit:
+**22/41** previously failed embeddings and **39/40** prior-success controls
+produce accepted optimized structures under the new protocol. Neither original
+prediction splits nor their historical scores are changed.
+
+The rejected control prompted an audit of all 983 old generated geometries:
+**nine fail coordinate-derived specified-stereo checks**. The 0.9.1 geometry
+study did not independently check stereo after MMFF; its old prediction results
+include these rows and must be interpreted with that limitation. New preparation
+rejects such coordinates before they reach xTB. This illustrates why embedding
+success alone is insufficient, not a new excited-state accuracy result.
+
+## 0.9.1 inherited runtime and matched geometry study
 
 The [0.9.1 evidence](validation/0.9.1/README.md) records **359 passed, 4 skipped**
 in development and isolated installed-wheel suites, **243 passed, 120 skipped**

@@ -1,0 +1,15 @@
+{
+  "README.md": "5f1b99c964cc34dc6da8ac8b886878822cf7e9ff5c41263ecec3cf489df9ce21",
+  "artifact-manifest.json": "8be2e9e95be785ddc8d49404c2a228eb9ec0857b18c0fa5ac3e5b4f29935f6d2",
+  "example.log": "8b38ed79c882e3ebb2d905cbf32ea436cd7ac1e2c814bf2d533665df5c72db6d",
+  "installation.json": "279646eba0ddf0e5cd76bcc8cdccb04f4e633a6c16ffc9db26c307eceb0a48ac",
+  "installed-compiled.json": "9c3c984a506fedf2bdf5cca035a375e98f022da7431faf1e70602137ae3078db",
+  "installed-pure.json": "5f2d6cf77455670e414361616a444c3191bac2d9ec05126898aff63eedd1420d",
+  "preparation-manifest.json": "3e917a66a005dcd560d75625fec25e7bc2825a1a50314edaa04c92551379e91a",
+  "preparation-reports.jsonl.gz": "41fb74f86dd75528267c9020d604c307df12221e4a69df52cadbbc2c836c0dd6",
+  "preparation-summary.json": "ba67904842343d24517f27cc4282e123cd2d0b50573e0110f8b7e9525a2da939",
+  "prior-stereo-audit.json": "ec660f8a33098c11e22dbcfe8b6e50f6f37c47c4d01b1525da18b065163d3481",
+  "tests-development.log": "e8a446dcb76c6560986619a6632909b7bfbd71036b04046eaccc2f67cb5e6c5d",
+  "tests-installed.log": "2c93b484362077d0232b12fe261462155efb551489284df7ae789ee6d073e9d5",
+  "tests-official.log": "efa3f5df2a95fbbc8c49883fdd560ec651865a5a1fef2b5277299591b2d8f37f"
+}

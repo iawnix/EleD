@@ -1,0 +1,149 @@
+{
+  "scope": "post-hoc coordinate/stereo audit; old predictions and geometries are not changed",
+  "input_sha256": "45c67c0df76d5be7760379768690ba67a3bd8de241f92515593bfba91287ce37",
+  "script_sha256": "83cd7b56841436cfb7ff8d973185fb4f06b4ede4ad1d1365ef8c327acf59f8a8",
+  "implementation": {
+    "python": [
+      3,
+      11
+    ],
+    "rdkit": "2026.09.1",
+    "numpy": "2.4.6",
+    "python_sources": {
+      "__init__.py": "6c304bbff9a00be428400ecca10f46cd27a815b068fdfb79bec513e6cdb78a27",
+      "__main__.py": "6860c4ee8632798efba30ba35a7cab4275b9632551b51e41f3fcad86626fbee3",
+      "backends/__init__.py": "c72f52ce189231eea2eb86180a5c41bd47bf8605b9a9909f0961581c739b0cbe",
+      "backends/native.py": "e79c0fe10968c161494c83b47b662a13a987bda6d900718d4b0e766ca65e4854",
+      "batch.py": "179ca84e229ca88ddfcb8bd6fc76b6006bf8b5971ba5bb5b15ace779fdd6a9b0",
+      "conformers.py": "a3f45aca5a650b9c218676cbb75c26f66b4904665d5eeb49289937cafad410d8",
+      "descriptors.py": "c790074858fe710f71d37dcfef92113caf75d02740961187c7f1407bd218f027",
+      "diagnostics.py": "166d21b1d01a2110c79ba6f85cf083680b1c75c4f818aac8738ea880604a9fd3",
+      "electronic_descriptors.py": "253d8d191aa52135ac0d6979011b38d031b3ba91a832c53a136fa6f2b3438a89",
+      "errors.py": "a0f9a011a9d2fb7160d0e412bf2ec0ad326e70a9552e654166ab885fff85851c",
+      "geometry.py": "cb5192abc3112cc721085a5c4e32af93e6ac53df812e6c51befa87cc44db6a3b",
+      "input.py": "0f00cf8bede2dfe2224f876dd66e6ae7092bc074f20fe2bd45559f3942675a41",
+      "mapping.py": "cb3440c4e912c7f4f85bd32b6203934b21091b59b29f0b13c283bbd04ccd89aa",
+      "options.py": "68b1531a29b107282afaa8a6f6a1ea2c75ad4abee8d234911296e9fac073967b",
+      "persistence.py": "cd414a3991a8f1d40303ed451385af3a949978be06341fee4503f37befd5832d",
+      "populations.py": "9b1c5e2121adfa3f46af73d59c43a52791b659a544a93a02d60bfab10024c707",
+      "reactivity.py": "8afde6f834e04e59e6ec74ec8ff67a1026174a94f36c178fee8fa5cbbadc75e7",
+      "reactivity_batch.py": "c46da4977d82ae994d9fce28269d8f992d06cdf08c13048349be221efcac838c",
+      "reports.py": "7b1e99acec91942ecf86c11fa3ce622b3bff32ea6f946ad4002f6bc581baa6a8",
+      "result.py": "d1c80e32844ca18a94be2b027ce5f1c34d4a951796bda58f1e77ec3e4a641f7c",
+      "runtime.py": "4db82208c3e34ea6a19371b501edbc2c75db6a89c6559d5a601db060a931fbd3",
+      "xtb.py": "fcb696874717700117ed94cc5c40ae906767f1edd6b49b4c0639ff8d373d8724"
+    }
+  },
+  "n_checked": 983,
+  "n_rejected": 9,
+  "rejected": [
+    {
+      "id": "2226",
+      "smiles": "O[C@H]1[C@H]2OC[C@]21O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          5
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "12782",
+      "smiles": "CC[C@H]1O[C@H]2C[C@]21C",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          6
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "10899",
+      "smiles": "O=C1[C@H]2C[C@@]2(O)[C@H]1O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          4
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "12755",
+      "smiles": "C#C[C@@H]1C[C@@H]2C[C@@]21O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          6
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "8195",
+      "smiles": "C[C@@]1(O)[C@H]2OC[C@]21O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          6
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "8099",
+      "smiles": "C[C@H]1[C@H]2C(=O)C[C@]21O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          6
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "4126",
+      "smiles": "O/N=C1\\C[C@H]2C[C@@]12O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          6
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "11740",
+      "smiles": "O=C1N[C@@]2(CO)C[C@@H]12",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          3
+        ],
+        "mismatched_bond_indices": []
+      }
+    },
+    {
+      "id": "12773",
+      "smiles": "C/N=C1\\O[C@H]2C[C@@]12O",
+      "check": {
+        "ok": false,
+        "reason": "stereo_mismatch",
+        "mismatched_atom_indices": [
+          6
+        ],
+        "mismatched_bond_indices": []
+      }
+    }
+  ]
+}

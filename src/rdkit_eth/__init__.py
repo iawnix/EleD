@@ -68,3 +68,7 @@ __all__ += ['XTBDiskCache', 'ReactivityCheckpoint', 'ReactivityJob',
 from .conformers import conformer_descriptor_columns, run_conformer_analysis
 
 __all__ += ['conformer_descriptor_columns', 'run_conformer_analysis']
+
+from .geometry import ConformerGenerationResult, prepare_conformers
+
+__all__ += ['ConformerGenerationResult', 'prepare_conformers']

@@ -1,0 +1,76 @@
+{
+  "groups": {
+    "prior_embedding_failure": {
+      "total": 41,
+      "accepted": 22,
+      "failed": 19
+    },
+    "prior_success_control": {
+      "total": 40,
+      "accepted": 39,
+      "failed": 1
+    }
+  },
+  "recovered_ids": [
+    "17447",
+    "18482",
+    "19918",
+    "16044",
+    "19505",
+    "12141",
+    "18160",
+    "19352",
+    "18511",
+    "19413",
+    "18483",
+    "19899",
+    "18445",
+    "14395",
+    "8106",
+    "3250",
+    "6590",
+    "14557",
+    "18449",
+    "19399",
+    "18137",
+    "18185"
+  ],
+  "remaining_ids": [
+    "19217",
+    "8594",
+    "19175",
+    "8596",
+    "19214",
+    "19394",
+    "14502",
+    "6596",
+    "17057",
+    "17445",
+    "6595",
+    "17778",
+    "19014",
+    "14505",
+    "18847",
+    "12123",
+    "17312",
+    "18970",
+    "17763"
+  ],
+  "recovery_methods": {
+    "ETKDGv3; random_coords=True": 8,
+    "ETKDGv4; random_coords=False": 12,
+    "srETKDGv3; random_coords=False": 2
+  },
+  "coordinate_stereo_rejections": 33,
+  "embedding_failure_counts": {
+    "INITIAL_COORDS": 2984,
+    "FIRST_MINIMIZATION": 661,
+    "FINAL_CENTER_IN_VOLUME": 39301,
+    "FINAL_CHIRAL_BOUNDS": 32929,
+    "MINIMIZATION": 5409,
+    "ETK_MINIMIZATION": 4542,
+    "CHECK_CHIRAL_CENTERS2": 88,
+    "CHECK_TETRAHEDRAL_CENTERS": 3665
+  },
+  "elapsed_seconds": 100.51506054867059
+}

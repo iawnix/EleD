@@ -1,4 +1,4 @@
-# Installing rdkit-eth 0.9.1
+# Installing rdkit-eth 0.10
 
 The standard profile uses **one extended libxtb for GFN0/1/2 and all current
 descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux

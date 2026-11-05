@@ -5,7 +5,7 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.9 supports **gas-phase single points through libxtb only**.
+Version 0.10 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
@@ -18,11 +18,17 @@ features show only small, split-dependent gains. Machine-learning tools remain
 optional developer dependencies in a separate environment.
 
 0.9.1 fixes automatic libxtb discovery in venvs inheriting the standard runtime.
-A [matched geometry study](docs/qm8-geometry-study.md) confirms that basic xTB
-features remain useful with SMILES-generated geometries on the common successful
-QM8 cohort; it retains embedding failures and paired uncertainty intervals.
+A [matched geometry study](docs/qm8-geometry-study.md) records exploratory
+SMILES-generated geometry results, failures and paired uncertainty intervals.
+The subsequent coordinate audit found nine stereo mismatches in its historical
+cohort; that limitation is recorded alongside the original results.
 
 ## Installation
+
+0.10 adds [`prepare_conformers`](docs/geometry-preparation.md): deterministic
+RDKit retries with coordinate-derived tetrahedral/E/Z checks before and after
+optional force-field optimization. It returns an explicit-H molecule ready for
+the existing xTB APIs, plus complete provenance and failure/coverage records.
 
 The standard profile is Linux x86-64 / Python 3.11. With conda available, run:
 
