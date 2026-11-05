@@ -24,6 +24,9 @@ jobs:
           .rdkit-eth/runtime/bin/python -I examples/descriptor_reports.py --output build/descriptor-example
           .rdkit-eth/runtime/bin/python -I examples/conformer_sensitivity.py --output build/conformer-example
           .rdkit-eth/runtime/bin/python -I examples/prepare_geometry.py --xtb --output build/geometry-example
+          .rdkit-eth/runtime/bin/python -I examples/parallel_descriptors.py
+      - name: Check isolated workers and installed SCC diagnostics
+        run: .rdkit-eth/runtime/bin/python -I -m pytest -q -o pythonpath= tests/test_workers.py tests/test_scf_diagnostics.py
       - name: Compare against native xTB Fukui output
         run: .rdkit-eth/runtime/bin/python -I tools/compare_fukui_cli.py --executable .rdkit-eth/runtime/bin/xtb --library .rdkit-eth/runtime/lib/libxtb.so --cases tests/data/reactivity_cases.json --output build/fukui-comparison
       - name: Verify persistent batches and expanded frozen corpus
@@ -41,7 +44,7 @@ jobs:
           .rdkit-eth/runtime/bin/python tools/check_wheel.py .rdkit-eth/artifacts/build-*/compiled/*.whl --kind compiled --library "$PWD/.rdkit-eth/runtime/lib/libxtb.so" --check native --check compiled --method GFN0-xTB --keep-overlap --output .rdkit-eth/installed-wheel.json
       - uses: actions/upload-artifact@v4
         with:
-          name: standard-native-0.10.0
+          name: standard-native-0.11.0
           include-hidden-files: true
           path: |
             .rdkit-eth/installation.json

@@ -1,4 +1,4 @@
-# Installing rdkit-eth 0.10
+# Installing rdkit-eth 0.11
 
 The standard profile uses **one extended libxtb for GFN0/1/2 and all current
 descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux
@@ -21,8 +21,8 @@ The installer creates two dedicated prefixes from the supplied exact locks:
   libxtb and parameters, and the installed `rdXTBTools` wheel.
 - `.rdkit-eth/toolchain`: Fortran compiler, mctc-lib and numerical dependencies.
 
-It fetches the pinned xTB revision containing upstream PR #1490, applies only
-our basis-export patch, runs upstream and installed-library regressions, builds
+It fetches the pinned xTB revision containing upstream PR #1490, applies
+our basis-export and SCC-diagnostics patches, runs upstream and installed-library regressions, builds
 pure/compiled wheels from clean source-archive extractions, installs the
 compiled wheel and checks all three methods through both interfaces with
 population analysis. Checks run outside the checkout, without `XTB_LIBRARY`
@@ -37,8 +37,9 @@ them. Use a new directory when changing the source/toolchain lock.
 
 Keep **both** prefixes installed at their original paths: native libraries
 use their RPATHs. This is a reproducible local source installation, not a
-portable binary distribution. Windows/macOS and public package-index delivery
-are not implemented. A plain `pip install .` still installs only the Python
+portable binary distribution by itself. The separate [offline bundle](runtime-bundle.md)
+provides relocation and installed-runtime checks. Windows/macOS and public
+package-index delivery are not implemented. A plain `pip install .` still installs only the Python
 adapter; it does not invoke a Fortran build. The old conda recipe remains a
 basic official-library compatibility recipe, not the standard full profile.
 

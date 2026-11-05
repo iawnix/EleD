@@ -50,7 +50,7 @@ def descriptor_columns(frontier_depth=2):
 
 def assess_descriptor_quality(result, *, occupation_threshold=1e-7, fractional_tolerance=1e-4,
                               conservation_tolerance=1e-5):
-    """Report observable issues; iteration counts/residuals are not exposed by C API."""
+    """Report observable issues and optional verified engine SCC diagnostics."""
     result = _as_result(result)
     for name, value in [('fractional_tolerance', fractional_tolerance),
                         ('conservation_tolerance', conservation_tolerance)]:
@@ -91,13 +91,17 @@ def assess_descriptor_quality(result, *, occupation_threshold=1e-7, fractional_t
         flag('calculation_settings_unknown', 'warning', 'Result does not record the numerical calculation settings.')
     elif settings['electronic_temperature'] != settings['effective_electronic_temperature']:
         flag('temperature_floor_applied', 'info', 'xTB uses a minimum electronic temperature of 1e-6 K.')
+    scf = result.metadata.get('scf', {})
+    if scf.get('available') and not scf['criteria_satisfied']:
+        flag('scf_criteria_not_satisfied', 'error', 'Final SCC diagnostics do not satisfy engine thresholds.')
     severity = {f['severity'] for f in flags}
     return {'status': 'error' if 'error' in severity else 'warning' if 'warning' in severity else 'ok',
             'flags': flags, 'fractional_orbital_indices': fractional,
             'occupied_counts_threshold_window': counts,
             'charge_sum_error_e': charge_error, 'electron_sum_error_e': electron_error,
-            'scf_iterations': None, 'scf_residual': None,
-            'scf_details_unavailable_reason': 'not_exposed_by_libxtb_c_api',
+            'scf_iterations': scf.get('iterations'), 'scf_residual': scf.get('mixer_rms'),
+            'scf_details': scf or None,
+            'scf_details_unavailable_reason': None if scf.get('available') else scf.get('reason', 'not_exposed_by_libxtb_c_api'),
             'calculation_status': result.metadata.get('calculation_status', 'unknown')}
 
 
@@ -188,7 +192,8 @@ def calc_descriptor_report(mol, result, *, record_id=None, fragments=None, front
     return report
 
 
-def run_descriptor_batch(molecules, *, options=None, cache=None, record_ids=None, fragments=None, **analysis):
+def run_descriptor_batch(molecules, *, options=None, cache=None, record_ids=None, fragments=None,
+                         max_workers=1, timeout=None, isolate=False, **analysis):
     """Ordered calculation/report rows; failures contain null features and diagnostics."""
     from .batch import run_xtb_batch
     from .options import XTBOptions
@@ -200,7 +205,8 @@ def run_descriptor_batch(molecules, *, options=None, cache=None, record_ids=None
     columns = descriptor_columns(analysis['frontier_depth'])
     config = options or XTBOptions(keep_overlap=True)
     results = run_xtb_batch(mols, options=config,
-                            cache=cache, return_exceptions=True)
+                            cache=cache, return_exceptions=True,
+                            max_workers=max_workers, timeout=timeout, isolate=isolate)
     reports = []
     for mol, result, identifier in zip(mols, results, ids):
         try:

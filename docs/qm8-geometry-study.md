@@ -1,5 +1,9 @@
 # Matched QM8 geometry study (0.9.1)
 
+The [0.11 validation update](mainline-validation.md) now provides a separately
+refitted stereo-audited correction and a separate checked-preparation benchmark.
+The original results below remain unchanged for historical reproducibility.
+
 **Subsequent 0.10 audit:** coordinate-derived stereo checking rejects 9 of the
 983 generated geometries because they do not reproduce the specified input
 tetrahedral stereo. The original protocol enforced chirality during embedding

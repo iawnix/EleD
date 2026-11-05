@@ -1,0 +1,9 @@
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: rdkit-eth
+  Building wheel for rdkit-eth (pyproject.toml): started
+  Building wheel for rdkit-eth (pyproject.toml): finished with status 'done'
+  Created wheel for rdkit-eth: filename=rdkit_eth-0.11.0-cp311-cp311-linux_x86_64.whl size=204871 sha256=dc91fbe82b7a8f6cafef8edbacd6461d73882f2f99810bdaa201d8cbb0f901b9
+  Stored in directory: /tmp/pip-ephem-wheel-cache-hr03hl5i/wheels/90/0d/cf/e18fe9b4b50c759df5b88ec650da44a99ac2c1be348b598d79
+Successfully built rdkit-eth

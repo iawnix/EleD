@@ -47,7 +47,9 @@ def source_tree(prefix, supplied, lock, patch=None):
     changes = git_output(source, 'diff', 'HEAD', '--name-only').splitlines()
     untracked = git_output(source, 'ls-files', '--others', '--exclude-standard')
     extension = lock.get('basis_extension')
+    diagnostics = lock.get('diagnostics_extension')
     allowed = ({lock['patched_file']} if patch else set()) | (set(extension['patched_files']) if extension else set())
+    if diagnostics: allowed |= set(diagnostics['patched_files'])
     if set(changes) - allowed or untracked:
         raise ValueError('Source contains unrelated changes; use a separate checkout. '
                          'The builder never resets or discards source changes.')
@@ -72,7 +74,17 @@ def source_tree(prefix, supplied, lock, patch=None):
                                capture_output=True, text=True)
         if check.returncode == 0:
             run(['git', '-C', source, 'apply', extra_patch])
-        for filename, expected in extension['patched_files'].items():
+        expected_files = dict(extension['patched_files'])
+        if diagnostics:
+            diagnostic_patch = (TOOLS / diagnostics['patch']).resolve()
+            if digest(diagnostic_patch) != diagnostics['patch_sha256']:
+                raise ValueError('Diagnostics patch hash differs from source lock')
+            check = subprocess.run(['git', '-C', str(source), 'apply', '--check', str(diagnostic_patch)],
+                                   capture_output=True, text=True)
+            if check.returncode == 0:
+                run(['git', '-C', source, 'apply', diagnostic_patch])
+            expected_files.update(diagnostics['patched_files'])
+        for filename, expected in expected_files.items():
             if digest(source / filename) != expected:
                 raise ValueError('Source does not match reviewed basis extension: ' + filename)
     return source
@@ -202,6 +214,11 @@ def main():
     checks = verify_library(build, library.parent, parameters, cache['CMAKE_C_COMPILER'],
                             dependency_prefix, env)
     basis_checks = verify_basis(build, prefix, cache['CMAKE_C_COMPILER'], dependency_prefix, env)
+    scf_checks = None
+    if lock.get('diagnostics_extension'):
+        checked = run([sys.executable, TOOLS / 'diagnostics/verify_scf.py', prefix],
+                      env=env, capture_output=True, text=True, timeout=60)
+        scf_checks = json.loads(checked.stdout)
     version = run([executable, '--version'], env=env, capture_output=True, text=True).stdout
     record_dir = parameters / 'rdkit-eth'
     record_dir.mkdir(exist_ok=True)
@@ -211,6 +228,9 @@ def main():
         shutil.copy2(patch, record_dir / patch.name)
     basis_patch = TOOLS / lock["basis_extension"]["patch"]
     shutil.copy2(basis_patch, record_dir / basis_patch.name)
+    if lock.get('diagnostics_extension'):
+        diagnostic_patch = TOOLS / lock['diagnostics_extension']['patch']
+        shutil.copy2(diagnostic_patch, record_dir / diagnostic_patch.name)
     source_diff = git_output(source, 'diff', 'HEAD', '--binary') + '\n'
     (record_dir / 'source.diff').write_text(source_diff)
     (record_dir / 'ctest.log').write_text(ctest.stdout + ctest.stderr)
@@ -224,7 +244,9 @@ def main():
                     cli_version_output=version.strip(),
                     files={str(p.relative_to(prefix)): digest(p) for p in
                            (library, executable, *(parameters / f'param_gfn{i}-xtb.txt' for i in range(3)))},
-                    state_checks=checks, basis_checks=basis_checks)
+                    state_checks=checks, basis_checks=basis_checks, scf_checks=scf_checks)
+    if lock.get('diagnostics_extension'):
+        manifest['capabilities']['scf_diagnostics_api'] = 1
     (record_dir / 'build.json').write_text(json.dumps(manifest, indent=2) + '\n')
     activation = '# Source this file to select this local xTB installation.\n'
     for key, value in [('XTB_LIBRARY', library), ('XTBPATH', parameters)]:

@@ -36,6 +36,10 @@ def _as_result(result):
                      shell_angular_momenta=tuple(map(int, result.GetShellAngularMomenta())))
     metadata = json.loads(result.inputProvenanceJSON) if result.inputProvenanceJSON else {'atom_count': result.numAtoms}
     metadata = dict(metadata)
+    from .scf import scf_record
+    metadata['scf'] = scf_record(result.method, getattr(result, 'scfIterations', -1),
+        [getattr(result, name, -1.) for name in ('scfEnergyChangeHartree', 'scfMixerRMS',
+                                                'scfEnergyThresholdHartree', 'scfMixerThreshold')])
     metadata.update(calculation_status='success', initialization=result.initialization, calculation_settings={
         'max_iterations': result.maxIterations, 'accuracy': result.accuracy,
         'electronic_temperature': result.electronicTemperature,

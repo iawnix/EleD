@@ -1,0 +1,252 @@
+[
+  {
+    "id": "17447",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "2226",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "19217",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "18482",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19918",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "16044",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "8594",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19505",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "12141",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "12782",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "18160",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19352",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19175",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "10899",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "8596",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "18511",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19214",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19394",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19413",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "14502",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "6596",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "18483",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19899",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "12755",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "18445",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "14395",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "8106",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "17057",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "8195",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "3250",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "17445",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "6595",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "17778",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19014",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "6590",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "8099",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "14557",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "14505",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "4126",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "18847",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "18449",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "11740",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "12123",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "19399",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "17312",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "18137",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "12773",
+    "stage": "coordinate_audit",
+    "reason": "stereo_mismatch"
+  },
+  {
+    "id": "18970",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "18185",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  },
+  {
+    "id": "17763",
+    "stage": "historical_geometry",
+    "reason": "embedding_failed"
+  }
+]

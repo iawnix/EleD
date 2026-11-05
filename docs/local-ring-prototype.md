@@ -1,5 +1,9 @@
 # Local ring-angle and nitrogen-planarity prototype
 
+**Status (2026-11-05): research paused.** The prototypes remain experimental;
+active development has returned to the
+[electronic-descriptor mainline](development-priorities.md).
+
 The first source-patch experiment identifies a useful intervention: the default
 SP2 nitrogen planarity term obstructs embedding of three selected strained ring
 systems. A local angle correction alone did not recover them. Removing the

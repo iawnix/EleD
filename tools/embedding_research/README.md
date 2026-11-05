@@ -1,5 +1,9 @@
 # Embedding algorithm research tools
 
+**Status (2026-11-05): research paused.** These tools and their frozen results
+are retained for reproducibility. See the
+[active development priorities](../../docs/development-priorities.md).
+
 These tools observe RDKit's embedding internals. They do not implement a new
 conformer generator and are not part of the installed `rdkit_eth` API.
 The initial findings and proposed experiments are in

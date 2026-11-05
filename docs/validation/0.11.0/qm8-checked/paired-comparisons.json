@@ -1,0 +1,902 @@
+[
+  {
+    "split": "random",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.14204915187176995,
+    "interval_95_eV": [
+      -0.18988854992460213,
+      -0.09792931984643122
+    ],
+    "n_test": 199,
+    "n_groups": 199,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 17,
+    "reference": [
+      "generated",
+      "rdkit"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.11359454243793027,
+    "interval_95_eV": [
+      -0.16245631033426117,
+      -0.07004047009331289
+    ],
+    "n_test": 199,
+    "n_groups": 199,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.009122024956168035,
+    "interval_95_eV": [
+      -0.015226686087333866,
+      -0.0030914588996079767
+    ],
+    "n_test": 199,
+    "n_groups": 199,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 17,
+    "reference": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.016420021850221844,
+    "interval_95_eV": [
+      -0.02521983767780973,
+      -0.007914822253880455
+    ],
+    "n_test": 199,
+    "n_groups": 199,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": 0.02845460943383967,
+    "interval_95_eV": [
+      0.013493243447221942,
+      0.04423578360823882
+    ],
+    "n_test": 199,
+    "n_groups": 199,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": 0.02115661253978586,
+    "interval_95_eV": [
+      0.007951150191904179,
+      0.034719996416750214
+    ],
+    "n_test": 199,
+    "n_groups": 199,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.1367817680332478,
+    "interval_95_eV": [
+      -0.18418402231426914,
+      -0.08873734123100914
+    ],
+    "n_test": 202,
+    "n_groups": 202,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 29,
+    "reference": [
+      "generated",
+      "rdkit"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.11230173613466767,
+    "interval_95_eV": [
+      -0.1610792459657572,
+      -0.06536070945686039
+    ],
+    "n_test": 202,
+    "n_groups": 202,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.007773448191802014,
+    "interval_95_eV": [
+      -0.014573384557141418,
+      -0.001242346856917319
+    ],
+    "n_test": 202,
+    "n_groups": 202,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 29,
+    "reference": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.0012847169425627928,
+    "interval_95_eV": [
+      -0.010289177558453514,
+      0.007414612484102042
+    ],
+    "n_test": 202,
+    "n_groups": 202,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": 0.024480031898580116,
+    "interval_95_eV": [
+      0.007819788816797126,
+      0.04252301537119649
+    ],
+    "n_test": 202,
+    "n_groups": 202,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": 0.030968763147819336,
+    "interval_95_eV": [
+      0.014169384081013895,
+      0.04808525195805969
+    ],
+    "n_test": 202,
+    "n_groups": 202,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.1320343501831099,
+    "interval_95_eV": [
+      -0.1720035605618458,
+      -0.09419283657310132
+    ],
+    "n_test": 198,
+    "n_groups": 198,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 43,
+    "reference": [
+      "generated",
+      "rdkit"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.09499566509015615,
+    "interval_95_eV": [
+      -0.13742359779167593,
+      -0.05261635732824788
+    ],
+    "n_test": 198,
+    "n_groups": 198,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.009472726324201246,
+    "interval_95_eV": [
+      -0.016274609568799916,
+      -0.0029625456729513327
+    ],
+    "n_test": 198,
+    "n_groups": 198,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 43,
+    "reference": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.013294093026496928,
+    "interval_95_eV": [
+      -0.02242124350981379,
+      -0.005322681105205119
+    ],
+    "n_test": 198,
+    "n_groups": 198,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": 0.037038685092953785,
+    "interval_95_eV": [
+      0.018627357108748435,
+      0.057538235788629224
+    ],
+    "n_test": 198,
+    "n_groups": 198,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "random",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": 0.0332173183906581,
+    "interval_95_eV": [
+      0.015374326251197105,
+      0.05257278989618295
+    ],
+    "n_test": 198,
+    "n_groups": 198,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.14213843422079678,
+    "interval_95_eV": [
+      -0.18391021051556414,
+      -0.10057155882988973
+    ],
+    "n_test": 210,
+    "n_groups": 68,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 17,
+    "reference": [
+      "generated",
+      "rdkit"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.11442257649856172,
+    "interval_95_eV": [
+      -0.1565581022759605,
+      -0.08034077649550278
+    ],
+    "n_test": 210,
+    "n_groups": 68,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.001443194046145358,
+    "interval_95_eV": [
+      -0.012198234380146934,
+      0.005790291003504683
+    ],
+    "n_test": 210,
+    "n_groups": 68,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 17,
+    "reference": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.0009352799473844645,
+    "interval_95_eV": [
+      -0.0074844360892218804,
+      0.006818157005133723
+    ],
+    "n_test": 210,
+    "n_groups": 68,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": 0.027715857722235053,
+    "interval_95_eV": [
+      0.004581566941145917,
+      0.047655106672488144
+    ],
+    "n_test": 210,
+    "n_groups": 68,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 17,
+    "reference": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": 0.028223771820995943,
+    "interval_95_eV": [
+      0.004444097737279323,
+      0.055315036857087815
+    ],
+    "n_test": 210,
+    "n_groups": 68,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9017,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.15278032405892666,
+    "interval_95_eV": [
+      -0.22400557787867711,
+      -0.10460271981734115
+    ],
+    "n_test": 210,
+    "n_groups": 69,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 29,
+    "reference": [
+      "generated",
+      "rdkit"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.12963155716991245,
+    "interval_95_eV": [
+      -0.2011684610845049,
+      -0.08570677441338664
+    ],
+    "n_test": 210,
+    "n_groups": 69,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.0024670702228951065,
+    "interval_95_eV": [
+      -0.010024953423763331,
+      0.0032051679288698197
+    ],
+    "n_test": 210,
+    "n_groups": 69,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 29,
+    "reference": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.00030930823791045555,
+    "interval_95_eV": [
+      -0.007513596784677607,
+      0.00837456313181133
+    ],
+    "n_test": 210,
+    "n_groups": 69,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": 0.02314876688901423,
+    "interval_95_eV": [
+      0.0007245517417701799,
+      0.043530976317625876
+    ],
+    "n_test": 210,
+    "n_groups": 69,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 29,
+    "reference": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": 0.025306528873998882,
+    "interval_95_eV": [
+      0.005687564394631841,
+      0.04618416934221809
+    ],
+    "n_test": 210,
+    "n_groups": 69,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9029,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.12961818806322598,
+    "interval_95_eV": [
+      -0.18502979774173092,
+      -0.09867146748521329
+    ],
+    "n_test": 199,
+    "n_groups": 67,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 43,
+    "reference": [
+      "generated",
+      "rdkit"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": -0.10667976324070338,
+    "interval_95_eV": [
+      -0.15815302984524637,
+      -0.0773417876756581
+    ],
+    "n_test": 199,
+    "n_groups": 67,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.0024886648046559164,
+    "interval_95_eV": [
+      -0.011737909211758657,
+      0.002941946646904864
+    ],
+    "n_test": 199,
+    "n_groups": 67,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 43,
+    "reference": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": -0.008188382811198363,
+    "interval_95_eV": [
+      -0.019908392998327962,
+      4.717251104718889e-05
+    ],
+    "n_test": 199,
+    "n_groups": 67,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit_basic"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic"
+    ],
+    "delta_mae_eV": 0.022938424822522573,
+    "interval_95_eV": [
+      0.009228171912621975,
+      0.0398378759869133
+    ],
+    "n_test": 199,
+    "n_groups": 67,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  },
+  {
+    "split": "scaffold",
+    "seed": 43,
+    "reference": [
+      "source",
+      "rdkit_basic_orbital"
+    ],
+    "candidate": [
+      "generated",
+      "rdkit_basic_orbital"
+    ],
+    "delta_mae_eV": 0.017238706815980127,
+    "interval_95_eV": [
+      0.0016639921542825383,
+      0.03589170900638134
+    ],
+    "n_test": 199,
+    "n_groups": 67,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 9043,
+    "direction": "candidate minus reference; negative favors candidate",
+    "resampling": "paired test groups with replacement; molecule-weighted MAE",
+    "scope": "conditional on these fitted models; no retraining or multiplicity adjustment",
+    "warning": null
+  }
+]

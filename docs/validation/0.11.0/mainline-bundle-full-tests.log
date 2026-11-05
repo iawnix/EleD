@@ -1,0 +1,18 @@
+.....................ss................................................. [ 16%]
+........................................................................ [ 33%]
+........................................................................ [ 49%]
+..................................s..................................... [ 66%]
+......................s.......ss........................................ [ 83%]
+..............sssssssssss............................................... [ 99%]
+.                                                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [2] tests/test_conformers.py:134: extended libxtb required
+SKIPPED [1] tests/test_native_basis.py:157: requires official or older library
+SKIPPED [1] tests/test_qm8_geometry.py:86: could not import 'sklearn': No module named 'sklearn'
+SKIPPED [2] tests/test_qm8_protocol.py:48: could not import 'sklearn': No module named 'sklearn'
+SKIPPED [3] tests/test_ring_angle_prototype.py:28: requires separately compiled research bounds probes
+SKIPPED [5] tests/test_ring_angle_prototype.py:46: requires separately compiled research bounds probes
+SKIPPED [1] tests/test_ring_angle_prototype.py:53: requires separately compiled research bounds probes
+SKIPPED [1] tests/test_ring_angle_prototype.py:58: requires separately compiled research bounds probes
+SKIPPED [1] tests/test_ring_angle_prototype.py:66: requires separately compiled research bounds probes
+416 passed, 17 skipped in 19.80s

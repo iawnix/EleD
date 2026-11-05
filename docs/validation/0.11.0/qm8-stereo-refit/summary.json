@@ -1,0 +1,433 @@
+{
+  "protocol": "qm8-stereo-refit-v1",
+  "n_selected": 1024,
+  "n_common": 974,
+  "n_failed": 50,
+  "failure_counts": {
+    "embedding_failed": 41,
+    "stereo_mismatch": 9
+  },
+  "preparation_and_features_seconds": 0.7013939690077677,
+  "source": {
+    "model": "ExtraTreesRegressor; 256 trees, min_samples_leaf=2, max_features=1.0; no tuning",
+    "imputation": "train-only median, keep_empty_features=True",
+    "metrics": [
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 780,
+        "n_test": 194,
+        "mae_eV": 0.3464729414787747,
+        "rmse_eV": 0.5278957258675272,
+        "fit_predict_seconds": 3.135054365033284
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 780,
+        "n_test": 194,
+        "mae_eV": 0.20138610609315008,
+        "rmse_eV": 0.28950912499160614,
+        "fit_predict_seconds": 3.0744935229886323
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 780,
+        "n_test": 194,
+        "mae_eV": 0.19355570838562863,
+        "rmse_eV": 0.2756583493546507,
+        "fit_predict_seconds": 2.851903895032592
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 779,
+        "n_test": 195,
+        "mae_eV": 0.3579105832246557,
+        "rmse_eV": 0.539385364819734,
+        "fit_predict_seconds": 3.500594048993662
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 779,
+        "n_test": 195,
+        "mae_eV": 0.22296460689745695,
+        "rmse_eV": 0.3201637719366926,
+        "fit_predict_seconds": 3.026229592040181
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 779,
+        "n_test": 195,
+        "mae_eV": 0.21568693419780052,
+        "rmse_eV": 0.31575527226979083,
+        "fit_predict_seconds": 3.2141795130446553
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 783,
+        "n_test": 191,
+        "mae_eV": 0.3529323223442305,
+        "rmse_eV": 0.5390430619942204,
+        "fit_predict_seconds": 3.2236694589955732
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 783,
+        "n_test": 191,
+        "mae_eV": 0.2148191609187779,
+        "rmse_eV": 0.3272457954088975,
+        "fit_predict_seconds": 3.1133525379700586
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 783,
+        "n_test": 191,
+        "mae_eV": 0.2049568535138844,
+        "rmse_eV": 0.32158747082978095,
+        "fit_predict_seconds": 3.3056420689681545
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 768,
+        "n_test": 206,
+        "mae_eV": 0.35910991657613667,
+        "rmse_eV": 0.49556786628763305,
+        "fit_predict_seconds": 3.4205424080137163
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 768,
+        "n_test": 206,
+        "mae_eV": 0.22246469701279561,
+        "rmse_eV": 0.30941770489476844,
+        "fit_predict_seconds": 2.9335865129251033
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 768,
+        "n_test": 206,
+        "mae_eV": 0.22334537125582626,
+        "rmse_eV": 0.3104846127615514,
+        "fit_predict_seconds": 3.022454621968791
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 769,
+        "n_test": 205,
+        "mae_eV": 0.36568025185569264,
+        "rmse_eV": 0.5153597121566469,
+        "fit_predict_seconds": 3.320098069962114
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 769,
+        "n_test": 205,
+        "mae_eV": 0.21685901987261277,
+        "rmse_eV": 0.3059825102498758,
+        "fit_predict_seconds": 2.9930195880588144
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 769,
+        "n_test": 205,
+        "mae_eV": 0.2190217660808326,
+        "rmse_eV": 0.30627082972543945,
+        "fit_predict_seconds": 3.141390267992392
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 775,
+        "n_test": 199,
+        "mae_eV": 0.3215144350036999,
+        "rmse_eV": 0.45888346337398317,
+        "fit_predict_seconds": 3.0167384770466015
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 775,
+        "n_test": 199,
+        "mae_eV": 0.18373477341575525,
+        "rmse_eV": 0.2577480149047331,
+        "fit_predict_seconds": 3.060680751921609
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 775,
+        "n_test": 199,
+        "mae_eV": 0.17938110805890006,
+        "rmse_eV": 0.25668412852525485,
+        "fit_predict_seconds": 3.1442801599623635
+      }
+    ],
+    "versions": {
+      "python": "3.11.18",
+      "rdkit": "2026.09.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.7.2",
+      "scipy": "1.16.3"
+    }
+  },
+  "generated": {
+    "model": "ExtraTreesRegressor; 256 trees, min_samples_leaf=2, max_features=1.0; no tuning",
+    "imputation": "train-only median, keep_empty_features=True",
+    "metrics": [
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 780,
+        "n_test": 194,
+        "mae_eV": 0.3464729414787747,
+        "rmse_eV": 0.5278957258675272,
+        "fit_predict_seconds": 3.526333112968132
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 780,
+        "n_test": 194,
+        "mae_eV": 0.22681252379410788,
+        "rmse_eV": 0.31927282148828817,
+        "fit_predict_seconds": 3.354554724995978
+      },
+      {
+        "split": "random",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 780,
+        "n_test": 194,
+        "mae_eV": 0.21517187819518305,
+        "rmse_eV": 0.2977732722992503,
+        "fit_predict_seconds": 3.162288971943781
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 779,
+        "n_test": 195,
+        "mae_eV": 0.3579105832246557,
+        "rmse_eV": 0.5393853648197339,
+        "fit_predict_seconds": 3.2833404330303892
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 779,
+        "n_test": 195,
+        "mae_eV": 0.24174144837996756,
+        "rmse_eV": 0.3478648170895218,
+        "fit_predict_seconds": 3.2256825829390436
+      },
+      {
+        "split": "random",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 779,
+        "n_test": 195,
+        "mae_eV": 0.24005987009713708,
+        "rmse_eV": 0.34115813562666236,
+        "fit_predict_seconds": 3.3251763640437275
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 783,
+        "n_test": 191,
+        "mae_eV": 0.35293232234423044,
+        "rmse_eV": 0.5390430619942204,
+        "fit_predict_seconds": 3.1597051849821582
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 783,
+        "n_test": 191,
+        "mae_eV": 0.24760131601291296,
+        "rmse_eV": 0.37671012358872213,
+        "fit_predict_seconds": 3.0218474350403994
+      },
+      {
+        "split": "random",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 783,
+        "n_test": 191,
+        "mae_eV": 0.23704412199474212,
+        "rmse_eV": 0.3676980619085112,
+        "fit_predict_seconds": 3.053483203984797
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 768,
+        "n_test": 206,
+        "mae_eV": 0.3591099165761366,
+        "rmse_eV": 0.49556786628763305,
+        "fit_predict_seconds": 3.0206954950699583
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 768,
+        "n_test": 206,
+        "mae_eV": 0.245074637452433,
+        "rmse_eV": 0.33792666740180394,
+        "fit_predict_seconds": 2.916232203016989
+      },
+      {
+        "split": "scaffold",
+        "seed": 17,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 768,
+        "n_test": 206,
+        "mae_eV": 0.24789845400535557,
+        "rmse_eV": 0.33756397156485546,
+        "fit_predict_seconds": 3.117030454915948
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 769,
+        "n_test": 205,
+        "mae_eV": 0.36568025185569264,
+        "rmse_eV": 0.5153597121566469,
+        "fit_predict_seconds": 3.3099836009787396
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 769,
+        "n_test": 205,
+        "mae_eV": 0.2376416242596817,
+        "rmse_eV": 0.3335829522615933,
+        "fit_predict_seconds": 3.7161022779764608
+      },
+      {
+        "split": "scaffold",
+        "seed": 29,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 769,
+        "n_test": 205,
+        "mae_eV": 0.23981959127363536,
+        "rmse_eV": 0.33011007281092564,
+        "fit_predict_seconds": 3.0490472209639847
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit",
+        "n_features": 1048,
+        "n_train": 775,
+        "n_test": 199,
+        "mae_eV": 0.32151443500369986,
+        "rmse_eV": 0.45888346337398317,
+        "fit_predict_seconds": 3.1295554200187325
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic",
+        "n_features": 1057,
+        "n_train": 775,
+        "n_test": 199,
+        "mae_eV": 0.20696943225039566,
+        "rmse_eV": 0.2928941399569034,
+        "fit_predict_seconds": 3.143089592922479
+      },
+      {
+        "split": "scaffold",
+        "seed": 43,
+        "features": "rdkit_basic_orbital",
+        "n_features": 1065,
+        "n_train": 775,
+        "n_test": 199,
+        "mae_eV": 0.19736425772836524,
+        "rmse_eV": 0.2865285318883177,
+        "fit_predict_seconds": 3.1431510449619964
+      }
+    ],
+    "versions": {
+      "python": "3.11.18",
+      "rdkit": "2026.09.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.7.2",
+      "scipy": "1.16.3"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {% set name = "rdkit-eth" %}
-{% set version = "0.8.0" %}
+{% set version = "0.11.0" %}
 
 package:
   name: {{ name|lower }}

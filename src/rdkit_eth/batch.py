@@ -15,7 +15,7 @@ from .options import XTBOptions
 from .result import XTBResult
 from .runtime import _engine_identity, _parameter_context, _parameter_file
 from .xtb import _resolve_options, run_xtb
-from .errors import XTBCacheError
+from .errors import XTBCacheError, XTBEnvironmentError, XTBNativeNotFoundError
 
 
 def _prepare(mol: Any, options: XTBOptions) -> tuple[XTBOptions, dict]:
@@ -111,19 +111,48 @@ class XTBCache:
 def run_xtb_batch(
     molecules: Iterable[Any], *, cache: XTBCache | None = None,
     max_workers: int = 1, return_exceptions: bool = False,
-    options: XTBOptions | None = None, **overrides: Any,
+    options: XTBOptions | None = None, timeout: float | None = None,
+    isolate: bool = False, **overrides: Any,
 ) -> list[XTBResult | Exception]:
-    """Calculate sequentially in input order, optionally retaining per-molecule errors.
+    """Calculate in input order, optionally retaining per-molecule errors.
 
     ``options`` can hold serializable defaults; keyword overrides take priority.
-    Only max_workers=1 is supported. Native calls in this package are serialized;
-    the former CLI subprocess workers have been removed.
+    max_workers>1, timeout or isolate=True selects disposable spawned Python
+    workers calling libxtb. Timeout includes worker startup, not queue time.
+    The default remains in-process. Use a __main__ guard for spawned workers.
     """
-    if isinstance(max_workers, bool) or not isinstance(max_workers, int) or max_workers < 1:
-        raise ValueError('max_workers must be a positive integer')
+    from .workers import validate_execution, isolated_map, single_point, molecule_bytes
+    isolated = validate_execution(max_workers, timeout, isolate)
     config = replace(options or XTBOptions(), **overrides)
-    if max_workers > 1:
-        raise ValueError('parallel batch execution is unavailable; use max_workers=1')
+    if isolated:
+        from contextlib import closing
+        from rdkit import Chem
+        config = _resolve_options(config)  # installation errors must not become failed molecular rows
+        values, tasks, pending = [], [], []
+        for mol in molecules:
+            index = len(values); values.append(None)
+            try:
+                snapshot = Chem.Mol(mol) if mol is not None else None
+                resolved, metadata = _prepare(snapshot, config)
+                key = _key(resolved, metadata) if cache is not None else None
+                cached = cache.get(key) if cache is not None else None
+                if cached is not None:
+                    values[index] = cached
+                else:
+                    tasks.append((molecule_bytes(snapshot), resolved.to_dict())); pending.append((index, key))
+            except (XTBCacheError, sqlite3.Error, XTBEnvironmentError, XTBNativeNotFoundError): raise
+            except (ValueError, TypeError) as exc:
+                if not return_exceptions: raise
+                values[index] = exc
+        with closing(isolated_map(single_point, tasks, max_workers=max_workers, timeout=timeout)) as completed:
+            for task_index, value in completed:
+                index, key = pending[task_index]
+                if isinstance(value, Exception):
+                    if isinstance(value, (XTBEnvironmentError, XTBNativeNotFoundError)) or not return_exceptions:
+                        raise value
+                elif cache is not None: cache.set(key, value)
+                values[index] = value
+        return values
 
     def calculate(mol):
         try:

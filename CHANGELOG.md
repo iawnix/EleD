@@ -1,5 +1,18 @@
 # Changes
 
+## 0.11.0 — isolated execution, SCC diagnostics and validated runtime bundles
+
+- Added spawned libxtb workers for single-point, descriptor and reactivity batches,
+  with per-task wall-clock limits, crash isolation, ordered results and parent-owned
+  cache/checkpoint writes. Preserve double-precision coordinates across processes.
+- Added an optional reviewed SCC diagnostic ABI and C++/Python fields for final
+  iterations, energy change, mixer RMS and thresholds; GFN0 remains non-SCF.
+- Added offline Linux runtime bundling and relocation checks for both interfaces.
+  Python compiled calls now discover libxtb in the active runtime by default.
+- Refit the historical QM8 study after stereo audit, separately evaluate the checked
+  preparation workflow, and compare dipoles on 256 nonoverlapping QM9 molecules.
+- Paused embedding-algorithm research; no experimental embedding patch is enabled.
+
 ## 0.10.0 — checked geometry preparation
 
 - Added `prepare_conformers` and `ConformerGenerationResult`: copied SMILES/Mol

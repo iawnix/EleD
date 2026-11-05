@@ -300,6 +300,17 @@ def _run_xtb_native(
         occupation_values = tuple(float(value) for value in occupations)
         homo, lumo = _frontier_energies(energies_ev, occupation_values)
         basis = library.basis_data(environment, results, natoms, nao.value) if keep_overlap else {}
+        from ..runtime import _native_diagnostics_build
+        from ..scf import scf_record
+        scf = scf_record(method_name)
+        if _native_diagnostics_build(library.library):
+            version = library._bind('xtb_rdkit_getSCFAPIVersion', ctypes.c_int, [])
+            getter = library._bind('xtb_rdkit_getSCFDiagnostics', ctypes.c_int,
+                [library._handle, library._handle, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_double)])
+            if version() != 1: raise XTBEnvironmentError('unsupported SCC diagnostics API')
+            count = ctypes.c_int(-1); data = (ctypes.c_double * 4)()
+            if getter(environment, results, ctypes.byref(count), data):
+                scf = scf_record(method_name, count.value, list(data))
         if _save_restart is not None:
             saved = library.copy_results(results)
             if not saved:
@@ -332,6 +343,7 @@ def _run_xtb_native(
                 **_input_metadata(mol, conf_id, charge, uhf, xyz),
                 'calculation_settings': settings,
                 'calculation_status': 'success',
+                'scf': scf,
                 'initialization': 'reference' if _restart else 'independent',
                 'optimize': False,
                 'solvent': None,

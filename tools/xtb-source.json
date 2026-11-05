@@ -2,7 +2,7 @@
   "repository": "https://github.com/grimme-lab/xtb.git",
   "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
   "upstream_version": "6.7.1",
-  "description": "Pinned upstream GFN0 repair (#1490) with only the opt-in native basis export patch",
+  "description": "Pinned upstream GFN0 repair with opt-in basis export and successful-SCC diagnostics",
   "basis_extension": {
     "api_version": 1,
     "patch": "diagnostics/xtb_basis_export.patch",
@@ -22,5 +22,18 @@
     "pull_request": "https://github.com/grimme-lab/xtb/pull/1490",
     "file": "src/disp/dftd4.F90",
     "file_sha256": "5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c"
+  },
+  "diagnostics_extension": {
+    "api_version": 1,
+    "patch": "diagnostics/xtb_scf_diagnostics.patch",
+    "patch_sha256": "fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911738afdaa75",
+    "patched_files": {
+      "src/type/data.F90": "c4357d7d79d407f144d902247bb00ae5f3f7d582cc13a65e6bf3fca04970cbf8",
+      "src/scc_core.f90": "541983b9329dc824173984669c1f05c6a56f6b9bd13026da57312f5e81a29964",
+      "src/scf_module.F90": "0167116c278468f3cf8766badf6d04051a04330cffde4978fd4a542824d62110",
+      "src/api/results.f90": "bb3093e329ff45a3db1afdc8f0c5f437bbc9925e913cfa441746ddeaf7e6c754",
+      "src/api/interface.f90": "bee056aa0f7159b648104ce8f1d6243a3ca6311bee1d05b9e7444074ee603849",
+      "include/xtb.h": "95711834b225f650c24eaf87d746f8f907a018d9a444b529e0bd6f3bfe023708"
+    }
   }
 }

@@ -107,8 +107,9 @@ instead of silently becoming cache misses or molecular failures. Checksums detec
 
 Checkpoint runs hold a nonblocking OS file lock: another writer to the same
 checkpoint fails clearly. Shared-cache writes use SQLite transactions; concurrent
-identical misses may calculate twice. This is a sequential batch API for local
-filesystems, not a distributed scheduler. Disk capacity, retention and eviction
+identical misses may calculate twice. The default is sequential; [isolated workers](isolated-batches.md) support
+parallel tasks and wall-clock limits. Cache/checkpoint writes stay in the parent
+process on a local filesystem; this is not a distributed scheduler. Disk capacity, retention and eviction
 are managed by the caller. The batch materializes inputs and returned reports;
 large datasets can be split into separately checkpointed chunks sharing a cache.
 

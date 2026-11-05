@@ -43,6 +43,9 @@ struct XTBResults {
   double electronicTemperature = 300.0;
   double effectiveElectronicTemperature = 300.0;
   bool gfn0StateFixVerified = false;
+  int scfIterations = -1;  // unavailable for GFN0 or older libraries
+  double scfEnergyChangeHartree = -1., scfMixerRMS = -1.;
+  double scfEnergyThresholdHartree = -1., scfMixerThreshold = -1.;
   double totalEnergyHartree = std::numeric_limits<double>::quiet_NaN();
   std::string libraryPath;
   std::string librarySHA256;

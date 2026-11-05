@@ -1,0 +1,174 @@
+--- a/include/xtb.h
++++ b/include/xtb.h
+@@ -339,6 +339,16 @@
+                            xtb_TResults /* res */,
+                            double* /* c */) XTB_API_SUFFIX__VERSION_2_0_0;
+ 
++/* rdkit-eth SCC diagnostics ABI v1. getSCFDiagnostics returns 1 only for a
++ * successful GFN1/2 singlepoint; otherwise 0 and leaves buffers untouched.
++ * Buffers: one integer and four doubles [abs(delta E) Hartree, mixer RMS,
++ * energy threshold Hartree, mixer threshold]. Copies own their snapshots.
++ * GFN2 mixer RMS combines shell charges and multipoles, not just charges.
++ */
++extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getSCFAPIVersion(void);
++extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getSCFDiagnostics(
++    xtb_TEnvironment, xtb_TResults, int*, double*);
++
+ /* rdkit-eth extension ABI v1; upstream API version remains unchanged.
+  * Enable on Results BEFORE singlepoint. Copies own their snapshots.
+  * Failed/repeated calculations and toggling retention invalidate old snapshots.
+--- a/src/api/interface.f90
++++ b/src/api/interface.f90
+@@ -58,6 +58,8 @@
+       ! Every attempt invalidates old basis snapshots, even on setup failure.
+       if (c_associated(vres)) then
+          call c_f_pointer(vres, res)
++         res%rdkit_scf_iterations = -1
++         res%rdkit_scf_values = -1.0_wp
+          if (allocated(res%chk)) call res%chk%wfn%clear_basis
+       end if
+ 
+@@ -148,6 +150,9 @@
+          call res%chk%wfn%clear_basis
+          return
+       end if
++
++      res%rdkit_scf_iterations = spRes%rdkit_scf_iterations
++      res%rdkit_scf_values = spRes%rdkit_scf_values
+ 
+       ! invalidate cache for properties not produced in GFN-FF
+       select type(gfnff => calc%ptr)
+@@ -195,6 +200,8 @@
+       ! These workflows do not promise a final single-point basis snapshot.
+       if (c_associated(vres)) then
+          call c_f_pointer(vres, res)
++         res%rdkit_scf_iterations = -1
++         res%rdkit_scf_values = -1.0_wp
+          if (allocated(res%chk)) then
+             call res%chk%wfn%clear_basis
+             res%chk%wfn%rdkit_keep_basis = .false.
+@@ -367,6 +374,8 @@
+       ! These workflows do not promise a final single-point basis snapshot.
+       if (c_associated(vres)) then
+          call c_f_pointer(vres, res)
++         res%rdkit_scf_iterations = -1
++         res%rdkit_scf_values = -1.0_wp
+          if (allocated(res%chk)) then
+             call res%chk%wfn%clear_basis
+             res%chk%wfn%rdkit_keep_basis = .false.
+--- a/src/api/results.f90
++++ b/src/api/results.f90
+@@ -26,6 +26,7 @@
+    implicit none
+    private
+ 
++   public :: rdkit_scf_version, rdkit_scf_diagnostics
+    public :: rdkit_basis_version, rdkit_keep_overlap, rdkit_basis_size, rdkit_overlap, rdkit_basis_map
+    public :: VResults
+    public :: newResults_api, delResults_api, getEnergy_api, getGradient_api, &
+@@ -38,6 +39,8 @@
+    !> Void pointer to wavefunction and result objects
+    type :: VResults
+       logical :: rdkit_keep_basis = .false.
++      integer :: rdkit_scf_iterations = -1
++      real(wp) :: rdkit_scf_values(4) = -1.0_wp
+       type(TRestart), allocatable :: chk
+       real(wp), allocatable :: energy
+       real(wp), allocatable :: gradient(:, :)
+@@ -599,4 +602,31 @@
+    sl = res%chk%wfn%rdkit_shell_l
+ end subroutine
+ 
++! Diagnostics ABI v1: successful GFN1/2 SCC only. Values are final absolute
++! energy change (Hartree), mixed-variable RMS, and their engine thresholds.
++! GFN2 RMS includes multipoles; it must not be labeled an atomic-charge RMS.
++function rdkit_scf_version() result(version) bind(C, name="xtb_rdkit_getSCFAPIVersion")
++   integer(c_int) :: version
++   version = 1
++end function
++
++function rdkit_scf_diagnostics(venv, vres, iterations, values) result(available) &
++      & bind(C, name="xtb_rdkit_getSCFDiagnostics")
++   type(c_ptr), value :: venv, vres, iterations, values
++   integer(c_int) :: available
++   type(VResults), pointer :: res
++   integer(c_int), pointer :: n
++   real(c_double), pointer :: data(:)
++   available = 0
++   if (.not.c_associated(venv) .or. .not.c_associated(vres)) return
++   if (.not.c_associated(iterations) .or. .not.c_associated(values)) return
++   call c_f_pointer(vres, res)
++   if (res%rdkit_scf_iterations < 0) return
++   call c_f_pointer(iterations, n)
++   call c_f_pointer(values, data, [4])
++   n = res%rdkit_scf_iterations
++   data = res%rdkit_scf_values
++   available = 1
++end function
++
+ end module xtb_api_results
+--- a/src/scc_core.f90
++++ b/src/scc_core.f90
+@@ -265,7 +265,7 @@
+       &        H0,H,S,dpint,qpint,P,ies, &
+       &        maxiter,startpdiag,scfconv,qconv, &
+       &        minpr,pr, &
+-      &        fail,jter)
++      &        fail,jter,rdkit_values)
+    use xtb_mctc_convert, only : autoev,evtoau
+ 
+    use xtb_disp_dftd4,  only: disppot,edisp_scc
+@@ -386,6 +386,7 @@
+    real(wp),intent(in)    :: qpint(6,ndim,ndim)
+    type(TxTBCoulomb), intent(inout) :: ies
+ 
++   real(wp), intent(out), optional :: rdkit_values(4)
+    integer, intent(inout) :: jter
+ !! ------------------------------------------------------------------------
+ !  local variables
+@@ -412,6 +413,7 @@
+ 
+    converged = .false.
+    ! number of iterations for this iterator
++   if (present(rdkit_values)) rdkit_values = -1.0_wp
+    thisiter = maxiter - jter
+ 
+    damp = damp0
+@@ -567,6 +569,7 @@
+    call diff_mixer(present(aes), qsh, dipm, qp, q_in, dq)
+    rmsq=sum(dq(1:nbr)**2)/dble(nbr)
+    rmsq=sqrt(rmsq)
++   if (present(rdkit_values)) rdkit_values = [abs(eel-eold), rmsq, scfconv, qconv]
+ 
+    ! ------------------------------------------------------------------------
+    ! end of SCC convergence part
+--- a/src/scf_module.F90
++++ b/src/scf_module.F90
+@@ -631,7 +631,7 @@
+       &     H0,wfn%C,S,dpint,qpint,wfn%P,ies, &
+       &     maxiter,startpdiag,scfconv,qconv, &
+       &     minpr,pr, &
+-      &     fail,jter)
++      &     fail,jter,res%rdkit_scf_values)
+ 
+    !$acc exit data delete(s, dpint, qpint)
+ 
+@@ -644,6 +644,7 @@
+ 
+    ! check for convergence
+    res % converged = .not. fail
++   res % rdkit_scf_iterations = jter
+    ! write convergence info depending on print setting
+    if (pr) then
+       if (fail) then
+--- a/src/type/data.F90
++++ b/src/type/data.F90
+@@ -64,6 +64,8 @@
+    end type TIFFResults
+ 
+    type :: scc_results
++      integer :: rdkit_scf_iterations = -1
++      real(wp) :: rdkit_scf_values(4) = -1.0_wp
+       real(wp) :: e_atom = 0.0_wp
+       real(wp) :: e_elec = 0.0_wp
+       real(wp) :: e_total = 0.0_wp

@@ -106,7 +106,10 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.numUnpairedElectrons = optionalInteger(unpaired, "numUnpairedElectrons");
   options.keepOrbitalCoefficients = keepCoefficients;
   options.keepOverlap = keepOverlap;
-  options.libraryPath = library;
+  // Use the active Python runtime, including relocated distributions. An explicit
+  // path remains authoritative; the standalone C++ default is unchanged.
+  options.libraryPath = library.empty() ? py::extract<std::string>(
+      py::import("rdkit_eth.runtime").attr("_find_xtb_library")()) : library;
   options.parameterDirectory = parameterDirectory;
   py::object settings = py::import("rdkit_eth.options").attr("calculation_settings")(
       maxIterations, accuracy, electronicTemperature);
@@ -230,6 +233,11 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def_readonly("electronicTemperature", &XTBResults::electronicTemperature)
       .def_readonly("effectiveElectronicTemperature", &XTBResults::effectiveElectronicTemperature)
       .def_readonly("gfn0StateFixVerified", &XTBResults::gfn0StateFixVerified)
+      .def_readonly("scfIterations", &XTBResults::scfIterations)
+      .def_readonly("scfEnergyChangeHartree", &XTBResults::scfEnergyChangeHartree)
+      .def_readonly("scfMixerRMS", &XTBResults::scfMixerRMS)
+      .def_readonly("scfEnergyThresholdHartree", &XTBResults::scfEnergyThresholdHartree)
+      .def_readonly("scfMixerThreshold", &XTBResults::scfMixerThreshold)
       .def_readonly("basisExportVerified", &XTBResults::basisExportVerified)
       .def_readonly("inputProvenanceJSON", &XTBResults::inputProvenanceJSON)
       .def_readonly("initialization", &XTBResults::initialization)

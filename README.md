@@ -5,7 +5,7 @@ validates indexed molecular input, returns quantities with explicit units,
 and maps results back to the original atoms and bonds. RDKit's YAeHMOP
 `rdEHTTools` interface remains available separately.
 
-Version 0.10 supports **gas-phase single points through libxtb only**.
+Version 0.11 supports **gas-phase single points through libxtb only**.
 The tblite backend and Python extra have been removed. Our reviewed native
 extension exports overlap and basis maps from the same calculation. The external xTB CLI backend and `auto`
 fallback were removed in 0.2. See the [0.2 migration notes](docs/migration-0.2.md).
@@ -25,11 +25,18 @@ cohort; that limitation is recorded alongside the original results.
 
 An [embedding algorithm investigation](docs/embedding-algorithm-research.md)
 records source-level constraint diagnostics and comparisons with existing RDKit
-initialization/bounds options. It is research tooling, not a new embedding API.
+initialization/bounds options. This research direction is paused; its experimental
+patches are not part of the installed API. Active work focuses on the extended
+libxtb interface, electronic descriptors and their validation; see the
+[development priorities](docs/development-priorities.md).
+
+New in 0.11: [isolated parallel batches](docs/isolated-batches.md), optional
+[SCC convergence diagnostics](docs/scf-diagnostics.md), an offline Linux runtime
+[bundle](docs/runtime-bundle.md), and [corrected/expanded validation](docs/mainline-validation.md).
 
 ## Installation
 
-0.10 adds [`prepare_conformers`](docs/geometry-preparation.md): deterministic
+0.11 includes [`prepare_conformers`](docs/geometry-preparation.md): deterministic
 RDKit retries with coordinate-derived tetrahedral/E/Z checks before and after
 optional force-field optimization. It returns an explicit-H molecule ready for
 the existing xTB APIs, plus complete provenance and failure/coverage records.
@@ -50,7 +57,7 @@ Keep `.rdkit-eth/runtime` and `.rdkit-eth/toolchain` in place; the build is tied
 to these local native-library prefixes.
 
 The pinned source includes the official [GFN0 repair, PR #1490](https://github.com/grimme-lab/xtb/pull/1490).
-Only our native basis-export patch is applied. Previously verified 0.4 engines
+Our native basis-export and SCC-diagnostics patches are applied. Previously verified 0.4 engines
 remain usable explicitly; official libraries retain basic GFN1/2 compatibility.
 
 See the [installation guide](docs/install.md) for upgrades, manual builds and
@@ -134,7 +141,8 @@ print(annotated.GetBondWithIdx(0).GetDoubleProp("xtb_wiberg_order"))
 
 `run_xtb` never changes the molecule. A missing/incompatible library or failed
 calculation raises an error. Geometry optimization, solvation and GFN-FF are
-outside the current API. Calculations do not create temporary work directories.
+outside the current API. Default in-process calculations do not create temporary work directories.
+Opt-in isolated batches use temporary worker-result transport files.
 
 Native GFN0 requires the build's capability record, the reviewed upstream fix identity,
 and a matching SHA-256 of the selected library. An xTB/API version alone cannot
@@ -247,10 +255,11 @@ results = run_xtb_batch([mol, mol], options=options, cache=cache,
 # options.to_dict() also works with run_xtb(mol, **...).
 ```
 
-Batches execute sequentially and preserve input order; only `max_workers=1`
-is supported. Native calls from Python threads are serialized within this
+Batches preserve input order. The default is sequential; `max_workers>1`,
+`timeout=...` or `isolate=True` selects disposable Python processes calling libxtb.
+See [isolated batches](docs/isolated-batches.md) for process startup, cleanup and caching. Native calls from Python threads are serialized within this
 package, including calls through `rdXTBTools`. Other independent bindings in
-the same process are outside that lock. No wall-clock timeout is enforced.
+the same process are outside that lock. Wall-clock timeouts require isolated execution; the ordinary in-process call has none.
 
 The cache is in memory. Keys include indexed structure, coordinates, resolved
 charge/spin/conformer, settings, backend, engine identity, binary/parameter

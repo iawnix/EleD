@@ -62,6 +62,19 @@ def _native_gfn0_build(path: str) -> dict | None:
 
 
 _BASIS_EXPORT_PATCH = '30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2'
+_SCF_DIAGNOSTICS_PATCH = 'fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911738afdaa75'
+
+
+def _native_diagnostics_build(path):
+    try:
+        if not _native_gfn0_build(path): return False
+        record = Path(path).resolve().parent.parent/'share/xtb/rdkit-eth/build.json'
+        data = json.loads(record.read_text())
+        extension = data['source']['diagnostics_extension']
+        return (data['capabilities']['scf_diagnostics_api'] == extension['api_version'] == 1 and
+                extension['patch_sha256'] == _SCF_DIAGNOSTICS_PATCH)
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
 
 
 def _native_basis_build(path: str) -> dict | None:

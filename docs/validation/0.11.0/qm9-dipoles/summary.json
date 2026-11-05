@@ -1,0 +1,26 @@
+{
+  "n_selected": 256,
+  "n_common": 256,
+  "failed_records": [],
+  "metrics": {
+    "GFN1-xTB": {
+      "n": 256,
+      "mae_debye": 0.9214447355432681,
+      "rmse_debye": 1.072916801394332,
+      "bias_debye": 0.853954610993344
+    },
+    "GFN2-xTB": {
+      "n": 256,
+      "mae_debye": 0.4285918393151915,
+      "rmse_debye": 0.49933329972368484,
+      "bias_debye": 0.35288268025959724
+    }
+  },
+  "delta_mae_gfn2_minus_gfn1_debye": -0.49285289622807654,
+  "paired_molecule_bootstrap_95_debye": [
+    -0.5395633537512465,
+    -0.44653125413890776
+  ],
+  "bootstrap_scope": "selected molecules, not scaffold-independent chemical generalization",
+  "calculation_seconds": 3.9008695790544152
+}

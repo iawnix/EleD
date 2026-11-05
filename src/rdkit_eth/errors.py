@@ -16,6 +16,14 @@ class XTBEnvironmentError(XTBRunError):
     """Engine setup, allocation or extraction failed; do not skip as an SCF row."""
 
 
+class XTBTimeoutError(XTBRunError):
+    """An isolated calculation exceeded its wall-clock budget."""
+
+
+class XTBWorkerError(XTBRunError):
+    """An isolated calculation process exited without returning a result."""
+
+
 class XTBCacheError(XTBError):
     """Persistent data is incompatible, corrupt or conflicts with this dataset."""
 

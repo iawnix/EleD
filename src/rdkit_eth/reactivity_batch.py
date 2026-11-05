@@ -1,7 +1,7 @@
 """Dataset-safe vertical reactivity: explicit jobs, successful cache, resumable rows."""
 from __future__ import annotations
 
-from contextlib import nullcontext
+from contextlib import nullcontext, closing
 from copy import deepcopy
 from dataclasses import dataclass, replace
 from numbers import Integral
@@ -112,7 +112,8 @@ def _prepare_jobs(jobs, options, population_scheme, interface, initialization):
 
 
 def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', interface='native',
-                         initialization='reference', cache=None, checkpoint=None, retry_failed=False):
+                         initialization='reference', cache=None, checkpoint=None, retry_failed=False,
+                         max_workers=1, timeout=None, isolate=False):
     """Run ordered ReactivityJob records with molecule-level checkpoint commits.
 
     Configuration and runtime errors propagate. Invalid molecular geometry/None
@@ -122,6 +123,9 @@ def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', int
     attempt history. Changing the protocol requires a new checkpoint path.
     An interrupted triplet restarts from its reference; no wavefunction is pickled.
     """
+    from .workers import validate_execution, isolated_map, reactivity, molecule_bytes
+    from .errors import XTBTimeoutError, XTBWorkerError
+    isolated = validate_execution(max_workers, timeout, isolate)
     if not isinstance(retry_failed, bool):
         raise ValueError('retry_failed must be Boolean')
     if cache is not None and not isinstance(cache, XTBDiskCache):
@@ -132,11 +136,24 @@ def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', int
     if cache is not None and checkpoint is not None and cache.path == checkpoint.path:
         raise ValueError('cache and checkpoint must use separate files')
     manifest = {'schema_version': 1, 'rows': [{'record_id': p[0], 'key': p[4], 'protocol': p[3]} for p in prepared]}
-    reports = []
+    reports = [None] * len(prepared)
+    tasks, pending = [], []
+
+    def finish(index, report, source, attempt):
+        identifier, mol, config, protocol, key, input_error = prepared[index]
+        report['record_id'] = identifier
+        report['provenance']['batch_protocol'] = protocol
+        if source == 'calculation' and cache is not None and report['error'] is None:
+            cache.set(key, report)
+        report['execution'] = {'source': source, 'key': key, 'attempt': attempt}
+        if checkpoint is not None:
+            checkpoint._save(identifier, key, report, attempt)
+        reports[index] = report
+
     with checkpoint._locked() if checkpoint is not None else nullcontext():
         if checkpoint is not None:
             checkpoint._bind(manifest)
-        for identifier, mol, config, protocol, key, input_error in prepared:
+        for index, (identifier, mol, config, protocol, key, input_error) in enumerate(prepared):
             old = None if checkpoint is None else checkpoint._store.read('rows', identifier)
             if old is not None:
                 if old['key'] != key:
@@ -144,7 +161,7 @@ def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', int
                 if old['report']['error'] is None or not retry_failed:
                     report = deepcopy(old['report'])
                     report['execution']['source'] = 'checkpoint'
-                    reports.append(report)
+                    reports[index] = report
                     continue
             attempt = 1 if old is None else old['attempt'] + 1
             report = None if cache is None or input_error is not None else cache.get(key)
@@ -162,17 +179,30 @@ def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', int
                 report['analysis_settings'].update(protocol_version=REACTIVITY_PROTOCOL_VERSION,
                     initialization=initialization, requested_options=config.to_dict(), interface=interface)
             elif report is None:
-                report = run_reactivity(mol, options=config, ionized_uhf=protocol['ionized_uhf'],
+                kwargs = dict(options=config, ionized_uhf=protocol['ionized_uhf'],
                     attached_uhf=protocol['attached_uhf'], fragments=protocol['fragments'],
                     population_scheme=population_scheme, interface=interface,
                     initialization=initialization, return_errors=True)
-                report['provenance']['batch_protocol'] = protocol
-                if cache is not None and report['error'] is None:
-                    cache.set(key, report)
-            report['record_id'] = identifier
-            report['provenance']['batch_protocol'] = protocol
-            report['execution'] = {'source': source, 'key': key, 'attempt': attempt}
-            if checkpoint is not None:
-                checkpoint._save(identifier, key, report, attempt)
-            reports.append(report)
+                if isolated:
+                    tasks.append((molecule_bytes(mol), kwargs)); pending.append((index, attempt))
+                    continue
+                report = run_reactivity(mol, **kwargs)
+            finish(index, report, source, attempt)
+        if isolated:
+            with closing(isolated_map(reactivity, tasks, max_workers=max_workers, timeout=timeout)) as completed:
+                for task_index, report in completed:
+                    index, attempt = pending[task_index]
+                    identifier, mol, config, protocol, key, input_error = prepared[index]
+                    if isinstance(report, (XTBTimeoutError, XTBWorkerError)):
+                        error = report
+                        report = _empty_report(identifier, population_scheme, {})
+                        report['error'] = {'type': type(error).__name__, 'message': str(error), 'stage': 'worker'}
+                        report['quality'] = {'status': 'error', 'flags': [
+                            {'code': 'isolated_execution_failed', 'severity': 'error', 'detail': str(error)}]}
+                        report['missing'] = dict.fromkeys(REACTIVITY_UNITS, 'isolated_execution_failed')
+                        report['analysis_settings'].update(protocol_version=REACTIVITY_PROTOCOL_VERSION,
+                            initialization=initialization, requested_options=config.to_dict(), interface=interface)
+                    elif isinstance(report, Exception):
+                        raise report
+                    finish(index, report, 'calculation', attempt)
     return reports

@@ -37,6 +37,7 @@ constexpr const char *upstreamD4SHA256 = "5c4022078296e46dfe6a21a36505ec07402bb1
 constexpr const char *d4PatchSHA256 =
     "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859";
 constexpr const char *basisPatchSHA256 = "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2";
+constexpr const char *scfPatchSHA256 = "fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911738afdaa75";
 std::mutex calculationMutex;
 
 std::string sha256(const fs::path &path) {
@@ -72,6 +73,8 @@ struct API {
   std::string path, hash;
   int version = 0;
   int (*getBasisAPIVersion)() = nullptr;
+  int (*getSCFAPIVersion)() = nullptr;
+  int (*getSCFDiagnostics)(xtb_TEnvironment, xtb_TResults, int *, double *) = nullptr;
   void (*setKeepOverlap)(xtb_TEnvironment, xtb_TResults, bool) = nullptr;
   void (*getBasisSize)(xtb_TEnvironment, xtb_TResults, int *) = nullptr;
   void (*getOverlap)(xtb_TEnvironment, xtb_TResults, int, double *) = nullptr;
@@ -120,6 +123,7 @@ struct API {
 #define OPTIONAL(name) name = reinterpret_cast<decltype(name)>(dlsym(handle.get(), "xtb_rdkit_" #name))
     OPTIONAL(getBasisAPIVersion); OPTIONAL(setKeepOverlap); OPTIONAL(getBasisSize);
     OPTIONAL(getOverlap); OPTIONAL(getBasisMap);
+    OPTIONAL(getSCFAPIVersion); OPTIONAL(getSCFDiagnostics);
 #undef OPTIONAL
   }
   void check(xtb_TEnvironment env, const char *operation) const {
@@ -339,6 +343,23 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
     api.singlepoint(h.env, h.mol, h.calc, h.res);
     api.check(h.env, "Single point");
     inSinglePoint = false;
+    if (method != 0 && api.getSCFAPIVersion && api.getSCFDiagnostics && result.gfn0StateFixVerified) {
+      boost::property_tree::ptree record;
+      boost::property_tree::read_json((fs::path(api.path).parent_path().parent_path() /
+                                      "share/xtb/rdkit-eth/build.json").string(), record);
+      if (record.get<int>("capabilities.scf_diagnostics_api", 0) == 1 &&
+          record.get<std::string>("source.diagnostics_extension.patch_sha256", "") == scfPatchSHA256) {
+        if (api.getSCFAPIVersion() != 1) throw EngineError("Unsupported SCC diagnostics API");
+        std::array<double, 4> data{};
+        if (api.getSCFDiagnostics(h.env, h.res, &result.scfIterations, data.data())) {
+          if (result.scfIterations < 1 || !std::all_of(data.begin(), data.end(),
+                [](double v){ return std::isfinite(v) && v >= 0.; }) || data[2] <= 0. || data[3] <= 0.)
+            throw EngineError("Invalid SCC diagnostics");
+          result.scfEnergyChangeHartree = data[0]; result.scfMixerRMS = data[1];
+          result.scfEnergyThresholdHartree = data[2]; result.scfMixerThreshold = data[3];
+        }
+      }
+    }
     api.getEnergy(h.env, h.res, &result.totalEnergyHartree);
     api.getNao(h.env, h.res, &result.numOrbitals);
     api.check(h.env, "Energy and basis size");

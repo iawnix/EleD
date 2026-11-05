@@ -163,8 +163,8 @@ def test_batch_keeps_order_and_retries_failed_calculations(engine):
     with patch('rdkit_eth.batch.run_xtb', return_value=sample_result(b)) as calculate:
         run_xtb_batch([b], cache=cache, xtb_library=engine)
     assert calculate.call_count == 1
-    with pytest.raises(ValueError, match='parallel'):
-        run_xtb_batch([a], backend='native', max_workers=2)
+    with pytest.raises(ValueError, match='max_workers'):
+        run_xtb_batch([a], backend='native', max_workers=0)
     with pytest.raises(TypeError):
         run_xtb_batch([a], unsupported_option=True, cache=cache)
 
@@ -194,5 +194,6 @@ def test_removed_options_are_not_silently_ignored(option, value):
         run_xtb(molecule(), **{option: value})
     with pytest.raises(TypeError, match=option):
         XTBOptions(**{option: value})
-    with pytest.raises(TypeError, match=option):
-        run_xtb_batch([molecule()], **{option: value})
+    if option != 'timeout':  # wall-clock timeout now belongs to isolated batch execution
+        with pytest.raises(TypeError, match=option):
+            run_xtb_batch([molecule()], **{option: value})

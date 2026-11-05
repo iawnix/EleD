@@ -1,5 +1,9 @@
 # Preserve successful embedding behavior
 
+**Status (2026-11-05): this algorithm route is paused.** Future integration
+ideas below are historical proposals, not scheduled work. Active priorities
+are recorded [separately](development-priorities.md).
+
 **Neither current ring prototype passes the conservative quality-retention gate
 for direct replacement of RDKit behavior.** Expanded tests preserve baseline
 success counts, but some previously successful inputs converge to higher-energy

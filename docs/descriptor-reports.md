@@ -37,8 +37,8 @@ export_descriptor_reports(reports, "features.jsonl")
 `calc_descriptor_report` performs no engine calls. It checks original atom order,
 topology and geometry before attaching atom/bond/spatial descriptors. It combines
 the [existing descriptors](descriptors.md), both population definitions and
-degeneracy-aware frontier distributions. `run_descriptor_batch` calculates
-sequentially and retains overlap by default. With an official library, explicitly
+degeneracy-aware frontier distributions. `run_descriptor_batch` retains overlap by default and supports
+[isolated parallel execution](isolated-batches.md). With an official library, explicitly
 use `options=XTBOptions(keep_overlap=False)` for basic features.
 
 The report schema version is **1** and descriptor-definition version is **1.0**;
@@ -71,10 +71,10 @@ reports into separate files.
 
 Quality checks include fractional occupations, frontier-threshold sensitivity,
 charge/electron conservation, missing frontier groups, spin-summed open-shell
-interpretation and charged-dipole origin dependence. Actual SCF iteration counts
-and residuals are **not exposed by libxtb's C API**; they remain null with an
-explicit reason. Successful API completion is not a measured residual or an
-experimental accuracy guarantee.
+interpretation and charged-dipole origin dependence. The optional [SCC diagnostics extension](scf-diagnostics.md) reports the actual
+iteration count, final energy change and mixed-variable RMS with their thresholds.
+Older libraries leave these fields null with a reason; GFN0 is non-SCF.
+Convergence criteria are not an experimental accuracy guarantee.
 
 ## Fixed-geometry charge-state analysis
 
@@ -178,8 +178,8 @@ python examples/descriptor_reports.py --output build/reports --sensitivity
 
 The example saves exact geometries, settings, all three state records and failure
 rows for a small temperature study. Its unoptimized structures test protocol
-behavior, not predictive accuracy. Conformer ensembles, solvent, calibrated
-IP/EA benchmarks and excited-state datasets remain future work.
+behavior, not predictive accuracy. Conformer sensitivity and a QM8 descriptor pilot are now available separately.
+Solvent support and calibrated IP/EA validation remain outside this protocol.
 
 
 The `charges` and `mulliken` options for gas-phase GFN1/2 are two extraction/

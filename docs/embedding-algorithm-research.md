@@ -1,5 +1,9 @@
 # Initial embedding algorithm investigation
 
+**Status (2026-11-05): paused at the user's request.** The findings below are
+retained as research evidence. Active development has returned to the
+[libxtb and electronic-descriptor mainline](development-priorities.md).
+
 The first source-level study supports investigating **local constraint modeling
 for strained ring systems**, alongside sampling. It does not establish a new
 algorithm or an improvement over RDKit. In particular, existing RDKit options

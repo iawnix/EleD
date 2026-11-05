@@ -1,0 +1,36 @@
+name: offline Linux runtime bundle
+on: [workflow_dispatch]
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ''
+          auto-activate-base: true
+      - name: Build and verify complete runtime
+        run: python tools/install_native.py --jobs 2
+      - name: Package outside the locked runtime
+        run: |
+          .rdkit-eth/runtime/bin/python -m venv build/packaging
+          build/packaging/bin/python -m pip install -r tools/distribution-requirements.txt
+          PATH="$PWD/build/packaging/bin:$PATH" build/packaging/bin/python tools/build_runtime_bundle.py --runtime .rdkit-eth/runtime --toolchain .rdkit-eth/toolchain --output dist/linux-runtime-bundle
+      - name: Install offline into a different prefix and verify
+        run: |
+          python tools/install_bundle.py --bundle dist/linux-runtime-bundle --directory build/relocated
+          build/relocated/runtime/bin/python -I examples/parallel_descriptors.py
+          build/relocated/runtime/bin/python -I -m pytest -q -o pythonpath= tests/test_workers.py tests/test_scf_diagnostics.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-runtime-bundle-0.11.0
+          compression-level: 0
+          path: |
+            dist/linux-runtime-bundle/
+            build/relocated/installation.json

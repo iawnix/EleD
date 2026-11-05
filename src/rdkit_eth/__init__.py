@@ -61,9 +61,11 @@ __all__ += [
 from .persistence import XTBDiskCache, ReactivityCheckpoint
 from .reactivity_batch import ReactivityJob, run_reactivity_batch
 from .errors import XTBCacheError, XTBEnvironmentError
+from .errors import XTBTimeoutError, XTBWorkerError
 
 __all__ += ['XTBDiskCache', 'ReactivityCheckpoint', 'ReactivityJob',
-            'run_reactivity_batch', 'XTBCacheError', 'XTBEnvironmentError']
+            'run_reactivity_batch', 'XTBCacheError', 'XTBEnvironmentError',
+            'XTBTimeoutError', 'XTBWorkerError']
 
 from .conformers import conformer_descriptor_columns, run_conformer_analysis
 

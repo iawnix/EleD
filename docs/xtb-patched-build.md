@@ -1,9 +1,9 @@
-# Building the native xTB dependency (0.5)
+# Building the native xTB dependency (0.11)
 
 The standard installation is `python tools/install_native.py`; see
 [install.md](install.md). This lower-level builder also supports a separate
 engine prefix for development. It uses upstream's GFN0 state repair and applies
-only our project-local basis-export patch. GFN0/1/2 and population analysis
+our project-local basis-export and SCC-diagnostics patches. GFN0/1/2 and population analysis
 use this single extended library; no CLI or tblite backend is involved.
 
 ## Reproduce the build
@@ -28,7 +28,7 @@ does not launch it.
 
 The [source lock](../tools/xtb-source.json) pins commit
 `33fe381adde775c4992610c0f90d8914b7572bb5`, the upstream-repaired D4 source,
-the basis-export patch and all modified source files by SHA256. This upstream main commit reports
+the basis/diagnostics patches and all modified source files by SHA256. This upstream main commit reports
 6.7.1 but differs from the release tag; see [earlier verification](gfn0-reverification.md).
 The builder accepts a clean pinned checkout or an exactly matching patched
 checkout. It refuses unrelated or mismatched edits and never resets them.
@@ -37,7 +37,7 @@ selects an existing checkout. Use a new prefix when changing the source lock
 to preserve prior verified engines.
 
 The build runs all upstream tests, 12 installed-library D4 method-switch
-checks, and the native basis/lifecycle C diagnostic before writing capability
+checks, the native basis/lifecycle C diagnostic and the SCC diagnostic lifecycle check before writing capability
 metadata. There is no skip-tests option. The installation includes:
 
 ```text
