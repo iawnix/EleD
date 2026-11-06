@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def calculate(library):
     import numpy as np
     from rdkit import Chem
-    from rdkit_eth import run_xtb, calc_orbital_populations
+    from rdkit_eth import XTBCalculator, calc_orbital_populations
     from rdkit_eth.runtime import _fingerprint
     cases = json.loads((ROOT / 'tests/data/orbital_alignment_cases.json').read_text())['cases']
     rows = []
@@ -27,7 +27,8 @@ def calculate(library):
         for i, xyz in enumerate(case['positions_angstrom']): conf.SetAtomPosition(i, xyz)
         mol.AddConformer(conf)
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
-            result = run_xtb(mol, method=method, xtb_library=str(library), keep_overlap=True)
+            result = XTBCalculator(method=method, xtb_library=str(library)).calculate(
+                mol, keep_overlap=True)
             population = calc_orbital_populations(result, scheme='mulliken')
             rows.append({'name': case['name'], 'method': method, 'energy_eh': result.total_energy_hartree,
                          'orbital_energies_ev': result.orbital_energies_ev,

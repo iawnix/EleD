@@ -139,7 +139,7 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
     if not mol.GetNumAtoms() or any(a.GetAtomicNum() == 0 for a in mol.GetAtoms()):
         raise ValueError('input must contain real atoms and no dummy atoms')
     if len(Chem.GetMolFrags(mol)) != 1:
-        raise ValueError('disconnected fragments need an explicit relative geometry; supply a prepared molecule to run_xtb')
+        raise ValueError('disconnected fragments need an explicit relative geometry; supply a prepared molecule to XTBCalculator')
     Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
     unassigned = [{'type': str(s.type), 'centered_on': int(s.centeredOn)}
                   for s in Chem.FindPotentialStereo(mol) if str(s.specified) != 'Specified']

@@ -13,7 +13,7 @@ from .xtb import calc_xtb_descriptors
 def _validate_mapping(mol: Any, result: XTBResult) -> None:
     metadata = result.metadata
     if not metadata.get('ordered_structure_sha256') or not metadata.get('geometry_sha256'):
-        raise ValueError('result lacks input provenance; recalculate with run_xtb before mapping')
+        raise ValueError('result lacks input provenance; recalculate with XTBCalculator before mapping')
     if metadata['ordered_structure_sha256'] != _ordered_structure_hash(mol):
         raise ValueError('molecule structure or atom order does not match the xTB input')
     try:

@@ -100,7 +100,7 @@ def optimize_xtb(
 
     The input molecule is copied. Coordinates are updated with bounded
     L-BFGS steps and an energy-backtracking line search; all engine calls
-    use the same reviewed extended library as :func:`run_xtb`. ``max_iterations``
+    use the same reviewed extended library as :class:`XTBCalculator`. ``max_iterations``
     counts geometry steps, while ``scf_max_iterations`` is passed to xTB for
     each energy/gradient evaluation. ``max_step`` and ``step_tolerance`` are in
     Angstrom, while gradient and energy tolerances use Hartree/Bohr and Hartree.

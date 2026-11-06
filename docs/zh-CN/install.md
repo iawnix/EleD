@@ -33,7 +33,9 @@ python -m rdkit_eth doctor --check native --method GFN2-xTB
 也可以显式指定库：
 
 ```python
-result = run_xtb(mol, xtb_library="/absolute/path/to/libxtb.so")
+from rdkit_eth import XTBCalculator
+
+result = XTBCalculator(xtb_library="/absolute/path/to/libxtb.so").calculate(mol)
 ```
 
 上游未修改的 xTB 库不包含本项目的 basis 导出扩展，因此不能支持
@@ -44,17 +46,17 @@ Mulliken/Löwdin shell 描述符。程序会检查扩展能力并记录库路径
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_xtb, calc_xtb_descriptors
+from rdkit_eth import XTBCalculator, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 AllChem.MMFFOptimizeMolecule(mol)
 
-result = run_xtb(mol, method="GFN2-xTB")
+result = XTBCalculator(method="GFN2-xTB").calculate(mol)
 print(calc_xtb_descriptors(result))
 ```
 
-输入需要显式氢、有限的 3D 构象和 RDKit 原子顺序。`run_xtb()` 不修改输入
+输入需要显式氢、有限的 3D 构象和 RDKit 原子顺序。`XTBCalculator` 不修改输入
 分子。
 
 ## 构建 C++ 接口

@@ -1,17 +1,17 @@
 # 描述符
 
 所有描述符都使用小写 `snake_case` 字段名，并明确单位。描述符函数只分析
-已有的 xTB 结果；只有 `run_xtb()`、`run_reactivity()` 等入口会调用引擎。
+已有的 xTB 结果；只有 `XTBCalculator.calculate()`、`run_reactivity()` 等入口会调用引擎。
 
 ## 单点描述符
 
 ```python
 from rdkit_eth import (
-    run_xtb, calc_xtb_descriptors, calc_xtb_atom_descriptors,
+    XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors,
 )
 
-result = run_xtb(mol, method="GFN2-xTB")
+result = XTBCalculator(method="GFN2-xTB").calculate(mol)
 molecular = calc_xtb_descriptors(result)
 atoms = calc_xtb_atom_descriptors(result)
 bonds = calc_xtb_bond_descriptors(mol, result)
@@ -31,9 +31,9 @@ HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不�
 ## 密度和 shell 描述符
 
 ```python
-from rdkit_eth import run_xtb, calc_shell_populations, calc_density_matrix
+from rdkit_eth import XTBCalculator, calc_shell_populations, calc_density_matrix
 
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 shells = calc_shell_populations(result)
 density = calc_density_matrix(result)
 ```

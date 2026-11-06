@@ -54,5 +54,5 @@ class XTBOptions:
             object.__setattr__(self, 'xtb_library', os.fspath(self.xtb_library))
 
     def to_dict(self) -> dict:
-        """Return JSON-compatible options, also suitable for ``run_xtb(mol, **opts)``."""
+        """Return JSON-compatible options for ``XTBCalculator`` and batches."""
         return asdict(self)

@@ -1,9 +1,8 @@
 """Reusable RDKit-facing calculators.
 
 The calculator facade owns a validated :class:`XTBOptions` object and returns
-the same immutable :class:`XTBResult` as ``run_xtb``.  Descriptor functions stay
-separate so a calculation can be reused for several analyses without another
-engine call.
+an immutable :class:`XTBResult`. Descriptor functions stay separate so a
+calculation can be reused for several analyses without another engine call.
 """
 from __future__ import annotations
 
@@ -12,7 +11,7 @@ from typing import Any
 
 from .options import XTBOptions
 from .result import XTBResult
-from .xtb import run_xtb
+from .xtb import _run_xtb
 
 
 _OPTION_NAMES = frozenset(field.name for field in fields(XTBOptions))
@@ -23,7 +22,7 @@ class XTBCalculator:
 
     Parameters are validated when the calculator is constructed.  Per-call
     overrides are limited to fields of :class:`XTBOptions`; this keeps the
-    RDKit-facing facade aligned with the functional ``run_xtb`` API.
+    RDKit-facing facade aligned with the shared ``XTBOptions`` contract.
 
     Examples
     --------
@@ -62,7 +61,7 @@ class XTBCalculator:
             names = ', '.join(unknown)
             raise TypeError(f'unknown XTBCalculator override(s): {names}')
         selected = replace(self._options, **overrides) if overrides else self._options
-        return run_xtb(mol, **selected.to_dict())
+        return _run_xtb(mol, **selected.to_dict())
 
     __call__ = calculate
 

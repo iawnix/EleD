@@ -3,7 +3,9 @@
 密度描述符只消费已有的扩展版 `libxtb` 结果，不调用引擎。运行时必须使用：
 
 ```python
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+from rdkit_eth import XTBCalculator
+
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 ```
 
 ## 密度矩阵

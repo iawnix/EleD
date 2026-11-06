@@ -1,7 +1,7 @@
 """Descriptors from the retained xTB density and AO basis.
 
 Every function in this module is an analysis of an existing result.  It never
-calls xTB.  ``run_xtb(..., keep_overlap=True)`` is required because orbital
+calls xTB.  ``XTBCalculator(...).calculate(..., keep_overlap=True)`` is required because orbital
 coefficients without the same calculation's overlap matrix are not a density
 in a defined non-orthogonal basis.
 """
@@ -27,7 +27,7 @@ def _basis(result):
     if not all(len(v) for v in fields):
         raise DescriptorUnavailableError(
             "density descriptors require same-calculation overlap, coefficients and shell maps; "
-            "use run_xtb(..., keep_overlap=True)")
+            "use XTBCalculator(...).calculate(..., keep_overlap=True)")
     c = _finite(result.orbital_coefficients, 'orbital coefficients', 2)
     s = _finite(result.overlap_matrix, 'overlap', 2)
     if c.shape != s.shape or s.shape[0] != len(result.ao_atom_indices):

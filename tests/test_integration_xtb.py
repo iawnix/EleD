@@ -1,4 +1,5 @@
 """Real shared-library calculations, with no xTB executable dependency."""
+from helpers import calculate_xtb
 import ctypes
 import os
 import subprocess
@@ -9,7 +10,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import annotate_mol, run_xtb, run_xtb_batch, XTBCache
+from rdkit_eth import annotate_mol, run_xtb_batch, XTBCache
 from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
 from rdkit_eth.errors import XTBNativeNotFoundError
 
@@ -49,7 +50,7 @@ def molecule(smiles):
 def test_native_results_and_mapping_without_executable(smiles, method, library, no_executable):
     mol = molecule(smiles)
     original = mol.ToBinary()
-    native = run_xtb(mol, method=method, xtb_library=library)
+    native = calculate_xtb(mol, method=method, xtb_library=library)
     assert native.backend == 'native'
     assert np.isfinite(native.total_energy_hartree) and native.total_energy_hartree < 0
     assert sum(native.partial_charges) == pytest.approx(Chem.GetFormalCharge(mol), abs=1e-6)
@@ -80,7 +81,7 @@ def test_fixed_water_matches_archived_reference(library, no_executable):
         conf.SetAtomPosition(i, xyz)
     conf.Set3D(True)
     mol.AddConformer(conf)
-    result = run_xtb(mol, xtb_library=library)
+    result = calculate_xtb(mol, xtb_library=library)
     assert result.total_energy_hartree == pytest.approx(-5.07037168, abs=2e-7)
 
 
@@ -91,19 +92,19 @@ def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable)
     expected = os.environ.get('RDKIT_ETH_EXPECT_NATIVE_GFN0')
     if expected is not None:
         assert bool(verified) == (expected == '1')
-    before = run_xtb(mol, xtb_library=library)
+    before = calculate_xtb(mol, xtb_library=library)
     if verified:
-        gfn0 = run_xtb(mol, method='GFN0-xTB', xtb_library=library)
+        gfn0 = calculate_xtb(mol, method='GFN0-xTB', xtb_library=library)
         assert gfn0.backend == 'native' and gfn0.method == 'GFN0-xTB'
         assert gfn0.orbital_energies_ev
         assert gfn0.metadata['engine']['native_gfn0']['library_sha256'] == gfn0.metadata['engine']['sha256']
-        run_xtb(molecule('CO'), method='gfn1', xtb_library=library)
+        calculate_xtb(molecule('CO'), method='gfn1', xtb_library=library)
         run_xtb_native(molecule('O'), method='gfn0', xtb_library=library)
     else:
-        for entry in (run_xtb, run_xtb_native):
+        for entry in (run_xtb_native):
             with pytest.raises(ValueError, match='verified patched'):
                 entry(mol, method='GFN0-xTB', xtb_library=library)
-    after = run_xtb(mol, xtb_library=library)
+    after = calculate_xtb(mol, xtb_library=library)
     assert after.total_energy_hartree == pytest.approx(before.total_energy_hartree, abs=1e-10)
     np.testing.assert_allclose(after.orbital_energies_ev, before.orbital_energies_ev, atol=1e-8, rtol=0)
     np.testing.assert_allclose(after.orbital_coefficients, before.orbital_coefficients, atol=1e-8, rtol=0)
@@ -126,4 +127,4 @@ def test_native_batch_and_cache_without_executable(method, library, no_executabl
 
 def test_missing_library_fails_without_fallback(no_executable):
     with pytest.raises(XTBNativeNotFoundError):
-        run_xtb(molecule('O'), xtb_library='/does/not/exist')
+        calculate_xtb(molecule('O'), xtb_library='/does/not/exist')

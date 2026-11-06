@@ -1,3 +1,4 @@
+from helpers import calculate_xtb
 from dataclasses import replace
 from pathlib import Path
 import json
@@ -9,7 +10,7 @@ Chem = pytest.importorskip('rdkit.Chem')
 from rdkit.Chem import AllChem
 from rdkit_eth import (
     XTBOptions, XTBResult, XTBRunError, XTBCache,
-    annotate_mol, run_xtb, run_xtb_batch, xtb_cache_key,
+    annotate_mol, run_xtb_batch, xtb_cache_key,
 )
 from rdkit_eth.input import _input_metadata, _xyz_from_mol
 
@@ -95,22 +96,22 @@ def test_atom_hydrogen_counts_are_not_explicit_hydrogen_vertices():
     conf.Set3D(True)
     mol.AddConformer(conf)
     with pytest.raises(ValueError, match='Chem.AddHs'):
-        run_xtb(mol, xtb_library='/missing')
+        calculate_xtb(mol, xtb_library='/missing')
 
 
 def test_coordinate_and_spin_validation_happens_before_engine_lookup():
     mol = molecule()
     with pytest.raises(ValueError, match='electron count'):
-        run_xtb(mol, uhf=1, xtb_library='/missing')
+        calculate_xtb(mol, uhf=1, xtb_library='/missing')
     with pytest.raises(ValueError, match='integers'):
-        run_xtb(mol, charge=.5, xtb_library='/missing')
+        calculate_xtb(mol, charge=.5, xtb_library='/missing')
     mol.GetConformer().Set3D(False)
     with pytest.raises(ValueError, match='3D'):
-        run_xtb(mol, xtb_library='/missing')
+        calculate_xtb(mol, xtb_library='/missing')
     mol.GetConformer().Set3D(True)
     mol.GetConformer().SetAtomPosition(0, (float('nan'), 0., 0.))
     with pytest.raises(ValueError, match='finite'):
-        run_xtb(mol, xtb_library='/missing')
+        calculate_xtb(mol, xtb_library='/missing')
 
 
 def test_cache_keys_include_geometry_options_library_and_parameters(engine, monkeypatch):
@@ -140,7 +141,7 @@ def test_cache_keys_include_geometry_options_library_and_parameters(engine, monk
 def test_batch_reuses_results_and_isolates_metadata(engine):
     mol = molecule()
     cache = XTBCache()
-    with patch('rdkit_eth.batch.run_xtb', return_value=sample_result(mol)) as calculate:
+    with patch('rdkit_eth.batch._run_xtb', return_value=sample_result(mol)) as calculate:
         results = run_xtb_batch([mol] * 12, cache=cache, xtb_library=engine)
     assert calculate.call_count == 1
     assert len(cache) == 1
@@ -156,13 +157,13 @@ def test_batch_keeps_order_and_retries_failed_calculations(engine):
         if mol.GetNumAtoms() == b.GetNumAtoms():
             raise XTBRunError('test failure')
         return sample_result(mol)
-    with patch('rdkit_eth.batch.run_xtb', side_effect=fake):
+    with patch('rdkit_eth.batch._run_xtb', side_effect=fake):
         results = run_xtb_batch([a, b, a], cache=cache, xtb_library=engine,
                                 return_exceptions=True)
     assert isinstance(results[1], XTBRunError)
     assert results[0] == results[2]
     assert len(cache) == 1
-    with patch('rdkit_eth.batch.run_xtb', return_value=sample_result(b)) as calculate:
+    with patch('rdkit_eth.batch._run_xtb', return_value=sample_result(b)) as calculate:
         run_xtb_batch([b], cache=cache, xtb_library=engine)
     assert calculate.call_count == 1
     with pytest.raises(ValueError, match='max_workers'):
@@ -173,7 +174,7 @@ def test_batch_keeps_order_and_retries_failed_calculations(engine):
 
 def test_gfnff_rejected_before_calculation():
     with pytest.raises(ValueError, match='no molecular orbitals'):
-        run_xtb(molecule(), method='GFN-FF')
+        calculate_xtb(molecule(), method='GFN-FF')
 
 
 @pytest.mark.parametrize('backend', ['cli', 'auto', 'tblite'])
@@ -184,7 +185,7 @@ def test_removed_backends_fail_before_calculation(backend, monkeypatch):
     monkeypatch.setattr(subprocess, 'Popen', forbidden)
     monkeypatch.setattr('rdkit_eth.xtb._find_xtb_library', forbidden)
     with pytest.raises(ValueError, match='removed'):
-        run_xtb(molecule(), backend=backend)
+        calculate_xtb(molecule(), backend=backend)
     with pytest.raises(ValueError, match='removed'):
         run_xtb_batch([molecule()], backend=backend)
 
@@ -193,7 +194,7 @@ def test_removed_backends_fail_before_calculation(backend, monkeypatch):
                                         ('timeout', 30), ('optimize', True), ('solvent', 'water')])
 def test_removed_options_are_not_silently_ignored(option, value):
     with pytest.raises(TypeError, match=option):
-        run_xtb(molecule(), **{option: value})
+        calculate_xtb(molecule(), **{option: value})
     with pytest.raises(TypeError, match=option):
         XTBOptions(**{option: value})
     if option != 'timeout':  # wall-clock timeout now belongs to isolated batch execution

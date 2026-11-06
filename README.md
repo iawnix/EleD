@@ -63,8 +63,8 @@ parameter hash and extension capabilities are recorded in every result.
 
 ### First calculation
 
-Inputs need explicit hydrogens and a finite 3D conformer. `run_xtb()` leaves the
-input molecule unchanged.
+Inputs need explicit hydrogens and a finite 3D conformer. `XTBCalculator` leaves
+the input molecule unchanged.
 
 ```python
 from rdkit import Chem
@@ -229,7 +229,7 @@ python -m rdkit_eth doctor --check native --method GFN2-xTB
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_xtb, calc_xtb_descriptors
+from rdkit_eth import XTBCalculator, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
@@ -243,7 +243,7 @@ print(features["xtb_gap_ev"])
 需要 shell、Mulliken/Löwdin 或密度描述符时：
 
 ```python
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 ```
 
 ### 描述符和研究文档

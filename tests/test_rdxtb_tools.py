@@ -1,4 +1,5 @@
 """Exercise the compiled ROMol binding against independent xTB entry points."""
+from helpers import calculate_xtb
 
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 import hashlib
@@ -13,7 +14,6 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdEHTTools
 
-from rdkit_eth import run_xtb
 from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
 
 if importlib.util.find_spec('rdkit_eth.rdXTBTools') is None:
@@ -52,7 +52,7 @@ def test_numerical_agreement_units_and_mapping(method, smiles, library):
     ok, result = rdXTBTools.RunMol(mol, confId=7, method=method, xtbLibrary=library,
                                  keepOrbitalCoefficients=True)
     assert ok and result.success and result.errorMessage == ''
-    native = run_xtb(mol, conf_id=7, method=method, backend='native', xtb_library=library)
+    native = calculate_xtb(mol, conf_id=7, method=method, backend='native', xtb_library=library)
     assert result.totalEnergyHartree == pytest.approx(native.total_energy_hartree, abs=1e-10)
     np.testing.assert_allclose(result.GetOrbitalEnergies(), native.orbital_energies_ev, atol=2e-5, rtol=0)
     np.testing.assert_allclose(result.GetOrbitalOccupancies(), native.orbital_occupations, atol=2e-5, rtol=0)
@@ -184,7 +184,7 @@ def test_native_calculation_does_not_delegate_to_python_backends(library, monkey
         pytest.fail('compiled calculations must call libxtb directly')
     monkeypatch.setattr(native._NativeXTB, '__init__', forbidden)
     monkeypatch.setattr(native, 'run_xtb_native', forbidden)
-    monkeypatch.setattr(adapter, 'run_xtb', forbidden)
+    monkeypatch.setattr(adapter, '_run_xtb', forbidden)
     assert rdXTBTools.RunMol(molecule(), xtbLibrary=library)[0]
 
 
@@ -203,7 +203,7 @@ def test_mixed_threads_share_lock_and_preserve_method_state(library):
         def calculate(index):
             method = methods[index]
             if index % 2:
-                return run_xtb(mol, method=method, backend='native', xtb_library=library).total_energy_hartree
+                return calculate_xtb(mol, method=method, backend='native', xtb_library=library).total_energy_hartree
             ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library)
             assert ok
             return result.totalEnergyHartree
@@ -256,7 +256,7 @@ def test_common_descriptors_accept_compiled_results(library):
     mol = molecule()
     ok, compiled = rdXTBTools.RunMol(mol, xtbLibrary=library)
     assert ok
-    native = run_xtb(mol, xtb_library=library)
+    native = calculate_xtb(mol, xtb_library=library)
     a, b = calc_xtb_descriptors(compiled), calc_xtb_descriptors(native)
     for key in a:
         if key in ('xtb_backend', 'xtb_version'): continue

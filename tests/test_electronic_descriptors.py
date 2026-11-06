@@ -10,7 +10,7 @@ from rdkit_eth import (
     XTBResult, XTBOptions, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
     calc_orbital_populations, calc_frontier_descriptors, DescriptorUnavailableError,
-    run_xtb, annotate_mol,
+    annotate_mol,
 )
 from rdkit_eth.input import _input_metadata, _xyz_from_mol
 

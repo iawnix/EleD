@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from rdkit import Chem
-from rdkit_eth import prepare_conformers, run_xtb
+from rdkit_eth import XTBCalculator, prepare_conformers
 
 
 def main():
@@ -19,7 +19,8 @@ def main():
         for conf in prepared.molecule.GetConformers(): writer.write(prepared.molecule, confId=conf.GetId())
     print('Accepted:', prepared.report['n_conformers'], 'status:', prepared.report['status'])
     if args.xtb:
-        result = run_xtb(prepared.molecule, conf_id=prepared.report['recommended_conformer_id'])
+        result = XTBCalculator().calculate(
+            prepared.molecule, conf_id=prepared.report['recommended_conformer_id'])
         print('GFN2 single-point energy (Hartree):', result.total_energy_hartree)
 
 

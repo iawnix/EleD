@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from .xtb import XTBResult, calc_xtb_descriptors, run_xtb
+from .xtb import XTBResult, calc_xtb_descriptors
+from .calculator import XTBCalculator
 
 
 def _frontier_from_fermi(energies: tuple[float, ...], fermi: float) -> tuple[float | None, float | None]:
@@ -51,7 +52,7 @@ def calc_orbital_descriptors(
     """Calculate method-prefixed scalar orbital descriptors.
 
     ``backend`` can be ``"eht"``, ``"xtb"``, or ``"both"``. xTB options are
-    forwarded to :func:`run_xtb`; EHT always uses RDKit's YAeHMOP interface.
+    forwarded to :class:`XTBCalculator`; EHT always uses RDKit's YAeHMOP interface.
     frontier_depth and occupation_threshold configure xTB feature extraction
     only; they do not change the calculation or EHT frontier convention.
     """
@@ -72,12 +73,11 @@ def calc_orbital_descriptors(
             raise RuntimeError("RDKit YAeHMOP EHT calculation failed")
         descriptors.update(calc_eht_descriptors(result))
     if normalized in {"xtb", "both"}:
-        result: XTBResult = run_xtb(
-            mol,
+        result: XTBResult = XTBCalculator(
             conf_id=conf_id,
             backend=xtb_backend,
             **xtb_options,
-        )
+        ).calculate(mol)
         descriptors.update(calc_xtb_descriptors(result, frontier_depth=frontier_depth,
                                                  occupation_threshold=occupation_threshold))
     return descriptors

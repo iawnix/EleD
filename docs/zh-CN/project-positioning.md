@@ -35,20 +35,14 @@ RDKit Mol / Conformer
 
 ## API 方向
 
-现有函数接口继续作为底层和脚本接口：
+公开计算接口使用可复用的计算器对象：
 
 ```python
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
-features = calc_xtb_descriptors(result)
-```
-
-下一步稳定 API 应提供可复用的计算器对象：
-
-```python
-from rdkit_eth import XTBCalculator
+from rdkit_eth import XTBCalculator, calc_xtb_descriptors
 
 calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
 result = calculator.calculate(mol, keep_overlap=True)
+features = calc_xtb_descriptors(result)
 ```
 
 描述符注册表应统一提供名称、单位、所需结果能力、不变性和缺失值语义。当前

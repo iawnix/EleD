@@ -24,8 +24,9 @@ def synthetic(monkeypatch):
         for i, xyz in enumerate(((0, 0, 0), (1+shift, 0, 0), (0, 1, 0))): conf.SetAtomPosition(i, xyz)
         mol.AddConformer(conf, assignId=False)
     monkeypatch.setattr('rdkit_eth.batch._resolve_options', lambda options: options)
-    def calculate(molecule, **kwargs):
-        identifier = kwargs['conf_id']; h = {3: -3., 8: -2., 12: -1.}[identifier]
+    def calculate(self, molecule, **kwargs):
+        identifier = kwargs.get('conf_id', self.options.conf_id)
+        h = {3: -3., 8: -2., 12: -1.}[identifier]
         metadata = _input_metadata(molecule, identifier, 0, 0, _xyz_from_mol(molecule, identifier))
         metadata.update(calculation_settings=calculation_settings(), calculation_status='success',
                         engine={'sha256': 'fixture-engine'}, initialization='independent')
@@ -33,7 +34,7 @@ def synthetic(monkeypatch):
             orbital_energies_ev=(-10., h, 1.), orbital_occupations=(2., 2., 0.),
             partial_charges=(-.6, .3, .3), dipole_e_bohr=(0., 0., 1.),
             wiberg_bond_orders=((0., 1., 1.), (1., 0., 0.), (1., 0., 0.)), metadata=metadata)
-    monkeypatch.setattr(conformers, 'run_xtb', calculate)
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', calculate)
     return mol, calculate
 
 
@@ -57,10 +58,10 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
 
 def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
     mol, calculate = synthetic
-    def fail_middle(mol, **kwargs):
-        if kwargs['conf_id'] == 8: raise XTBRunError('SCF failed')
-        return calculate(mol, **kwargs)
-    monkeypatch.setattr(conformers, 'run_xtb', fail_middle)
+    def fail_middle(self, mol, **kwargs):
+        if kwargs.get('conf_id', self.options.conf_id) == 8: raise XTBRunError('SCF failed')
+        return calculate(self, mol, **kwargs)
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', fail_middle)
     report = run_conformer_analysis(mol, columns=['xtb_homo_ev'])
     assert report['n_failed'] == 1 and report['status'] == 'partial'
     assert report['statistics']['xtb_homo_ev']['n_valid'] == 2
@@ -69,9 +70,9 @@ def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
     with pytest.raises(XTBRunError): run_conformer_analysis(mol, return_errors=False)
     for error in (XTBEnvironmentError('runtime'), RuntimeError('unexpected'), ValueError('analysis')):
         def fail(*a, **k): raise error
-        monkeypatch.setattr(conformers, 'run_xtb', fail)
+        monkeypatch.setattr(conformers.XTBCalculator, 'calculate', fail)
         with pytest.raises(type(error)): run_conformer_analysis(mol)
-    monkeypatch.setattr(conformers, 'run_xtb', lambda *a, **k: (_ for _ in ()).throw(XTBRunError('SCF')))
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', lambda *a, **k: (_ for _ in ()).throw(XTBRunError('SCF')))
     report = run_conformer_analysis(mol)
     assert report['status'] == 'failed' and report['n_failed'] == 3
     assert all(s['mean'] is None and s['n_failed'] == 3 for s in report['statistics'].values())
@@ -84,14 +85,14 @@ def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
 def test_invalid_inputs_do_not_calculate(synthetic, monkeypatch, kwargs):
     mol, _ = synthetic
     def unexpected(*a, **k): raise AssertionError('must validate first')
-    monkeypatch.setattr(conformers, 'run_xtb', unexpected)
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
     with pytest.raises(ValueError): run_conformer_analysis(mol, **kwargs)
 
 
 def test_bad_later_geometry_rejected_before_first_calculation(synthetic, monkeypatch):
     mol, _ = synthetic; mol.GetConformer(12).SetAtomPosition(0, (float('nan'), 0, 0))
     def unexpected(*a, **k): raise AssertionError('must validate all first')
-    monkeypatch.setattr(conformers, 'run_xtb', unexpected)
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
     with pytest.raises(ValueError, match='finite'): run_conformer_analysis(mol)
 
 
@@ -99,10 +100,11 @@ def test_bad_later_geometry_rejected_before_first_calculation(synthetic, monkeyp
                                         ('conformer_id', 3), ('calculation_settings', {})])
 def test_mixed_or_wrong_provenance_is_rejected(synthetic, monkeypatch, field, value):
     mol, calculate = synthetic
-    def mixed(mol, **kwargs):
-        r = calculate(mol, **kwargs)
-        return replace(r, metadata={**r.metadata, field: value}) if kwargs['conf_id'] == 8 else r
-    monkeypatch.setattr(conformers, 'run_xtb', mixed)
+    def mixed(self, mol, **kwargs):
+        r = calculate(self, mol, **kwargs)
+        identifier = kwargs.get('conf_id', self.options.conf_id)
+        return replace(r, metadata={**r.metadata, field: value}) if identifier == 8 else r
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', mixed)
     with pytest.raises(ValueError, match='provenance|protocol'): run_conformer_analysis(mol)
 
 
@@ -142,5 +144,5 @@ def test_real_engine_rigid_transform_and_disk_cache(smiles, tmp_path, monkeypatc
     assert report['status'] == 'complete' and len(cache) == 2
     for key, stats in report['statistics'].items(): assert stats['range'] < 1e-6, key
     def unexpected(*a, **k): raise AssertionError('cache should hit')
-    monkeypatch.setattr(conformers, 'run_xtb', unexpected)
+    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
     assert run_conformer_analysis(mol, cache=cache, frontier_depth=0) == report

@@ -53,7 +53,7 @@ The C++ core verifies the complete build manifest, reviewed upstream repair
 identity, basis-export and SCC-diagnostics extensions, and selected binary
 digest **before loading any parameters**. An official unpatched library is
 rejected for GFN0/1/2. `rdXTBTools` always uses the extended native library.
-The separate `run_xtb()` API defaults to ctypes/libxtb and applies the same
+The separate `XTBCalculator` API defaults to ctypes/libxtb and applies the same
 verification; neither interface falls back to another engine or process.
 
 Build a wheel in the same activated environment with:

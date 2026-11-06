@@ -3,9 +3,9 @@
 ## 单点报告
 
 ```python
-from rdkit_eth import run_xtb, calc_descriptor_report
+from rdkit_eth import XTBCalculator, calc_descriptor_report
 
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 report = calc_descriptor_report(mol, result, record_id="molecule-1")
 ```
 

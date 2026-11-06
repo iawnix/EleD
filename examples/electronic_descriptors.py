@@ -9,7 +9,7 @@ import json
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit_eth import (
-    run_xtb, calc_xtb_descriptors, calc_xtb_atom_descriptors,
+    XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
     calc_orbital_populations, calc_frontier_descriptors,
 )
@@ -25,7 +25,7 @@ def main():
     alkyl = {a.GetIdx() for a in mol.GetAtoms() if a.GetAtomicNum() == 6}
     alkyl.update(n.GetIdx() for i in list(alkyl) for n in mol.GetAtomWithIdx(i).GetNeighbors() if n.GetAtomicNum() == 1)
     fragments = {'alkyl': sorted(alkyl), 'hydroxyl': sorted(set(range(mol.GetNumAtoms())) - alkyl)}
-    result = run_xtb(mol, keep_overlap=args.populations)
+    result = XTBCalculator().calculate(mol, keep_overlap=args.populations)
     report = {
         'scalars': calc_xtb_descriptors(result),
         'atoms': calc_xtb_atom_descriptors(result),

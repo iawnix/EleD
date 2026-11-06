@@ -1,4 +1,5 @@
 """Native same-calculation basis and population contracts; no second engine."""
+from helpers import calculate_xtb
 import builtins
 from dataclasses import replace
 import hashlib
@@ -12,7 +13,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 from rdkit_eth import (
-    run_xtb, run_xtb_batch, XTBCache, DescriptorUnavailableError,
+    run_xtb_batch, XTBCache, DescriptorUnavailableError,
     calc_orbital_populations, calc_frontier_descriptors, calc_xtb_bond_descriptors, annotate_mol,
     calc_density_descriptors,
 )
@@ -46,7 +47,7 @@ def test_native_basis_on_frozen_corpus(method,case,library):
     conf=Chem.Conformer(mol.GetNumAtoms()); conf.Set3D(True)
     for i,xyz in enumerate(case['positions_angstrom']): conf.SetAtomPosition(i,xyz)
     mol.AddConformer(conf)
-    result=run_xtb(mol,method=method,xtb_library=library,keep_overlap=True)
+    result=calculate_xtb(mol,method=method,xtb_library=library,keep_overlap=True)
     c,s=np.array(result.orbital_coefficients),np.array(result.overlap_matrix)
     np.testing.assert_allclose(c.T@s@c,np.eye(len(c)),atol=1e-8,rtol=0)
     ao,ash,sa,l=map(np.asarray,[result.ao_atom_indices,result.ao_shell_indices,result.shell_atom_indices,result.shell_angular_momenta])
@@ -71,7 +72,7 @@ def test_native_basis_on_frozen_corpus(method,case,library):
 def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
     rdXTBTools = pytest.importorskip("rdkit_eth.rdXTBTools")
     m=molecule(smiles)
-    r=run_xtb(m,method=method,xtb_library=library,keep_overlap=True)
+    r=calculate_xtb(m,method=method,xtb_library=library,keep_overlap=True)
     ok,compiled=rdXTBTools.RunMol(m,method=method,xtbLibrary=library,keepOverlap=True)
     assert ok and compiled.overlapRetained and compiled.basisExportVerified
     np.testing.assert_allclose(compiled.GetOverlapMatrix(),r.overlap_matrix,atol=1e-12,rtol=0)
@@ -100,7 +101,7 @@ def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
     assert calc_xtb_bond_descriptors(m,compiled)
     assert annotate_mol(m,compiled).GetAtomWithIdx(0).HasProp('xtb_wiberg_sum')
     old=compiled.GetOverlapMatrix().copy()
-    run_xtb(molecule('CC'),xtb_library=library,keep_overlap=True)
+    calculate_xtb(molecule('CC'),xtb_library=library,keep_overlap=True)
     np.testing.assert_array_equal(compiled.GetOverlapMatrix(),old)
     m.GetConformer().SetAtomPosition(0,(12.,0.,0.))
     with pytest.raises(ValueError,match='coordinates'): calc_frontier_descriptors(m,compiled)
@@ -129,7 +130,7 @@ def test_benzene_degenerate_subspaces(library):
         for index,radius in ((i,1.4),(i+6,2.48)):
             conf.SetAtomPosition(index,(radius*np.cos(i*np.pi/3),radius*np.sin(i*np.pi/3),0.))
     m.AddConformer(conf)
-    r=run_xtb(m,xtb_library=library,keep_overlap=True)
+    r=calculate_xtb(m,xtb_library=library,keep_overlap=True)
     baseline=calc_frontier_descriptors(m,r); c=np.array(r.orbital_coefficients)
     for label in ['homo','lumo']:
         selected=baseline[label]['orbital_indices']; assert len(selected)==2
@@ -168,7 +169,7 @@ def test_standard_library_basic_support_and_missing_capability():
     if _native_basis_build(library): pytest.skip('requires an unextended library')
     m=molecule()
     with pytest.raises(XTBEnvironmentError,match='extended libxtb'):
-        run_xtb(m,xtb_library=library)
+        calculate_xtb(m,xtb_library=library)
     rdXTBTools = pytest.importorskip("rdkit_eth.rdXTBTools")
     with pytest.raises(ValueError,match='extended libxtb'):
         rdXTBTools.RunMol(m,xtbLibrary=library)

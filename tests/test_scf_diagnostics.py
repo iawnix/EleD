@@ -1,4 +1,5 @@
 """SCC diagnostic semantics, invalidation, copies and binding agreement."""
+from helpers import calculate_xtb
 import ctypes
 import json
 from pathlib import Path
@@ -6,7 +7,7 @@ from pathlib import Path
 import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_xtb, calc_descriptor_report
+from rdkit_eth import calc_descriptor_report
 from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _SCF_DIAGNOSTICS_PATCH
 from rdkit_eth.scf import scf_record
 from rdkit_eth.errors import XTBEnvironmentError, XTBNativeNotFoundError
@@ -41,7 +42,7 @@ def test_reviewed_patch_and_missing_semantics():
 @pytest.mark.parametrize('method', ['GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'])
 def test_success_diagnostics_and_compiled_parity(library, method):
     molecule = mol()
-    result = run_xtb(molecule, method=method, xtb_library=library)
+    result = calculate_xtb(molecule, method=method, xtb_library=library)
     diagnostic = result.metadata['scf']
     if method == 'GFN0-xTB': assert diagnostic['available'] is False
     else:

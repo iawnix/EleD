@@ -18,7 +18,7 @@ import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem, Descriptors, rdFingerprintGenerator
 
-from rdkit_eth import XTBOptions, XTBEnvironmentError, XTBRunError, run_xtb, calc_descriptor_report
+from rdkit_eth import XTBOptions, XTBCalculator, XTBEnvironmentError, XTBRunError, calc_descriptor_report
 from rdkit_eth.input import _geometry_hash, _xyz_from_mol
 from rdkit_eth.persistence import _implementation_identity
 
@@ -187,7 +187,7 @@ def main():
             if not np.allclose(two_d, original['rdkit'], atol=1e-10, rtol=1e-12):
                 raise ValueError('2D features changed after canonical reconstruction: ' + identifier)
             t = time.perf_counter()
-            try: result = run_xtb(mol, **frozen['options'])
+            try: result = XTBCalculator(**frozen['options']).calculate(mol)
             except XTBEnvironmentError: raise
             except XTBRunError as exc:
                 failures.append({'id': identifier, 'stage': 'xtb', 'reason': str(exc)}); continue

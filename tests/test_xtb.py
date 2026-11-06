@@ -46,12 +46,12 @@ class AdapterTests(unittest.TestCase):
             from rdkit.Chem import AllChem
         except ImportError:
             self.skipTest("RDKit is optional for the parser-only test suite")
-        from rdkit_eth.xtb import run_xtb
+        from helpers import calculate_xtb
 
         mol = Chem.MolFromSmiles("CC")
         AllChem.EmbedMolecule(mol, randomSeed=1)
         with self.assertRaisesRegex(ValueError, "implicit hydrogens"):
-            run_xtb(mol, xtb_library="/does/not/matter")
+            calculate_xtb(mol, xtb_library="/does/not/matter")
 
 
 if __name__ == "__main__":

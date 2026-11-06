@@ -45,20 +45,15 @@ capabilities explicitly.
 
 ## Public API direction
 
-The existing functional API remains the low-level and scripting interface:
-
-```python
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
-features = calc_xtb_descriptors(result)
-```
-
-The next stable convenience layer should provide a reusable calculator object:
+The public calculation API is the reusable calculator object:
 
 ```python
 from rdkit_eth import XTBCalculator
+from rdkit_eth import calc_xtb_descriptors
 
 calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
 result = calculator.calculate(mol, keep_overlap=True)
+features = calc_xtb_descriptors(result)
 ```
 
 Descriptor objects or registry entries should expose a common contract for

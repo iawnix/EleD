@@ -23,7 +23,7 @@ from rdkit import Chem, rdBase
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
-from rdkit_eth import XTBEnvironmentError, XTBOptions, XTBRunError, calc_descriptor_report, run_xtb
+from rdkit_eth import XTBEnvironmentError, XTBOptions, XTBRunError, calc_descriptor_report, XTBCalculator
 from rdkit_eth.input import _xyz_from_mol, _geometry_hash
 from rdkit_eth.persistence import _implementation_identity
 from rdkit_eth.backends.native import HARTREE_TO_EV
@@ -223,7 +223,7 @@ def main():
             row['rdkit_seconds'] = time.perf_counter()-t
             t = time.perf_counter()
             try:
-                result = run_xtb(mol, **options.to_dict())
+                result = XTBCalculator(**options.to_dict()).calculate(mol)
             except XTBEnvironmentError: raise
             except XTBRunError as exc:
                 failures.append({**metadata, 'reason': str(exc)}); continue

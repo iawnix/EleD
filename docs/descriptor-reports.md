@@ -23,11 +23,11 @@ retaining its settings does not imply an SCC iteration or finite-T SCF protocol.
 
 ```python
 from rdkit_eth import (
-    run_xtb, calc_descriptor_report, run_descriptor_batch,
+    XTBCalculator, calc_descriptor_report, run_descriptor_batch,
     export_descriptor_reports, XTBOptions, XTBCache,
 )
 
-result = run_xtb(mol, keep_overlap=True, accuracy=0.1)
+result = XTBCalculator(accuracy=0.1).calculate(mol, keep_overlap=True)
 report = calc_descriptor_report(mol, result, record_id="molecule-1")
 reports = run_descriptor_batch(molecules, record_ids=identifiers, cache=XTBCache())
 export_descriptor_reports(reports, "features.csv")
@@ -107,7 +107,7 @@ semantics are in `atom_units`, `atom_invariance`, and
 Only GFN1/2 support this ΔSCF workflow. It evaluates reference charge Q,
 ionized Q+1 and attached Q−1 at the **same input geometry**, method, numerical
 settings, engine and parameter identity. Inputs require explicit H atoms and
-a 3D conformer, as for `run_xtb`. No optimization or spin-state search occurs.
+a 3D conformer, as for `XTBCalculator`. No optimization or spin-state search occurs.
 For a closed-shell reference, adjacent states default to one unpaired electron.
 For an open-shell reference, explicitly supply both `ionized_uhf` and
 `attached_uhf`; spin parity is validated. The selected states are not asserted

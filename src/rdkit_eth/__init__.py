@@ -9,8 +9,6 @@ from .xtb import (
     XTBRunError,
     XTBNativeNotFoundError,
     calc_xtb_descriptors,
-    run_xtb,
-    run_xtb_native,
 )
 from .descriptors import calc_eht_descriptors, calc_orbital_descriptors
 from .mapping import annotate_mol
@@ -34,8 +32,6 @@ __all__ = [
     "XTBRunError",
     "XTBNativeNotFoundError",
     "calc_xtb_descriptors",
-    "run_xtb",
-    "run_xtb_native",
     "calc_eht_descriptors",
     "calc_orbital_descriptors",
     "annotate_mol",

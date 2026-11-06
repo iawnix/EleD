@@ -29,12 +29,12 @@ provenance record; molecule-bound helpers reject missing provenance.
 
 ```python
 from rdkit_eth import (
-    run_xtb, calc_xtb_descriptors, calc_xtb_atom_descriptors,
+    XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors, annotate_mol,
 )
 
 # mol must already have explicit hydrogen atoms and a 3D conformer.
-result = run_xtb(mol, method="GFN2-xTB")
+result = XTBCalculator(method="GFN2-xTB").calculate(mol)
 scalars = calc_xtb_descriptors(result, frontier_depth=2)
 atoms = calc_xtb_atom_descriptors(result)
 bonds = calc_xtb_bond_descriptors(mol, result)
@@ -90,7 +90,7 @@ in-place writes; geometry/topology changes are rejected.
 ## Obtain same-calculation basis data
 
 ```python
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 print(result.ao_atom_indices)  # one zero-based atom index per AO
 print(result.overlap_matrix)  # AO × AO, same basis/order as coefficients
 ```
@@ -208,7 +208,7 @@ failed SCF, Hessian invalidation and recovery. No tblite or ASE is imported.
 ```python
 from rdkit_eth import calc_density_descriptors
 
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 density = calc_density_descriptors(mol, result)
 ```
 

@@ -33,7 +33,7 @@ def test_real_single_point_disk_cache_and_process_roundtrip(library,tmp_path):
     mol=molecule();path=tmp_path/'cache.sqlite';cache=XTBDiskCache(path)
     opts=XTBOptions(xtb_library=library,keep_overlap=bool(_native_basis_build(library)))
     first=run_xtb_batch([mol],options=opts,cache=cache)[0]
-    with patch('rdkit_eth.batch.run_xtb',side_effect=AssertionError('recalculated')):
+    with patch('rdkit_eth.batch._run_xtb',side_effect=AssertionError('recalculated')):
         again=run_xtb_batch([mol],options=opts,cache=XTBDiskCache(path))[0]
     assert first==again
     from rdkit_eth.batch import _prepare,_key

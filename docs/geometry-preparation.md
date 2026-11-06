@@ -7,7 +7,7 @@ preparation report. It uses RDKit embedding and MMFF94/UFF by default. With
 not a new embedding algorithm.
 
 ```python
-from rdkit_eth import prepare_conformers, run_xtb
+from rdkit_eth import prepare_conformers, XTBCalculator
 
 prepared = prepare_conformers(
     'C[C@H](O)C(=O)O', num_conformers=8, random_seed=42,
@@ -15,7 +15,8 @@ prepared = prepare_conformers(
 )
 if prepared.success:
     molecule = prepared.molecule
-    result = run_xtb(molecule, conf_id=prepared.report['recommended_conformer_id'])
+    result = XTBCalculator().calculate(
+        molecule, conf_id=prepared.report['recommended_conformer_id'])
 else:
     print(prepared.report['error'], prepared.report['attempts'])
 ```
@@ -81,7 +82,7 @@ discarded conformers are in the report.
 Invalid SMILES, empty molecules, dummy atoms, disconnected fragments, enhanced
 stereo groups and unsupported non-tetrahedral/non-E/Z stereo are rejected.
 Relative geometries for salts/complexes require explicit user preparation;
-already prepared structures can still be passed directly to `run_xtb`.
+already prepared structures can still be passed directly to `XTBCalculator`.
 
 Unspecified stereochemistry is flagged in `unspecified_stereo` and `warnings`.
 Set `require_assigned_stereo=True` to reject it. Otherwise the output can be

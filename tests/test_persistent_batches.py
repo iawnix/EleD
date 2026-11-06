@@ -176,7 +176,7 @@ def test_checkpoint_concurrent_writer_and_tampered_row_are_rejected(environment,
 
 def test_single_reactivity_does_not_hide_runtime_errors():
     with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda c:c), \
-         patch('rdkit_eth.reactivity.run_xtb',side_effect=ImportError('broken runtime')):
+         patch('rdkit_eth.reactivity.XTBCalculator.calculate',side_effect=ImportError('broken runtime')):
         with pytest.raises(ImportError):run_reactivity(molecule(),return_errors=True,initialization='independent')
 
 

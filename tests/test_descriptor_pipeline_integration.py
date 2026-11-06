@@ -1,4 +1,5 @@
 """Real-engine parameter parity, finite-temperature sensitivity and charge states."""
+from helpers import calculate_xtb
 from dataclasses import replace
 import json
 import os
@@ -9,7 +10,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import (XTBOptions, XTBNativeNotFoundError, run_xtb, run_xtb_batch, XTBCache,
+from rdkit_eth import (XTBOptions, XTBNativeNotFoundError, run_xtb_batch, XTBCache,
     calc_descriptor_report, run_reactivity, calc_reactivity_descriptors, assess_descriptor_quality)
 from rdkit_eth.runtime import _find_xtb_library, _native_basis_build
 
@@ -33,7 +34,7 @@ def molecule(smiles='O'):
 @pytest.mark.parametrize('temperature',[0.,1200.])
 def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temperature):
     mod=pytest.importorskip('rdkit_eth.rdXTBTools');m=molecule('CCO')
-    a=run_xtb(m,method=method,xtb_library=library,accuracy=.1,max_iterations=333,
+    a=calculate_xtb(m,method=method,xtb_library=library,accuracy=.1,max_iterations=333,
               electronic_temperature=temperature,keep_overlap=True)
     ok,b=mod.RunMol(m,method=method,xtbLibrary=library,accuracy=.1,maxIterations=333,
                    electronicTemperature=temperature,keepOverlap=True)
@@ -161,8 +162,8 @@ def test_lowdin_fukui_and_finite_temperature_label(library):
 
 def test_report_does_not_recalculate_and_labels_thermal_occupations(library):
     m=molecule('c1ccccc1')
-    result=run_xtb(m,xtb_library=library,electronic_temperature=50000.,keep_overlap=True)
-    with patch('rdkit_eth.xtb.run_xtb',side_effect=AssertionError('must not calculate')):
+    result=calculate_xtb(m,xtb_library=library,electronic_temperature=50000.,keep_overlap=True)
+    with patch('rdkit_eth.xtb._run_xtb',side_effect=AssertionError('must not calculate')):
         report=calc_descriptor_report(m,result)
     assert report['quality']['fractional_orbital_indices']
     assert 'fractional_occupations' in {f['code'] for f in report['quality']['flags']}

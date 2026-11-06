@@ -72,7 +72,7 @@ def test_mixed_or_invalid_charge_states_are_rejected(damage):
 def test_failed_required_state_never_yields_partial_reactivity():
     mol,r=states()
     with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('rdkit_eth.reactivity.run_xtb',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
+         patch('rdkit_eth.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
         report=run_reactivity(mol,return_errors=True,initialization="independent")
     assert calculate.call_count==2
     assert report['states']['attached']['status']=='not_run'
@@ -82,7 +82,7 @@ def test_failed_required_state_never_yields_partial_reactivity():
     assert report['analysis_settings']['requested_options']['electronic_temperature']==300.
     assert all(v is None for v in report['values'].values())
     with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('rdkit_eth.reactivity.run_xtb',side_effect=[r[0],XTBRunError('SCF failure')]):
+         patch('rdkit_eth.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]):
         with pytest.raises(ChargeStateCalculationError) as error:run_reactivity(mol,initialization="independent")
     assert error.value.state=='ionized'
 

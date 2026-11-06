@@ -15,7 +15,7 @@ import time
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
-from rdkit_eth import prepare_conformers, run_xtb, calc_descriptor_report, XTBRunError, XTBEnvironmentError
+from rdkit_eth import prepare_conformers, XTBCalculator, calc_descriptor_report, XTBRunError, XTBEnvironmentError
 from rdkit_eth.geometry import _check_geometry, _stereo_constraints
 from rdkit_eth.input import _geometry_hash, _xyz_from_mol
 from rdkit_eth.persistence import _implementation_identity
@@ -133,7 +133,7 @@ def main():
                 two_d += fpgen.GetFingerprintAsNumPy(heavy).astype(float).tolist()
                 if not np.allclose(two_d, original['rdkit'], atol=1e-10, rtol=1e-12):
                     raise ValueError('2D reconstruction mismatch')
-                try: result = run_xtb(mol, **frozen['options'])
+                try: result = XTBCalculator(**frozen['options']).calculate(mol)
                 except XTBEnvironmentError: raise
                 except XTBRunError as exc:
                     failures.append({'id': identifier, 'stage': 'xtb', 'reason': str(exc)}); continue

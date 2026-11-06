@@ -71,9 +71,10 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
                   "basis_export_verified": result.basisExportVerified,
                   "overlap_retained": result.overlapRetained}
     else:
-        from . import run_xtb
-        result = run_xtb(mol, method=method, backend=backend,
-                         xtb_library=library, keep_overlap=keep_overlap)
+        from . import XTBCalculator
+        result = XTBCalculator(method=method, backend=backend,
+                                xtb_library=library,
+                                keep_overlap=keep_overlap).calculate(mol)
         energy = result.total_energy_hartree
         charges = result.partial_charges
         nao = result.number_of_molecular_orbitals

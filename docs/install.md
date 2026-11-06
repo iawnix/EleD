@@ -73,11 +73,11 @@ back. The base runtime must already have been installed.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_xtb, rdXTBTools, calc_orbital_populations
+from rdkit_eth import XTBCalculator, rdXTBTools, calc_orbital_populations
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 print(result.total_energy_hartree)  # Hartree
 print(calc_orbital_populations(result))
 

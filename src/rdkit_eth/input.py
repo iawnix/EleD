@@ -52,7 +52,7 @@ def _xyz_from_mol(mol: Any, conf_id: int) -> str:
     if any(a.GetNumImplicitHs() or a.GetNumExplicitHs() for a in mol.GetAtoms()):
         raise ValueError(
             'the molecule contains implicit hydrogens or hydrogen counts without atoms; '
-            'call Chem.AddHs(mol) before run_xtb'
+            'call Chem.AddHs(mol) before XTBCalculator.calculate'
         )
     conf = mol.GetConformer(conf_id)
     if not conf.Is3D():

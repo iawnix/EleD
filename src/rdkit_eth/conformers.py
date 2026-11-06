@@ -18,7 +18,7 @@ from .errors import XTBEnvironmentError, XTBRunError
 from .input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
 from .options import XTBOptions
 from .reports import DESCRIPTOR_VERSION, _analysis_settings, _base_report, calc_descriptor_report, descriptor_columns
-from .xtb import run_xtb
+from .calculator import XTBCalculator
 
 _KB_EH_PER_K = 3.166811563e-6
 
@@ -83,7 +83,7 @@ def run_conformer_analysis(mol, *, conf_ids=None, options=None, cache=None,
         # must never masquerade as a failed single point.
         def calculate():
             try:
-                return run_xtb(snapshot, **resolved.to_dict())
+                return XTBCalculator(**resolved.to_dict()).calculate(snapshot)
             except XTBEnvironmentError:
                 raise
             except XTBRunError as exc:

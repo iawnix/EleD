@@ -1,4 +1,5 @@
 """Actual coordinate stereo, failure boundaries and deterministic preparation."""
+from helpers import calculate_xtb
 import json
 import os
 
@@ -142,7 +143,6 @@ def test_raw_failure_counters_and_exhausted_plan_are_retained():
 @pytest.mark.integration
 def test_prepared_molecule_connects_to_existing_xtb_api():
     if os.environ.get('RDKIT_ETH_REQUIRE_RDXTB') != '1': pytest.skip('native integration profile')
-    from rdkit_eth import run_xtb
     r = prepare_conformers('O', **FAST)
-    result = run_xtb(r.molecule, conf_id=r.report['recommended_conformer_id'])
+    result = calculate_xtb(r.molecule, conf_id=r.report['recommended_conformer_id'])
     assert result.metadata['geometry_sha256'] == r.report['conformers'][0]['geometry_sha256']

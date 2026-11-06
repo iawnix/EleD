@@ -31,7 +31,7 @@ def calc_orbital_populations(result, *, orbital_indices=None, scheme='lowdin',
             or not len(result.ao_atom_indices)):
         raise DescriptorUnavailableError(
             'orbital populations require same-calculation overlap and AO-to-atom mapping; '
-            'use run_xtb(..., keep_overlap=True) with the verified native basis extension. '
+            'use XTBCalculator(...).calculate(..., keep_overlap=True) with the verified native basis extension. '
             'Official libraries support basic descriptors without this extension.')
     energies, occupations, _, _ = _orbitals(result)
     n = len(energies)

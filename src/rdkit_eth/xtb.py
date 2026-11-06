@@ -1,4 +1,9 @@
-"""Public xTB entry points; backend implementations are kept separate."""
+"""Internal xTB execution entry points.
+
+The public RDKit-facing calculation API is :class:`XTBCalculator`. This module
+keeps the engine adapter private so the package can evolve its result and
+backend layers without carrying a legacy function API.
+"""
 
 from __future__ import annotations
 import os
@@ -17,7 +22,7 @@ from .options import XTBOptions
 from .backends.native import run_xtb_native, _NativeXTB
 from .runtime import _find_xtb_library, _require_extended_libxtb
 
-def run_xtb(
+def _run_xtb(
     mol: Any,
     *,
     conf_id: int = -1,
@@ -31,7 +36,7 @@ def run_xtb(
     accuracy: float = 1.0,
     electronic_temperature: float = 300.0,
 ) -> XTBResult:
-    """Run a gas-phase single point through the reviewed extended ``libxtb``.
+    """Run one gas-phase single point for ``XTBCalculator``.
 
     The selected library must contain the project basis-export, SCC-diagnostics
     and verified GFN0 extensions. No external engine or fallback is used.

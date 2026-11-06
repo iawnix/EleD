@@ -89,9 +89,9 @@ def isolated_map(function, payloads, *, max_workers, timeout):
 
 def single_point(payload):
     from rdkit import Chem
-    from .xtb import run_xtb
+    from .calculator import XTBCalculator
     mol, options = payload
-    return run_xtb(Chem.Mol(mol), **options)
+    return XTBCalculator(**options).calculate(Chem.Mol(mol))
 
 
 def reactivity(payload):

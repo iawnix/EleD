@@ -14,7 +14,7 @@ from .input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
 from .options import XTBOptions
 from .result import XTBResult
 from .runtime import _engine_identity, _parameter_context, _parameter_file
-from .xtb import _resolve_options, run_xtb
+from .xtb import _resolve_options, _run_xtb
 from .errors import XTBCacheError, XTBEnvironmentError, XTBNativeNotFoundError
 
 
@@ -157,10 +157,10 @@ def run_xtb_batch(
     def calculate(mol):
         try:
             if cache is None:
-                return run_xtb(mol, **config.to_dict())
+                return _run_xtb(mol, **config.to_dict())
             resolved, metadata = _prepare(mol, config)
             key = _key(resolved, metadata)
-            return cache.get_or_compute(key, lambda: run_xtb(mol, **resolved.to_dict()))
+            return cache.get_or_compute(key, lambda: _run_xtb(mol, **resolved.to_dict()))
         except (XTBCacheError, sqlite3.Error, XTBEnvironmentError, XTBNativeNotFoundError):
             raise
         except Exception as exc:

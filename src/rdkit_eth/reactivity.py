@@ -21,7 +21,8 @@ from .mapping import _validate_mapping
 from .options import XTBOptions
 from .populations import calc_orbital_populations
 from .reports import SCHEMA_VERSION, DESCRIPTOR_VERSION, assess_descriptor_quality
-from .xtb import run_xtb, _resolve_options
+from .calculator import XTBCalculator
+from .xtb import _resolve_options
 
 REACTIVITY_UNITS = {'vertical_ip_ev':'eV', 'vertical_ea_ev':'eV',
                     'chemical_potential_ev':'eV', 'electronegativity_ev':'eV',
@@ -266,4 +267,4 @@ def _charge_state_results(mol, configurations, interface, initialization):
             yield from calculations
     else:
         for selected in configurations:
-            yield run_xtb(mol, **selected.to_dict())
+            yield XTBCalculator(**selected.to_dict()).calculate(mol)
