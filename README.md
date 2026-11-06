@@ -69,14 +69,15 @@ input molecule unchanged.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_xtb, calc_xtb_descriptors
+from rdkit_eth import XTBCalculator, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
     raise RuntimeError("RDKit could not generate a conformer")
 AllChem.MMFFOptimizeMolecule(mol)
 
-result = run_xtb(mol, method="GFN2-xTB")
+calculator = XTBCalculator(method="GFN2-xTB")
+result = calculator.calculate(mol)
 features = calc_xtb_descriptors(result)
 print(features["xtb_total_energy_hartree"])
 print(features["xtb_homo_ev"], features["xtb_lumo_ev"])
@@ -86,11 +87,11 @@ print(features["xtb_homo_ev"], features["xtb_lumo_ev"])
 
 ```python
 from rdkit_eth import (
-    run_xtb, calc_xtb_atom_descriptors, calc_xtb_bond_descriptors,
+    XTBCalculator, calc_xtb_atom_descriptors, calc_xtb_bond_descriptors,
     calc_shell_populations, calc_density_matrix,
 )
 
-result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 atoms = calc_xtb_atom_descriptors(result)
 bonds = calc_xtb_bond_descriptors(mol, result)
 shells = calc_shell_populations(result)
@@ -152,7 +153,8 @@ preparation; it is not a transition-state, solvent or excited-state module.
 - [Reports and reactivity](docs/descriptor-reports.md) · [报告与反应性](docs/zh-CN/descriptor-reports.md)
 - [Descriptor catalog](docs/descriptor-catalog.md) · [描述符目录](docs/zh-CN/descriptor-catalog.md)
 - [Density descriptors](docs/density-descriptors.md) · [密度描述符](docs/zh-CN/density-descriptors.md)
-- [EAS research plan](docs/research-plan-eas.md) · [EAS 研究方案](docs/zh-CN/research-plan-eas.md)
+- [EAS research plan](docs/research-plan-eas-en.md) · [EAS 研究方案](docs/zh-CN/research-plan-eas.md)
+- [Project positioning](docs/project-positioning.md) · [项目定位](docs/zh-CN/project-positioning.md)
 - [Compiled RDKit interface](docs/rdxtb-tools.md)
 - [Extended xTB build](docs/xtb-patched-build.md)
 - [Frozen EAS protocol](protocol.json)
@@ -233,7 +235,7 @@ mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 AllChem.MMFFOptimizeMolecule(mol)
 
-result = run_xtb(mol, method="GFN2-xTB")
+result = XTBCalculator(method="GFN2-xTB").calculate(mol)
 features = calc_xtb_descriptors(result)
 print(features["xtb_gap_ev"])
 ```

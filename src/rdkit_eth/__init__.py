@@ -16,6 +16,7 @@ from .descriptors import calc_eht_descriptors, calc_orbital_descriptors
 from .mapping import annotate_mol
 from .batch import XTBCache, run_xtb_batch, xtb_cache_key
 from .options import XTBOptions
+from .calculator import XTBCalculator
 
 from .electronic_descriptors import (
     calc_xtb_atom_descriptors, calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
@@ -42,6 +43,7 @@ __all__ = [
     "run_xtb_batch",
     "xtb_cache_key",
     "XTBOptions",
+    "XTBCalculator",
     "calc_xtb_atom_descriptors",
     "calc_xtb_bond_descriptors",
     "calc_xtb_fragment_descriptors",
