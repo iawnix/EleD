@@ -38,8 +38,14 @@ def main():
     if not patcher: raise ValueError('patchelf required')
     runtime = args.runtime.resolve(); toolchain = args.toolchain.resolve()
     record = json.loads((runtime/'share/xtb/rdkit-eth/build.json').read_text())
-    library_hash = digest(runtime/'lib/libxtb.so')
-    if record['files']['lib/libxtb.so'] != library_hash: raise ValueError('stale build manifest')
+    engine_files = [runtime/'lib/libxtb.so', runtime/'bin/xtb',
+                    *(runtime/'share/xtb'/f'param_gfn{i}-xtb.txt' for i in range(3))]
+    if any(not path.is_file() for path in engine_files):
+        raise ValueError('runtime is missing an installed extended xTB artifact')
+    engine_hashes = {str(path.relative_to(runtime)): digest(path) for path in engine_files}
+    if any(record['files'].get(relative) != checksum for relative, checksum in engine_hashes.items()):
+        raise ValueError('stale build manifest')
+    library_hash = engine_hashes['lib/libxtb.so']
     # Record proof of a working installed profile before packing.
     env = __import__('os').environ.copy()
     for key in ('PYTHONPATH','PYTHONHOME','XTB_LIBRARY','XTBPATH','XTB_PREFIX','LD_LIBRARY_PATH','LD_PRELOAD'):
@@ -76,7 +82,9 @@ def main():
                 archive.add(path, arcname='xtb/'+str(path.relative_to(source)))
     manifest = {'schema_version': 1, 'platform': 'linux-x86_64',
         'prefixes': {'runtime': str(runtime), 'toolchain': str(toolchain)},
-        'original_library_sha256': library_hash, 'source_lock': record['source'],
+        'original_library_sha256': library_hash,
+        'extended_xtb': {'files': engine_hashes, 'build_manifest_sha256': digest(runtime/'share/xtb/rdkit-eth/build.json')},
+        'source_lock': record['source'],
         'rpaths': rpaths, 'build_host': platform.platform(),
         'scope': 'offline conda environment bundle; target glibc/CPU compatibility requires validation',
         'sha256': {p.name: digest(p) for p in sorted(args.output.iterdir()) if p.is_file()}}

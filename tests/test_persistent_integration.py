@@ -3,6 +3,7 @@ from dataclasses import replace
 import json
 import subprocess
 import sys
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -10,15 +11,17 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit_eth import (XTBDiskCache,ReactivityJob,XTBOptions,run_xtb_batch,
     run_reactivity_batch,XTBNativeNotFoundError,DescriptorUnavailableError)
-from rdkit_eth.runtime import _find_xtb_library,_native_basis_build
+from rdkit_eth.runtime import _find_xtb_library,_extended_libxtb_build,_native_basis_build
 
 pytestmark=pytest.mark.integration
 
 
 @pytest.fixture
 def library():
-    try:return _find_xtb_library()
-    except XTBNativeNotFoundError:pytest.skip('libxtb unavailable')
+    try:lib=_find_xtb_library()
+    except XTBNativeNotFoundError:pytest.skip('extended libxtb unavailable')
+    if not _extended_libxtb_build(lib):pytest.skip('reviewed extended libxtb required')
+    return lib
 
 
 def molecule():
@@ -35,10 +38,14 @@ def test_real_single_point_disk_cache_and_process_roundtrip(library,tmp_path):
     assert first==again
     from rdkit_eth.batch import _prepare,_key
     config,metadata=_prepare(mol,opts);key=_key(config,metadata)
-    command='from rdkit_eth import XTBDiskCache; import sys,json; r=XTBDiskCache(sys.argv[1]).get(sys.argv[2]); print(json.dumps([r.total_energy_eh,r.partial_charges]))'
+    source = Path(__file__).resolve().parents[1] / 'src'
+    command=(f'import sys; sys.path.insert(0, {str(source)!r}); '
+             'from rdkit_eth import XTBDiskCache; import sys,json; '
+             'r=XTBDiskCache(sys.argv[1]).get(sys.argv[2]); '
+             'print(json.dumps([r.total_energy_hartree,r.partial_charges]))')
     child=subprocess.run([sys.executable,'-I','-c',command,str(path),key],capture_output=True,text=True,check=True)
     energy,charges=json.loads(child.stdout)
-    assert energy==first.total_energy_eh and charges==list(first.partial_charges)
+    assert energy==first.total_energy_hartree and charges==list(first.partial_charges)
 
 
 @pytest.mark.parametrize('interface',['native','compiled'])

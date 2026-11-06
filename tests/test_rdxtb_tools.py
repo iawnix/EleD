@@ -14,7 +14,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdEHTTools
 
 from rdkit_eth import run_xtb
-from rdkit_eth.runtime import _find_xtb_library, _native_gfn0_build
+from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
 
 if importlib.util.find_spec('rdkit_eth.rdXTBTools') is None:
     if os.environ.get('RDKIT_ETH_REQUIRE_RDXTB') == '1':
@@ -36,7 +36,10 @@ def molecule(smiles='CCO'):
 
 @pytest.fixture(scope='module')
 def library():
-    return _find_xtb_library(None)
+    path = _find_xtb_library(None)
+    if not _extended_libxtb_build(path):
+        pytest.skip('reviewed extended libxtb is required')
+    return path
 
 
 @pytest.mark.parametrize('method', ['GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'])
@@ -50,11 +53,11 @@ def test_numerical_agreement_units_and_mapping(method, smiles, library):
                                  keepOrbitalCoefficients=True)
     assert ok and result.success and result.errorMessage == ''
     native = run_xtb(mol, conf_id=7, method=method, backend='native', xtb_library=library)
-    assert result.totalEnergyHartree == pytest.approx(native.total_energy_eh, abs=1e-10)
+    assert result.totalEnergyHartree == pytest.approx(native.total_energy_hartree, abs=1e-10)
     np.testing.assert_allclose(result.GetOrbitalEnergies(), native.orbital_energies_ev, atol=2e-5, rtol=0)
     np.testing.assert_allclose(result.GetOrbitalOccupancies(), native.orbital_occupations, atol=2e-5, rtol=0)
     np.testing.assert_allclose(result.GetAtomicCharges(), native.partial_charges, atol=2e-5, rtol=0)
-    np.testing.assert_allclose(result.GetDipole(), native.dipole_au, atol=1e-9, rtol=0)
+    np.testing.assert_allclose(result.GetDipole(), native.dipole_e_bohr, atol=1e-9, rtol=0)
     np.testing.assert_allclose(result.GetWibergBondOrders(), native.wiberg_bond_orders, atol=1e-9, rtol=0)
     # Native basis tests independently check C.T S C and density populations.
     np.testing.assert_allclose(np.abs(result.GetOrbitalCoefficients()),
@@ -88,6 +91,7 @@ def test_eht_coexistence_and_result_ownership(library):
     assert rdXTBTools.orbitalEnergyUnit == 'eV'
     assert rdXTBTools.dipoleUnit == 'e*Bohr'
     assert rdXTBTools.coefficientAxes == ('AO', 'MO')
+    assert xtb.GetGradient().shape == (mol.GetNumAtoms(), 3)
     assert hasattr(eht, 'totalEnergy') and not hasattr(xtb, 'totalEnergy')
     assert not hasattr(xtb, 'fermiEnergy')
     assert not hasattr(xtb, 'GetReducedOverlapPopulationMatrix')
@@ -199,7 +203,7 @@ def test_mixed_threads_share_lock_and_preserve_method_state(library):
         def calculate(index):
             method = methods[index]
             if index % 2:
-                return run_xtb(mol, method=method, backend='native', xtb_library=library).total_energy_eh
+                return run_xtb(mol, method=method, backend='native', xtb_library=library).total_energy_hartree
             ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library)
             assert ok
             return result.totalEnergyHartree

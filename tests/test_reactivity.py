@@ -33,9 +33,9 @@ def states(ip=10.,ea=2.):
 
 def test_vertical_formulas_fukui_signs_and_fragment_conservation():
     mol,r=states(); report=calc_reactivity_descriptors(mol,*r,fragments={'O':[0],'H':[1,2]})
-    assert report['values']==pytest.approx({'vertical_ip_eV':10.,'vertical_ea_eV':2.,
-        'chemical_potential_eV':-6.,'electronegativity_eV':6.,'hardness_eV':4.,
-        'softness_per_eV':.125,'electrophilicity_eV':4.5})
+    assert report['values']==pytest.approx({'vertical_ip_ev':10.,'vertical_ea_ev':2.,
+        'chemical_potential_ev':-6.,'electronegativity_ev':6.,'hardness_ev':4.,
+        'softness_per_ev':.125,'electrophilicity_ev':4.5})
     np.testing.assert_allclose([a['f_plus'] for a in report['atoms']],[.2,.4,.4])
     np.testing.assert_allclose([a['f_minus'] for a in report['atoms']],[.3,.35,.35])
     np.testing.assert_allclose([a['dual'] for a in report['atoms']],[-.1,.05,.05])
@@ -46,12 +46,12 @@ def test_vertical_formulas_fukui_signs_and_fragment_conservation():
 
 def test_negative_ea_is_retained_and_nonpositive_hardness_not_divided():
     mol,r=states(ea=-2.);report=calc_reactivity_descriptors(mol,*r)
-    assert report['values']['vertical_ea_eV']==pytest.approx(-2.)
+    assert report['values']['vertical_ea_ev']==pytest.approx(-2.)
     assert 'negative_vertical_ea' in {f['code'] for f in report['quality']['flags']}
     mol,r=states(ip=2.,ea=4.);report=calc_reactivity_descriptors(mol,*r)
-    assert report['values']['hardness_eV']==pytest.approx(-1)
-    assert report['values']['softness_per_eV'] is None
-    assert report['values']['electrophilicity_eV'] is None
+    assert report['values']['hardness_ev']==pytest.approx(-1)
+    assert report['values']['softness_per_ev'] is None
+    assert report['values']['electrophilicity_ev'] is None
 
 
 @pytest.mark.parametrize('damage',['geometry','charge','method','engine','parameters','settings','electron','conservation'])

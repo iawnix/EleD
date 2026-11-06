@@ -94,11 +94,12 @@ def _check_geometry(mol, conf_id, constraints):
 def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_methods=None,
                        random_seed=42, attempts_per_strategy=2, retry_random_coords=True,
                        max_embedding_iterations=300, optimize='MMFF94', optimization_iterations=500,
-                       require_assigned_stereo=False):
+                       require_assigned_stereo=False, xtb_method='GFN2-xTB', xtb_library=None):
     """Generate a checked conformer pool from SMILES or a copied RDKit molecule.
 
     Keep all specified tetrahedral/E/Z stereo constraints in every attempt and
-    verify them from coordinates before and after optional MMFF94/UFF relaxation.
+    verify them from coordinates before and after optional MMFF94/UFF/xTB
+    relaxation.
     Default fallbacks are ETKDGv4 and srETKDGv3 when installed; explicit unsupported
     preset requests raise. An empty fallback sequence disables other presets.
     Stop at the first strategy yielding any valid conformers (up to requested N).
@@ -113,8 +114,8 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
     iterations = _integer(optimization_iterations, 'optimization_iterations')
     if not isinstance(retry_random_coords, bool) or not isinstance(require_assigned_stereo, bool):
         raise ValueError('retry_random_coords and require_assigned_stereo must be Boolean')
-    if optimize not in (None, 'MMFF94', 'UFF'):
-        raise ValueError("optimize must be None, 'MMFF94' or 'UFF'")
+    if optimize not in (None, 'MMFF94', 'UFF', 'xTB'):
+        raise ValueError("optimize must be None, 'MMFF94', 'UFF' or 'xTB'")
     primary = _method(method)
     if not hasattr(AllChem, primary): raise ValueError(f'installed RDKit lacks {primary}')
     defaults = fallback_methods is None
@@ -162,7 +163,7 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
         'optimization': optimize, 'optimization_iterations': iterations if optimize else None,
         'attempts': [], 'conformers': [], 'recommended_conformer_id': None, 'error': None}
     output = Chem.Mol(mol)
-    if optimize:
+    if optimize in ('MMFF94', 'UFF'):
         has_parameters = (AllChem.MMFFHasAllMoleculeParams(mol) if optimize == 'MMFF94'
                           else AllChem.UFFHasAllMoleculeParams(mol))
         if not has_parameters:
@@ -193,7 +194,7 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
                     if not check['ok']: continue
                     candidate = Chem.Mol(mol)
                     candidate.AddConformer(Chem.Conformer(working.GetConformer(conf_id)), assignId=True)
-                    if optimize:
+                    if optimize in ('MMFF94', 'UFF'):
                         outcomes = (AllChem.MMFFOptimizeMoleculeConfs(candidate, numThreads=1, maxIters=iterations,
                                     mmffVariant='MMFF94') if optimize == 'MMFF94' else
                                     AllChem.UFFOptimizeMoleculeConfs(candidate, numThreads=1, maxIters=iterations))
@@ -202,6 +203,19 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
                         record.update(optimization_status=int(status), energy_kcal_mol=float(energy))
                         if status != 0:
                             record['rejection'] = 'force_field_not_converged'; continue
+                    elif optimize == 'xTB':
+                        from .optimization import optimize_xtb
+                        optimized = optimize_xtb(candidate, conf_id=0, method=xtb_method,
+                                                 xtb_library=xtb_library, max_iterations=iterations)
+                        status = 0 if optimized.success else 1
+                        energy = optimized.report['final_energy_hartree']
+                        record.update(optimization_status=status,
+                                      energy_hartree=float(energy),
+                                      energy_kcal_mol=float(energy * 627.5094740631),
+                                      xtb_optimization=optimized.report)
+                        if not optimized.success:
+                            record['rejection'] = 'xtb_not_converged'; continue
+                        candidate = optimized.molecule
                     check = _check_geometry(candidate, 0, constraints)
                     record['after_optimization'] = check
                     if not check['ok']: continue
@@ -217,7 +231,8 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
                         status='complete' if output.GetNumConformers() == requested else 'partial',
                         ordered_structure_sha256=_ordered_structure_hash(output))
                     report['recommended_conformer_id'] = (min(report['conformers'], key=lambda r: (
-                        r['energy_kcal_mol'], r['conformer_id']))['conformer_id'] if optimize else 0)
+                        r['energy_kcal_mol'], r['conformer_id']))['conformer_id']
+                        if optimize else 0)
                     json.dumps(report, allow_nan=False)
                     return ConformerGenerationResult(output, report)
     report['error'] = {'reason': 'no_accepted_conformer'}

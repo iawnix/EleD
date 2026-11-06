@@ -1,10 +1,10 @@
 # Successful SCC diagnostics (0.11)
 
 The reviewed libxtb extension adds `xtb_rdkit_getSCFAPIVersion()` and
-`xtb_rdkit_getSCFDiagnostics(env, results, iterations, values)`. This is a separate
-optional ABI version 1; the upstream xTB API and basis-export ABI stay unchanged.
-The selected binary must match its build record and reviewed diagnostic patch.
-Official/older libraries still work with their existing capabilities.
+`xtb_rdkit_getSCFDiagnostics(env, results, iterations, values)`. This is a
+project ABI version 1 alongside the upstream xTB API and basis-export ABI. The
+selected binary must match its build record and reviewed diagnostic patch;
+official or older libraries are rejected by the public calculation APIs.
 
 After a successful GFN1/2 single point, `result.metadata['scf']` contains:
 
@@ -30,8 +30,7 @@ definitions and prediction feature sets do not change.
 Compiled `XTBResults` exposes `scfIterations`, `scfEnergyChangeHartree`,
 `scfMixerRMS`, `scfEnergyThresholdHartree` and `scfMixerThreshold`. Raw C++ fields
 use -1 for unavailable data; shared Python extractors return explicit missing
-records. GFN0 reports `not_applicable_non_scf_method`. An older library reports
-`not_exposed_by_selected_libxtb`.
+records. GFN0 reports `not_applicable_non_scf_method`.
 
 The C getter writes one integer and four doubles only when data are available.
 New results, failed/repeated calculations, Hessian and CPCM-X entry points clear

@@ -1,4 +1,4 @@
-"""Locate xTB and identify the actual installation used for provenance/cache keys."""
+"""Locate and verify the extended xTB runtime used for calculations and provenance."""
 
 from __future__ import annotations
 import ctypes
@@ -75,6 +75,34 @@ def _native_diagnostics_build(path):
                 extension['patch_sha256'] == _SCF_DIAGNOSTICS_PATCH)
     except (OSError, ValueError, KeyError, TypeError):
         return False
+
+
+def _extended_libxtb_build(path: str) -> dict | None:
+    """Return the reviewed project engine identity when every extension is present."""
+    gfn0 = _native_gfn0_build(path)
+    basis = _native_basis_build(path)
+    diagnostics = _native_diagnostics_build(path)
+    if not gfn0 or not basis or not diagnostics:
+        return None
+    return {
+        'source_commit': gfn0['source_commit'],
+        'library_sha256': gfn0['library_sha256'],
+        'basis_patch_sha256': basis['patch_sha256'],
+        'diagnostics_patch_sha256': _SCF_DIAGNOSTICS_PATCH,
+    }
+
+
+def _require_extended_libxtb(path: str) -> dict:
+    """Require the single libxtb profile supported by the public calculation API."""
+    build = _extended_libxtb_build(path)
+    if build is None:
+        from .errors import XTBEnvironmentError
+        raise XTBEnvironmentError(
+            'rdkit-eth requires the reviewed extended libxtb build with '
+            'basis-export and SCC-diagnostics APIs; run tools/install_native.py '
+            'or tools/build_patched_xtb.py'
+        )
+    return build
 
 
 def _native_basis_build(path: str) -> dict | None:
@@ -170,6 +198,8 @@ def _engine_identity(backend: str, path: str) -> dict:
     if backend == 'native':
         identity['native_gfn0'] = _native_gfn0_build(path)
         identity['orbital_basis'] = _native_basis_build(path)
+        identity['scf_diagnostics'] = _native_diagnostics_build(path)
+        identity['extended'] = _extended_libxtb_build(path)
     return identity
 
 

@@ -1,4 +1,4 @@
-"""Opt-in compiled module; the default adapter install remains pure Python."""
+"""Build the optional RDKit-style adapter against the reviewed xTB runtime."""
 import os
 from pathlib import Path
 import subprocess

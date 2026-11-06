@@ -10,6 +10,8 @@ from rdkit.Chem import AllChem
 from rdkit_eth import (run_xtb_batch, run_descriptor_batch, XTBOptions, XTBCache,
                        XTBTimeoutError, XTBWorkerError, ReactivityJob, run_reactivity_batch)
 from rdkit_eth.workers import isolated_map, validate_execution
+from rdkit_eth.runtime import _extended_libxtb_build, _find_xtb_library
+from rdkit_eth.errors import XTBNativeNotFoundError
 
 
 def task(value):
@@ -31,6 +33,17 @@ def delayed_reactivity(payload):
     mol = Chem.Mol(binary)
     if mol.GetNumAtoms() > 3: time.sleep(10)
     return run_reactivity(mol, **kwargs)
+
+
+@pytest.fixture
+def extended_runtime():
+    try:
+        library = _find_xtb_library()
+    except XTBNativeNotFoundError:
+        pytest.skip('extended libxtb unavailable')
+    if not _extended_libxtb_build(library):
+        pytest.skip('reviewed extended libxtb required')
+    return library
 
 
 @pytest.mark.parametrize('args', [(0, None, False), (True, None, False), (1, 0, False),
@@ -57,18 +70,18 @@ def test_timeout_and_early_close_clean_up_children():
 
 
 @pytest.mark.integration
-def test_native_parallel_parity_cache_order_and_reports():
+def test_native_parallel_parity_cache_order_and_reports(extended_runtime):
     mols = [molecule('O'), molecule('CO')]
     serial = run_xtb_batch(mols)
     cache = XTBCache()
     parallel = run_xtb_batch(mols, max_workers=2, timeout=30, cache=cache)
     for a, b in zip(serial, parallel):
-        assert a.total_energy_eh == pytest.approx(b.total_energy_eh, abs=1e-10)
+        assert a.total_energy_hartree == pytest.approx(b.total_energy_hartree, abs=1e-10)
         assert a.metadata['geometry_sha256'] == b.metadata['geometry_sha256']
     assert len(cache) == 2
     # A cache hit needs no worker, even with a budget too small for startup.
     hits = run_xtb_batch(mols, timeout=1e-6, cache=cache)
-    assert hits[0].total_energy_eh == parallel[0].total_energy_eh
+    assert hits[0].total_energy_hartree == parallel[0].total_energy_hartree
     reports = run_descriptor_batch(mols, max_workers=2, timeout=30,
                                   options=XTBOptions(keep_overlap=False))
     assert all(r['error'] is None for r in reports)
@@ -78,7 +91,7 @@ def test_native_parallel_parity_cache_order_and_reports():
 
 
 @pytest.mark.integration
-def test_reactivity_timeout_checkpoint_retry_and_resume(tmp_path):
+def test_reactivity_timeout_checkpoint_retry_and_resume(tmp_path, extended_runtime):
     jobs = [ReactivityJob('water', molecule())]
     path = tmp_path/'checkpoint.sqlite'
     failed = run_reactivity_batch(jobs, checkpoint=path, timeout=1e-6)
@@ -92,7 +105,7 @@ def test_reactivity_timeout_checkpoint_retry_and_resume(tmp_path):
 
 
 @pytest.mark.integration
-def test_completed_rows_commit_before_a_slow_neighbor_finishes(tmp_path, monkeypatch):
+def test_completed_rows_commit_before_a_slow_neighbor_finishes(tmp_path, monkeypatch, extended_runtime):
     from concurrent.futures import ThreadPoolExecutor
     from rdkit_eth import ReactivityCheckpoint
     import rdkit_eth.workers as workers

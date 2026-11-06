@@ -17,9 +17,11 @@ from .electronic_descriptors import (
 )
 from .result import XTBResult
 from .populations import calc_orbital_populations, calc_frontier_descriptors
+from .density_descriptors import (calc_density_matrix, calc_shell_populations,
+    calc_mayer_bond_descriptors, calc_frontier_bond_descriptors, calc_pi_descriptors)
 
-DESCRIPTOR_VERSION = '1.0'
-SCHEMA_VERSION = 1
+DESCRIPTOR_VERSION = '1.1'
+SCHEMA_VERSION = 2
 
 
 def descriptor_columns(frontier_depth=2):
@@ -28,11 +30,12 @@ def descriptor_columns(frontier_depth=2):
     values = calc_xtb_descriptors(empty, frontier_depth=frontier_depth)
     units = {}
     for name in values:
-        if name.endswith('_Eh'): unit = 'Hartree'
-        elif name.endswith('_eV'): unit = 'eV'
-        elif name.endswith('_au'): unit = 'e*Bohr'
+        if name.endswith('_hartree'): unit = 'Hartree'
+        elif name.endswith('_ev'): unit = 'eV'
+        elif name.endswith('_e_bohr'): unit = 'e*Bohr'
         elif name.endswith('_debye'): unit = 'Debye'
-        elif '_charge_' in name or name == 'xtb_occupation_threshold': unit = 'e'
+        elif '_charge_' in name: unit = 'e'
+        elif name == 'xtb_occupation_threshold': unit = 'dimensionless'
         elif name.startswith('xtb_num_'): unit = 'count'
         elif name.endswith('_index'): unit = 'index'
         elif name == 'xtb_wiberg_pair_sum': unit = 'dimensionless'
@@ -105,6 +108,48 @@ def assess_descriptor_quality(result, *, occupation_threshold=1e-7, fractional_t
             'calculation_status': result.metadata.get('calculation_status', 'unknown')}
 
 
+def descriptor_sensitivity(reference, *, gfn1=None, gfn2=None,
+                           temperature_300=None, temperature_1000=None):
+    """Compare already-produced reports without invoking an engine.
+
+    The returned per-column diagnostics deliberately keep the three effects
+    separate: conformer dispersion, GFN1/GFN2 absolute difference, and the
+    300 K/1000 K absolute difference.  ``None`` means the comparison report
+    was not supplied or the value is missing; it is never treated as zero.
+    """
+    if not isinstance(reference, dict):
+        raise TypeError('reference must be a descriptor report or conformer report')
+    if 'statistics' in reference:
+        base = {k: v.get('std') for k, v in reference['statistics'].items()}
+    else:
+        base = {k: None for k in reference.get('values', {})}
+    def values(report):
+        if report is None: return {}
+        return report.get('values', {}) if 'values' in report else {k: v.get('mean') for k, v in report.get('statistics', {}).items()}
+    ref_values = values(reference)
+    g1, g2 = values(gfn1), values(gfn2)
+    t3, t10 = values(temperature_300), values(temperature_1000)
+    keys = list(ref_values) if ref_values else list(base)
+    output = {}
+    for key in keys:
+        def delta(a, b):
+            try:
+                return abs(float(a) - float(b)) if a is not None and b is not None else None
+            except (TypeError, ValueError): return None
+        output[key] = {
+            'conformer_dispersion': base.get(key),
+            'gfn1_vs_gfn2_abs_difference': delta(g1.get(key), g2.get(key)),
+            'electronic_temperature_300_vs_1000_abs_difference': delta(t3.get(key), t10.get(key)),
+            'missing': {
+                'gfn1_vs_gfn2': gfn1 is None or g2.get(key) is None or g1.get(key) is None,
+                'electronic_temperature': temperature_300 is None or temperature_1000 is None or t3.get(key) is None or t10.get(key) is None,
+            },
+        }
+    return {'descriptor_version': DESCRIPTOR_VERSION,
+            'definition': 'absolute differences; conformer dispersion is population std',
+            'values': output}
+
+
 def _base_report(record_id, columns, analysis):
     if record_id is not None and not isinstance(record_id, str):
         raise ValueError('record_id must be a string or None')
@@ -112,7 +157,9 @@ def _base_report(record_id, columns, analysis):
             'report_type': 'single_point', 'record_id': record_id,
             'units': columns, 'values': dict.fromkeys(columns), 'analysis_settings': analysis,
             'provenance': {}, 'quality': {}, 'missing': {}, 'error': None,
-            'atoms': None, 'bonds': None, 'fragments': None, 'populations': None, 'frontier': None}
+            'atoms': None, 'bonds': None, 'fragments': None, 'populations': None, 'frontier': None,
+            'density': None, 'shell_populations': None, 'mayer_bonds': None,
+            'frontier_bonds': None, 'pi': None}
 
 
 def _analysis_settings(*, frontier_depth=2, occupation_threshold=1e-7,
@@ -181,9 +228,25 @@ def calc_descriptor_report(mol, result, *, record_id=None, fragments=None, front
                 report['values'][f'frontier_{label}_centroid_{axis}_angstrom'] = value
         for key in ('homo_lumo_atom_overlap','homo_lumo_atom_centroid_separation_angstrom'):
             report['values']['frontier_' + key] = frontier[key]
+        for name, function in (
+            ('density', calc_density_matrix),
+            ('shell_populations', calc_shell_populations),
+            ('mayer_bonds', lambda r: calc_mayer_bond_descriptors(mol, r)),
+            ('frontier_bonds', lambda r: calc_frontier_bond_descriptors(mol, r)),
+            ('pi', lambda r: calc_pi_descriptors(mol, r)),
+        ):
+            try:
+                report[name] = function(result)
+            except Exception as exc:
+                report['missing'][name] = f'{type(exc).__name__}: {exc}'
+                report['quality']['flags'].append({'code': f'{name}_unavailable',
+                    'severity': 'warning', 'detail': str(exc)})
+                if report['quality']['status'] == 'ok': report['quality']['status'] = 'partial'
     else:
         reason = 'basis_not_retained' if include_orbitals else 'not_requested'
-        report['missing'].update(populations=reason, frontier=reason)
+        report['missing'].update(populations=reason, frontier=reason, density=reason,
+                                 shell_populations=reason, mayer_bonds=reason,
+                                 frontier_bonds=reason, pi=reason)
         if include_orbitals and report['quality']['status'] == 'ok': report['quality']['status'] = 'partial'
     for key, value in report['values'].items():
         if key.startswith('frontier_') and value is None:

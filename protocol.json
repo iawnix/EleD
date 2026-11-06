@@ -1,0 +1,68 @@
+{
+  "protocol_id": "eas_regioselectivity_v1",
+  "purpose": "Evaluate atom-level xTB density descriptors for electrophilic aromatic substitution regioselectivity.",
+  "status": "frozen_before_feature_calculation",
+  "target": {
+    "primary": "RegioML/RegioSQM EAS regioselectivity labels",
+    "backup": "CYP site-of-metabolism atom labels",
+    "unit_of_prediction": "atom",
+    "metric": ["top-k accuracy", "mean reciprocal rank", "macro ROC-AUC"]
+  },
+  "selection": {
+    "input": "public reaction records with atom mapping and a single EAS electrophilic aromatic substitution event",
+    "allowed_elements": ["H", "B", "C", "N", "O", "F", "Si", "P", "S", "Cl", "Br", "I"],
+    "exclude": ["metals", "mixtures without a mapped reacting molecule", "ambiguous or unmapped regio labels", "failed stereochemistry sanitization"],
+    "deduplicate": "canonical mapped reactant scaffold and reaction identifier"
+  },
+  "geometry": {
+    "conformers_per_molecule": 10,
+    "embedding": "RDKit ETKDGv3",
+    "optimization": "extended-libxtb GFN2-xTB, gas phase",
+    "keep_overlap": true,
+    "failed_conformers": "record and exclude from feature aggregation; never impute"
+  },
+  "calculation": {
+    "methods": ["GFN1-xTB", "GFN2-xTB"],
+    "primary_geometry_method": "GFN2-xTB",
+    "comparison_geometry": "identical optimized coordinates for GFN1 and GFN2 single points",
+    "electronic_temperature_K": 300.0,
+    "diagnostic_electronic_temperature_K": 1000.0,
+    "charge": "formal molecular charge",
+    "spin": "RDKit-derived multiplicity; explicit for open-shell records",
+    "backend": "extended libxtb only",
+    "engine_calls_for_density_features": 0,
+    "keep_overlap": true,
+    "gfn0_scope": "single-point descriptors only; no Delta-SCF or shell-charge equivalence"
+  },
+  "split": {
+    "primary": "Bemis-Murcko scaffold split",
+    "secondary": "scaffold-stratified 5-fold clustering split",
+    "cluster": "Morgan fingerprint Tanimoto 0.7 single-linkage",
+    "leakage_rule": "all records sharing a scaffold or cluster stay in one partition"
+  },
+  "models": {
+    "baseline": "GFN1 xTB engine partial charges and shell descriptors with the published RegioSQM feature recipe; CM5 is not claimed unless an explicit CM5 transform is added",
+    "candidate": "regularized logistic regression and gradient-boosted trees",
+    "evaluation": "nested training split for hyperparameters; untouched scaffold test set",
+    "random_seeds": [20261106, 20261107, 20261108],
+    "preprocessing": "fit scaling, feature selection and train-median imputation inside training folds; retain missing indicators"
+  },
+  "feature_groups": [
+    "formal and RDKit atom features",
+    "GFN1/GFN2 charges and shell populations",
+    "Mulliken/Löwdin density populations and p-to-s ratios",
+    "Wiberg and Mayer bond descriptors",
+    "HOMO/LUMO frontier bond overlap populations",
+    "pi population and pi bond order",
+    "local Fukui, local softness and local electrophilicity",
+    "conformer mean/std/min/max and reliability diagnostics"
+  ],
+  "acceptance": {
+    "primary": "at least one primary metric difference over GFN1 has a molecule-bootstrap 95% CI entirely above zero, with no significant deterioration in the other primary metrics",
+    "primary_metrics": ["macro ROC-AUC", "mean reciprocal rank", "top-1 accuracy", "top-2 accuracy"],
+    "bootstrap_replicates": 2000,
+    "unit": "molecule",
+    "negative_result": "report no stable incremental benefit when the primary condition is not met",
+    "minimum_reporting": "all failures, missing descriptors, method/temperature sensitivity, per-atom coverage, calibration and runtime"
+  }
+}

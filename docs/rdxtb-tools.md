@@ -43,19 +43,18 @@ no build path was configured. An explicit path that fails to load is an error.
 The module supports the gas-phase calls shared by xTB C API major versions 1
 and 2. This ABI version is not the xTB program version.
 
-For native GFN0, first follow the [patched-build guide](xtb-patched-build.md),
-then select its installation before launching Python:
+Select the extended installation before launching Python:
 
 ```bash
 source .xtb-native/activate.sh
 ```
 
-The C++ core verifies the build manifest, reviewed upstream repair identity (or
-legacy local patch digest), and selected
-binary digest **before loading GFN0 parameters**. Official unpatched 6.7.1
-can run GFN1/2; GFN0 raises `ValueError`. `rdXTBTools` always uses the native
-library. The separate `run_xtb()` API defaults to ctypes/libxtb and also
-requires a verified library for GFN0; neither interface falls back to a process.
+The C++ core verifies the complete build manifest, reviewed upstream repair
+identity, basis-export and SCC-diagnostics extensions, and selected binary
+digest **before loading any parameters**. An official unpatched library is
+rejected for GFN0/1/2. `rdXTBTools` always uses the extended native library.
+The separate `run_xtb()` API defaults to ctypes/libxtb and applies the same
+verification; neither interface falls back to another engine or process.
 
 Build a wheel in the same activated environment with:
 
@@ -96,6 +95,7 @@ if eht_ok:
 | Occupations | `GetOrbitalOccupancies()`, electrons, `[MO]` | xTB occupations can be fractional at finite electronic temperature |
 | Partial charges | `GetAtomicCharges()`, elementary charge, `[atom]` | xTB's charge model; do not equate it with EHT's population analysis |
 | Dipole | `GetDipole()`, e·Bohr, `[x,y,z]` | Origin-dependent for charged molecules; uses supplied coordinates |
+| Nuclear gradient | `GetGradient()`, Hartree/Bohr, `[atom,xyz]` | Used by `optimize_xtb`; it is not an excited-state gradient |
 | Bond orders | `GetWibergBondOrders()`, dimensionless, `[atom,atom]` | Not the EHT overlap population matrix |
 | MO coefficients | `GetOrbitalCoefficients()`, `[AO,MO]` | Optional; xTB basis ordering, not EHT basis ordering |
 | Overlap / maps | `GetOverlapMatrix()`, `GetAOAtomMap()`, `GetAOShellMap()`, `GetShellAtomMap()`, `GetShellAngularMomenta()` | Optional native basis data; not EHT matrices |
@@ -124,8 +124,9 @@ finite and marked as 3D. Use `Chem.AddHs` to expand all hydrogen counts into
 atoms. Charge and unpaired electrons default to RDKit formal charges and
 radical counts, with electron-count/parity validation. Electronic temperature
 is in kelvin; accuracy is xTB's dimensionless numerical accuracy setting.
-The scope is gas-phase single points, with no geometry optimization or solvent
-option. These operations are outside the current package scope.
+The C++ module scope is gas-phase single points, with no solvent option or
+optimizer method. The Python package exposes xTB gradient optimization through
+`optimize_xtb`, while `rdXTBTools` supplies the underlying single-point data.
 
 Parameter discovery checks `parameterDirectory` first, then colon-separated
 `XTBPATH`, then the selected library's `share/xtb`. An explicit directory must
@@ -171,8 +172,8 @@ the molecule snapshot used by C++; mapping rejects subsequently changed atom
 order, topology or geometry. Standalone C++ results leave `inputProvenanceJSON`
 empty. `basisExportVerified` reports the verified ABI/manifest capability;
 `overlapRetained` reports whether this result actually holds basis data.
-Official libxtb still handles basic GFN1/2; requesting `keepOverlap=True` without
-the reviewed extension raises `ValueError`. See [definitions](descriptors.md).
+The wrapper rejects an upstream library without the complete reviewed extension
+set, even for a basic single point. See [definitions](descriptors.md).
 
 ## Standalone C++ use
 
@@ -190,7 +191,9 @@ ctest --test-dir build/core --output-on-failure
 cmake --install build/core
 ```
 
-Use `-DRDXTB_XTB_PREFIX="$CONDA_PREFIX"` for the environment's release xTB.
+Use `-DRDXTB_XTB_PREFIX="$CONDA_PREFIX"` only when that prefix contains the
+project-built extended library; an upstream release xTB does not satisfy the
+runtime contract.
 An external CMake project can use:
 
 ```cmake

@@ -62,8 +62,11 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env.pop("RDKIT_ETH_BUILD_RDXTB", None)
+    # Do not run the build frontend from the checkout root: a repository-local
+    # ``build/`` directory would shadow the installed ``build`` package as a
+    # namespace package on sys.path.
     subprocess.run([sys.executable, "-m", "build", "--sdist", "--no-isolation",
-                    "--outdir", str(output), str(ROOT)], env=env, check=True)
+                    "--outdir", str(output), str(ROOT)], env=env, cwd=output, check=True)
     source, = output.glob("*.tar.gz")
     with tarfile.open(source) as archive:
         members = archive.getnames()
@@ -86,7 +89,8 @@ def main():
                 build_env.update(RDKIT_ETH_BUILD_RDXTB="1", RDXTB_XTB_PREFIX=str(args.xtb_prefix.resolve()),
                                  RDXTB_RDKIT_PREFIX=os.environ.get("RDXTB_RDKIT_PREFIX", sys.prefix))
             subprocess.run([sys.executable, "-m", "build", "--wheel", "--no-isolation",
-                            "--outdir", str(destination), str(checkout)], env=build_env, check=True)
+                            "--outdir", str(destination), str(checkout)], env=build_env,
+                           cwd=temporary, check=True)
         wheel, = destination.glob("*.whl")
         records.append(wheel_record(wheel, compiled))
     manifest = {

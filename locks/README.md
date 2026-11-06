@@ -6,7 +6,7 @@ of the tested environments, not a new dependency solve on each installation.
 
 | File | Purpose |
 | --- | --- |
-| `linux-64/runtime.txt` | RDKit + official xTB 6.7.1, Python adapter and tests |
+| `linux-64/runtime.txt` | Legacy RDKit + upstream xTB compatibility snapshot for packaging tests |
 | `linux-64/rdxtb-sdk.txt` | Matched RDKit 2026.09.1 / Boost 1.90 / C++ SDK; no xTB package |
 | `linux-64/xtb-toolchain.txt` | Fortran 16.2 / mctc-lib 0.7 toolchain for the pinned xTB source |
 | `linux-64/release-tools-py311.txt` | Source/wheel build frontend and PEP 517 hooks |
@@ -41,5 +41,6 @@ have been tested.
 
 The standard `tools/install_native.py` uses `rdxtb-sdk.txt` for its runtime
 and `xtb-toolchain.txt` for its separate compiler prefix. It adds the built
-extended libxtb directly to that runtime. `runtime.txt` remains an official
-xTB compatibility profile, not the recommended full installation.
+extended libxtb directly to that runtime. `runtime.txt` is retained only as a
+legacy upstream compatibility snapshot; it cannot run the public calculation
+API because it has no project extensions.

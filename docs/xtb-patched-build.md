@@ -93,8 +93,8 @@ reviewed patch hash, manifest capability and selected binary hash agree.
 `capabilities.orbital_basis_api` is 1. GFN0 independently requires the verified
 upstream-fix commit/source identity and `capabilities.native_gfn0: true`.
 Historical 0.4 manifests with the reviewed local D4 patch are also accepted. An engine version string cannot
-establish either capability. Official C API 1/2 libraries still support basic
-GFN1/2 calculations; requesting unavailable basis retention fails explicitly.
+establish either capability. The public adapter requires the complete extended
+profile for every GFN0/1/2 calculation.
 
 ## Validation and scope
 
@@ -108,13 +108,15 @@ See [current validation](validation.md) for measured results.
 
 This does not establish general libxtb thread safety. Adapter calls are
 serialized, including the two Python interfaces; independent bindings are
-outside that lock. Optimization, solvation and excited-state calculations
-are not adapter features.
+outside that lock. The Python adapter now exposes a gas-phase gradient
+optimizer built on this single-point API; solvent models and excited-state
+calculations remain outside the adapter.
 
 The standard installer composes this engine build with locked RDKit dependencies
-and adapter-wheel installation. The old conda recipe remains a basic official-
-library compatibility profile. Plain `pip install` installs the adapter, not
-a Fortran toolchain.
+and adapter-wheel installation. The conda recipe is packaging scaffolding and
+does not provide a usable upstream-only runtime. Plain `pip install` installs
+the adapter, not a Fortran toolchain; use the standard installer or this builder
+to obtain the required extended library.
 A portable distribution needs its own packaging and clean-environment checks.
 xTB is LGPL-3.0-or-later; both license texts, exact patches, source diff and
 commit are retained with the installation. Dependencies have their own licenses.

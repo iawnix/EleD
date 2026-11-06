@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (0.8)
+# Descriptor reports and vertical reactivity (1.1)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
@@ -38,10 +38,11 @@ export_descriptor_reports(reports, "features.jsonl")
 topology and geometry before attaching atom/bond/spatial descriptors. It combines
 the [existing descriptors](descriptors.md), both population definitions and
 degeneracy-aware frontier distributions. `run_descriptor_batch` retains overlap by default and supports
-[isolated parallel execution](isolated-batches.md). With an official library, explicitly
-use `options=XTBOptions(keep_overlap=False)` for basic features.
+[isolated parallel execution](isolated-batches.md). The same extended library
+is used for basic and overlap-aware features; set `keep_overlap=False` only
+when the additional basis snapshot is not needed.
 
-The report schema version is **1** and descriptor-definition version is **1.0**;
+The report schema version is **2** and descriptor-definition version is **1.1**;
 neither is the package version. `descriptor_columns(frontier_depth=2)` returns
 the ordered scalar schema and units. Each report includes:
 
@@ -49,6 +50,9 @@ the ordered scalar schema and units. Each report includes:
   explicit; nonnumeric identity fields have no physical unit.
 - `atoms`, `bonds`, `fragments`, `populations`, `frontier`: nested indexed data.
   Frontier sections retain the actual MO indices used for each group.
+- `density`, `shell_populations`, `mayer_bonds`, `frontier_bonds`, `pi`: zero-cost
+  sections derived from retained `P`, `S`, `C` and shell maps. Each section
+  carries units, invariance and explicit missing-value reasons.
 - `analysis_settings`: thresholds, degeneracy tolerance and extraction controls.
 - `provenance`: input hashes, charge/spin, numerical settings, engine and parameter
   identity. Failed calculations retain requested options where no result exists.
@@ -71,9 +75,10 @@ reports into separate files.
 
 Quality checks include fractional occupations, frontier-threshold sensitivity,
 charge/electron conservation, missing frontier groups, spin-summed open-shell
-interpretation and charged-dipole origin dependence. The optional [SCC diagnostics extension](scf-diagnostics.md) reports the actual
-iteration count, final energy change and mixed-variable RMS with their thresholds.
-Older libraries leave these fields null with a reason; GFN0 is non-SCF.
+interpretation and charged-dipole origin dependence. The [SCC diagnostics
+extension](scf-diagnostics.md) reports the actual iteration count, final energy
+change and mixed-variable RMS with their thresholds. The runtime rejects
+libraries without this extension; GFN0 is non-SCF.
 Convergence criteria are not an experimental accuracy guarantee.
 
 ## Fixed-geometry charge-state analysis
@@ -83,7 +88,7 @@ from rdkit_eth import run_reactivity, XTBOptions, calc_reactivity_descriptors
 
 # Default protocol: GFN2, 300 K, reference wavefunction copies, fixed geometry.
 reaction = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
-print(reaction["values"]["vertical_ip_eV"])
+print(reaction["values"]["vertical_ip_ev"])
 print(reaction["atoms"])  # f_plus, f_minus, f_radical, dual
 
 # Explicit independent initialization for comparison; no automatic selection.
@@ -92,6 +97,12 @@ reaction = run_reactivity(mol, options=XTBOptions(electronic_temperature=300.),
 # Existing compatible results can instead be analyzed without new calculations:
 # calc_reactivity_descriptors(mol, reference, ionized, attached)
 ```
+
+Each atom row also contains `local_softness_per_ev = s f+`,
+`local_electrophilicity_ev = ω f+`, and the explicitly named
+`local_nucleophilicity_per_ev = s f−` proxy. Their units and missing-value
+semantics are in `atom_units`, `atom_invariance`, and
+`atom_missing_semantics`; no absolute nucleophilicity reference is assumed.
 
 Only GFN1/2 support this ΔSCF workflow. It evaluates reference charge Q,
 ionized Q+1 and attached Q−1 at the **same input geometry**, method, numerical
@@ -119,8 +130,8 @@ triplet workflow, including failures. Returned results contain owned arrays.
 0.6 initialization. To reproduce the complete 0.6 default protocol, also set
 `electronic_temperature=0.` explicitly. Reports record `protocol_version="2.0"`
 and requested initialization in `analysis_settings`; successful state provenance
-records the actual initialization. Descriptor version 1.0 and schema 1 remain
-unchanged because the formulas and output columns have not changed.
+records the actual initialization. Descriptor version 1.1 and schema 2 identify
+the added nested density sections; existing scalar columns remain unchanged.
 
 Reference reuse can improve convergence, but neither initialization guarantees
 the lowest SCF solution. Compare protocols explicitly if this matters; the API
@@ -131,13 +142,13 @@ With N modeled electrons and energies converted from Hartree to eV:
 
 | Field | Definition |
 | --- | --- |
-| `vertical_ip_eV` | E(N−1) − E(N) |
-| `vertical_ea_eV` | E(N) − E(N+1) |
-| `chemical_potential_eV` | −(IP+EA)/2 |
-| `electronegativity_eV` | (IP+EA)/2 |
-| `hardness_eV` | η = (IP−EA)/2 |
-| `softness_per_eV` | 1/(IP−EA) = 1/(2η) |
-| `electrophilicity_eV` | μ²/(2η) |
+| `vertical_ip_ev` | E(N−1) − E(N) |
+| `vertical_ea_ev` | E(N) − E(N+1) |
+| `chemical_potential_ev` | −(IP+EA)/2 |
+| `electronegativity_ev` | (IP+EA)/2 |
+| `hardness_ev` | η = (IP−EA)/2 |
+| `softness_per_ev` | 1/(IP−EA) = 1/(2η) |
+| `electrophilicity_ev` | μ²/(2η) |
 
 The softness convention is explicit because literature conventions differ.
 When η ≤ 1e-8 eV, softness/electrophilicity are null with a reason. Negative IP

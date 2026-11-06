@@ -1,97 +1,75 @@
 # rdkit-eth
 
-Electronic-structure descriptors for RDKit molecules through the native xTB C API.
-`rdkit-eth` keeps RDKit as the molecule and conformer model, calls `libxtb` in the
-same process, and returns indexed results with explicit units and provenance.
+**RDKit-native electronic-structure descriptors powered by an extended xTB C API.**
 
-The package provides two matching interfaces:
+`rdkit-eth` keeps RDKit as the molecule, atom-order and conformer model, then
+uses one project-built `libxtb` installation for gas-phase GFN0, GFN1 and GFN2
+calculations. It exposes the result through Python/ctypes and an optional
+RDKit-style C++/Boost.Python module. Units, atom indexing, provenance and
+missing-value reasons are part of the public API.
 
-- a pure Python/ctypes interface, `run_xtb()`;
-- an optional Boost.Python module, `rdXTBTools`, with an RDKit-style `ROMol -> RunMol()` API.
+[English](#english) · [中文](#中文)
 
-Both interfaces use the same selected `libxtb` installation. The optional native
-basis extension exposes the overlap matrix and AO maps from that calculation, so
-population and frontier descriptors use the actual xTB basis ordering.
+## English
 
-## What it provides
+### What it provides
 
-- GFN0-xTB, GFN1-xTB and GFN2-xTB gas-phase single-point calculations;
-- total energy, orbital energies and occupations, charges, dipole, Wiberg bond orders,
-  orbital coefficients and optional overlap/basis maps;
+- GFN0-xTB, GFN1-xTB and GFN2-xTB single-point calculations;
 - molecular, atom, bond and fragment descriptors;
-- Löwdin and Mulliken orbital populations and degeneracy-aware frontier descriptors;
-- fixed-geometry GFN1/2 ΔSCF IP, EA, hardness, softness and condensed Fukui descriptors;
-- checked SMILES-to-3D preparation with ETKDG presets and optional MMFF94 optimization;
-- ordered batches, isolated workers, in-memory/disk caching and JSONL/CSV reports;
-- RDKit EHT/YAeHMOP comparison helpers. EHT and xTB remain separate physical models.
+- HOMO/LUMO, dipole, partial-charge and Wiberg-bond features;
+- same-calculation Mulliken/Löwdin orbital and shell populations;
+- degeneracy-aware frontier and signed frontier-bond descriptors;
+- Mayer and local π descriptors when the required basis data are defined;
+- fixed-geometry GFN1/2 ΔSCF IP, EA, hardness, softness and Fukui descriptors;
+- checked RDKit conformer preparation with ETKDG, MMFF94/UFF and optional xTB
+  gradient optimization;
+- ordered batches, isolated workers, caching and JSONL/CSV reports;
+- RDKit YAeHMOP/EHT helpers kept separate from the xTB model.
 
-Descriptor helpers consume an existing result; calculation entry points are explicit.
+Density and frontier descriptors require the reviewed extended `libxtb` build
+and `keep_overlap=True`. They are extracted from the retained result and do not
+invoke a second engine calculation. The package does not provide an excited-state
+solver or a solvent model.
 
-## Install the complete native profile
+### Installation
 
-The reproducible profile targets Linux x86-64 with Python 3.11 and a conda-forge
-RDKit/Boost toolchain. From a repository checkout:
+The complete native profile targets Linux x86-64 with Python 3.11 and a
+conda-forge RDKit/Boost toolchain:
 
 ```bash
+git clone https://github.com/iawnix/rdkit-eth.git
+cd rdkit-eth
 python tools/install_native.py --jobs 6
 conda activate "$PWD/.rdkit-eth/runtime"
 python -m rdkit_eth doctor --check compiled --method GFN2-xTB --keep-overlap
 ```
 
-The installer creates separate locked runtime and build prefixes, builds the
-reviewed xTB source, builds the optional `rdXTBTools` module, and verifies GFN0/1/2,
-overlap/population descriptors and charge-state workflows. Keep
-`.rdkit-eth/runtime` and `.rdkit-eth/toolchain` together after installation.
+This builds the reviewed xTB source, its parameters and the optional
+`rdXTBTools` module in matched prefixes. Keep `.rdkit-eth/runtime` and
+`.rdkit-eth/toolchain` together. See the [installation guide](docs/install.md)
+and [offline runtime bundle guide](docs/runtime-bundle.md).
 
-For an offline installation, use the Linux runtime bundle from a GitHub release:
-
-```bash
-python install.py --directory /absolute/path/rdkit-eth
-/absolute/path/rdkit-eth/runtime/bin/python -m rdkit_eth doctor \
-  --check compiled --method GFN2-xTB --keep-overlap
-```
-
-The bundle contains the matched Python/RDKit runtime, extended `libxtb`, native
-dependencies, parameters and the compiled adapter. It is a Linux x86-64 runtime
-archive rather than a platform-independent wheel. See
-[the installation guide](docs/install.md) and [runtime bundle guide](docs/runtime-bundle.md).
-
-## Use an existing libxtb installation
-
-The pure adapter can be installed into an environment that already provides RDKit,
-NumPy and a loadable xTB library:
+If an extended `libxtb` is already installed beside RDKit, install the Python
+adapter and select the library explicitly when needed:
 
 ```bash
 python -m pip install .
 python -m rdkit_eth doctor --check native --method GFN2-xTB
 ```
 
-Library discovery checks the active Python/conda prefixes and the system loader.
-Use `xtb_library="/path/to/libxtb.so"` or `XTB_LIBRARY` to select a specific file.
-The selected library's path and SHA-256 are recorded in result metadata.
+The ordinary upstream xTB library does not provide the basis-export extension
+used by shell and density descriptors. The selected library path, build hash,
+parameter hash and extension capabilities are recorded in every result.
 
-The compiled interface needs a matching RDKit/Boost development environment:
+### First calculation
 
-```bash
-RDKIT_ETH_BUILD_RDXTB=1 \
-RDXTB_XTB_PREFIX=/path/to/extended-xtb \
-python -m pip install --no-deps --no-build-isolation .
-```
-
-The compiled wheel contains the adapter and C++ module. It uses the surrounding
-RDKit, Boost and xTB runtime; the complete native profile or offline bundle is the
-recommended way to obtain those matched dependencies.
-
-## First calculation
-
-Inputs use explicit hydrogens, a finite 3D conformer and RDKit atom ordering.
-`prepare_conformers()` can create a checked conformer pool from a SMILES string or
-an RDKit molecule.
+Inputs need explicit hydrogens and a finite 3D conformer. `run_xtb()` leaves the
+input molecule unchanged.
 
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_xtb, calc_xtb_descriptors, annotate_mol
+from rdkit_eth import run_xtb, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
@@ -99,179 +77,87 @@ if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
 AllChem.MMFFOptimizeMolecule(mol)
 
 result = run_xtb(mol, method="GFN2-xTB")
-print(result.total_energy_eh)       # Hartree
-print(result.homo_ev, result.lumo_ev, result.gap_ev)  # eV
-print(result.partial_charges)      # elementary charge
-print(calc_xtb_descriptors(result))
-
-annotated = annotate_mol(mol, result)
-print(annotated.GetAtomWithIdx(0).GetDoubleProp("xtb_partial_charge"))
+features = calc_xtb_descriptors(result)
+print(features["xtb_total_energy_hartree"])
+print(features["xtb_homo_ev"], features["xtb_lumo_ev"])
 ```
 
-`run_xtb()` leaves the molecule unchanged. `annotate_mol()` returns a copy by
-default and writes validated atom, bond and molecular properties to that copy.
-
-## Core Python API
-
-### Single points and results
-
-```python
-from rdkit_eth import XTBOptions, run_xtb
-
-options = XTBOptions(method="GFN2-xTB", electronic_temperature=300.0)
-result = run_xtb(mol, **options.to_dict())
-```
-
-`XTBResult` contains:
-
-| Field | Unit or shape |
-| --- | --- |
-| `total_energy_eh` | Hartree |
-| `orbital_energies_ev`, `homo_ev`, `lumo_ev`, `gap_ev` | eV |
-| `orbital_occupations` | electrons per MO |
-| `partial_charges` | elementary charge per atom |
-| `dipole_au` | e·Bohr, `[x, y, z]` |
-| `wiberg_bond_orders` | dimensionless, `[atom, atom]` |
-| `orbital_coefficients` | optional `[AO, MO]` |
-| `overlap_matrix` and AO/shell maps | optional native basis data |
-| `metadata` | input, settings, engine and parameter provenance |
-
-`keep_overlap=True` retains coefficients, overlap and native AO maps. It enables
-population and frontier analysis and adds O(NAO²) storage.
-
-### Molecular, atom, bond and fragment descriptors
+### Density and atom-level descriptors
 
 ```python
 from rdkit_eth import (
-    calc_xtb_descriptors, calc_xtb_atom_descriptors,
-    calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
+    run_xtb, calc_xtb_atom_descriptors, calc_xtb_bond_descriptors,
+    calc_shell_populations, calc_density_matrix,
 )
-
-molecular = calc_xtb_descriptors(result)
-atoms = calc_xtb_atom_descriptors(result)
-bonds = calc_xtb_bond_descriptors(mol, result)
-fragments = calc_xtb_fragment_descriptors(
-    result, {"donor": [0, 1], "acceptor": [2, 3, 4]}
-)
-```
-
-The scalar descriptor set includes frontier energies, dipole components and norm,
-charge statistics, electron/orbital counts and Wiberg sums. Atom rows contain
-charges and Wiberg sums; bond rows contain indexed Wiberg orders; fragment rows
-contain charge and internal/external Wiberg summaries.
-
-### Populations and frontier subspaces
-
-```python
-from rdkit_eth import calc_orbital_populations, calc_frontier_descriptors
 
 result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
-lowdin = calc_orbital_populations(result, scheme="lowdin")
-mulliken = calc_orbital_populations(result, scheme="mulliken")
-frontier = calc_frontier_descriptors(mol, result)
+atoms = calc_xtb_atom_descriptors(result)
+bonds = calc_xtb_bond_descriptors(mol, result)
+shells = calc_shell_populations(result)
+density = calc_density_matrix(result)
 ```
 
-These are spin-summed, ground-state descriptors. Near-degenerate HOMO/LUMO
-orbitals are grouped using the configured energy tolerance; the output records the
-indices and settings used for each group.
+`keep_overlap=True` retains the native `C`, `S`, AO-atom map and shell map. The
+analysis checks `trace(P S)` against the modeled electron count and preserves
+`None` plus a reason when a descriptor is undefined. See the
+[descriptor catalog](docs/descriptor-catalog.md) and
+[density descriptor guide](docs/density-descriptors.md).
 
 ### Fixed-geometry reactivity
 
 ```python
-from rdkit_eth import XTBOptions, run_reactivity
+from rdkit_eth import run_reactivity, XTBOptions
 
 report = run_reactivity(
     mol,
-    options=XTBOptions(method="GFN2-xTB"),
+    options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
     population_scheme="lowdin",
     return_errors=True,
 )
-print(report["values"]["vertical_ip_eV"])
-print(report["atoms"])
+print(report["values"]["vertical_ip_ev"])
+print(report["atoms"][0]["f_plus"])
 ```
 
-The protocol evaluates the reference, ionized and attached charge states at the
-same geometry. GFN1/2 support vertical ΔSCF IP/EA and atomic/fragment Fukui
-quantities using charge, Mulliken or Löwdin populations. Open-shell references
-accept explicit adjacent-state spin settings.
+The workflow calculates Q, Q+1 and Q−1 at one fixed geometry. GFN1/2 support
+vertical ΔSCF descriptors; GFN0 is not used for this analysis. Electronic
+temperature controls orbital occupation smoothing. It is not a nuclear
+temperature or an excited-state calculation.
 
-### Batches, caching and reports
+### Reports and batches
 
 ```python
-from rdkit_eth import XTBCache, run_descriptor_batch, export_descriptor_reports
+from rdkit_eth import run_descriptor_batch, export_descriptor_reports
 
-reports = run_descriptor_batch(
-    molecules,
-    record_ids=record_ids,
-    cache=XTBCache(),
-    max_workers=4,
-    isolate=True,
-)
+reports = run_descriptor_batch(molecules, record_ids=ids, max_workers=4,
+                               isolate=True)
 export_descriptor_reports(reports, "features.jsonl")
 ```
 
-Batch APIs preserve input order. Isolated workers provide per-molecule timeout and
-crash boundaries while the parent process owns cache/checkpoint writes. Use
-`XTBDiskCache` and `ReactivityCheckpoint` for datasets that span process restarts.
-Reports retain units, settings, quality flags, missing fields, errors and engine
-hashes. See [descriptor reports](docs/descriptor-reports.md),
-[persistent batches](docs/persistent-batches.md) and
-[isolated batches](docs/isolated-batches.md).
+Reports retain units, analysis settings, engine and parameter identity, quality
+flags, missing-value reasons and failures. Scalar columns are stable; atom,
+bond, population and density sections remain indexed nested data.
 
-## RDKit-style C++/Python interface
+### Geometry preparation
 
-`rdXTBTools` accepts an RDKit `ROMol` and returns `(success, XTBResults)`:
+`prepare_conformers()` is an input layer around RDKit embedding and force-field
+optimization. `optimize_xtb()` is an opt-in xTB gradient optimizer for workflows
+that need xTB-consistent coordinates. Geometry optimization supports descriptor
+preparation; it is not a transition-state, solvent or excited-state module.
 
-```python
-from rdkit_eth import rdXTBTools
+### Documentation and research
 
-ok, result = rdXTBTools.RunMol(
-    mol,
-    method="GFN2-xTB",
-    keepOverlap=True,
-)
-if not ok:
-    raise RuntimeError(result.errorMessage)
-print(result.totalEnergyHartree)       # Hartree
-print(result.GetOrbitalEnergies())     # eV
-print(result.GetOverlapMatrix())       # AO × AO
-```
+- [Documentation index](docs/README.md)
+- [Installation](docs/install.md) · [安装说明](docs/zh-CN/install.md)
+- [Descriptor definitions](docs/descriptors.md) · [描述符定义](docs/zh-CN/descriptors.md)
+- [Reports and reactivity](docs/descriptor-reports.md) · [报告与反应性](docs/zh-CN/descriptor-reports.md)
+- [Descriptor catalog](docs/descriptor-catalog.md) · [描述符目录](docs/zh-CN/descriptor-catalog.md)
+- [Density descriptors](docs/density-descriptors.md) · [密度描述符](docs/zh-CN/density-descriptors.md)
+- [EAS research plan](docs/research-plan-eas.md) · [EAS 研究方案](docs/zh-CN/research-plan-eas.md)
+- [Compiled RDKit interface](docs/rdxtb-tools.md)
+- [Extended xTB build](docs/xtb-patched-build.md)
+- [Frozen EAS protocol](protocol.json)
 
-The C++ library is available as `RDKitXTB::RDKitXTB` for applications that use
-RDKit's CMake package. See [the C++ API guide](docs/rdxtb-tools.md).
-
-## Conformer preparation
-
-```python
-from rdkit_eth import prepare_conformers
-
-prepared = prepare_conformers(
-    "C[C@H](O)C(=O)O",
-    num_conformers=4,
-    method="ETKDGv4",
-    fallback_methods=("ETKDGv3", "srETKDGv3"),
-    optimize="MMFF94",
-)
-if not prepared.success:
-    raise RuntimeError(prepared.report)
-mol = prepared.molecule
-```
-
-The preparation layer records embedding attempts, stereo checks, optimization
-status and coverage in `prepared.report`. It is a checked input layer for xTB
-workflows, while conformer selection remains under the caller's control.
-
-## Scope and scientific interpretation
-
-The current release focuses on gas-phase GFN0/1/2 single points and ground-state
-electronic descriptors. Energies, orbital gaps, charges, populations and Fukui
-values retain their method-specific definitions and are suitable for comparative
-workflows with recorded provenance. HOMO-LUMO gaps are frontier descriptors, and
-vertical ΔSCF values are approximate GFN energy differences. Solvent models,
-geometry optimization and excited-state solvers can be added as separate workflow
-layers; the package reports the ground-state quantities returned by xTB.
-
-## Development
+### Development
 
 ```bash
 conda activate "$PWD/.rdkit-eth/runtime"
@@ -279,18 +165,97 @@ python -m pip install --no-deps --no-build-isolation -e .
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest -q
 ```
 
-The repository includes the locked build recipes, C++ tests, integration checks,
-examples and validation datasets. Start with the focused guides:
+Contributions should include a focused test, documented units and invariance,
+explicit missing-value semantics, and provenance changes when the public report
+schema changes. See [CONTRIBUTING.md](CONTRIBUTING.md) if present in the checkout.
 
-- [installation](docs/install.md)
-- [descriptor definitions](docs/descriptors.md)
-- [descriptor reports and reactivity](docs/descriptor-reports.md)
-- [compiled interface](docs/rdxtb-tools.md)
-- [patched xTB build](docs/xtb-patched-build.md)
-- [validation scope](docs/mainline-validation.md)
+### License
 
-## License
+The project code is released under the BSD 3-Clause license. xTB source and
+patches retain their upstream licenses; see the bundled license files.
 
-`rdkit-eth` is released under the BSD 3-Clause license. xTB source and patches
-retain their upstream licensing terms; see the bundled license files and
-[the xTB build guide](docs/xtb-patched-build.md).
+## 中文
+
+### 项目简介
+
+`rdkit-eth` 是一个面向 RDKit 的电子结构描述符库。RDKit 负责分子图、原子
+编号和构象；项目构建的扩展版 `libxtb` 负责 GFN0/GFN1/GFN2 气相电子结构
+计算。Python/ctypes 接口和可选的 RDKit 风格 C++/Boost.Python 接口使用同一
+后端。单位、原子索引、计算来源、引擎哈希和缺失值原因都属于公开接口。
+
+### 已支持功能
+
+- GFN0、GFN1、GFN2 单点计算；
+- 分子级、原子级、键级和片段级描述符；
+- HOMO/LUMO、能隙、偶极矩、原子电荷和 Wiberg 键级；
+- 同一次计算得到的 Mulliken/Löwdin 轨道和 shell 布居；
+- 简并不变的前线轨道描述符和前线键分解；
+- 满足条件时的 Mayer 键级和局部 π 描述符；
+- 固定几何下的 GFN1/2 ΔSCF、IP、EA、硬度、软度和 Fukui 描述符；
+- 基于 RDKit 的 ETKDG 构象准备、MMFF94/UFF 优化和可选 xTB 梯度优化；
+- 批量计算、隔离 worker、缓存以及 JSONL/CSV 报告；
+- 与 xTB 分开的 RDKit YAeHMOP/EHT 辅助接口。
+
+密度和前线描述符需要扩展版 `libxtb` 以及 `keep_overlap=True`。这些描述符
+直接消费同一次计算保留的结果，不会再次调用量子引擎。项目当前不提供激发态
+求解器或溶剂模型。
+
+### 安装
+
+完整原生环境面向 Linux x86-64、Python 3.11 和 conda-forge RDKit/Boost：
+
+```bash
+git clone https://github.com/iawnix/rdkit-eth.git
+cd rdkit-eth
+python tools/install_native.py --jobs 6
+conda activate "$PWD/.rdkit-eth/runtime"
+python -m rdkit_eth doctor --check compiled --method GFN2-xTB --keep-overlap
+```
+
+已有扩展版 `libxtb` 时，也可以只安装 Python 适配层：
+
+```bash
+python -m pip install .
+python -m rdkit_eth doctor --check native --method GFN2-xTB
+```
+
+普通上游 xTB 库没有本项目密度分析所需的 basis 导出扩展。每个结果都会记录
+实际使用的库路径、构建哈希、参数哈希和扩展能力。
+
+### 最小示例
+
+```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit_eth import run_xtb, calc_xtb_descriptors
+
+mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
+assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
+AllChem.MMFFOptimizeMolecule(mol)
+
+result = run_xtb(mol, method="GFN2-xTB")
+features = calc_xtb_descriptors(result)
+print(features["xtb_gap_ev"])
+```
+
+需要 shell、Mulliken/Löwdin 或密度描述符时：
+
+```python
+result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+```
+
+### 描述符和研究文档
+
+从[双语文档目录](docs/README.md)开始。核心中文页面包括[安装说明](docs/zh-CN/install.md)、
+[描述符定义](docs/zh-CN/descriptors.md)、[报告与反应性](docs/zh-CN/descriptor-reports.md)
+和[EAS 研究方案](docs/zh-CN/research-plan-eas.md)。
+
+### 开发与许可
+
+```bash
+conda activate "$PWD/.rdkit-eth/runtime"
+python -m pip install --no-deps --no-build-isolation -e .
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest -q
+```
+
+项目代码采用 BSD 3-Clause 许可证；xTB 源码和补丁遵循其上游许可证。

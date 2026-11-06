@@ -1,4 +1,4 @@
-# Electronic descriptors and population analysis (0.6)
+# Electronic descriptors and density analysis (1.1)
 
 For standardized reports, quality flags, CSV/JSONL export and vertical charge-state
 analysis, see [descriptor reports](descriptor-reports.md).
@@ -18,6 +18,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `calc_xtb_fragment_descriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
 | `calc_orbital_populations(result, scheme="lowdin", orbital_indices=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
 | `calc_frontier_descriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
+| `calc_density_descriptors(mol, result)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond and π descriptors | Same-calculation C/S/maps; `keep_overlap=True` |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned
 molecule snapshot. Both Python result types support bond mapping, annotation and
@@ -45,9 +46,9 @@ annotated = annotate_mol(mol, result)
 (Hartree), HOMO/LUMO/gap (eV) and electron/orbital counts. It adds:
 
 - `xtb_homo_index`, `xtb_lumo_index`: zero-based indices; `None` if absent.
-- `xtb_homo_minus_1_eV`, `xtb_lumo_plus_1_eV`, etc., up to `frontier_depth`.
+- `xtb_homo_minus_1_ev`, `xtb_lumo_plus_1_ev`, etc., up to `frontier_depth`.
   Values beyond the occupied/virtual lists are `None`; depth zero omits them.
-- `xtb_dipole_x_au`, `_y_au`, `_z_au`, `xtb_dipole_norm_au` and
+- `xtb_dipole_x_e_bohr`, `_y_e_bohr`, `_z_e_bohr`, `xtb_dipole_norm_e_bohr` and
   `xtb_dipole_norm_debye`. One e·Bohr = 2.541746473 Debye.
 - `xtb_charge_sum_e`, `_min_e`, `_max_e`, `_mean_e`, `_std_e`, `_abs_sum_e`.
   Standard deviation uses all atoms and `ddof=0`, including explicit hydrogens.
@@ -201,3 +202,24 @@ GFN0/1/2 on ethanol, ammonium and methyl radical compare compiled and ctypes
 matrices/populations. Benzene verifies degenerate frontier subspace invariance.
 The C ABI diagnostic also checks copies, disabled retention, invalid buffers,
 failed SCF, Hessian invalidation and recovery. No tblite or ASE is imported.
+
+## Shell, Mayer, frontier-bond and π descriptors
+
+```python
+from rdkit_eth import calc_density_descriptors
+
+result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
+density = calc_density_descriptors(mol, result)
+```
+
+`calc_density_matrix` exposes `P`, `trace_PS_e` and the electron-conservation
+error. `calc_shell_populations` reports Mulliken and Löwdin s/p/d electron
+counts, p/s ratios and shell rows. `calc_mayer_bond_descriptors` places Mayer
+and Wiberg values beside each RDKit bond; open-shell Mayer entries are `None`
+with an explicit spin-density reason. `calc_frontier_bond_descriptors` uses
+near-degenerate HOMO/LUMO projectors and signed Mulliken overlap populations.
+`calc_pi_descriptors` reports p-shell projection for aromatic/sp2 atoms and
+π-bond order where a local plane exists. Units, invariance and missing-value
+semantics are included in each section. See [density-descriptors](density-descriptors.md)
+for definitions and the EAS validation protocol. The scope and literature
+positioning audit is in [literature-density-ml-audit](literature-density-ml-audit.md).

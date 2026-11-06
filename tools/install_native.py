@@ -111,10 +111,17 @@ def main():
                     raise RuntimeError('Check selected an engine outside the standard installation')
                 reports.append(report)
                 print(f'Installed {backend} {method} basis/populations: OK', flush=True)
+    optimization_output = Path(tempfile.mkdtemp(prefix='optimization-', dir=artifacts))
+    optimization = run([runtime / 'bin/python', '-I', ROOT / 'tools/benchmark_xtb_optimization.py',
+                         '--output', optimization_output, '--smiles', 'O', '--smiles', 'CCO', '--check'],
+                        env=env, cwd=directory, capture_output=True, text=True)
+    optimization_report = json.loads(optimization.stdout)
+    print('Installed in-process xTB optimization comparison: OK', flush=True)
     record = {'schema_version': 1, 'installed_at': datetime.now(timezone.utc).isoformat(),
               'runtime': str(runtime), 'toolchain': str(toolchain), 'wheel': str(wheel),
               'wheel_sha256': digest(wheel), 'source_lock_sha256': digest(ROOT / 'tools/xtb-source.json'),
-              'checks': reports, 'scope': 'local Linux x86-64; preserve both environment prefixes'}
+              'checks': reports, 'optimization_check': optimization_report,
+              'scope': 'local Linux x86-64; preserve both environment prefixes'}
     (directory / 'installation.json').write_text(json.dumps(record, indent=2) + '\n')
     print(f'\nVerified installation: {runtime}\nActivate: conda activate {shlex.quote(str(runtime))}\n'
           f'Report: {directory / "installation.json"}')

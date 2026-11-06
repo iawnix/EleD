@@ -21,6 +21,9 @@ repairs cross-prefix ELF RPATHs. It preserves the original binary/build-record
 hashes in relocation provenance and fingerprints the relocated library anew.
 It then checks GFN0/1/2, overlap/populations and GFN1/2 reactivity through both
 interfaces from outside the checkout, with library-selection overrides removed.
+The bundle builder also records hashes for the xTB executable and all GFN
+parameter files, so the installed runtime contains the complete extended xTB
+profile rather than only `libxtb.so`.
 It also rejects unresolved or original-prefix dependencies in `ldd` output.
 
 The resulting `installation.json` records the checks. Keep `runtime` and

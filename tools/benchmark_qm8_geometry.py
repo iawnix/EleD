@@ -113,7 +113,7 @@ def read_evidence(root):
     if manifest['protocol'] != 'qm8-pilot-v1' or manifest['sha256'] != pilot.SHA256:
         raise ValueError('unsupported source protocol')
     if (manifest['options'] != XTBOptions(keep_overlap=True).to_dict()
-            or manifest['basic_features'] != list(pilot.BASIC) or manifest['orbital_features'] != list(pilot.ORBITAL)
+            or manifest['basic_features'] != list(pilot.FROZEN_BASIC) or manifest['orbital_features'] != list(pilot.ORBITAL)
             or manifest['rdkit_features'] != list(pilot.TWO_D) + ['Morgan radius2, 1024bits, no chirality']):
         raise ValueError('feature or calculation protocol differs from frozen pilot')
     selected = {row['id']: row for row in manifest['selected']}

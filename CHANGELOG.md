@@ -7,6 +7,17 @@
   cache/checkpoint writes. Preserve double-precision coordinates across processes.
 - Added an optional reviewed SCC diagnostic ABI and C++/Python fields for final
   iterations, energy change, mixer RMS and thresholds; GFN0 remains non-SCF.
+- Unified every calculation entry point around the complete reviewed extended
+  `libxtb` profile (GFN0 repair, basis export and SCC diagnostics). Upstream
+  or partially patched libraries now fail before engine handles are created.
+- Added `optimize_xtb()` and `prepare_conformers(..., optimize="xTB")`, using
+  native xTB gradients, bounded L-BFGS steps, fixed atoms and auditable
+  convergence reports without modifying caller-owned molecules.
+- Added an in-process-versus-CLI geometry optimization regression test/tool,
+  ran the test in the standard CI profile, and recorded extended xTB
+  executable/parameter hashes in runtime bundle manifests.
+- Hardened clean source-archive wheel builds so the repository's local `build/`
+  directory cannot shadow the Python build frontend.
 - Added offline Linux runtime bundling and relocation checks for both interfaces.
   Python compiled calls now discover libxtb in the active runtime by default.
 - Refit the historical QM8 study after stereo audit, separately evaluate the checked

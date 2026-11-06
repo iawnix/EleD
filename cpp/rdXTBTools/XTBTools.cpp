@@ -89,6 +89,7 @@ struct API {
   XTB_FUNCTION(setMaxIter); XTB_FUNCTION(setAccuracy); XTB_FUNCTION(setElectronicTemp);
   XTB_FUNCTION(newResults); XTB_FUNCTION(copyResults); XTB_FUNCTION(delResults); XTB_FUNCTION(singlepoint);
   XTB_FUNCTION(getEnergy); XTB_FUNCTION(getNao); XTB_FUNCTION(getDipole);
+  XTB_FUNCTION(getGradient);
   XTB_FUNCTION(getCharges); XTB_FUNCTION(getBondOrders);
   XTB_FUNCTION(getOrbitalEigenvalues); XTB_FUNCTION(getOrbitalOccupations);
   XTB_FUNCTION(getOrbitalCoefficients);
@@ -117,7 +118,8 @@ struct API {
     BIND(loadGFN0xTB); BIND(loadGFN1xTB); BIND(loadGFN2xTB);
     BIND(setMaxIter); BIND(setAccuracy); BIND(setElectronicTemp);
     BIND(newResults); BIND(copyResults); BIND(delResults); BIND(singlepoint);
-    BIND(getEnergy); BIND(getNao); BIND(getDipole); BIND(getCharges); BIND(getBondOrders);
+    BIND(getEnergy); BIND(getNao); BIND(getDipole); BIND(getGradient);
+    BIND(getCharges); BIND(getBondOrders);
     BIND(getOrbitalEigenvalues); BIND(getOrbitalOccupations); BIND(getOrbitalCoefficients);
 #undef BIND
 #define OPTIONAL(name) name = reinterpret_cast<decltype(name)>(dlsym(handle.get(), "xtb_rdkit_" #name))
@@ -190,6 +192,21 @@ bool verifyBasis(const API &api) {
       fs::canonical(prefix / "lib/libxtb.so") == fs::path(api.path) &&
       entry != files.not_found() && entry->second.get_value<std::string>() == api.hash &&
       sha256(api.path) == api.hash && api.getBasisAPIVersion() == 1;
+  } catch (const std::exception &) { return false; }
+}
+
+bool verifyDiagnostics(const API &api) {
+  if (!api.getSCFAPIVersion || !api.getSCFDiagnostics) return false;
+  try {
+    const auto prefix = fs::path(api.path).parent_path().parent_path();
+    boost::property_tree::ptree record;
+    boost::property_tree::read_json((prefix / "share/xtb/rdkit-eth/build.json").string(), record);
+    const auto &extension = record.get_child("source.diagnostics_extension");
+    return record.get<int>("schema_version", 0) == 1 &&
+      record.get<int>("capabilities.scf_diagnostics_api", 0) == 1 &&
+      extension.get<int>("api_version", 0) == 1 &&
+      extension.get<std::string>("patch_sha256", "") == scfPatchSHA256 &&
+      api.getSCFAPIVersion() == 1;
   } catch (const std::exception &) { return false; }
 }
 
@@ -307,10 +324,12 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
   result.apiVersion = api.version;
   result.gfn0StateFixVerified = verifyGFN0(api, result.sourceCommit);
   result.basisExportVerified = verifyBasis(api);
-  if (options.keepOverlap && !result.basisExportVerified)
-    throw std::invalid_argument("keepOverlap requires a verified native basis extension; rebuild with tools/build_patched_xtb.py");
   if (method == 0 && !result.gfn0StateFixVerified)
     throw std::invalid_argument("Native GFN0 requires a verified patched xTB build; run tools/build_patched_xtb.sh");
+  if (!result.basisExportVerified || !verifyDiagnostics(api))
+    throw std::invalid_argument(
+      "rdXTBTools requires the reviewed extended libxtb build with basis-export and SCC-diagnostics APIs; "
+      "run tools/install_native.py or tools/build_patched_xtb.py");
   result.parameterFile = parameterFile(api, options, method);
   if (!result.parameterFile.empty()) result.parameterSHA256 = sha256(result.parameterFile);
   Handles h(api);
@@ -367,11 +386,13 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       throw EngineError("Invalid total energy or orbital count");
     const size_t nao = result.numOrbitals;
     result.atomicCharges.resize(n);
+    result.gradientHartreePerBohr.resize(static_cast<size_t>(3) * n);
     result.dipoleAtomicUnits.resize(3);
     result.wibergBondOrders.resize(static_cast<size_t>(n) * n);
     result.orbitalEnergiesEV.resize(nao);
     result.orbitalOccupancies.resize(nao);
     api.getCharges(h.env, h.res, result.atomicCharges.data());
+    api.getGradient(h.env, h.res, result.gradientHartreePerBohr.data());
     api.getDipole(h.env, h.res, result.dipoleAtomicUnits.data());
     api.getBondOrders(h.env, h.res, result.wibergBondOrders.data());
     api.getOrbitalEigenvalues(h.env, h.res, result.orbitalEnergiesEV.data());
@@ -409,6 +430,7 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       }
     }
     api.check(h.env, "Result extraction");
+    requireFinite(result.gradientHartreePerBohr, "gradient");
     for (auto &energy : result.orbitalEnergiesEV) energy *= hartreeToEV;
     // The Fortran WBO array is column-major; expose atom rows and columns.
     for (size_t i = 0; i < static_cast<size_t>(n); ++i)

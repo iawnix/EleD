@@ -7,7 +7,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit_eth import run_xtb, calc_descriptor_report
-from rdkit_eth.runtime import _find_xtb_library, _native_diagnostics_build, _SCF_DIAGNOSTICS_PATCH
+from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _SCF_DIAGNOSTICS_PATCH
 from rdkit_eth.scf import scf_record
 from rdkit_eth.errors import XTBEnvironmentError, XTBNativeNotFoundError
 
@@ -16,7 +16,7 @@ from rdkit_eth.errors import XTBEnvironmentError, XTBNativeNotFoundError
 def library():
     try: path = _find_xtb_library()
     except XTBNativeNotFoundError: pytest.skip('libxtb unavailable')
-    if not _native_diagnostics_build(path): pytest.skip('SCC diagnostics extension unavailable')
+    if not _extended_libxtb_build(path): pytest.skip('reviewed extended libxtb unavailable')
     return path
 
 
@@ -53,7 +53,17 @@ def test_success_diagnostics_and_compiled_parity(library, method):
     if not hasattr(rdXTBTools.XTBResults, 'scfIterations'): return
     from rdkit_eth.electronic_descriptors import _as_result
     ok, compiled = rdXTBTools.RunMol(molecule, method=method, xtbLibrary=library)
-    assert ok and _as_result(compiled).metadata['scf'] == diagnostic
+    assert ok
+    compiled_diagnostic = _as_result(compiled).metadata['scf']
+    assert compiled_diagnostic['available'] == diagnostic['available']
+    if diagnostic['available']:
+        assert compiled_diagnostic['iterations'] == diagnostic['iterations']
+        assert compiled_diagnostic['criteria_satisfied'] == diagnostic['criteria_satisfied']
+        for key in ('energy_change_hartree', 'mixer_rms',
+                    'energy_threshold_hartree', 'mixer_threshold'):
+            # ctypes and C++ bindings invoke the same engine through separate
+            # call sequences; final SCF diagnostics can differ by roundoff.
+            assert compiled_diagnostic[key] == pytest.approx(diagnostic[key], rel=1e-4, abs=1e-12)
 
 
 @pytest.mark.integration

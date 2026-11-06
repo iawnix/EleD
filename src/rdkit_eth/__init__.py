@@ -21,6 +21,10 @@ from .electronic_descriptors import (
     calc_xtb_atom_descriptors, calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
 )
 from .populations import calc_orbital_populations, calc_frontier_descriptors
+from .density_descriptors import (
+    calc_density_matrix, calc_shell_populations, calc_mayer_bond_descriptors,
+    calc_frontier_bond_descriptors, calc_pi_descriptors, calc_density_descriptors,
+)
 from .errors import DescriptorUnavailableError
 
 __all__ = [
@@ -43,18 +47,26 @@ __all__ = [
     "calc_xtb_fragment_descriptors",
     "calc_orbital_populations",
     "calc_frontier_descriptors",
+    "calc_density_matrix",
+    "calc_shell_populations",
+    "calc_mayer_bond_descriptors",
+    "calc_frontier_bond_descriptors",
+    "calc_pi_descriptors",
+    "calc_density_descriptors",
     "DescriptorUnavailableError",
 ]
 
 from .reports import (
     DESCRIPTOR_VERSION, descriptor_columns, assess_descriptor_quality,
     calc_descriptor_report, run_descriptor_batch, export_descriptor_reports,
+    descriptor_sensitivity,
 )
 from .reactivity import calc_reactivity_descriptors, run_reactivity, ChargeStateCalculationError
 
 __all__ += [
     'DESCRIPTOR_VERSION', 'descriptor_columns', 'assess_descriptor_quality',
     'calc_descriptor_report', 'run_descriptor_batch', 'export_descriptor_reports',
+    'descriptor_sensitivity',
     'calc_reactivity_descriptors', 'run_reactivity', 'ChargeStateCalculationError',
 ]
 
@@ -74,3 +86,13 @@ __all__ += ['conformer_descriptor_columns', 'run_conformer_analysis']
 from .geometry import ConformerGenerationResult, prepare_conformers
 
 __all__ += ['ConformerGenerationResult', 'prepare_conformers']
+
+from .optimization import XTBOptimizationResult, optimize_xtb
+
+__all__ += ['XTBOptimizationResult', 'optimize_xtb']
+
+from .eas import normalize_eas_records, cluster_keys, assign_eas_splits, prepare_eas_dataset
+from .descriptor_catalog import descriptor_catalog, descriptor_status
+
+__all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'prepare_eas_dataset',
+            'descriptor_catalog', 'descriptor_status']

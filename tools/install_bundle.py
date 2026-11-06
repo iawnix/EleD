@@ -50,6 +50,11 @@ def install(bundle, destination):
     library = (runtime/'lib/libxtb.so').resolve()
     if digest(library) != manifest['original_library_sha256']:
         raise ValueError('unpacked libxtb differs from the verified build')
+    engine = manifest.get('extended_xtb', {})
+    for relative, expected in engine.get('files', {}).items():
+        artifact = runtime / relative
+        if not artifact.is_file() or digest(artifact) != expected:
+            raise ValueError('unpacked extended xTB artifact differs from the verified build: ' + relative)
     old_record = runtime/'share/xtb/rdkit-eth/build.json'
     old_digest = digest(old_record)
     for label in ('toolchain', 'runtime'):

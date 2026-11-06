@@ -1,9 +1,10 @@
 # Checked SMILES-to-3D preparation (0.10)
 
 `prepare_conformers` builds an explicit-H RDKit molecule plus an auditable
-preparation report. It uses RDKit embedding and optional force fields; libxtb
-is not needed until a subsequent `run_xtb` call. This is a workflow around RDKit,
-not a new embedding algorithm or an xTB geometry optimizer.
+preparation report. It uses RDKit embedding and MMFF94/UFF by default. With
+`optimize="xTB"`, it can run the separate gradient optimizer from
+`rdkit_eth.optimize_xtb` after embedding. This is a workflow around RDKit,
+not a new embedding algorithm.
 
 ```python
 from rdkit_eth import prepare_conformers, run_xtb
@@ -46,8 +47,14 @@ explicitly chooses UFF; missing force-field parameters produce a failed report
 before embedding, with no force-field substitution. `optimize=None` returns
 checked, unoptimized embeddings and labels them accordingly. After optimization,
 coordinate and stereo checks run again. Nonconverged or stereochemically changed
-coordinates never enter the returned molecule. Unexpected exceptions propagate;
-they are not hidden as ordinary embedding failures.
+coordinates never enter the returned molecule. `optimize='xTB'` uses GFN2-xTB by
+default (override with `xtb_method`), records the full gradient optimization
+report under each candidate, and requires the reviewed extended libxtb. The
+standalone `optimize_xtb()` API exposes convergence tolerances, bounded step
+size, fixed atoms and a separate `scf_max_iterations` limit. `prepare_conformers`
+uses `optimization_iterations` for the geometry-step limit and keeps the other
+optimizer controls at their documented defaults. Unexpected exceptions
+propagate; they are not hidden as ordinary embedding failures.
 
 Stop at the **first strategy with any accepted conformers**. Return only its
 accepted pool, with status `complete` or `partial`. A partial pool does not
@@ -98,7 +105,9 @@ including `UNKNOWN_SLOT_N` for counters unnamed by the installed API. These
 count internal failed attempts/stages, not failed molecules, and stage names
 alone do not prove a unique physical root cause. Reports distinguish an empty
 embedding result from coordinate rejection, stereo rejection, missing force-field
-parameters and failure to converge. No SCF calculation occurs in this layer.
+parameters and failure to converge. With `optimize='xTB'`, each candidate also
+records the native SCF/gradient optimization report; other modes perform no SCF
+calculation in this layer.
 
 Reliability here means explicit scope, bounded attempts, validation and recorded
 failure. It does not guarantee coverage of every molecule, a correct protonation

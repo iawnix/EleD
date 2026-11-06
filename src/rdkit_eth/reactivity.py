@@ -23,9 +23,9 @@ from .populations import calc_orbital_populations
 from .reports import SCHEMA_VERSION, DESCRIPTOR_VERSION, assess_descriptor_quality
 from .xtb import run_xtb, _resolve_options
 
-REACTIVITY_UNITS = {'vertical_ip_eV':'eV', 'vertical_ea_eV':'eV',
-                    'chemical_potential_eV':'eV', 'electronegativity_eV':'eV',
-                    'hardness_eV':'eV', 'softness_per_eV':'1/eV', 'electrophilicity_eV':'eV'}
+REACTIVITY_UNITS = {'vertical_ip_ev':'eV', 'vertical_ea_ev':'eV',
+                    'chemical_potential_ev':'eV', 'electronegativity_ev':'eV',
+                    'hardness_ev':'eV', 'softness_per_ev':'1/eV', 'electrophilicity_ev':'eV'}
 
 REACTIVITY_PROTOCOL_VERSION = '2.0'
 
@@ -40,7 +40,7 @@ class ChargeStateCalculationError(XTBRunError):
 
 def _summary(result):
     return {'status':'success', 'method':result.method, 'charge':result.metadata['charge'],
-            'uhf':result.metadata['uhf'], 'energy_hartree':result.total_energy_eh,
+            'uhf':result.metadata['uhf'], 'energy_hartree':result.total_energy_hartree,
             'num_electrons':result.number_of_electrons,
             'partial_charges_e':list(result.partial_charges), 'provenance':deepcopy(dict(result.metadata))}
 
@@ -57,7 +57,13 @@ def _empty_report(record_id, scheme, states):
                 'f_minus':'population(N)-population(N-1)', 'dual':'f_plus-f_minus',
                 'spin_search':False},
             'states':states, 'provenance':{'states':states}, 'quality':{},
-            'missing':{}, 'error':None, 'atoms':None, 'fragments':None}
+            'missing':{}, 'error':None, 'atoms':None, 'fragments':None,
+            'atom_units': {'f_plus':'dimensionless', 'f_minus':'dimensionless',
+                'f_radical':'dimensionless', 'dual':'dimensionless',
+                'local_softness_per_ev':'1/eV', 'local_electrophilicity_ev':'eV',
+                'local_nucleophilicity_per_ev':'1/eV'},
+            'atom_invariance': 'atom index and molecular geometry fixed; values invariant to rigid translation/rotation',
+            'atom_missing_semantics': 'None means the required global softness/electrophilicity is undefined or the state failed; never zero-filled'}
 
 
 def _scheme(scheme):
@@ -104,7 +110,7 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
         _effective_charge_uhf(mol, result.metadata['charge'], result.metadata['uhf'])
         if result.number_of_unpaired_electrons != result.metadata['uhf']:
             raise ValueError('charge-state spin count disagrees with its provenance')
-        energy = result.total_energy_eh
+        energy = result.total_energy_hartree
         if energy is None or not np.isfinite(energy): raise ValueError('all three energies must be finite')
         charges = _finite(result.partial_charges,'charges',1)
         if len(charges) != mol.GetNumAtoms(): raise ValueError('charges must match the indexed atoms')
@@ -114,17 +120,17 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
         states[label] = _summary(result)
     groups = _fragments(fragments,mol.GetNumAtoms()) if fragments is not None else {}
     report = _empty_report(record_id,population_scheme,states)
-    ip = (results['ionized'].total_energy_eh-ref.total_energy_eh)*HARTREE_TO_EV
-    ea = (ref.total_energy_eh-results['attached'].total_energy_eh)*HARTREE_TO_EV
+    ip = (results['ionized'].total_energy_hartree-ref.total_energy_hartree)*HARTREE_TO_EV
+    ea = (ref.total_energy_hartree-results['attached'].total_energy_hartree)*HARTREE_TO_EV
     mu = -(ip+ea)/2; eta = (ip-ea)/2
-    values = report['values']; values.update(vertical_ip_eV=ip, vertical_ea_eV=ea,
-            chemical_potential_eV=mu, electronegativity_eV=-mu, hardness_eV=eta)
+    values = report['values']; values.update(vertical_ip_ev=ip, vertical_ea_ev=ea,
+            chemical_potential_ev=mu, electronegativity_ev=-mu, hardness_ev=eta)
     if eta > 1e-8:
-        values.update(softness_per_eV=1/(2*eta), electrophilicity_eV=mu*mu/(2*eta))
+        values.update(softness_per_ev=1/(2*eta), electrophilicity_ev=mu*mu/(2*eta))
     else:
         flags.append({'code':'nonpositive_or_tiny_hardness','severity':'warning',
                       'detail':'Reciprocal hardness descriptors are undefined or numerically unstable.'})
-        report['missing'].update(softness_per_eV='nonpositive_or_tiny_hardness',electrophilicity_eV='nonpositive_or_tiny_hardness')
+        report['missing'].update(softness_per_ev='nonpositive_or_tiny_hardness',electrophilicity_ev='nonpositive_or_tiny_hardness')
     if ea < 0:
         flags.append({'code':'negative_vertical_ea','severity':'warning',
                       'detail':'Attachment is energetically unfavorable at this geometry; no bound-anion claim.'})
@@ -144,11 +150,27 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
     dual, radical = plus-minus, (plus+minus)/2
     errors = {'f_plus':float(plus.sum()-1), 'f_minus':float(minus.sum()-1), 'dual':float(dual.sum())}
     if max(abs(v) for v in errors.values()) > 1e-5: raise ValueError('condensed Fukui sums violate electron conservation')
-    report['atoms'] = [{'atom_index':i,'f_plus':float(plus[i]),'f_minus':float(minus[i]),
-                        'f_radical':float(radical[i]),'dual':float(dual[i])} for i in range(len(plus))]
+    # Local conceptual-DFT indices are derived solely from the already
+    # calculated vertical Delta-SCF quantities.  The nucleophilicity column is
+    # deliberately named a soft-nucleophilicity proxy: an absolute global
+    # nucleophilicity scale needs an external reference (usually TCE), which
+    # this gas-phase API does not assume.
+    softness = values.get('softness_per_ev')
+    electrophilicity = values.get('electrophilicity_ev')
+    atoms = []
+    for i in range(len(plus)):
+        atoms.append({'atom_index':i,'f_plus':float(plus[i]),'f_minus':float(minus[i]),
+                      'f_radical':float(radical[i]),'dual':float(dual[i]),
+                      'local_softness_per_ev': float(softness * plus[i]) if softness is not None else None,
+                      'local_electrophilicity_ev': float(electrophilicity * plus[i]) if electrophilicity is not None else None,
+                      'local_nucleophilicity_per_ev': float(softness * minus[i]) if softness is not None else None})
+    report['atoms'] = atoms
     report['fragments'] = {name:{'atom_indices':indices.tolist(),
         'f_plus':float(plus[indices].sum()), 'f_minus':float(minus[indices].sum()),
-        'f_radical':float(radical[indices].sum()), 'dual':float(dual[indices].sum())}
+        'f_radical':float(radical[indices].sum()), 'dual':float(dual[indices].sum()),
+        'local_softness_per_ev': float(softness * plus[indices].sum()) if softness is not None else None,
+        'local_electrophilicity_ev': float(electrophilicity * plus[indices].sum()) if electrophilicity is not None else None,
+        'local_nucleophilicity_per_ev': float(softness * minus[indices].sum()) if softness is not None else None}
         for name, indices in groups.items()}
     report['unassigned_atom_indices'] = sorted(set(range(len(plus)))-set(i for group in groups.values() for i in group))
     report['quality'] = {'status':'warning' if any(f['severity']=='warning' for f in flags) else 'ok',

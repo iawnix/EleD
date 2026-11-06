@@ -31,7 +31,7 @@ def synthetic(monkeypatch):
                         engine={'sha256': 'fixture-engine'}, initialization='independent')
         return XTBResult('GFN2-xTB', None, -1., 3., 3, 4, 0,
             orbital_energies_ev=(-10., h, 1.), orbital_occupations=(2., 2., 0.),
-            partial_charges=(-.6, .3, .3), dipole_au=(0., 0., 1.),
+            partial_charges=(-.6, .3, .3), dipole_e_bohr=(0., 0., 1.),
             wiberg_bond_orders=((0., 1., 1.), (1., 0., 0.), (1., 0., 0.)), metadata=metadata)
     monkeypatch.setattr(conformers, 'run_xtb', calculate)
     return mol, calculate
@@ -42,7 +42,7 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
     report = run_conformer_analysis(mol, record_id='water')
     assert report['conformer_ids'] == [3, 8, 12]
     assert report['status'] == 'partial'  # synthetic results lack basis arrays
-    stats = report['statistics']['xtb_homo_eV']
+    stats = report['statistics']['xtb_homo_ev']
     assert stats == dict(n_total=3, n_valid=3, n_missing=0, n_failed=0,
                          mean=-2., std=np.std([-3., -2., -1.]), min=-3., max=-1., range=2.)
     missing = report['statistics']['frontier_homo_participation_ratio']
@@ -51,8 +51,8 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
     assert reverse['statistics'] == report['statistics']
     assert mol.ToBinary() == before
     assert json.loads(json.dumps(report, allow_nan=False)) == report
-    single = run_conformer_analysis(mol, conf_ids=[8], columns=['xtb_homo_eV'])
-    assert single['status'] == 'complete' and single['statistics']['xtb_homo_eV']['std'] == 0
+    single = run_conformer_analysis(mol, conf_ids=[8], columns=['xtb_homo_ev'])
+    assert single['status'] == 'complete' and single['statistics']['xtb_homo_ev']['std'] == 0
 
 
 def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
@@ -61,10 +61,10 @@ def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
         if kwargs['conf_id'] == 8: raise XTBRunError('SCF failed')
         return calculate(mol, **kwargs)
     monkeypatch.setattr(conformers, 'run_xtb', fail_middle)
-    report = run_conformer_analysis(mol, columns=['xtb_homo_eV'])
+    report = run_conformer_analysis(mol, columns=['xtb_homo_ev'])
     assert report['n_failed'] == 1 and report['status'] == 'partial'
-    assert report['statistics']['xtb_homo_eV']['n_valid'] == 2
-    assert report['statistics']['xtb_homo_eV']['n_missing'] == 0
+    assert report['statistics']['xtb_homo_ev']['n_valid'] == 2
+    assert report['statistics']['xtb_homo_ev']['n_missing'] == 0
     assert report['reports'][1]['error']['message'] == 'SCF failed'
     with pytest.raises(XTBRunError): run_conformer_analysis(mol, return_errors=False)
     for error in (XTBEnvironmentError('runtime'), RuntimeError('unexpected'), ValueError('analysis')):
@@ -79,7 +79,7 @@ def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
 
 @pytest.mark.parametrize('kwargs', [dict(conf_ids=[]), dict(conf_ids=[3, 3]), dict(conf_ids=[True]),
     dict(conf_ids=[-1]), dict(conf_ids=[999]), dict(columns=['xtb_homo_index']),
-    dict(columns=['xtb_dipole_x_au']), dict(columns=[]), dict(degeneracy_ev=-1),
+    dict(columns=['xtb_dipole_x_e_bohr']), dict(columns=[]), dict(degeneracy_ev=-1),
     dict(options=XTBOptions(conf_id=3)), dict(return_errors=1)])
 def test_invalid_inputs_do_not_calculate(synthetic, monkeypatch, kwargs):
     mol, _ = synthetic

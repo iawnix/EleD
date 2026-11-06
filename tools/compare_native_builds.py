@@ -29,9 +29,9 @@ def calculate(library):
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
             result = run_xtb(mol, method=method, xtb_library=str(library), keep_overlap=True)
             population = calc_orbital_populations(result, scheme='mulliken')
-            rows.append({'name': case['name'], 'method': method, 'energy_eh': result.total_energy_eh,
+            rows.append({'name': case['name'], 'method': method, 'energy_eh': result.total_energy_hartree,
                          'orbital_energies_ev': result.orbital_energies_ev,
-                         'charges_e': result.partial_charges, 'dipole_au': result.dipole_au,
+                         'charges_e': result.partial_charges, 'dipole_e_bohr': result.dipole_e_bohr,
                          'wiberg': result.wiberg_bond_orders,
                          'orthonormality_error': population['orthonormality_error'],
                          'electron_error': float(abs(sum(population['electron_populations_e']) - result.number_of_electrons))})
@@ -68,7 +68,7 @@ def main():
         records.append({'name': old['name'], 'method': old['method'],
                         'delta_energy_eh': new['energy_eh'] - old['energy_eh'],
                         **{'max_abs_' + field: float(np.max(np.abs(np.array(new[field])-old[field])))
-                           for field in ('orbital_energies_ev', 'charges_e', 'dipole_au', 'wiberg')}})
+                           for field in ('orbital_energies_ev', 'charges_e', 'dipole_e_bohr', 'wiberg')}})
     summary = {}
     for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
         rows = [r for r in records if r['method'] == method]

@@ -36,3 +36,13 @@ def test_install_checks_ignore_external_engine_selection(monkeypatch):
     env = installer.clean_environment()
     assert all(name not in env for name in ('XTB_LIBRARY','XTBPATH','LD_PRELOAD','PYTHONPATH','RDXTB_XTB_PREFIX'))
     assert env['OMP_NUM_THREADS'] == '1'
+
+
+def test_release_builder_runs_outside_checkout_build_directory():
+    """The repository's build/ directory must not shadow the build frontend."""
+    # This check is intentionally source-level: the actual wheel build is
+    # covered by the locked installed-profile workflow.
+    release = Path(__file__).resolve().parents[1] / 'tools/build_release.py'
+    text = release.read_text()
+    assert 'cwd=output' in text
+    assert 'cwd=temporary' in text

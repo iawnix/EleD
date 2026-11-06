@@ -35,6 +35,9 @@ int main() {
     RDKit::XTBTools::XTBResults before, after, intermediate;
     require(RDKit::XTBTools::runMol(mol, before, options), "GFN2 calculation failed");
     require(before.numAtoms == 3 && before.numElectrons == 8 && before.numTotalElectrons == 10 && before.conformerId == 7, "Input identity or electron semantics changed");
+    require(before.gradientHartreePerBohr.size() == 9, "Gradient dimensions incorrect");
+    for (double value : before.gradientHartreePerBohr)
+      require(std::isfinite(value), "Gradient contains a non-finite value");
     require(before.orbitalCoefficients.size() == static_cast<size_t>(before.numOrbitals * before.numOrbitals), "Coefficient dimensions incorrect");
     options.method = "GFN0-xTB";
     if (before.gfn0StateFixVerified) {

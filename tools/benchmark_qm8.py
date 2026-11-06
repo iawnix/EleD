@@ -36,9 +36,14 @@ TWO_D = ('MolWt', 'MolLogP', 'TPSA', 'NumHDonors', 'NumHAcceptors',
          'FractionCSP3', 'HeavyAtomCount', 'NHOHCount', 'NOCount', 'LabuteASA',
          'BalabanJ', 'BertzCT', 'Chi0v', 'Chi1v', 'Kappa1', 'Kappa2', 'Kappa3',
          'NumValenceElectrons', 'NumHeteroatoms', 'MolMR')
-BASIC = ('xtb_total_energy_Eh', 'xtb_homo_eV', 'xtb_lumo_eV', 'xtb_gap_eV',
+BASIC = ('xtb_total_energy_hartree', 'xtb_homo_ev', 'xtb_lumo_ev', 'xtb_gap_ev',
          'xtb_dipole_norm_debye', 'xtb_charge_min_e', 'xtb_charge_max_e',
          'xtb_charge_std_e', 'xtb_wiberg_pair_sum')
+# Immutable 0.9 evidence stores the former column spellings. This tuple is
+# only for validating that archival manifest; new calculations use BASIC.
+FROZEN_BASIC = ('xtb_total_energy_Eh', 'xtb_homo_eV', 'xtb_lumo_eV', 'xtb_gap_eV',
+                'xtb_dipole_norm_debye', 'xtb_charge_min_e', 'xtb_charge_max_e',
+                'xtb_charge_std_e', 'xtb_wiberg_pair_sum')
 ORBITAL = tuple(f'frontier_{label}_{field}' for label in ('homo', 'lumo')
                 for field in ('inverse_participation_ratio', 'participation_ratio', 'entropy_nats')) + (
     'frontier_homo_lumo_atom_overlap', 'frontier_homo_lumo_atom_centroid_separation_angstrom')

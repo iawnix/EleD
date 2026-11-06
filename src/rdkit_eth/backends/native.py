@@ -12,7 +12,7 @@ from ..errors import XTBNativeNotFoundError, XTBRunError, XTBEnvironmentError, D
 from ..options import calculation_settings
 from ..result import XTBResult, _frontier_energies
 from ..input import _xyz_from_mol, _method_flag, _effective_charge_uhf, _input_metadata
-from ..runtime import _find_xtb_library, _engine_identity, _parameter_file
+from ..runtime import _find_xtb_library, _engine_identity, _parameter_file, _require_extended_libxtb
 
 HARTREE_TO_EV = 27.211386245988
 ANGSTROM_TO_BOHR = 1.8897261254578281
@@ -87,6 +87,9 @@ class _NativeXTB:
         self.del_results = self._bind("xtb_delResults", None, [ctypes.POINTER(h)])
         self.singlepoint = self._bind("xtb_singlepoint", None, [h, h, h, h])
         self.get_energy = self._bind("xtb_getEnergy", None, [h, h, ctypes.POINTER(ctypes.c_double)])
+        self.get_gradient = self._bind(
+            "xtb_getGradient", None, [h, h, ctypes.POINTER(ctypes.c_double)]
+        )
         self.get_dipole = self._bind(
             "xtb_getDipole", None, [h, h, ctypes.POINTER(ctypes.c_double)]
         )
@@ -182,11 +185,13 @@ def _run_xtb_native(
     electronic_temperature: float = 300.0,
     _restart=None,
     _save_restart=None,
+    _return_gradient=False,
 ) -> XTBResult:
     """Run a single point through a shared ``libxtb`` C API library.
 
-    This adapter supports gas-phase single points only; geometry optimization
-    and solvent setup are outside its current API.
+    This adapter evaluates gas-phase single points and can optionally return
+    the nuclear gradient. Geometry-step orchestration lives in
+    :mod:`rdkit_eth.optimization`; solvent setup remains outside this API.
     """
 
     from rdkit import Chem
@@ -200,6 +205,7 @@ def _run_xtb_native(
         raise ValueError('GFN-FF does not provide molecular orbital descriptors')
     charge, uhf = _effective_charge_uhf(mol, charge, uhf)
     library = _NativeXTB(_find_xtb_library(xtb_library))
+    _require_extended_libxtb(library.library)
     engine = _engine_identity('native', library.library)
     if keep_overlap:
         if not engine['orbital_basis']:
@@ -277,11 +283,14 @@ def _run_xtb_native(
         library.check(environment, "single point")
 
         energy = ctypes.c_double()
+        gradient = (ctypes.c_double * (3 * natoms))() if _return_gradient else None
         dipole = (ctypes.c_double * 3)()
         charges = (ctypes.c_double * natoms)()
         bond_orders = (ctypes.c_double * (natoms * natoms))()
         nao = ctypes.c_int()
         library.get_energy(environment, results, ctypes.byref(energy))
+        if gradient is not None:
+            library.get_gradient(environment, results, gradient)
         library.get_dipole(environment, results, dipole)
         library.get_charges(environment, results, charges)
         library.get_bond_orders(environment, results, bond_orders)
@@ -320,7 +329,7 @@ def _run_xtb_native(
             **basis,
             method=method_name,
             version=engine["version"],
-            total_energy_eh=float(energy.value),
+            total_energy_hartree=float(energy.value),
             homo_lumo_gap_ev=(lumo - homo if homo is not None and lumo is not None else None),
             number_of_molecular_orbitals=int(nao.value),
             number_of_electrons=int(round(sum(occupation_values))),
@@ -328,7 +337,7 @@ def _run_xtb_native(
             orbital_energies_ev=energies_ev,
             orbital_occupations=occupation_values,
             partial_charges=tuple(float(value) for value in charges),
-            dipole_au=tuple(float(value) for value in dipole),
+            dipole_e_bohr=tuple(float(value) for value in dipole),
             wiberg_bond_orders=tuple(
                 tuple(float(bond_orders[row * natoms + column]) for column in range(natoms))
                 for row in range(natoms)
@@ -353,6 +362,8 @@ def _run_xtb_native(
                 'elapsed_seconds': time.perf_counter() - started,
                 'coefficient_axes': ['AO', 'MO'],
                 'overlap_source': 'same libxtb calculation' if keep_overlap else None,
+                **({'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
+                   if gradient is not None else {}),
             },
         )
     finally:

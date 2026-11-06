@@ -27,11 +27,11 @@ def calc_eht_descriptors(result: Any) -> dict[str, float | int | str | None]:
         homo, lumo = _frontier_from_fermi(energies, float(result.fermiEnergy))
     return {
         "eht_backend": "yaehmop",
-        "eht_homo_eV": homo,
-        "eht_lumo_eV": lumo,
-        "eht_gap_eV": lumo - homo if homo is not None and lumo is not None else None,
-        "eht_fermi_eV": float(result.fermiEnergy),
-        "eht_total_energy_eV": float(result.totalEnergy),
+        "eht_homo_ev": homo,
+        "eht_lumo_ev": lumo,
+        "eht_gap_ev": lumo - homo if homo is not None and lumo is not None else None,
+        "eht_fermi_ev": float(result.fermiEnergy),
+        "eht_total_energy_ev": float(result.totalEnergy),
         "eht_num_orbitals": int(result.numOrbitals),
         "eht_num_electrons": int(result.numElectrons),
     }

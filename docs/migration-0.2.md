@@ -27,7 +27,7 @@ is rejected before GFN0 initialization. Install using [these instructions](insta
 ```python
 from rdkit_eth import run_xtb
 result = run_xtb(mol, xtb_library="/absolute/prefix/lib/libxtb.so")
-print(result.total_energy_eh)
+print(result.total_energy_hartree)
 print(result.metadata["engine"])
 ```
 

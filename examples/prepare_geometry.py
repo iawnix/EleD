@@ -20,7 +20,7 @@ def main():
     print('Accepted:', prepared.report['n_conformers'], 'status:', prepared.report['status'])
     if args.xtb:
         result = run_xtb(prepared.molecule, conf_id=prepared.report['recommended_conformer_id'])
-        print('GFN2 single-point energy (Hartree):', result.total_energy_eh)
+        print('GFN2 single-point energy (Hartree):', result.total_energy_hartree)
 
 
 if __name__ == '__main__': main()

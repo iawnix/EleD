@@ -27,6 +27,8 @@ jobs:
           .rdkit-eth/runtime/bin/python -I examples/parallel_descriptors.py
       - name: Check isolated workers and installed SCC diagnostics
         run: .rdkit-eth/runtime/bin/python -I -m pytest -q -o pythonpath= tests/test_workers.py tests/test_scf_diagnostics.py
+      - name: Regression-test Python geometry optimization against xTB CLI
+        run: .rdkit-eth/runtime/bin/python -I -m pytest -q -o pythonpath= tests/test_xtb_optimization_cli.py
       - name: Compare against native xTB Fukui output
         run: .rdkit-eth/runtime/bin/python -I tools/compare_fukui_cli.py --executable .rdkit-eth/runtime/bin/xtb --library .rdkit-eth/runtime/lib/libxtb.so --cases tests/data/reactivity_cases.json --output build/fukui-comparison
       - name: Verify persistent batches and expanded frozen corpus

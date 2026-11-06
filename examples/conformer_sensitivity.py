@@ -35,7 +35,7 @@ def main():
             'positions_angstrom': {str(i): mol.GetConformer(i).GetPositions().tolist() for i in retained}}
         reports.append(report)
         summary.append({'name': name, 'n_conformers': report['n_conformers'], 'status': report['status'],
-                        'gap_eV': report['statistics']['xtb_gap_eV'],
+                        'gap_eV': report['statistics']['xtb_gap_ev'],
                         'homo_participation_ratio': report['statistics']['frontier_homo_participation_ratio'],
                         'centroid_separation_angstrom': report['statistics']['frontier_homo_lumo_atom_centroid_separation_angstrom']})
     with gzip.open(args.output/'reports.jsonl.gz', 'wt') as handle:

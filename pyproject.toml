@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rdkit-eth"
 version = "0.11.0"
-description = "RDKit electronic-structure descriptors with an optional xTB backend"
+description = "RDKit electronic-structure descriptors through the extended xTB C API"
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.10"
@@ -13,6 +13,12 @@ dependencies = [
     "rdkit>=2024.03",
     "numpy>=1.23,<3",
 ]
+
+[project.urls]
+Homepage = "https://github.com/iawnix/rdkit-eth"
+Documentation = "https://github.com/iawnix/rdkit-eth/tree/main/docs"
+Repository = "https://github.com/iawnix/rdkit-eth"
+Issues = "https://github.com/iawnix/rdkit-eth/issues"
 
 [project.optional-dependencies]
 test = [

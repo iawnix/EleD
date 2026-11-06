@@ -47,8 +47,9 @@ Model dependencies stay in the research environment rather than the installed ru
   build and installed-package evidence.
 
 Current functionality is described in [the README](../README.md), with detailed
-[descriptor definitions](descriptors.md), [reactivity protocols](descriptor-reports.md)
-and [validation history](validation.md). Historical embedding findings and the
+[descriptor definitions](descriptors.md), [reactivity protocols](descriptor-reports.md),
+[the EAS research plan](research-plan-eas-en.md), and [validation history](validation.md).
+Historical embedding findings and the
 reason for rejecting direct replacement remain in the
 [nonregression report](embedding-nonregression.md).
 

@@ -52,6 +52,7 @@ struct XTBResults {
   std::string parameterFile;
   std::string parameterSHA256;
   std::string sourceCommit;
+  std::vector<double> gradientHartreePerBohr; // row-major [atom][xyz]
   std::vector<double> orbitalEnergiesEV;
   std::vector<double> orbitalOccupancies;
   std::vector<double> atomicCharges;         // elementary charge

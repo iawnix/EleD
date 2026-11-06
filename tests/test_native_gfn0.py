@@ -9,6 +9,7 @@ import pytest
 
 from rdkit_eth.options import XTBOptions
 from rdkit_eth.runtime import _D4_LOCAL_REFERENCES_PATCH, _native_gfn0_build
+from rdkit_eth.errors import XTBEnvironmentError
 from rdkit_eth.xtb import _resolve_options
 
 
@@ -64,18 +65,20 @@ def test_stale_or_unverified_builds_are_not_enabled(verified_install, damage):
     assert _native_gfn0_build(str(library)) is None
 
 
-def test_gfn0_routing_changes_with_library_verification(verified_install, monkeypatch):
+def test_public_routing_requires_complete_extended_profile(verified_install, monkeypatch):
     library, manifest, _ = verified_install
     monkeypatch.setattr('rdkit_eth.xtb._find_xtb_library', lambda _: str(library))
     monkeypatch.setattr('rdkit_eth.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
     options = XTBOptions(method='gfn0', backend='native')
-    assert _resolve_options(options).backend == 'native'
-    assert _resolve_options(XTBOptions(method='gfn0', backend='native')).backend == 'native'
+    # A GFN0-only manifest is deliberately insufficient: every public method
+    # now requires the complete extended runtime profile.
+    with pytest.raises(XTBEnvironmentError, match='extended libxtb'):
+        _resolve_options(options)
     manifest.unlink()
-    with pytest.raises(ValueError, match='verified patched'):
+    with pytest.raises(XTBEnvironmentError, match='extended libxtb'):
         _resolve_options(XTBOptions(method='gfn0', backend='native'))
-    # GFN1/2 do not require a GFN0 capability record.
-    assert _resolve_options(XTBOptions(method='gfn2', backend='native')).backend == 'native'
+    with pytest.raises(XTBEnvironmentError, match='extended libxtb'):
+        _resolve_options(XTBOptions(method='gfn2', backend='native'))
 
 
 @pytest.mark.parametrize('damage', [None, 'commit', 'fix-commit', 'kind', 'file-hash', 'malformed'])

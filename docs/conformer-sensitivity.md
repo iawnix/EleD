@@ -2,9 +2,9 @@
 
 `run_conformer_analysis` evaluates **explicitly supplied conformers of one RDKit
 molecule** using native libxtb. It does not generate or optimize geometries.
-The default requests the extended library's overlap/basis data, as do descriptor
-reports. `XTBOptions(keep_overlap=False)` allows basic descriptors with an
-official GFN1/2 library and retains missing orbital-distribution fields.
+Use [`optimize_xtb`](../README.md#xtb-geometry-optimization) before this
+analysis when relaxed structures are required. The default requests the
+extended library's overlap/basis data, as do descriptor reports.
 
 ```python
 import json
@@ -21,7 +21,7 @@ report = run_conformer_analysis(
     mol, conf_ids=ids, record_id="ethylene-glycol",
     cache=XTBDiskCache("conformers.sqlite"),
 )
-print(report["statistics"]["xtb_gap_eV"])
+print(report["statistics"]["xtb_gap_ev"])
 with open("sensitivity.json", "w") as f:
     json.dump(report, f, indent=2, allow_nan=False)
 ```

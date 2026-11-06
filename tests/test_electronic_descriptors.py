@@ -28,7 +28,7 @@ def simple():
     result = XTBResult(
         'GFN2-xTB', 'test', -1., 3., 4, 4, 0,
         orbital_energies_ev=(-10., -2., 1., 3.), orbital_occupations=(2., 2., 0., 0.),
-        partial_charges=(-.6, .2, .4), dipole_au=(3., 4., 0.),
+        partial_charges=(-.6, .2, .4), dipole_e_bohr=(3., 4., 0.),
         wiberg_bond_orders=((9., .8, .9), (.8, 9., .2), (.9, .2, 9.)),
         metadata=_input_metadata(mol, -1, 0, 0, _xyz_from_mol(mol, -1)),
     )
@@ -38,12 +38,12 @@ def simple():
 def test_scalar_units_frontier_depth_and_missing_boundaries(simple):
     _, result = simple
     d = calc_xtb_descriptors(result, frontier_depth=3)
-    assert d['xtb_gap_eV'] == 3
-    assert d['xtb_homo_minus_1_eV'] == -10
-    assert d['xtb_lumo_plus_1_eV'] == 3
-    assert d['xtb_homo_minus_2_eV'] is None
-    assert d['xtb_lumo_plus_3_eV'] is None
-    assert d['xtb_dipole_norm_au'] == 5
+    assert d['xtb_gap_ev'] == 3
+    assert d['xtb_homo_minus_1_ev'] == -10
+    assert d['xtb_lumo_plus_1_ev'] == 3
+    assert d['xtb_homo_minus_2_ev'] is None
+    assert d['xtb_lumo_plus_3_ev'] is None
+    assert d['xtb_dipole_norm_e_bohr'] == 5
     assert d['xtb_dipole_norm_debye'] == pytest.approx(12.708732365)
     assert d['xtb_charge_sum_e'] == pytest.approx(0)
     assert d['xtb_charge_std_e'] == pytest.approx(np.sqrt(.56 / 3))
@@ -54,13 +54,13 @@ def test_scalar_units_frontier_depth_and_missing_boundaries(simple):
     assert calc_xtb_descriptors(tiny)['xtb_homo_index'] == 1
     assert calc_xtb_descriptors(tiny, occupation_threshold=1e-9)['xtb_homo_index'] == 2
     filled = replace(result, orbital_occupations=(2., 2., 2., 2.))
-    assert calc_xtb_descriptors(filled)['xtb_lumo_eV'] is None
-    assert calc_xtb_descriptors(filled)['xtb_gap_eV'] is None
+    assert calc_xtb_descriptors(filled)['xtb_lumo_ev'] is None
+    assert calc_xtb_descriptors(filled)['xtb_gap_ev'] is None
 
 
 def test_missing_arrays_are_none_and_not_fake_zero(simple):
     _, result = simple
-    missing = replace(result, partial_charges=(), dipole_au=(), wiberg_bond_orders=())
+    missing = replace(result, partial_charges=(), dipole_e_bohr=(), wiberg_bond_orders=())
     d = calc_xtb_descriptors(missing)
     assert d['xtb_charge_sum_e'] is None
     assert d['xtb_dipole_norm_debye'] is None
@@ -99,7 +99,7 @@ def test_fragment_indices_fail_explicitly(simple, fragments):
 
 
 @pytest.mark.parametrize('change', [
-    {'dipole_au': (1., 2.)}, {'partial_charges': (0.,)},
+    {'dipole_e_bohr': (1., 2.)}, {'partial_charges': (0.,)},
     {'partial_charges': (0., float('nan'), 0.)},
     {'wiberg_bond_orders': ((0., 1., 0.), (0., 0., 0.), (0., 0., 0.))},
     {'orbital_energies_ev': (-2., -10., 1., 3.)}, {'orbital_occupations': (2.,)},

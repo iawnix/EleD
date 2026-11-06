@@ -148,7 +148,7 @@ def test_actual_scf_failure_keeps_protocol_and_does_not_poison_next_call(library
     successful=run_reactivity(molecule(),interface=interface,
         options=XTBOptions(xtb_library=library,electronic_temperature=0.))
     assert successful['error'] is None
-    assert successful['values']['vertical_ip_eV'] > 0
+    assert successful['values']['vertical_ip_ev'] > 0
 
 
 def test_lowdin_fukui_and_finite_temperature_label(library):

@@ -23,7 +23,7 @@ def sample():
     meta = _input_metadata(mol,-1,0,0,_xyz_from_mol(mol,-1))
     meta.update(calculation_settings=calculation_settings(),calculation_status='success')
     r = XTBResult('GFN2-xTB',None,-1.,3.,3,4,0,orbital_energies_ev=(-10.,-2.,1.),
-        orbital_occupations=(2.,2.,0.),partial_charges=(-.6,.3,.3),dipole_au=(0.,0.,1.),
+        orbital_occupations=(2.,2.,0.),partial_charges=(-.6,.3,.3),dipole_e_bohr=(0.,0.,1.),
         wiberg_bond_orders=((0.,1.,1.),(1.,0.,0.),(1.,0.,0.)),metadata=meta)
     return mol,r
 
@@ -34,8 +34,8 @@ def test_report_records_missing_basis_and_exports_fixed_columns(tmp_path):
     assert report['missing']['populations']=='basis_not_retained'
     assert report['values']['frontier_homo_participation_ratio'] is None
     assert set(report['values'])==set(descriptor_columns())
-    assert report['units']['xtb_total_energy_Eh']=='Hartree'
-    assert report['units']['xtb_homo_eV']=='eV'
+    assert report['units']['xtb_total_energy_hartree']=='Hartree'
+    assert report['units']['xtb_homo_ev']=='eV'
     assert report['quality']['scf_iterations'] is None
     for kind in ['csv','jsonl']:
         p=export_descriptor_reports([report],tmp_path/f'data.{kind}')
@@ -70,7 +70,7 @@ def test_export_rejects_schema_mismatch_before_overwriting(tmp_path):
     path=tmp_path/'data.csv';path.write_text('keep')
     with pytest.raises(ValueError,match='incompatible'): export_descriptor_reports([a,b],path)
     assert path.read_text()=='keep'
-    a['values']['xtb_gap_eV']=float('nan')
+    a['values']['xtb_gap_ev']=float('nan')
     with pytest.raises(ValueError): export_descriptor_reports([a],path)
     assert path.read_text()=='keep'
 

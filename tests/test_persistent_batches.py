@@ -60,7 +60,7 @@ def test_disk_cache_roundtrips_arrays_across_instances_and_rejects_corruption(tm
 def test_cache_refuses_failed_nonfinite_and_unrelated_database(tmp_path):
     cache=XTBDiskCache(tmp_path/'cache.sqlite')
     with pytest.raises(ValueError):cache.set('failed',report(True))
-    bad=report();bad['values']['vertical_ip_eV']=float('nan')
+    bad=report();bad['values']['vertical_ip_ev']=float('nan')
     with pytest.raises(ValueError):cache.set('bad',bad)
     assert len(cache)==0
     path=tmp_path/'unrelated.sqlite'
@@ -111,8 +111,8 @@ def test_cached_reports_are_independent_of_record_ids_and_export_execution(envir
     assert calculate.call_count==1 and rows[1]['execution']['source']=='cache'
     assert [r['record_id'] for r in rows]==['a','b']
     assert list(rows[0]['units'])==list(rows[1]['units'])
-    rows[0]['values']['vertical_ip_eV']=100
-    assert rows[1]['values']['vertical_ip_eV']==1
+    rows[0]['values']['vertical_ip_ev']=100
+    assert rows[1]['values']['vertical_ip_ev']==1
     path=export_descriptor_reports(rows,tmp_path/'rows.csv')
     import csv
     exported=list(csv.DictReader(path.open()))

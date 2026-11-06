@@ -38,6 +38,9 @@ py::object occupancies(const XTBResults &r) {
 py::object dipole(const XTBResults &r) {
   requireSuccess(r); return array(r.dipoleAtomicUnits, {3});
 }
+py::object gradient(const XTBResults &r) {
+  requireSuccess(r); return array(r.gradientHartreePerBohr, {r.numAtoms, 3});
+}
 py::object bondOrders(const XTBResults &r) {
   requireSuccess(r); return array(r.wibergBondOrders, {r.numAtoms, r.numAtoms});
 }
@@ -208,7 +211,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
   py::scope().attr("__doc__") =
       "RDKit ROMol to libxtb C++ interface. Gas-phase GFN0/1/2 single points. "
       "Total energies are Hartree; orbital energies are eV; dipoles are e*Bohr. "
-      "GFN0 requires a verified patched library. Independent of YAeHMOP.";
+      "The reviewed extended libxtb is required. Independent of YAeHMOP.";
   py::scope().attr("rdkitVersion") = RDXTB_RDKIT_VERSION;
   py::scope().attr("totalEnergyUnit") = "Hartree";
   py::scope().attr("orbitalEnergyUnit") = "eV";
@@ -257,6 +260,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def("GetOrbitalEnergies", energies, "Copy of molecular orbital energies in eV, [MO].")
       .def("GetOrbitalOccupancies", occupancies, "Copy of orbital occupancies in electrons, [MO].")
       .def("GetDipole", dipole, "Copy of dipole in e*Bohr, [x,y,z].")
+      .def("GetGradient", gradient, "Copy of nuclear gradient in Hartree/Bohr, [atom,xyz].")
       .def("GetWibergBondOrders", bondOrders, "Copy of dimensionless Wiberg bond orders, [atom,atom].")
       .def("GetOrbitalCoefficients", coefficients, "Copy of optional MO coefficients, [AO,MO].");
 

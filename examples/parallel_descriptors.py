@@ -12,7 +12,7 @@ def main():
                                    max_workers=2, timeout=30)
     for report in reports:
         if report['error']: raise RuntimeError(report['error'])
-        print(report['record_id'], report['values']['xtb_gap_eV'], 'eV',
+        print(report['record_id'], report['values']['xtb_gap_ev'], 'eV',
               report['quality']['scf_details'])
 
 

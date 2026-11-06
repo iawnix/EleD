@@ -74,7 +74,7 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
         from . import run_xtb
         result = run_xtb(mol, method=method, backend=backend,
                          xtb_library=library, keep_overlap=keep_overlap)
-        energy = result.total_energy_eh
+        energy = result.total_energy_hartree
         charges = result.partial_charges
         nao = result.number_of_molecular_orbitals
         engine = result.metadata["engine"]

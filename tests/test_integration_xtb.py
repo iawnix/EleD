@@ -10,7 +10,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 from rdkit_eth import annotate_mol, run_xtb, run_xtb_batch, XTBCache
-from rdkit_eth.runtime import _find_xtb_library, _native_gfn0_build
+from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
 from rdkit_eth.errors import XTBNativeNotFoundError
 
 pytestmark = pytest.mark.integration
@@ -19,11 +19,14 @@ pytestmark = pytest.mark.integration
 @pytest.fixture(scope='module')
 def library():
     try:
-        return _find_xtb_library(None)
+        path = _find_xtb_library(None)
     except XTBNativeNotFoundError:
         if os.environ.get('XTB_LIBRARY'):
             raise
-        pytest.skip('shared libxtb is not installed')
+        pytest.skip('extended libxtb is not installed')
+    if not _extended_libxtb_build(path):
+        pytest.skip('reviewed extended libxtb is required')
+    return path
 
 
 @pytest.fixture
@@ -48,7 +51,7 @@ def test_native_results_and_mapping_without_executable(smiles, method, library, 
     original = mol.ToBinary()
     native = run_xtb(mol, method=method, xtb_library=library)
     assert native.backend == 'native'
-    assert np.isfinite(native.total_energy_eh) and native.total_energy_eh < 0
+    assert np.isfinite(native.total_energy_hartree) and native.total_energy_hartree < 0
     assert sum(native.partial_charges) == pytest.approx(Chem.GetFormalCharge(mol), abs=1e-6)
     assert sum(native.orbital_occupations) == pytest.approx(native.number_of_electrons, abs=1e-7)
     assert np.isfinite(native.orbital_energies_ev).all()
@@ -78,7 +81,7 @@ def test_fixed_water_matches_archived_reference(library, no_executable):
     conf.Set3D(True)
     mol.AddConformer(conf)
     result = run_xtb(mol, xtb_library=library)
-    assert result.total_energy_eh == pytest.approx(-5.07037168, abs=2e-7)
+    assert result.total_energy_hartree == pytest.approx(-5.07037168, abs=2e-7)
 
 
 def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable):
@@ -101,7 +104,7 @@ def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable)
             with pytest.raises(ValueError, match='verified patched'):
                 entry(mol, method='GFN0-xTB', xtb_library=library)
     after = run_xtb(mol, xtb_library=library)
-    assert after.total_energy_eh == pytest.approx(before.total_energy_eh, abs=1e-10)
+    assert after.total_energy_hartree == pytest.approx(before.total_energy_hartree, abs=1e-10)
     np.testing.assert_allclose(after.orbital_energies_ev, before.orbital_energies_ev, atol=1e-8, rtol=0)
     np.testing.assert_allclose(after.orbital_coefficients, before.orbital_coefficients, atol=1e-8, rtol=0)
 

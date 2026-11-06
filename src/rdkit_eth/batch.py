@@ -161,7 +161,7 @@ def run_xtb_batch(
             resolved, metadata = _prepare(mol, config)
             key = _key(resolved, metadata)
             return cache.get_or_compute(key, lambda: run_xtb(mol, **resolved.to_dict()))
-        except (XTBCacheError, sqlite3.Error):
+        except (XTBCacheError, sqlite3.Error, XTBEnvironmentError, XTBNativeNotFoundError):
             raise
         except Exception as exc:
             if return_exceptions:

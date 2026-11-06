@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        engine: [release, patched]
+        engine: [patched]
     env:
       OMP_NUM_THREADS: '1'
       OPENBLAS_NUM_THREADS: '1'
@@ -38,17 +38,7 @@ jobs:
           auto-activate-base: true
       - name: Create locked RDKit SDK
         run: conda create --yes --prefix "$PWD/.rdxtb-build-env" --file locks/linux-64/rdxtb-sdk.txt
-      - name: Select official runtime in its own prefix
-        if: matrix.engine == 'release'
-        run: |
-          conda create --yes --prefix "$PWD/.runtime-env" --file locks/linux-64/runtime.txt
-          echo "RDXTB_XTB_PREFIX=$PWD/.runtime-env" >> "$GITHUB_ENV"
-          echo "XTB_LIBRARY=$PWD/.runtime-env/lib/libxtb.so" >> "$GITHUB_ENV"
-          echo "XTBPATH=$PWD/.runtime-env/share/xtb" >> "$GITHUB_ENV"
-          echo 'RDKIT_ETH_EXPECT_BASIS=0' >> "$GITHUB_ENV"
-          echo 'RDKIT_ETH_EXPECT_NATIVE_GFN0=0' >> "$GITHUB_ENV"
       - name: Build and verify source with separate locked toolchain
-        if: matrix.engine == 'patched'
         run: |
           conda create --yes --prefix "$PWD/.xtb-build-env" --file locks/linux-64/xtb-toolchain.txt
           conda run --no-capture-output -p "$PWD/.xtb-build-env" python tools/build_patched_xtb.py "$PWD/.xtb-rdkit" --dependency-prefix "$PWD/.xtb-build-env" --jobs 2
@@ -76,12 +66,10 @@ jobs:
         run: |
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.11.0/compiled/*.whl --kind compiled --check compiled --check native --reactivity --output dist/0.11.0/installed-compiled.json
       - name: Verify installed native population descriptors
-        if: matrix.engine == 'patched'
         run: |
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.11.0/compiled/*.whl --kind compiled --check compiled --check native --keep-overlap --reactivity --output dist/0.11.0/installed-basis.json
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python examples/electronic_descriptors.py --populations
       - name: Verify installed GFN0 capability
-        if: matrix.engine == 'patched'
         run: |
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python tools/check_wheel.py dist/0.11.0/compiled/*.whl --kind compiled --method GFN0-xTB --check compiled --check native --output dist/0.11.0/installed-gfn0.json
       - uses: actions/upload-artifact@v4

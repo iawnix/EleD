@@ -27,9 +27,12 @@ pure/compiled wheels from clean source-archive extractions, installs the
 compiled wheel and checks all three methods through both interfaces with
 population analysis. Checks run outside the checkout, without `XTB_LIBRARY`
 or `XTBPATH`. Both interfaces discover the same library in the runtime prefix.
+The installer also runs the in-process-vs-CLI geometry optimization comparison
+on water and ethanol and stores its numerical report in `installation.json`.
 
 Artifacts are retained in `.rdkit-eth/artifacts/build-*/`; `installation.json`
-records wheel/source identity and the six installed calculation checks. No
+records wheel/source identity, the installed calculation checks and the
+optimization comparison. No
 upload is performed. Use `--directory /absolute/path` to select another root.
 Reruns accept exactly matching conda environments and reviewed engine source;
 changed environments or unrelated source edits are rejected without resetting
@@ -40,8 +43,9 @@ use their RPATHs. This is a reproducible local source installation, not a
 portable binary distribution by itself. The separate [offline bundle](runtime-bundle.md)
 provides relocation and installed-runtime checks. Windows/macOS and public
 package-index delivery are not implemented. A plain `pip install .` still installs only the Python
-adapter; it does not invoke a Fortran build. The old conda recipe remains a
-basic official-library compatibility recipe, not the standard full profile.
+adapter; it does not invoke a Fortran build. The conda recipe is packaging
+scaffolding only: an unmodified conda-forge xTB library does not satisfy the
+runtime contract and is rejected by the calculation API.
 
 If an older shell has `XTB_LIBRARY`, `XTBPATH` or `XTB_PREFIX` set, unset those
 explicit overrides before using the new environment. The installer clears
@@ -74,7 +78,7 @@ from rdkit_eth import run_xtb, rdXTBTools, calc_orbital_populations
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 result = run_xtb(mol, method="GFN2-xTB", keep_overlap=True)
-print(result.total_energy_eh)  # Hartree
+print(result.total_energy_hartree)  # Hartree
 print(calc_orbital_populations(result))
 
 ok, compiled = rdXTBTools.RunMol(mol, method="GFN0-xTB", keepOverlap=True)
@@ -87,6 +91,24 @@ Omit `keep_overlap` / `keepOverlap` for basic descriptors to avoid retaining
 the additional overlap matrix. Both APIs retain results in original atom order.
 The source build disables tblite and CPCM-X, and needs neither Python tblite
 nor ASE. GFN0/1/2 and radicals use the same engine, with spin-summed populations.
+
+## Geometry optimization regression
+
+The installed profile can compare the in-process gradient optimizer with the
+matching xTB CLI optimizer from the same runtime. Both start from the same
+RDKit-generated coordinates; the report records the library hash, CLI version,
+energies, final gradients and rigid-aligned coordinate RMSD:
+
+```bash
+python tools/benchmark_xtb_optimization.py \
+  --output build/xtb-optimization \
+  --smiles O --smiles CCO --check
+```
+
+`--check` fails when the Python optimizer does not converge, the final energies
+differ by more than `1e-5` Hartree, or the aligned geometries differ by more
+than `0.05` Å. These are implementation regression thresholds; they do not
+claim that either optimizer is a benchmark for experimental structures.
 
 ## Upgrade from 0.7
 
@@ -119,7 +141,7 @@ builds the current adapter in its own directory and uses the official GFN0 repai
 Previously verified 0.4 libraries are still recognized when selected explicitly.
 Unknown libraries do not gain GFN0 permission just because they report 6.7.1.
 
-## Manual build and official-library compatibility
+## Manual build of the extended runtime
 
 For engine-only development, see [the source-build guide](xtb-patched-build.md).
 To build the adapter against an already verified installation:
@@ -129,11 +151,10 @@ RDKIT_ETH_BUILD_RDXTB=1 RDXTB_XTB_PREFIX=/path/to/extended-xtb \
   python -m pip install --no-deps --no-build-isolation .
 ```
 
-Run this in the matched RDKit SDK. The separate `locks/linux-64/runtime.txt`
-retains an official xTB 6.7.1 compatibility environment, supporting basic
-GFN1/2 but not our basis export or verified GFN0. It is used by compatibility
-CI rather than the recommended installation. Its upstream xTB package may
-link native tblite; this does not apply to our standard source build.
+Run this in the matched RDKit SDK. The selected prefix must contain the
+project-built extended library and its `share/xtb/rdkit-eth/build.json`
+manifest. An upstream xTB 6.7.1 library, even when loadable, is rejected
+because it lacks the project ABI extensions.
 
 ## Diagnostics and release artifacts
 

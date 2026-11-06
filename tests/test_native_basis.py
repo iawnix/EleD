@@ -14,6 +14,7 @@ from rdkit.Chem import AllChem
 from rdkit_eth import (
     run_xtb, run_xtb_batch, XTBCache, DescriptorUnavailableError,
     calc_orbital_populations, calc_frontier_descriptors, calc_xtb_bond_descriptors, annotate_mol,
+    calc_density_descriptors,
 )
 from rdkit_eth.runtime import _find_xtb_library, _native_basis_build, _BASIS_EXPORT_PATCH
 
@@ -84,6 +85,16 @@ def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
     for scheme in ['lowdin','mulliken']:
         np.testing.assert_allclose(calc_orbital_populations(compiled,scheme=scheme)['atom_populations'],
                                    calc_orbital_populations(r,scheme=scheme)['atom_populations'],atol=1e-8)
+    py_density = calc_density_descriptors(m, r)
+    compiled_density = calc_density_descriptors(m, compiled)
+    assert compiled_density['density']['electron_conservation_error_e'] == pytest.approx(
+        py_density['density']['electron_conservation_error_e'], abs=1e-10)
+    np.testing.assert_allclose(
+        [row['mulliken_s_electron_count_e'] for row in compiled_density['shell_populations']['atoms']],
+        [row['mulliken_s_electron_count_e'] for row in py_density['shell_populations']['atoms']], atol=1e-8)
+    np.testing.assert_allclose(
+        [row['mayer_bond_order'] for row in compiled_density['mayer_bonds']['bonds'] if row['mayer_bond_order'] is not None],
+        [row['mayer_bond_order'] for row in py_density['mayer_bonds']['bonds'] if row['mayer_bond_order'] is not None], atol=1e-8)
     f=calc_frontier_descriptors(m,compiled)
     assert f['homo'] is not None
     assert calc_xtb_bond_descriptors(m,compiled)
@@ -106,7 +117,7 @@ def test_opt_in_cache_identity_and_no_other_engine(library,monkeypatch):
     a=run_xtb_batch([m],cache=cache,xtb_library=library)[0]
     b=run_xtb_batch([m],cache=cache,xtb_library=library,keep_overlap=True)[0]
     assert len(cache)==2 and not a.overlap_matrix and b.overlap_matrix
-    assert a.total_energy_eh==pytest.approx(b.total_energy_eh,abs=1e-12)
+    assert a.total_energy_hartree==pytest.approx(b.total_energy_hartree,abs=1e-12)
     with pytest.raises(DescriptorUnavailableError): calc_orbital_populations(a)
     assert calc_frontier_descriptors(m,b)['homo']
 
@@ -151,14 +162,13 @@ def test_capability_requires_exact_verified_binary(tmp_path,damage):
 @pytest.mark.integration
 def test_standard_library_basic_support_and_missing_capability():
     from rdkit_eth.runtime import _find_xtb_library
-    from rdkit_eth import XTBNativeNotFoundError
+    from rdkit_eth import XTBNativeNotFoundError, XTBEnvironmentError
     try: library=_find_xtb_library()
     except XTBNativeNotFoundError: pytest.skip('libxtb not installed')
-    if _native_basis_build(library): pytest.skip('requires official or older library')
+    if _native_basis_build(library): pytest.skip('requires an unextended library')
     m=molecule()
-    assert run_xtb(m,xtb_library=library).total_energy_eh<0
-    with pytest.raises(DescriptorUnavailableError,match='verified native basis'):
-        run_xtb(m,xtb_library=library,keep_overlap=True)
+    with pytest.raises(XTBEnvironmentError,match='extended libxtb'):
+        run_xtb(m,xtb_library=library)
     rdXTBTools = pytest.importorskip("rdkit_eth.rdXTBTools")
-    with pytest.raises(ValueError,match='verified native basis'):
-        rdXTBTools.RunMol(m,xtbLibrary=library,keepOverlap=True)
+    with pytest.raises(ValueError,match='extended libxtb'):
+        rdXTBTools.RunMol(m,xtbLibrary=library)

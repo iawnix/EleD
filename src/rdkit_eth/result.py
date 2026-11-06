@@ -26,7 +26,7 @@ def _frontier_energies(
 class XTBResult:
     """Normalized output from one gas-phase xTB single point.
 
-    Energies in ``*_ev`` are electron-volts. ``total_energy_eh`` remains in
+    Energies in ``*_ev`` are electron-volts. ``total_energy_hartree`` remains in
     Hartree because that is xTB's native total-energy unit. Coordinates use
     Angstrom, matching RDKit and XYZ files. Native orbital coefficients have
     axes [AO][MO]. With keep_overlap=True, the verified native extension
@@ -37,7 +37,7 @@ class XTBResult:
 
     method: str
     version: str | None
-    total_energy_eh: float | None
+    total_energy_hartree: float | None
     homo_lumo_gap_ev: float | None
     number_of_molecular_orbitals: int | None
     number_of_electrons: int | None
@@ -45,7 +45,7 @@ class XTBResult:
     orbital_energies_ev: tuple[float, ...] = ()
     orbital_occupations: tuple[float, ...] = ()
     partial_charges: tuple[float, ...] = ()
-    dipole_au: tuple[float, ...] = ()
+    dipole_e_bohr: tuple[float, ...] = ()
     wiberg_bond_orders: tuple[tuple[float, ...], ...] = ()
     raw_json: Mapping[str, Any] = field(default_factory=dict, repr=False)
     orbital_coefficients: tuple[tuple[float, ...], ...] = ()

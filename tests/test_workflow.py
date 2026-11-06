@@ -40,6 +40,8 @@ def engine(tmp_path, monkeypatch):
     monkeypatch.setattr('rdkit_eth.xtb._find_xtb_library',
                         lambda explicit: str(explicit or os.environ['XTB_LIBRARY']))
     monkeypatch.setattr('rdkit_eth.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
+    # This fixture exercises cache-key plumbing without a real extended engine.
+    monkeypatch.setattr('rdkit_eth.xtb._require_extended_libxtb', lambda path: {})
     return path
 
 

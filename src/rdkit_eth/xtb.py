@@ -15,7 +15,7 @@ from .electronic_descriptors import calc_xtb_descriptors
 from .input import _xyz_from_mol, _effective_charge_uhf
 from .options import XTBOptions
 from .backends.native import run_xtb_native, _NativeXTB
-from .runtime import _find_xtb_library, _native_gfn0_build
+from .runtime import _find_xtb_library, _require_extended_libxtb
 
 def run_xtb(
     mol: Any,
@@ -31,10 +31,10 @@ def run_xtb(
     accuracy: float = 1.0,
     electronic_temperature: float = 300.0,
 ) -> XTBResult:
-    """Run a gas-phase libxtb single point, optionally retaining native basis data.
+    """Run a gas-phase single point through the reviewed extended ``libxtb``.
 
-    keep_overlap requires the verified project basis extension. GFN0 also
-    requires the D4 state fix. No external engine or fallback is used.
+    The selected library must contain the project basis-export, SCC-diagnostics
+    and verified GFN0 extensions. No external engine or fallback is used.
     """
 
     opts = XTBOptions(conf_id=conf_id, method=method, charge=charge, uhf=uhf,
@@ -51,7 +51,5 @@ def run_xtb(
 
 def _resolve_options(options: XTBOptions) -> XTBOptions:
     library = _NativeXTB(_find_xtb_library(options.xtb_library))
-    if options.method == 'GFN0-xTB' and not _native_gfn0_build(library.library):
-        raise ValueError('native GFN0 requires a verified patched xTB build; '
-                         'run tools/build_patched_xtb.sh')
+    _require_extended_libxtb(library.library)
     return replace(options, xtb_library=library.library)

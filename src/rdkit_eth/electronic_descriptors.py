@@ -47,15 +47,17 @@ def _as_result(result):
         engine={'backend': 'compiled', 'path': result.libraryPath, 'sha256': result.librarySHA256,
                 'source_commit': result.sourceCommit, 'api_version': result.apiVersion},
         parameter_file={'path': result.parameterFile, 'sha256': result.parameterSHA256} if result.parameterFile else None)
+    if hasattr(result, 'GetGradient'):
+        metadata['gradient_hartree_per_bohr'] = tuple(float(value) for value in np.asarray(result.GetGradient()).ravel())
     return XTBResult(
         **basis,
-        method=result.method, version=None, total_energy_eh=result.totalEnergyHartree,
+        method=result.method, version=None, total_energy_hartree=result.totalEnergyHartree,
         homo_lumo_gap_ev=None, number_of_molecular_orbitals=result.numOrbitals,
         number_of_electrons=result.numElectrons,
         number_of_unpaired_electrons=result.numUnpairedElectrons,
         orbital_energies_ev=tuple(result.GetOrbitalEnergies()),
         orbital_occupations=tuple(result.GetOrbitalOccupancies()),
-        partial_charges=tuple(result.GetAtomicCharges()), dipole_au=tuple(result.GetDipole()),
+        partial_charges=tuple(result.GetAtomicCharges()), dipole_e_bohr=tuple(result.GetDipole()),
         wiberg_bond_orders=tuple(map(tuple, result.GetWibergBondOrders())),
         backend='compiled', metadata=metadata,
     )
@@ -147,18 +149,18 @@ def calc_xtb_descriptors(result, *, frontier_depth=2, occupation_threshold=1e-7)
     result = _as_result(result)
     energies, occupations, occupied, virtual = _orbitals(result, occupation_threshold)
     charges = _charges(result)
-    dipole = _finite(result.dipole_au, 'dipole', 1)
+    dipole = _finite(result.dipole_e_bohr, 'dipole', 1)
     if len(dipole) not in (0, 3):
         raise ValueError('dipole must have three components')
-    energy = result.total_energy_eh
+    energy = result.total_energy_hartree
     if energy is not None and not np.isfinite(energy):
         raise ValueError('total energy must be finite')
     homo = float(energies[occupied[-1]]) if len(occupied) else None
     lumo = float(energies[virtual[0]]) if len(virtual) else None
     output = {
         'xtb_method': result.method, 'xtb_backend': result.backend, 'xtb_version': result.version,
-        'xtb_total_energy_Eh': energy, 'xtb_homo_eV': homo, 'xtb_lumo_eV': lumo,
-        'xtb_gap_eV': lumo - homo if homo is not None and lumo is not None else None,
+        'xtb_total_energy_hartree': energy, 'xtb_homo_ev': homo, 'xtb_lumo_ev': lumo,
+        'xtb_gap_ev': lumo - homo if homo is not None and lumo is not None else None,
         'xtb_num_orbitals': result.number_of_molecular_orbitals,
         'xtb_num_electrons': result.number_of_electrons,
         'xtb_num_unpaired_electrons': result.number_of_unpaired_electrons,
@@ -167,12 +169,12 @@ def calc_xtb_descriptors(result, *, frontier_depth=2, occupation_threshold=1e-7)
         'xtb_lumo_index': int(virtual[0]) if len(virtual) else None,
     }
     for offset in range(1, frontier_depth + 1):
-        output[f'xtb_homo_minus_{offset}_eV'] = float(energies[occupied[-1-offset]]) if len(occupied) > offset else None
-        output[f'xtb_lumo_plus_{offset}_eV'] = float(energies[virtual[offset]]) if len(virtual) > offset else None
+        output[f'xtb_homo_minus_{offset}_ev'] = float(energies[occupied[-1-offset]]) if len(occupied) > offset else None
+        output[f'xtb_lumo_plus_{offset}_ev'] = float(energies[virtual[offset]]) if len(virtual) > offset else None
     for i, axis in enumerate('xyz'):
-        output[f'xtb_dipole_{axis}_au'] = float(dipole[i]) if len(dipole) else None
+        output[f'xtb_dipole_{axis}_e_bohr'] = float(dipole[i]) if len(dipole) else None
     norm = float(np.linalg.norm(dipole)) if len(dipole) else None
-    output['xtb_dipole_norm_au'] = norm
+    output['xtb_dipole_norm_e_bohr'] = norm
     output['xtb_dipole_norm_debye'] = norm * AU_DIPOLE_TO_DEBYE if norm is not None else None
     for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
                         ('mean', np.mean), ('std', np.std), ('abs_sum', lambda q: np.abs(q).sum())]:
