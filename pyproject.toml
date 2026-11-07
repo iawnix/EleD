@@ -31,6 +31,9 @@ rdkit-eth = "rdkit_eth.diagnostics:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+rdkit_eth = ["protocol.json"]
+
 [tool.setuptools.exclude-package-data]
 rdkit_eth = ["*.so"]
 

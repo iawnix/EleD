@@ -89,8 +89,11 @@ from .optimization import XTBOptimizationResult, optimize_xtb
 
 __all__ += ['XTBOptimizationResult', 'optimize_xtb']
 
-from .eas import normalize_eas_records, cluster_keys, assign_eas_splits, prepare_eas_dataset
+from .eas import (normalize_eas_records, cluster_keys, assign_eas_splits,
+                  assign_eas_folds, prepare_eas_dataset, load_frozen_protocol,
+                  frozen_protocol_sha256)
 from .descriptor_catalog import descriptor_catalog, descriptor_status
 
-__all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'prepare_eas_dataset',
+__all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'assign_eas_folds',
+            'prepare_eas_dataset', 'load_frozen_protocol', 'frozen_protocol_sha256',
             'descriptor_catalog', 'descriptor_status']

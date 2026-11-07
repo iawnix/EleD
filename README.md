@@ -158,6 +158,7 @@ preparation; it is not a transition-state, solvent or excited-state module.
 - [Compiled RDKit interface](docs/rdxtb-tools.md)
 - [Extended xTB build](docs/xtb-patched-build.md)
 - [Frozen EAS protocol](protocol.json)
+- [EAS model benchmark protocol](benchmarks/eas/model_protocol.json)
 
 ### Development
 

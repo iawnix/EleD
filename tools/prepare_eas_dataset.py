@@ -16,12 +16,12 @@ def main(argv=None):
     parser.add_argument('input', type=Path)
     parser.add_argument('-o', '--output', type=Path, required=True)
     parser.add_argument('--source', default='local')
-    parser.add_argument('--seed', type=int, default=20261106)
+    parser.add_argument('--seed', type=int, default=None)
     args = parser.parse_args(argv)
     report = prepare_eas_dataset(args.input, source=args.source, seed=args.seed)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n', encoding='utf-8')
-    print(json.dumps({k: report[k] for k in ('protocol_id','n_input','n_selected','n_excluded','split_counts')}, indent=2))
+    print(json.dumps({k: report[k] for k in ('protocol_id','protocol_sha256','n_input','n_selected','n_excluded','split_counts')}, indent=2))
     return 0
 
 if __name__ == '__main__': raise SystemExit(main())

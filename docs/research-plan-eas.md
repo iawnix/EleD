@@ -69,8 +69,9 @@ pilot，不能包装成泛化结论。
 使用现有扩展版 `libxtb`，不使用 tblite 或 ASE。RDKit 负责分子图、氢原子、
 构象生成和原子编号；xTB 只负责电子结构。
 
-- 构象：沿用 `protocol.json` 的 ETKDGv3 和固定随机种子；失败构象保留原因，
-  不用零值填补。
+- 构象：严格使用 `protocol.json` 的 ETKDGv3，不启用其它 RDKit preset 回退；
+  允许同一 preset 的固定种子随机坐标重试。每个分子最多 10 个构象，失败
+  构象保留原因，不用零值填补。
 - 几何：每个分子只用预先声明的 GFN2 优化坐标作为比较几何；GFN1 和 GFN2
   在完全相同的坐标上做单点计算，避免“方法差异”和“几何差异”混淆。
 - 电子温度：主分析使用 300 K；300 K 与 1000 K 的差异只作为诊断。这里的
@@ -82,9 +83,9 @@ pilot，不能包装成泛化结论。
 - 电荷态：Fukui/局部概念 DFT 使用同一几何的 Q、Q+1、Q-1 GFN1 或 GFN2
   结果；不做几何弛豫和自动自旋态搜索。GFN0 不参与 ΔSCF 结论。
 
-当前 `protocol.json` 已冻结主要 EAS 规则；在真正生成特征前还需要把“配对
-的 GFN1/GFN2 计算、模型种子、缺失值处理和统计重复次数”写入协议哈希，
-作为论文的 protocol artifact。
+特征清单必须携带 `protocol.json` 的 SHA256。特征生成脚本对哈希做硬校验，
+并同时生成 GFN2/300 K 主结果、同一优化坐标上的 GFN1/300 K 对照和
+GFN2/1000 K 电子温度诊断；三者的坐标哈希必须一致。
 
 ## 特征组与公平比较
 
@@ -159,8 +160,9 @@ atom-level descriptor benchmark”，但必须把负结果和适用边界放在�
 
 ## 执行顺序
 
-1. 在特征计算前补全并哈希 protocol artifact，确认 GFN1/GFN2 配对计算和
-   模型/随机种子设置。
+1. 在特征计算前冻结并哈希 protocol artifact；输入清单必须保存哈希、
+   primary split 和 5-fold `cv_fold`，确认 GFN1/GFN2 配对计算和模型/随机
+   种子设置。
 2. 用 20--50 个代表性分子完成端到端 dry run，检查映射、覆盖率、守恒和
    运行成本；dry run 不进入最终测试集。
 3. 锁定完整数据清单和 scaffold/cluster 划分，生成 A--G 特征组。
