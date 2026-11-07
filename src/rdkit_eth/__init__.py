@@ -1,6 +1,9 @@
-"""Electronic-structure helpers for RDKit molecules.
+"""RDKit electronic-structure descriptors backed by the extended xTB API.
 
-The package keeps the RDKit YAeHMOP interface separate from the xTB backend.
+The public package is centered on :class:`XTBCalculator` and the project-built
+extended ``libxtb``.  The optional ``rdkit_eth.descriptors`` module contains a
+small adapter for RDKit's pre-existing YAeHMOP/EHT interface; it is not part of
+the xTB descriptor protocol.
 """
 
 from .xtb import (
@@ -10,7 +13,6 @@ from .xtb import (
     XTBNativeNotFoundError,
     calc_xtb_descriptors,
 )
-from .descriptors import calc_eht_descriptors, calc_orbital_descriptors
 from .mapping import annotate_mol
 from .batch import XTBCache, run_xtb_batch, xtb_cache_key
 from .options import XTBOptions
@@ -32,8 +34,6 @@ __all__ = [
     "XTBRunError",
     "XTBNativeNotFoundError",
     "calc_xtb_descriptors",
-    "calc_eht_descriptors",
-    "calc_orbital_descriptors",
     "annotate_mol",
     "XTBCache",
     "run_xtb_batch",

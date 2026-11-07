@@ -1,4 +1,10 @@
-"""Common scalar descriptors for RDKit's EHT and xTB backends."""
+"""Optional adapters for RDKit EHT and xTB scalar orbital features.
+
+The main public descriptor protocol is xTB-based and lives in the dedicated
+modules exported by :mod:`rdkit_eth`.  ``calc_eht_descriptors`` and the EHT
+branches of ``calc_orbital_descriptors`` only normalize RDKit's existing
+YAeHMOP interface for comparison; they do not modify or replace YAeHMOP.
+"""
 
 from __future__ import annotations
 

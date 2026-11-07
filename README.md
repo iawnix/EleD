@@ -24,7 +24,8 @@ missing-value reasons are part of the public API.
 - checked RDKit conformer preparation with ETKDG, MMFF94/UFF and optional xTB
   gradient optimization;
 - ordered batches, isolated workers, caching and JSONL/CSV reports;
-- RDKit YAeHMOP/EHT helpers kept separate from the xTB model.
+- an optional adapter for comparing RDKit's existing YAeHMOP/EHT results;
+  this is outside the xTB descriptor protocol.
 
 Density and frontier descriptors require the reviewed extended `libxtb` build
 and `keep_overlap=True`. They are extracted from the retained result and do not
@@ -198,7 +199,7 @@ patches retain their upstream licenses; see the bundled license files.
 - 固定几何下的 GFN1/2 ΔSCF、IP、EA、硬度、软度和 Fukui 描述符；
 - 基于 RDKit 的 ETKDG 构象准备、MMFF94/UFF 优化和可选 xTB 梯度优化；
 - 批量计算、隔离 worker、缓存以及 JSONL/CSV 报告；
-- 与 xTB 分开的 RDKit YAeHMOP/EHT 辅助接口。
+- 可选的 RDKit YAeHMOP/EHT 对照适配器；它不属于 xTB 描述符协议。
 
 密度和前线描述符需要扩展版 `libxtb` 以及 `keep_overlap=True`。这些描述符
 直接消费同一次计算保留的结果，不会再次调用量子引擎。项目当前不提供激发态

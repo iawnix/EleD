@@ -16,6 +16,7 @@ kept identical in both languages.
 | Reports and reactivity / 报告与反应性 | [descriptor-reports.md](descriptor-reports.md) | [zh-CN/descriptor-reports.md](zh-CN/descriptor-reports.md) |
 | Descriptor catalog / 描述符目录 | [descriptor-catalog.md](descriptor-catalog.md) | [zh-CN/descriptor-catalog.md](zh-CN/descriptor-catalog.md) |
 | Density descriptors / 密度描述符 | [density-descriptors.md](density-descriptors.md) | [zh-CN/density-descriptors.md](zh-CN/density-descriptors.md) |
+| YAeHMOP/EHT comparison / YAeHMOP/EHT 对照 | [eht-comparison.md](eht-comparison.md) | [zh-CN/eht-comparison.md](zh-CN/eht-comparison.md) |
 | EAS research plan / EAS 研究方案 | [research-plan-eas-en.md](research-plan-eas-en.md) | [zh-CN/research-plan-eas.md](zh-CN/research-plan-eas.md) |
 | EAS protocol audit / EAS 协议审计 | [protocol-audit.md](protocol-audit.md) | English reference |
 | EAS benchmark layer / EAS benchmark 层 | [../benchmarks/eas/README.md](../benchmarks/eas/README.md) | English reference |

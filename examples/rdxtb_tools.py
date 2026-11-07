@@ -1,4 +1,8 @@
-"""Run after building the optional rdXTBTools extension."""
+"""Run after building the optional rdXTBTools extension.
+
+The EHT block at the end is an optional comparison with RDKit's existing
+YAeHMOP interface; it is independent of the xTB workflow above.
+"""
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdEHTTools
 from rdkit_eth import rdXTBTools
