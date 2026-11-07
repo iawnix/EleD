@@ -46,3 +46,7 @@ Morgan cluster 隔离，所有标准化、特征选择和缺失处理只在训�
 
 如果没有稳定增益，负结果仍然保留，并明确描述适用边界。完整预注册方案见
 [English research plan](../research-plan-eas-en.md)。
+
+模型命令位于独立的 `benchmarks/eas/` 和 `tools/run_eas_benchmark.py`，只消费
+已经生成的特征归档，完成训练折调参、固定测试集评估和分子级 paired
+bootstrap。它是可选 benchmark 依赖，不会被 `rdkit_eth` 运行时导入。

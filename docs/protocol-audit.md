@@ -24,10 +24,9 @@ benchmark. Model choices and acceptance rules live separately in
 
 ## Items deliberately outside the feature runner
 
-The repository does not yet ship a training/evaluation command for the RegioML
-or RegioSQM source data, nor a flattened A–G model matrix. The feature runner
-stores the complete RDKit/xTB reports from which that matrix must be constructed.
-Nested hyperparameter selection,
+The repository now ships the separate `tools/run_eas_benchmark.py` command and
+the A–G matrix exporter. It still does not contain a downloaded RegioML or
+RegioSQM dataset or a completed benchmark result. Nested hyperparameter selection,
 molecule-level bootstrap confidence intervals, calibration, and the A–G
 ablation tables still require a separate benchmark stage.  Until that stage is
 archived, no predictive gain or failure should be inferred from a feature file.

@@ -9,9 +9,29 @@ import argparse, hashlib, json
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from rdkit import Chem
 from rdkit_eth import (XTBOptions, prepare_conformers, run_conformer_analysis,
                        run_reactivity, descriptor_sensitivity)
 from rdkit_eth.eas import frozen_protocol_sha256, load_frozen_protocol
+
+
+def _atom_features(smiles):
+    """Serialize only stable RDKit graph features for the benchmark layer."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        raise ValueError('SMILES could not be parsed for atom feature export')
+    values = []
+    for atom in mol.GetAtoms():
+        values.append({
+            'atomic_number': atom.GetAtomicNum(),
+            'formal_charge': atom.GetFormalCharge(),
+            'degree': atom.GetDegree(),
+            'total_hydrogens': atom.GetTotalNumHs(),
+            'is_aromatic': int(atom.GetIsAromatic()),
+            'is_in_ring': int(atom.IsInRing()),
+            'hybridization': str(atom.GetHybridization()),
+        })
+    return values
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
@@ -38,8 +58,11 @@ def main(argv=None):
     for row in manifest.get('records', []):
         digest = hashlib.sha256(f"{args.seed}:{row['id']}".encode()).hexdigest()
         seed = int(digest[:8], 16) % 2147483646 + 1
-        item = {'id': row['id'], 'reactive_atoms': row['reactive_atoms'],
-                'split': row['split'], 'cv_fold': row['cv_fold']}
+        item = {'id': row['id'], 'smiles': row['smiles'],
+                'scaffold': row['scaffold'], 'reactive_atoms': row['reactive_atoms'],
+                'split': row['split'], 'cv_fold': row['cv_fold'],
+                'charge': row.get('charge', 0), 'uhf': row.get('uhf', 0),
+                'atom_features': _atom_features(row['smiles'])}
         try:
             prepared = prepare_conformers(row['smiles'], num_conformers=args.num_conformers,
                 method=protocol['geometry']['embedding']['method'], fallback_methods=(),

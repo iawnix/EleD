@@ -9,6 +9,17 @@ random seeds, metrics and bootstrap acceptance rule. A future training command
 must verify both the feature archive's `protocol_sha256` and this model
 protocol before fitting anything.
 
+The current utilities are split into three steps:
+
+- `pipeline.py` validates the archive and expands one A–G atom feature group;
+- `modeling.py` computes molecule-weighted ranking metrics and paired bootstrap;
+- `train.py` optionally uses scikit-learn for training-fold tuning and untouched
+  test evaluation.
+
+The command-line entry point is `tools/run_eas_benchmark.py`. It requires the
+separate packages in `tools/benchmark-requirements.txt`; the core
+`rdkit_eth` installation does not acquire those machine-learning dependencies.
+
 The benchmark layer is intentionally separate from the public `rdkit_eth`
 calculation API. Descriptor unit tests and numerical invariance tests therefore
 remain valid even when the EAS dataset, model, or statistical evaluation is

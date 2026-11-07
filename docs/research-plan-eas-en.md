@@ -70,3 +70,9 @@ parameter hashes; and conformer-level atom/bond index checks.
 The final package contains the frozen protocol and hash, selected-record manifest,
 feature files, failure manifest, training scripts, locked environment, test logs,
 models and bootstrap results. A negative result is retained as a valid outcome.
+
+The model command is isolated under `benchmarks/eas/` and
+`tools/run_eas_benchmark.py`. It consumes a validated feature archive, performs
+training-fold tuning, evaluates the untouched test partition, and reports paired
+molecule bootstrap intervals. It is an optional benchmark dependency and is not
+imported by the `rdkit_eth` runtime package.
