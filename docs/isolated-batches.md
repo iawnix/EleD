@@ -7,7 +7,7 @@ fresh spawned Python processes, each directly calling the same libxtb library.
 No xTB executable is searched for or invoked.
 
 ```python
-from rdkit_eth import run_descriptor_batch, XTBOptions
+from eled import run_descriptor_batch, XTBOptions
 
 def main():
     # molecules must have explicit H atoms and prepared 3D coordinates.
@@ -49,7 +49,7 @@ they are not converted to apparent SCF failures.
 Input molecules are snapshotted with double-precision coordinates, properties,
 atom ordering and actual conformer IDs preserved. No native pointers cross
 process boundaries. Workers temporarily serialize owned results into private
-`rdkit-eth-worker-*` directories in Python's temporary directory. Normal exit,
+`eled-worker-*` directories in Python's temporary directory. Normal exit,
 timeout and handled interruption remove them; forcibly killing the entire parent
 can leave such directories. These are transport files, not xTB calculation logs.
 Persistent storage still uses checksummed JSON, not pickle.

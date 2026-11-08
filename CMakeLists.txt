@@ -19,7 +19,7 @@ target_compile_features(RDKitXTB PUBLIC cxx_std_17)
 target_compile_options(RDKitXTB PRIVATE -Wall -Wextra)
 target_include_directories(RDKitXTB PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cpp/rdXTBTools>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/rdkit-eth>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/eled>)
 target_include_directories(RDKitXTB PRIVATE "${XTB_INCLUDE_DIR}")
 target_link_libraries(RDKitXTB PUBLIC RDKit::GraphMol OpenSSL::Crypto ${CMAKE_DL_LIBS})
 if(RDXTB_XTB_PREFIX)
@@ -46,7 +46,7 @@ if(RDXTB_BUILD_PYTHON)
 endif()
 
 install(TARGETS RDKitXTB EXPORT RDKitXTBTargets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(FILES cpp/rdXTBTools/XTBTools.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rdkit-eth)
+install(FILES cpp/rdXTBTools/XTBTools.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/eled)
 install(EXPORT RDKitXTBTargets NAMESPACE RDKitXTB:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RDKitXTB)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cpp/rdXTBTools/RDKitXTBConfig.cmake.in

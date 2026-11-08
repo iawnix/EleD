@@ -156,7 +156,7 @@ bool verifyGFN0(const API &api, std::string &commit) {
   try {
     const auto prefix = fs::path(api.path).parent_path().parent_path();
     boost::property_tree::ptree record;
-    boost::property_tree::read_json((prefix / "share/xtb/rdkit-eth/build.json").string(), record);
+    boost::property_tree::read_json((prefix / "share/xtb/eled/build.json").string(), record);
     const bool upstream = record.get<std::string>("source.commit", "") == upstreamGFN0Commit &&
       record.get<std::string>("source.gfn0_fix.kind", "") == "upstream" &&
       record.get<std::string>("source.gfn0_fix.commit", "") == upstreamGFN0Commit &&
@@ -182,7 +182,7 @@ bool verifyBasis(const API &api) {
   try {
     const auto prefix = fs::path(api.path).parent_path().parent_path();
     boost::property_tree::ptree record;
-    boost::property_tree::read_json((prefix / "share/xtb/rdkit-eth/build.json").string(), record);
+    boost::property_tree::read_json((prefix / "share/xtb/eled/build.json").string(), record);
     const auto &files = record.get_child("files");
     const auto entry = files.find("lib/libxtb.so");
     return record.get<int>("schema_version", 0) == 1 &&
@@ -200,7 +200,7 @@ bool verifyDiagnostics(const API &api) {
   try {
     const auto prefix = fs::path(api.path).parent_path().parent_path();
     boost::property_tree::ptree record;
-    boost::property_tree::read_json((prefix / "share/xtb/rdkit-eth/build.json").string(), record);
+    boost::property_tree::read_json((prefix / "share/xtb/eled/build.json").string(), record);
     const auto &extension = record.get_child("source.diagnostics_extension");
     return record.get<int>("schema_version", 0) == 1 &&
       record.get<int>("capabilities.scf_diagnostics_api", 0) == 1 &&
@@ -365,7 +365,7 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
     if (method != 0 && api.getSCFAPIVersion && api.getSCFDiagnostics && result.gfn0StateFixVerified) {
       boost::property_tree::ptree record;
       boost::property_tree::read_json((fs::path(api.path).parent_path().parent_path() /
-                                      "share/xtb/rdkit-eth/build.json").string(), record);
+                                      "share/xtb/eled/build.json").string(), record);
       if (record.get<int>("capabilities.scf_diagnostics_api", 0) == 1 &&
           record.get<std::string>("source.diagnostics_extension.patch_sha256", "") == scfPatchSHA256) {
         if (api.getSCFAPIVersion() != 1) throw EngineError("Unsupported SCC diagnostics API");

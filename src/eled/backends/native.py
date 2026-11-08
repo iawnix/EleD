@@ -20,7 +20,7 @@ ANGSTROM_TO_BOHR = 1.8897261254578281
 class _NativeXTB:
     """Small ctypes binding for the stable xTB C API.
 
-    The binding is loaded lazily.  Installing rdkit-eth therefore does not
+    The binding is loaded lazily.  Installing eled therefore does not
     require a shared xTB library until a native calculation is requested.
     """
 
@@ -191,7 +191,7 @@ def _run_xtb_native(
 
     This adapter evaluates gas-phase single points and can optionally return
     the nuclear gradient. Geometry-step orchestration lives in
-    :mod:`rdkit_eth.optimization`; solvent setup remains outside this API.
+    :mod:`eled.optimization`; solvent setup remains outside this API.
     """
 
     from rdkit import Chem

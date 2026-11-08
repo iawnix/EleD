@@ -120,7 +120,7 @@ Install 0.9.1 first: it fixes native-library discovery from a venv inheriting
 the standard runtime. Keep model dependencies outside that locked runtime:
 
 ```bash
-.rdkit-eth/runtime/bin/python -m venv --system-site-packages build/benchmark-env
+.eled/runtime/bin/python -m venv --system-site-packages build/benchmark-env
 build/benchmark-env/bin/python -m pip install -r tools/benchmark-requirements.txt
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
   build/benchmark-env/bin/python -I tools/benchmark_qm8_geometry.py \

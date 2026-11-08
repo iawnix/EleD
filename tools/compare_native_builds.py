@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def calculate(library):
     import numpy as np
     from rdkit import Chem
-    from rdkit_eth import XTBCalculator, calc_orbital_populations
-    from rdkit_eth.runtime import _fingerprint
+    from eled import XTBCalculator, calc_orbital_populations
+    from eled.runtime import _fingerprint
     cases = json.loads((ROOT / 'tests/data/orbital_alignment_cases.json').read_text())['cases']
     rows = []
     for case in cases:

@@ -94,7 +94,8 @@ def _check_geometry(mol, conf_id, constraints):
 def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_methods=None,
                        random_seed=42, attempts_per_strategy=2, retry_random_coords=True,
                        max_embedding_iterations=300, optimize='MMFF94', optimization_iterations=500,
-                       require_assigned_stereo=False, xtb_method='GFN2-xTB', xtb_library=None):
+                       require_assigned_stereo=False, xtb_method='GFN2-xTB', xtb_library=None,
+                       charge=None, uhf=None):
     """Generate a checked conformer pool from SMILES or a copied RDKit molecule.
 
     Keep all specified tetrahedral/E/Z stereo constraints in every attempt and
@@ -161,6 +162,7 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
             'enforce_chirality': True, 'selection': 'first strategy with any accepted conformers',
             'require_assigned_stereo': require_assigned_stereo},
         'optimization': optimize, 'optimization_iterations': iterations if optimize else None,
+        'charge': charge, 'uhf': uhf,
         'attempts': [], 'conformers': [], 'recommended_conformer_id': None, 'error': None}
     output = Chem.Mol(mol)
     if optimize in ('MMFF94', 'UFF'):
@@ -172,6 +174,9 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
     for preset in methods:
         for random_coords in ([False, True] if retry_random_coords else [False]):
             for retry in range(attempts):
+                remaining = requested - output.GetNumConformers()
+                if remaining <= 0:
+                    break
                 current_seed = (seed + 104729 * len(report['attempts'])) % 2147483647
                 params = getattr(AllChem, preset)()
                 params.randomSeed = current_seed; params.numThreads = 1; params.pruneRmsThresh = .2
@@ -180,7 +185,10 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
                 working = Chem.Mol(mol)
                 # Unexpected RDKit/programming errors propagate; they are not
                 # converted into apparent ordinary embedding failures.
-                ids = list(AllChem.EmbedMultipleConfs(working, numConfs=requested, params=params))
+                # A retry only fills the remaining slots.  Without this bound,
+                # a partial first attempt followed by a successful retry could
+                # silently return more conformers than the frozen request.
+                ids = list(AllChem.EmbedMultipleConfs(working, numConfs=remaining, params=params))[:remaining]
                 attempt = {'method': preset, 'retry': retry, 'random_seed': current_seed,
                     'use_random_coords': random_coords, 'enforce_chirality': True,
                     'n_embedded': len(ids), 'n_accepted': 0, 'failure_counts': _failure_counts(params),
@@ -206,7 +214,8 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
                     elif optimize == 'xTB':
                         from .optimization import optimize_xtb
                         optimized = optimize_xtb(candidate, conf_id=0, method=xtb_method,
-                                                 xtb_library=xtb_library, max_iterations=iterations)
+                                                 charge=charge, uhf=uhf, xtb_library=xtb_library,
+                                                 max_iterations=iterations)
                         status = 0 if optimized.success else 1
                         energy = optimized.report['final_energy_hartree']
                         record.update(optimization_status=status,

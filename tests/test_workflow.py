@@ -8,11 +8,11 @@ import pytest
 
 Chem = pytest.importorskip('rdkit.Chem')
 from rdkit.Chem import AllChem
-from rdkit_eth import (
+from eled import (
     XTBOptions, XTBResult, XTBRunError, XTBCache,
     annotate_mol, run_xtb_batch, xtb_cache_key,
 )
-from rdkit_eth.input import _input_metadata, _xyz_from_mol
+from eled.input import _input_metadata, _xyz_from_mol
 
 
 def molecule(smiles='CCO'):
@@ -38,11 +38,11 @@ def engine(tmp_path, monkeypatch):
     path.write_text('test engine A')
     from types import SimpleNamespace
     import os
-    monkeypatch.setattr('rdkit_eth.xtb._find_xtb_library',
+    monkeypatch.setattr('eled.xtb._find_xtb_library',
                         lambda explicit: str(explicit or os.environ['XTB_LIBRARY']))
-    monkeypatch.setattr('rdkit_eth.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
+    monkeypatch.setattr('eled.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
     # This fixture exercises cache-key plumbing without a real extended engine.
-    monkeypatch.setattr('rdkit_eth.xtb._require_extended_libxtb', lambda path: {})
+    monkeypatch.setattr('eled.xtb._require_extended_libxtb', lambda path: {})
     return path
 
 
@@ -141,7 +141,7 @@ def test_cache_keys_include_geometry_options_library_and_parameters(engine, monk
 def test_batch_reuses_results_and_isolates_metadata(engine):
     mol = molecule()
     cache = XTBCache()
-    with patch('rdkit_eth.batch._run_xtb', return_value=sample_result(mol)) as calculate:
+    with patch('eled.batch._run_xtb', return_value=sample_result(mol)) as calculate:
         results = run_xtb_batch([mol] * 12, cache=cache, xtb_library=engine)
     assert calculate.call_count == 1
     assert len(cache) == 1
@@ -157,13 +157,13 @@ def test_batch_keeps_order_and_retries_failed_calculations(engine):
         if mol.GetNumAtoms() == b.GetNumAtoms():
             raise XTBRunError('test failure')
         return sample_result(mol)
-    with patch('rdkit_eth.batch._run_xtb', side_effect=fake):
+    with patch('eled.batch._run_xtb', side_effect=fake):
         results = run_xtb_batch([a, b, a], cache=cache, xtb_library=engine,
                                 return_exceptions=True)
     assert isinstance(results[1], XTBRunError)
     assert results[0] == results[2]
     assert len(cache) == 1
-    with patch('rdkit_eth.batch._run_xtb', return_value=sample_result(b)) as calculate:
+    with patch('eled.batch._run_xtb', return_value=sample_result(b)) as calculate:
         run_xtb_batch([b], cache=cache, xtb_library=engine)
     assert calculate.call_count == 1
     with pytest.raises(ValueError, match='max_workers'):
@@ -183,7 +183,7 @@ def test_removed_backends_fail_before_calculation(backend, monkeypatch):
     def forbidden(*args, **kwargs):
         pytest.fail('removed backends must not launch a process or load libxtb')
     monkeypatch.setattr(subprocess, 'Popen', forbidden)
-    monkeypatch.setattr('rdkit_eth.xtb._find_xtb_library', forbidden)
+    monkeypatch.setattr('eled.xtb._find_xtb_library', forbidden)
     with pytest.raises(ValueError, match='removed'):
         calculate_xtb(molecule(), backend=backend)
     with pytest.raises(ValueError, match='removed'):

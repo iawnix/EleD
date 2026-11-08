@@ -28,9 +28,16 @@ A--D 是主要结论，E--G 单独作为探索性扩展。缺失值保留 mask �
 
 ## 计算和评估
 
+这里的模型和评估属于独立的 benchmark 层，不是描述符 API 的一部分。
+机器可读的模型协议见
+[`benchmarks/eas/model_protocol.json`](../../benchmarks/eas/model_protocol.json)，
+`protocol.json` 只负责特征生成和数据清单。
+
 使用公开 RegioML/RegioSQM EAS 原子标签，沿用 `protocol.json` 的筛选、
-ETKDGv3、GFN2 几何和扩展版 `libxtb`。GFN1 与 GFN2 在同一坐标上做单点。
-主分析为 300 K；1000 K 只用于电子占据敏感性诊断，不代表热构象或激发态。
+严格 ETKDGv3（不启用其它 preset 的静默回退）、GFN2 几何和扩展版 `libxtb`。
+GFN1 与 GFN2 在同一坐标上做单点。主分析为 300 K；同时记录 GFN2/1000 K
+电子占据敏感性诊断，不代表热构象或激发态。输入清单保存协议 SHA256 和
+泄漏安全的五折 `cv_fold`。
 
 模型使用正则化 logistic regression 和梯度提升树。测试集按 scaffold 加
 Morgan cluster 隔离，所有标准化、特征选择和缺失处理只在训练折拟合。
@@ -39,3 +46,7 @@ Morgan cluster 隔离，所有标准化、特征选择和缺失处理只在训�
 
 如果没有稳定增益，负结果仍然保留，并明确描述适用边界。完整预注册方案见
 [English research plan](../research-plan-eas-en.md)。
+
+模型命令位于独立的 `benchmarks/eas/` 和 `tools/run_eas_benchmark.py`，只消费
+已经生成的特征归档，完成训练折调参、固定测试集评估和分子级 paired
+bootstrap。它是可选 benchmark 依赖，不会被 `eled` 运行时导入。

@@ -1,13 +1,13 @@
 # Compiled rdXTBTools interface
 
-`rdkit_eth.rdXTBTools` is an optional Boost.Python extension backed by a C++
+`eled.rdXTBTools` is an optional Boost.Python extension backed by a C++
 library. It accepts RDKit's native `ROMol`, calls the xTB C API directly, and
 returns `(success, XTBResults)` in the style of `rdEHTTools.RunMol`. The C++
 namespace is `RDKit::XTBTools`. It is independent of YAeHMOP and is not part of
 the upstream RDKit distribution.
 
 The recommended complete profile is `python tools/install_native.py` followed
-by `conda activate "$PWD/.rdkit-eth/runtime"`. It installs the extended libxtb
+by `conda activate "$PWD/.eled/runtime"`. It installs the extended libxtb
 in the same prefix; the manual build below remains available for development.
 
 ## Build and install
@@ -22,13 +22,13 @@ described there, then:
 ```bash
 conda create --yes --prefix "$PWD/.rdxtb-build-env" --file locks/linux-64/rdxtb-sdk.txt
 conda activate "$PWD/.rdxtb-build-env"
-RDKIT_ETH_BUILD_RDXTB=1 RDXTB_XTB_PREFIX="$PWD/.xtb-native" python -m pip install --no-deps --no-build-isolation -e .
+ELED_BUILD_RDXTB=1 RDXTB_XTB_PREFIX="$PWD/.xtb-native" python -m pip install --no-deps --no-build-isolation -e .
 ```
 
 The environment installs RDKit, its C++ development headers/libraries, Boost,
 NumPy, OpenSSL, a C++ compiler, CMake and Ninja. xTB is selected from its
 separate prefix. An ordinary pip install
-without `RDKIT_ETH_BUILD_RDXTB=1` remains a pure Python adapter install. A pip
+without `ELED_BUILD_RDXTB=1` remains a pure Python adapter install. A pip
 RDKit wheel alone does not supply this C++ SDK. Use the same environment for
 building and importing the extension; mixing RDKit or Boost builds can break
 the C++ ABI even when their version numbers agree. Import checks the RDKit
@@ -59,7 +59,7 @@ verification; neither interface falls back to another engine or process.
 Build a wheel in the same activated environment with:
 
 ```bash
-RDKIT_ETH_BUILD_RDXTB=1 python -m pip wheel --no-deps --no-build-isolation -w dist .
+ELED_BUILD_RDXTB=1 python -m pip wheel --no-deps --no-build-isolation -w dist .
 ```
 
 These are local development binaries tied to the SDK and xTB installations;
@@ -72,7 +72,7 @@ macOS and Windows need platform loader support and have not been implemented.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdEHTTools
-from rdkit_eth import rdXTBTools
+from eled import rdXTBTools
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
@@ -158,7 +158,7 @@ APIs continue to produce the dataclass through ctypes.
 ## Shared descriptor extraction
 
 ```python
-from rdkit_eth import calc_xtb_descriptors, calc_orbital_populations, annotate_mol
+from eled import calc_xtb_descriptors, calc_orbital_populations, annotate_mol
 ok, xtb = rdXTBTools.RunMol(mol, keepOverlap=True)
 if not ok:
     raise RuntimeError(xtb.errorMessage)
@@ -226,7 +226,7 @@ Runtime loading uses `dlopen`; there is no link-time dependency on libxtb.
 
 ```bash
 source .xtb-native/activate.sh
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 RDKIT_ETH_REQUIRE_RDXTB=1 \
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 ELED_REQUIRE_RDXTB=1 \
   python -m pytest -q
 python examples/rdxtb_tools.py
 ```

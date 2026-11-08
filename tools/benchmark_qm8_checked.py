@@ -15,10 +15,10 @@ import time
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
-from rdkit_eth import prepare_conformers, XTBCalculator, calc_descriptor_report, XTBRunError, XTBEnvironmentError
-from rdkit_eth.geometry import _check_geometry, _stereo_constraints
-from rdkit_eth.input import _geometry_hash, _xyz_from_mol
-from rdkit_eth.persistence import _implementation_identity
+from eled import prepare_conformers, XTBCalculator, calc_descriptor_report, XTBRunError, XTBEnvironmentError
+from eled.geometry import _check_geometry, _stereo_constraints
+from eled.input import _geometry_hash, _xyz_from_mol
+from eled.persistence import _implementation_identity
 
 _spec = importlib.util.spec_from_file_location('qm8_geometry', Path(__file__).with_name('benchmark_qm8_geometry.py'))
 study = importlib.util.module_from_spec(_spec)

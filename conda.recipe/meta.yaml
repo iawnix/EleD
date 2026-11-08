@@ -1,4 +1,4 @@
-{% set name = "rdkit-eth" %}
+{% set name = "eled" %}
 {% set version = "0.11.0" %}
 
 package:
@@ -25,5 +25,5 @@ requirements:
     - xtb >=6.7
 
 about:
-  summary: RDKit orbital descriptors with an xTB backend
+  summary: RDKit electronic-structure descriptor extension with an xTB backend
   license: BSD-3-Clause

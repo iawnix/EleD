@@ -39,7 +39,7 @@ def source_tree(prefix, supplied, lock, patch=None):
         run(['git', 'init', source])
         run(['git', '-C', source, 'remote', 'add', 'origin', lock['repository']])
         run(['git', '-C', source, 'fetch', '--depth=1', 'origin', lock['commit']])
-        run(['git', '-C', source, 'checkout', '-b', 'rdkit-eth/native-basis', 'FETCH_HEAD'])
+        run(['git', '-C', source, 'checkout', '-b', 'eled/native-basis', 'FETCH_HEAD'])
     actual = git_output(source, 'rev-parse', 'HEAD')
     if actual != lock['commit']:
         raise ValueError(f'Source HEAD is {actual}, expected {lock["commit"]}. '
@@ -220,7 +220,7 @@ def main():
                       env=env, capture_output=True, text=True, timeout=60)
         scf_checks = json.loads(checked.stdout)
     version = run([executable, '--version'], env=env, capture_output=True, text=True).stdout
-    record_dir = parameters / 'rdkit-eth'
+    record_dir = parameters / 'eled'
     record_dir.mkdir(exist_ok=True)
     for filename in ('COPYING', 'COPYING.LESSER'):
         shutil.copy2(source / filename, record_dir / filename)

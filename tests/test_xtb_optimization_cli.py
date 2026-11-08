@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from rdkit_eth.errors import XTBNativeNotFoundError
-from rdkit_eth.runtime import _extended_libxtb_build, _find_xtb_library
+from eled.errors import XTBNativeNotFoundError
+from eled.runtime import _extended_libxtb_build, _find_xtb_library
 
 
 _TOOL = Path(__file__).resolve().parents[1] / "tools/benchmark_xtb_optimization.py"

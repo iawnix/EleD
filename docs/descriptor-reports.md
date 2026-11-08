@@ -22,7 +22,7 @@ retaining its settings does not imply an SCC iteration or finite-T SCF protocol.
 ## Report API and export
 
 ```python
-from rdkit_eth import (
+from eled import (
     XTBCalculator, calc_descriptor_report, run_descriptor_batch,
     export_descriptor_reports, XTBOptions, XTBCache,
 )
@@ -84,7 +84,7 @@ Convergence criteria are not an experimental accuracy guarantee.
 ## Fixed-geometry charge-state analysis
 
 ```python
-from rdkit_eth import run_reactivity, XTBOptions, calc_reactivity_descriptors
+from eled import run_reactivity, XTBOptions, calc_reactivity_descriptors
 
 # Default protocol: GFN2, 300 K, reference wavefunction copies, fixed geometry.
 reaction = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
@@ -183,7 +183,7 @@ rows must be retained in dataset accounting.
 ## Reproduce checks
 
 ```bash
-python -m rdkit_eth doctor --check compiled --keep-overlap --reactivity
+python -m eled doctor --check compiled --keep-overlap --reactivity
 python examples/descriptor_reports.py --output build/reports --sensitivity
 ```
 

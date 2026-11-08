@@ -18,9 +18,9 @@ import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem, Descriptors, rdFingerprintGenerator
 
-from rdkit_eth import XTBOptions, XTBCalculator, XTBEnvironmentError, XTBRunError, calc_descriptor_report
-from rdkit_eth.input import _geometry_hash, _xyz_from_mol
-from rdkit_eth.persistence import _implementation_identity
+from eled import XTBOptions, XTBCalculator, XTBEnvironmentError, XTBRunError, calc_descriptor_report
+from eled.input import _geometry_hash, _xyz_from_mol
+from eled.persistence import _implementation_identity
 
 # Resolve the sibling explicitly so the tool also works with isolated Python -I.
 _spec = importlib.util.spec_from_file_location('qm8_pilot', Path(__file__).with_name('benchmark_qm8.py'))

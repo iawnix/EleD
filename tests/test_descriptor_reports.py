@@ -8,12 +8,12 @@ from unittest.mock import patch
 import pytest
 from rdkit import Chem
 
-from rdkit_eth import (
+from eled import (
     XTBOptions, XTBResult, XTBRunError, descriptor_columns, calc_descriptor_report,
     assess_descriptor_quality, export_descriptor_reports, run_descriptor_batch,
 )
-from rdkit_eth.input import _input_metadata, _xyz_from_mol
-from rdkit_eth.options import calculation_settings
+from eled.input import _input_metadata, _xyz_from_mol
+from eled.options import calculation_settings
 
 
 def sample():
@@ -77,7 +77,7 @@ def test_export_rejects_schema_mismatch_before_overwriting(tmp_path):
 
 def test_batch_failures_preserve_order_ids_and_null_features():
     mol,r=sample()
-    with patch('rdkit_eth.batch.run_xtb_batch',return_value=[r,XTBRunError('no convergence'),r]):
+    with patch('eled.batch.run_xtb_batch',return_value=[r,XTBRunError('no convergence'),r]):
         reports=run_descriptor_batch([mol]*3,record_ids=['a','b','c'])
     assert [v['record_id'] for v in reports]==['a','b','c']
     assert reports[1]['quality']['status']=='error'
@@ -92,7 +92,7 @@ def test_batch_failures_preserve_order_ids_and_null_features():
                                   {'occupation_threshold':float('nan')}, {'include_orbitals':1}])
 def test_batch_rejects_global_analysis_errors_before_calculation(kwargs):
     mol,_=sample()
-    with patch('rdkit_eth.batch.run_xtb_batch',side_effect=AssertionError('must not calculate')):
+    with patch('eled.batch.run_xtb_batch',side_effect=AssertionError('must not calculate')):
         with pytest.raises((TypeError,ValueError)):
             run_descriptor_batch([mol],**kwargs)
 
@@ -116,7 +116,7 @@ def test_zero_temperature_records_actual_engine_floor():
 @pytest.mark.parametrize('kwargs',[{'maxIterations':True}, {'maxIterations':2**32},
                                   {'accuracy':1e-5}, {'electronicTemperature':float('nan')}])
 def test_compiled_settings_reject_invalid_values_before_library_lookup(kwargs):
-    module=pytest.importorskip('rdkit_eth.rdXTBTools')
+    module=pytest.importorskip('eled.rdXTBTools')
     mol,_=sample()
     with pytest.raises(ValueError):
         module.RunMol(mol,xtbLibrary='/missing/libxtb.so',**kwargs)

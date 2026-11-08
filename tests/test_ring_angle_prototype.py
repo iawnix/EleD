@@ -10,7 +10,7 @@ from rdkit import Chem
 
 @pytest.fixture(scope='module')
 def probes():
-    names = ('RDKIT_ETH_RING_ANGLE_CONTROL', 'RDKIT_ETH_RING_ANGLE_CANDIDATE')
+    names = ('ELED_RING_ANGLE_CONTROL', 'ELED_RING_ANGLE_CANDIDATE')
     paths = [os.environ.get(n) for n in names]
     if not any(paths):
         pytest.skip('requires separately compiled research bounds probes')
@@ -64,10 +64,10 @@ def test_missing_mmff_parameters_preserve_original_rule(probes):
 
 
 def test_planarity_ablation_retains_bounds_and_chirality_checks(probes):
-    combined = os.environ.get('RDKIT_ETH_RING_ANGLE_COMBINED')
+    combined = os.environ.get('ELED_RING_ANGLE_COMBINED')
     if not combined:
         pytest.skip('requires the additional diagnostic planarity-ablation build')
-    from rdkit_eth.geometry import _check_geometry, _stereo_constraints
+    from eled.geometry import _check_geometry, _stereo_constraints
     smiles = 'N#C[C@@H]1C(=O)N2C[C@H]12'
     angle_only = run(probes[1], smiles)
     both = run(combined, smiles)

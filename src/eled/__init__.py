@@ -1,6 +1,9 @@
-"""Electronic-structure helpers for RDKit molecules.
+"""An RDKit extension for electronic-structure descriptors backed by xTB.
 
-The package keeps the RDKit YAeHMOP interface separate from the xTB backend.
+The public package is centered on :class:`XTBCalculator` and the project-built
+extended ``libxtb``.  The optional ``eled.descriptors`` module contains a
+small adapter for RDKit's pre-existing YAeHMOP/EHT interface; it is not part of
+the xTB descriptor protocol.
 """
 
 from .xtb import (
@@ -10,7 +13,6 @@ from .xtb import (
     XTBNativeNotFoundError,
     calc_xtb_descriptors,
 )
-from .descriptors import calc_eht_descriptors, calc_orbital_descriptors
 from .mapping import annotate_mol
 from .batch import XTBCache, run_xtb_batch, xtb_cache_key
 from .options import XTBOptions
@@ -32,8 +34,6 @@ __all__ = [
     "XTBRunError",
     "XTBNativeNotFoundError",
     "calc_xtb_descriptors",
-    "calc_eht_descriptors",
-    "calc_orbital_descriptors",
     "annotate_mol",
     "XTBCache",
     "run_xtb_batch",
@@ -89,8 +89,11 @@ from .optimization import XTBOptimizationResult, optimize_xtb
 
 __all__ += ['XTBOptimizationResult', 'optimize_xtb']
 
-from .eas import normalize_eas_records, cluster_keys, assign_eas_splits, prepare_eas_dataset
+from .eas import (normalize_eas_records, cluster_keys, assign_eas_splits,
+                  assign_eas_folds, prepare_eas_dataset, load_frozen_protocol,
+                  frozen_protocol_sha256)
 from .descriptor_catalog import descriptor_catalog, descriptor_status
 
-__all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'prepare_eas_dataset',
+__all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'assign_eas_folds',
+            'prepare_eas_dataset', 'load_frozen_protocol', 'frozen_protocol_sha256',
             'descriptor_catalog', 'descriptor_status']

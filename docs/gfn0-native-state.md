@@ -63,16 +63,16 @@ Python package or proposed as a production workaround.
 ```bash
 cc -std=c11 -Wall -Wextra -Werror \
   tools/diagnostics/xtb_gfn0_state.c \
-  -I/tmp/rdkit-xtb-check/include -L/tmp/rdkit-xtb-check/lib \
-  -Wl,-rpath,/tmp/rdkit-xtb-check/lib \
+  -I/tmp/eled-check/include -L/tmp/eled-check/lib \
+  -Wl,-rpath,/tmp/eled-check/lib \
   -lxtb -ldl -lm -o /tmp/xtb-state-repro
 
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /tmp/xtb-state-repro \
-  /tmp/rdkit-xtb-check/share/xtb 0 --inspect-restore
+  /tmp/eled-check/share/xtb 0 --inspect-restore
 
 # Negative control: load GFN1 instead of GFN0 in a fresh process.
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /tmp/xtb-state-repro \
-  /tmp/rdkit-xtb-check/share/xtb 1 --inspect-restore
+  /tmp/eled-check/share/xtb 1 --inspect-restore
 ```
 
 Observed values:

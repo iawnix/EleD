@@ -1,7 +1,7 @@
 """Optional tblite comparison backend.
 
 These tests are skipped when the optional tblite wheel is absent. They never
-make tblite part of the default rdkit-eth installation.
+make tblite part of the default eled installation.
 """
 
 import importlib.util
@@ -12,8 +12,8 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import XTBRunError, XTBNativeNotFoundError, run_xtb, xtb_cache_key
-from rdkit_eth.runtime import _find_xtb_library
+from eled import XTBRunError, XTBNativeNotFoundError, run_xtb, xtb_cache_key
+from eled.runtime import _find_xtb_library
 
 if importlib.util.find_spec("tblite") is None:
     pytest.skip("optional tblite backend is not installed", allow_module_level=True)
@@ -84,7 +84,7 @@ def test_tblite_restrictions_are_clear():
 @pytest.mark.parametrize('method', ['GFN1-xTB', 'GFN2-xTB'])
 @pytest.mark.parametrize('smiles', ['O', 'CCO', '[NH4+]', 'CS(C)=O', 'CCl'])
 def test_population_descriptors_recover_engine_charges(method, smiles):
-    from rdkit_eth import calc_orbital_populations, calc_frontier_descriptors
+    from eled import calc_orbital_populations, calc_frontier_descriptors
     mol = molecule(smiles)
     result = run_xtb(mol, backend='tblite', method=method, keep_overlap=True)
     assert result.metadata['overlap_source'] == 'same tblite calculation'
@@ -107,7 +107,7 @@ def test_population_descriptors_recover_engine_charges(method, smiles):
 
 
 def test_overlap_is_opt_in_and_cache_distinguishes_it():
-    from rdkit_eth import XTBCache, run_xtb_batch, calc_orbital_populations, DescriptorUnavailableError
+    from eled import XTBCache, run_xtb_batch, calc_orbital_populations, DescriptorUnavailableError
     mol = molecule('O')
     cache = XTBCache()
     ordinary = run_xtb_batch([mol], backend='tblite', cache=cache)[0]
@@ -122,7 +122,7 @@ def test_overlap_is_opt_in_and_cache_distinguishes_it():
 
 def test_real_benzene_degenerate_frontier_is_rotation_invariant():
     from dataclasses import replace
-    from rdkit_eth import calc_frontier_descriptors
+    from eled import calc_frontier_descriptors
     mol = Chem.AddHs(Chem.MolFromSmiles('c1ccccc1'))
     conf = Chem.Conformer(12)
     for i in range(6):

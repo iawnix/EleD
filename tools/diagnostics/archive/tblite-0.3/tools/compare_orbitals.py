@@ -23,9 +23,9 @@ import time
 import numpy as np
 from rdkit import Chem, rdBase
 
-from rdkit_eth import rdXTBTools
-from rdkit_eth.backends.tblite import run_xtb_tblite
-from rdkit_eth.orbital_alignment import compare_orbitals, libxtb_to_tblite_rows
+from eled import rdXTBTools
+from eled.backends.tblite import run_xtb_tblite
+from eled.orbital_alignment import compare_orbitals, libxtb_to_tblite_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -172,8 +172,8 @@ def main():
         "schema_version": 1, "created_utc": datetime.now(timezone.utc).isoformat(),
         "implementation_sha256": {
             name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-            for name in ("tools/compare_orbitals.py", "src/rdkit_eth/orbital_alignment.py",
-                         "src/rdkit_eth/backends/tblite.py", "cpp/rdXTBTools/XTBTools.cpp",
+            for name in ("tools/compare_orbitals.py", "src/eled/orbital_alignment.py",
+                         "src/eled/backends/tblite.py", "cpp/rdXTBTools/XTBTools.cpp",
                          "cpp/rdXTBTools/Wrap.cpp")},
         "dataset": {"path": str(args.cases.resolve()), "sha256": hashlib.sha256(data).hexdigest(),
                     "metadata": {k: v for k, v in dataset.items() if k != "cases"}},

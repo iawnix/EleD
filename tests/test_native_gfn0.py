@@ -7,10 +7,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from rdkit_eth.options import XTBOptions
-from rdkit_eth.runtime import _D4_LOCAL_REFERENCES_PATCH, _native_gfn0_build
-from rdkit_eth.errors import XTBEnvironmentError
-from rdkit_eth.xtb import _resolve_options
+from eled.options import XTBOptions
+from eled.runtime import _D4_LOCAL_REFERENCES_PATCH, _native_gfn0_build
+from eled.errors import XTBEnvironmentError
+from eled.xtb import _resolve_options
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def verified_install(tmp_path):
     library.parent.mkdir()
     library.write_bytes(b'patched test binary')
     (library.parent / 'libxtb.so').symlink_to(library.name)
-    manifest = tmp_path / 'share/xtb/rdkit-eth/build.json'
+    manifest = tmp_path / 'share/xtb/eled/build.json'
     manifest.parent.mkdir(parents=True)
     record = {'schema_version': 1, 'capabilities': {'native_gfn0': True},
               'source': {'patch_sha256': _D4_LOCAL_REFERENCES_PATCH, 'commit': 'test-commit'},
@@ -67,8 +67,8 @@ def test_stale_or_unverified_builds_are_not_enabled(verified_install, damage):
 
 def test_public_routing_requires_complete_extended_profile(verified_install, monkeypatch):
     library, manifest, _ = verified_install
-    monkeypatch.setattr('rdkit_eth.xtb._find_xtb_library', lambda _: str(library))
-    monkeypatch.setattr('rdkit_eth.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
+    monkeypatch.setattr('eled.xtb._find_xtb_library', lambda _: str(library))
+    monkeypatch.setattr('eled.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
     options = XTBOptions(method='gfn0', backend='native')
     # A GFN0-only manifest is deliberately insufficient: every public method
     # now requires the complete extended runtime profile.
@@ -83,7 +83,7 @@ def test_public_routing_requires_complete_extended_profile(verified_install, mon
 
 @pytest.mark.parametrize('damage', [None, 'commit', 'fix-commit', 'kind', 'file-hash', 'malformed'])
 def test_upstream_fix_requires_reviewed_identity(verified_install, damage):
-    from rdkit_eth.runtime import _UPSTREAM_GFN0_COMMIT, _UPSTREAM_D4_SHA256
+    from eled.runtime import _UPSTREAM_GFN0_COMMIT, _UPSTREAM_D4_SHA256
     library, manifest, record = verified_install
     record['source'] = {'commit': _UPSTREAM_GFN0_COMMIT,
                         'gfn0_fix': {'kind': 'upstream', 'commit': _UPSTREAM_GFN0_COMMIT,

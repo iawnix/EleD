@@ -8,7 +8,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import geometry, prepare_conformers
+from eled import geometry, prepare_conformers
 
 
 FAST = dict(fallback_methods=(), attempts_per_strategy=1, retry_random_coords=False)
@@ -142,7 +142,7 @@ def test_raw_failure_counters_and_exhausted_plan_are_retained():
 
 @pytest.mark.integration
 def test_prepared_molecule_connects_to_existing_xtb_api():
-    if os.environ.get('RDKIT_ETH_REQUIRE_RDXTB') != '1': pytest.skip('native integration profile')
+    if os.environ.get('ELED_REQUIRE_RDXTB') != '1': pytest.skip('native integration profile')
     r = prepare_conformers('O', **FAST)
     result = calculate_xtb(r.molecule, conf_id=r.report['recommended_conformer_id'])
     assert result.metadata['geometry_sha256'] == r.report['conformers'][0]['geometry_sha256']

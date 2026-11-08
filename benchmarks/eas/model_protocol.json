@@ -1,0 +1,47 @@
+{
+  "model_protocol_id": "eas_regioselectivity_model_v1",
+  "status": "frozen_before_model_training",
+  "feature_protocol_id": "eas_regioselectivity_v1",
+  "models": {
+    "baseline": "GFN1 xTB engine partial charges and shell descriptors with the published RegioSQM feature recipe; CM5 is not claimed unless an explicit CM5 transform is added",
+    "candidate": "regularized logistic regression and gradient-boosted trees",
+    "evaluation": "nested training split for hyperparameters; untouched scaffold test set",
+    "random_seeds": [
+      20261106,
+      20261107,
+      20261108
+    ],
+    "preprocessing": "fit scaling, feature selection and train-median imputation inside training folds; retain missing indicators",
+    "tuning": {
+      "scoring": "atom-level ROC-AUC within training folds",
+      "fold_source": "manifest cv_fold, restricted to primary train partition",
+      "logistic_regression_C": [0.1, 1.0, 10.0],
+      "gradient_boosting_n_estimators": [100, 200],
+      "gradient_boosting_max_depth": [1, 2]
+    }
+  },
+  "feature_groups": [
+    "formal and RDKit atom features",
+    "GFN1/GFN2 charges and shell populations",
+    "Mulliken/Löwdin density populations and p-to-s ratios",
+    "Wiberg and Mayer bond descriptors",
+    "HOMO/LUMO frontier bond overlap populations",
+    "pi population and pi bond order",
+    "local Fukui, local softness and local electrophilicity",
+    "conformer mean/std/min/max and reliability diagnostics"
+  ],
+  "acceptance": {
+    "primary": "at least one primary metric difference over GFN1 has a molecule-bootstrap 95% CI entirely above zero, with no significant deterioration in the other primary metrics",
+    "primary_metrics": [
+      "macro ROC-AUC",
+      "mean reciprocal rank",
+      "top-1 accuracy",
+      "top-2 accuracy"
+    ],
+    "bootstrap_replicates": 2000,
+    "unit": "molecule",
+    "negative_result": "report no stable incremental benefit when the primary condition is not met",
+    "minimum_reporting": "all failures, missing descriptors, method/temperature sensitivity, per-atom coverage, calibration and runtime"
+  },
+  "feature_protocol_sha256": "220bd354d166355c755e662c4495c081ee0dd1bbe96ebef275ddd4c8b2b1ce95"
+}

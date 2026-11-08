@@ -1,11 +1,11 @@
 -- Configuring done (0.0s)
 -- Generating done (0.0s)
--- Build files have been written to: /home/iaw/project/rdkit_eth/build/install-validation/cpp
+-- Build files have been written to: /home/iaw/project/eled/build/install-validation/cpp
 [1/4] Building CXX object CMakeFiles/rdxtb_cpp_test.dir/cpp/rdXTBTools/testXTB.cpp.o
 [2/4] Building CXX object CMakeFiles/RDKitXTB.dir/cpp/rdXTBTools/XTBTools.cpp.o
 [3/4] Linking CXX static library libRDKitXTB.a
 [4/4] Linking CXX executable rdxtb_cpp_test
-Test project /home/iaw/project/rdkit_eth/build/install-validation/cpp
+Test project /home/iaw/project/eled/build/install-validation/cpp
     Start 1: rdXTBTools/core
 1/1 Test #1: rdXTBTools/core ..................   Passed    0.24 sec
 

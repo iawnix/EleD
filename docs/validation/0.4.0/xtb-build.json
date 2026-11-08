@@ -27,20 +27,20 @@
       }
     }
   },
-  "source_directory": "/home/iaw/project/rdkit_eth/.xtb-native/source",
-  "prefix": "/home/iaw/project/rdkit_eth/.xtb-native",
+  "source_directory": "/home/iaw/project/eled/.xtb-native/source",
+  "prefix": "/home/iaw/project/eled/.xtb-native",
   "built_at": "2026-11-03T18:08:08.212212+00:00",
   "source_diff_sha256": "011d3cb56dcb90d2af0906227766a92849b6b173ab45b94b79c8a35a706bd3e4",
   "configure_command": [
     "cmake",
     "-S",
-    "/home/iaw/project/rdkit_eth/.xtb-native/source",
+    "/home/iaw/project/eled/.xtb-native/source",
     "-B",
-    "/home/iaw/project/rdkit_eth/.xtb-native/build",
+    "/home/iaw/project/eled/.xtb-native/build",
     "-G",
     "Ninja",
     "-DCMAKE_BUILD_TYPE=Release",
-    "-DCMAKE_INSTALL_PREFIX=/home/iaw/project/rdkit_eth/.xtb-native",
+    "-DCMAKE_INSTALL_PREFIX=/home/iaw/project/eled/.xtb-native",
     "-DCMAKE_INSTALL_LIBDIR=lib",
     "-DBUILD_SHARED_LIBS=ON",
     "-DWITH_OBJECT=ON",
@@ -51,14 +51,14 @@
     "-DCMAKE_C_STANDARD=17",
     "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
     "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON",
-    "-DCMAKE_PREFIX_PATH=/home/iaw/project/rdkit_eth/build/install-validation/toolchain",
-    "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/rdkit_eth/build/install-validation/toolchain/lib",
-    "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/rdkit_eth/build/install-validation/toolchain/lib"
+    "-DCMAKE_PREFIX_PATH=/home/iaw/project/eled/build/install-validation/toolchain",
+    "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/eled/build/install-validation/toolchain/lib",
+    "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/eled/build/install-validation/toolchain/lib"
   ],
-  "dependency_prefix": "/home/iaw/project/rdkit_eth/build/install-validation/toolchain",
+  "dependency_prefix": "/home/iaw/project/eled/build/install-validation/toolchain",
   "compilers": {
-    "CMAKE_C_COMPILER": "/home/iaw/project/rdkit_eth/build/install-validation/toolchain/bin/x86_64-conda-linux-gnu-cc",
-    "CMAKE_Fortran_COMPILER": "/home/iaw/project/rdkit_eth/build/install-validation/toolchain/bin/x86_64-conda-linux-gnu-gfortran"
+    "CMAKE_C_COMPILER": "/home/iaw/project/eled/build/install-validation/toolchain/bin/x86_64-conda-linux-gnu-cc",
+    "CMAKE_Fortran_COMPILER": "/home/iaw/project/eled/build/install-validation/toolchain/bin/x86_64-conda-linux-gnu-gfortran"
   },
   "cli_version_output": "-----------------------------------------------------------      \n     |                   =====================                   |     \n     |                           x T B                           |     \n     |                   =====================                   |     \n     |                         S. Grimme                         |     \n     |          Mulliken Center for Theoretical Chemistry        |     \n     |                    University of Bonn                     |     \n      -----------------------------------------------------------      \n\n   * xtb version 6.7.1 (a9040512dd7c15793472aa20f9647d36a266f7cd) compiled by '@Linux' on 2026/11/03",
   "files": {

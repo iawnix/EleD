@@ -4,14 +4,14 @@ import numpy as np
 import pytest
 from rdkit import Chem
 
-from rdkit_eth import (
+from eled import (
     XTBResult, calc_density_matrix, calc_shell_populations,
     calc_mayer_bond_descriptors, calc_frontier_bond_descriptors,
     calc_pi_descriptors,
 )
-from rdkit_eth.input import _input_metadata, _xyz_from_mol
-from rdkit_eth.reports import descriptor_sensitivity
-from rdkit_eth import descriptor_catalog, descriptor_columns
+from eled.input import _input_metadata, _xyz_from_mol
+from eled.reports import descriptor_sensitivity
+from eled import descriptor_catalog, descriptor_columns
 
 
 def result():

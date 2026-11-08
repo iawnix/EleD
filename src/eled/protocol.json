@@ -1,0 +1,116 @@
+{
+  "protocol_id": "eas_regioselectivity_v1",
+  "purpose": "Evaluate atom-level xTB density descriptors for electrophilic aromatic substitution regioselectivity.",
+  "status": "frozen_before_feature_calculation",
+  "target": {
+    "primary": "RegioML/RegioSQM EAS regioselectivity labels",
+    "backup": "CYP site-of-metabolism atom labels",
+    "unit_of_prediction": "atom",
+    "metric": [
+      "top-k accuracy",
+      "mean reciprocal rank",
+      "macro ROC-AUC"
+    ]
+  },
+  "selection": {
+    "input": "public reaction records with atom mapping and a single EAS electrophilic aromatic substitution event",
+    "event_field": "event_type or reaction_class when present; records without an event field must be prefiltered by the source adapter",
+    "allowed_elements": [
+      "H",
+      "B",
+      "C",
+      "N",
+      "O",
+      "F",
+      "Si",
+      "P",
+      "S",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "exclude": [
+      "metals",
+      "mixtures without a mapped reacting molecule",
+      "ambiguous or unmapped regio labels",
+      "failed stereochemistry sanitization"
+    ],
+    "deduplicate": "canonical mapped reactant scaffold and reaction identifier",
+    "label_indexing": "zero-based RDKit atom indices after SMILES sanitization"
+  },
+  "geometry": {
+    "conformers_per_molecule": 10,
+    "seed": 20261106,
+    "seed_derivation": "SHA256(seed:record_id) first 8 hex digits modulo 2147483646 plus 1",
+    "embedding": {
+      "method": "ETKDGv3",
+      "fallback_methods": [],
+      "attempts_per_strategy": 2,
+      "retry_random_coords": true,
+      "max_embedding_iterations": 300,
+      "prune_rms_angstrom": 0.2,
+      "num_threads": 1
+    },
+    "optimization": {
+      "method": "extended-libxtb GFN2-xTB, gas phase",
+      "max_iterations": 200,
+      "scf_max_iterations": 250,
+      "accuracy": 1.0
+    },
+    "keep_overlap": true,
+    "failed_conformers": "record and exclude from feature aggregation; never impute"
+  },
+  "calculation": {
+    "methods": [
+      "GFN1-xTB",
+      "GFN2-xTB"
+    ],
+    "primary_geometry_method": "GFN2-xTB",
+    "comparison_geometry": "identical optimized coordinates for GFN1 and GFN2 single points",
+    "electronic_temperature_K": 300.0,
+    "diagnostic_electronic_temperature_K": 1000.0,
+    "charge": "formal molecular charge",
+    "spin": "RDKit-derived multiplicity; explicit for open-shell records",
+    "backend": "extended libxtb only",
+    "engine_calls_for_density_features": 0,
+    "engine_call_semantics": "zero additional calls after each retained single-point result; density descriptors consume C, S and AO maps from that result",
+    "keep_overlap": true,
+    "gfn0_scope": "single-point descriptors only; no Delta-SCF or shell-charge equivalence"
+  },
+  "split": {
+    "seed": 20261106,
+    "primary": "Bemis-Murcko scaffold split with Morgan-cluster leakage constraint",
+    "secondary": "scaffold-stratified 5-fold clustering split",
+    "fractions": {
+      "train": 0.8,
+      "valid": 0.1,
+      "test": 0.1
+    },
+    "secondary_folds": 5,
+    "cluster": {
+      "fingerprint": "Morgan",
+      "radius": 2,
+      "fp_size": 1024,
+      "include_chirality": false,
+      "similarity": "Tanimoto",
+      "threshold": 0.7,
+      "linkage": "single"
+    },
+    "leakage_rule": "all records sharing a scaffold or cluster stay in one partition or fold"
+  },
+  "outputs": {
+    "descriptor_source": "retained single-point XTBResult; no extra engine call for density extraction",
+    "required_feature_families": [
+      "RDKit atom/bond structure features",
+      "GFN1/GFN2 charges and shell populations",
+      "Mulliken/Loewdin density populations and p-to-s ratios",
+      "Wiberg and Mayer bond descriptors",
+      "HOMO/LUMO frontier bond overlap populations",
+      "pi population and pi bond order",
+      "fixed-geometry Fukui and local conceptual-DFT descriptors",
+      "conformer statistics and reliability diagnostics"
+    ],
+    "missing_value_policy": "preserve null and reason; never impute during feature generation",
+    "report_format": "nested JSON feature reports with atom and bond indices fixed to RDKit input order"
+  }
+}

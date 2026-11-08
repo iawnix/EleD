@@ -1,7 +1,7 @@
 # Descriptor catalog
 
 The public descriptor API has five layers. The complete machine-readable
-catalog is returned by `rdkit_eth.descriptor_catalog()`; this page states which
+catalog is returned by `eled.descriptor_catalog()`; this page states which
 layers are appropriate for validation.
 
 Python functions, report fields and analysis arguments use RDKit/Python's

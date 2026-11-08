@@ -4,10 +4,10 @@
   "source_patch_sha256": "01aa24fec9037e5191f2c61003e3180f3c329c2184e0e1a61d345e93c706188f",
   "diagnostic_only": true,
   "comparison_command": [
-    "/home/iaw/project/rdkit_eth/.rdxtb-build-env/bin/python",
-    "/home/iaw/project/rdkit_eth/tools/compare_orbitals.py",
+    "/home/iaw/project/eled/.rdxtb-build-env/bin/python",
+    "/home/iaw/project/eled/tools/compare_orbitals.py",
     "--library",
-    "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-only/libxtb.so",
+    "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-only/libxtb.so",
     "--accuracy",
     "0.01",
     "--case",
@@ -17,7 +17,7 @@
     "--case",
     "iodomethane",
     "--output",
-    "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-only/comparison"
+    "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-only/comparison"
   ],
   "comparison_exit_code": 1
 }

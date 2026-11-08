@@ -5,7 +5,7 @@
 > comparison sources are archived in `tools/diagnostics/archive/tblite-0.3/`.
 > Current population analysis uses the [native basis extension](xtb-patched-build.md).
 
-`rdkit_eth` can use [tblite](https://github.com/tblite/tblite) as an explicit,
+`eled` can use [tblite](https://github.com/tblite/tblite) as an explicit,
 optional comparison backend:
 
 ```bash
@@ -13,7 +13,7 @@ python -m pip install -e '.[tblite]'  # from the source checkout
 ```
 
 This installs the tblite Python wheel and its two runtime Python dependencies,
-NumPy and CFFI. It does **not** install ASE. The base `rdkit-eth` dependency
+NumPy and CFFI. It does **not** install ASE. The base `eled` dependency
 set is unchanged, and the default backend remains native libxtb. A
 current Linux CPython 3.11 tblite wheel is about 7.2 MB compressed and about
 18 MB unpacked including its bundled native library; actual size varies by
@@ -85,7 +85,7 @@ represent separate spin channels. This is a conservative adapter restriction,
 not a statement that tblite cannot calculate radicals; use native libxtb for
 radicals in this package. The
 backend does not currently add tblite's ALPB/GBSA, gradient, periodic or
-density-matrix functionality to the public `rdkit_eth` API. ASE is not part
+density-matrix functionality to the public `eled` API. ASE is not part
 of this path.
 
 This separation is intentional: tblite is useful for validating numerical

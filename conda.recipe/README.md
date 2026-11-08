@@ -3,7 +3,7 @@
 This recipe is retained as packaging scaffolding and has not been validated
 with `conda build` or published. The `xtb` package from conda-forge is an
 unmodified upstream library and therefore cannot satisfy the runtime contract
-of `rdkit-eth` by itself: calculations require the project-built extended
+of `eled` by itself: calculations require the project-built extended
 `libxtb` with basis export, SCC diagnostics and the verified GFN0 state fix.
 
 Use `python tools/install_native.py` from the repository root for the tested

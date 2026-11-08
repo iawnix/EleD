@@ -1,9 +1,10 @@
-# rdkit-eth
+# EleD
 
-**RDKit-native electronic-structure descriptors powered by an extended xTB C API.**
+**EleD (Electronic Descriptors) is an RDKit extension for electronic-structure descriptors, powered by the extended xTB C API.**
 
-`rdkit-eth` keeps RDKit as the molecule, atom-order and conformer model, then
-uses one project-built `libxtb` installation for gas-phase GFN0, GFN1 and GFN2
+`EleD` extends RDKit with electronic-structure descriptors while keeping
+RDKit as the molecule, atom-order and conformer model. It uses one project-built
+`libxtb` installation for gas-phase GFN0, GFN1 and GFN2
 calculations. It exposes the result through Python/ctypes and an optional
 RDKit-style C++/Boost.Python module. Units, atom indexing, provenance and
 missing-value reasons are part of the public API.
@@ -24,7 +25,8 @@ missing-value reasons are part of the public API.
 - checked RDKit conformer preparation with ETKDG, MMFF94/UFF and optional xTB
   gradient optimization;
 - ordered batches, isolated workers, caching and JSONL/CSV reports;
-- RDKit YAeHMOP/EHT helpers kept separate from the xTB model.
+- an optional adapter for comparing RDKit's existing YAeHMOP/EHT results;
+  this is outside the xTB descriptor protocol.
 
 Density and frontier descriptors require the reviewed extended `libxtb` build
 and `keep_overlap=True`. They are extracted from the retained result and do not
@@ -37,16 +39,16 @@ The complete native profile targets Linux x86-64 with Python 3.11 and a
 conda-forge RDKit/Boost toolchain:
 
 ```bash
-git clone https://github.com/iawnix/rdkit-eth.git
-cd rdkit-eth
+git clone https://github.com/iawnix/EleD.git
+cd EleD
 python tools/install_native.py --jobs 6
-conda activate "$PWD/.rdkit-eth/runtime"
-python -m rdkit_eth doctor --check compiled --method GFN2-xTB --keep-overlap
+conda activate "$PWD/.eled/runtime"
+python -m eled doctor --check compiled --method GFN2-xTB --keep-overlap
 ```
 
 This builds the reviewed xTB source, its parameters and the optional
-`rdXTBTools` module in matched prefixes. Keep `.rdkit-eth/runtime` and
-`.rdkit-eth/toolchain` together. See the [installation guide](docs/install.md)
+`rdXTBTools` module in matched prefixes. Keep `.eled/runtime` and
+`.eled/toolchain` together. See the [installation guide](docs/install.md)
 and [offline runtime bundle guide](docs/runtime-bundle.md).
 
 If an extended `libxtb` is already installed beside RDKit, install the Python
@@ -54,7 +56,7 @@ adapter and select the library explicitly when needed:
 
 ```bash
 python -m pip install .
-python -m rdkit_eth doctor --check native --method GFN2-xTB
+python -m eled doctor --check native --method GFN2-xTB
 ```
 
 The ordinary upstream xTB library does not provide the basis-export extension
@@ -69,7 +71,7 @@ the input molecule unchanged.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
@@ -86,7 +88,7 @@ print(features["xtb_homo_ev"], features["xtb_lumo_ev"])
 ### Density and atom-level descriptors
 
 ```python
-from rdkit_eth import (
+from eled import (
     XTBCalculator, calc_xtb_atom_descriptors, calc_xtb_bond_descriptors,
     calc_shell_populations, calc_density_matrix,
 )
@@ -107,7 +109,7 @@ analysis checks `trace(P S)` against the modeled electron count and preserves
 ### Fixed-geometry reactivity
 
 ```python
-from rdkit_eth import run_reactivity, XTBOptions
+from eled import run_reactivity, XTBOptions
 
 report = run_reactivity(
     mol,
@@ -127,7 +129,7 @@ temperature or an excited-state calculation.
 ### Reports and batches
 
 ```python
-from rdkit_eth import run_descriptor_batch, export_descriptor_reports
+from eled import run_descriptor_batch, export_descriptor_reports
 
 reports = run_descriptor_batch(molecules, record_ids=ids, max_workers=4,
                                isolate=True)
@@ -158,11 +160,13 @@ preparation; it is not a transition-state, solvent or excited-state module.
 - [Compiled RDKit interface](docs/rdxtb-tools.md)
 - [Extended xTB build](docs/xtb-patched-build.md)
 - [Frozen EAS protocol](protocol.json)
+- [EAS model benchmark protocol](benchmarks/eas/model_protocol.json)
+- [EAS benchmark tools](benchmarks/eas/README.md)
 
 ### Development
 
 ```bash
-conda activate "$PWD/.rdkit-eth/runtime"
+conda activate "$PWD/.eled/runtime"
 python -m pip install --no-deps --no-build-isolation -e .
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest -q
 ```
@@ -180,7 +184,7 @@ patches retain their upstream licenses; see the bundled license files.
 
 ### 项目简介
 
-`rdkit-eth` 是一个面向 RDKit 的电子结构描述符库。RDKit 负责分子图、原子
+`EleD` 是一个面向 RDKit 的电子结构描述符库。RDKit 负责分子图、原子
 编号和构象；项目构建的扩展版 `libxtb` 负责 GFN0/GFN1/GFN2 气相电子结构
 计算。Python/ctypes 接口和可选的 RDKit 风格 C++/Boost.Python 接口使用同一
 后端。单位、原子索引、计算来源、引擎哈希和缺失值原因都属于公开接口。
@@ -196,7 +200,7 @@ patches retain their upstream licenses; see the bundled license files.
 - 固定几何下的 GFN1/2 ΔSCF、IP、EA、硬度、软度和 Fukui 描述符；
 - 基于 RDKit 的 ETKDG 构象准备、MMFF94/UFF 优化和可选 xTB 梯度优化；
 - 批量计算、隔离 worker、缓存以及 JSONL/CSV 报告；
-- 与 xTB 分开的 RDKit YAeHMOP/EHT 辅助接口。
+- 可选的 RDKit YAeHMOP/EHT 对照适配器；它不属于 xTB 描述符协议。
 
 密度和前线描述符需要扩展版 `libxtb` 以及 `keep_overlap=True`。这些描述符
 直接消费同一次计算保留的结果，不会再次调用量子引擎。项目当前不提供激发态
@@ -207,18 +211,18 @@ patches retain their upstream licenses; see the bundled license files.
 完整原生环境面向 Linux x86-64、Python 3.11 和 conda-forge RDKit/Boost：
 
 ```bash
-git clone https://github.com/iawnix/rdkit-eth.git
-cd rdkit-eth
+git clone https://github.com/iawnix/EleD.git
+cd EleD
 python tools/install_native.py --jobs 6
-conda activate "$PWD/.rdkit-eth/runtime"
-python -m rdkit_eth doctor --check compiled --method GFN2-xTB --keep-overlap
+conda activate "$PWD/.eled/runtime"
+python -m eled doctor --check compiled --method GFN2-xTB --keep-overlap
 ```
 
 已有扩展版 `libxtb` 时，也可以只安装 Python 适配层：
 
 ```bash
 python -m pip install .
-python -m rdkit_eth doctor --check native --method GFN2-xTB
+python -m eled doctor --check native --method GFN2-xTB
 ```
 
 普通上游 xTB 库没有本项目密度分析所需的 basis 导出扩展。每个结果都会记录
@@ -229,7 +233,7 @@ python -m rdkit_eth doctor --check native --method GFN2-xTB
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
@@ -255,7 +259,7 @@ result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 ### 开发与许可
 
 ```bash
-conda activate "$PWD/.rdkit-eth/runtime"
+conda activate "$PWD/.eled/runtime"
 python -m pip install --no-deps --no-build-isolation -e .
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest -q
 ```

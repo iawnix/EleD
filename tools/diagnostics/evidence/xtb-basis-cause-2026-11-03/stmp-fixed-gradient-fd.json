@@ -1,5 +1,5 @@
 {
-  "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/gradient-stmp/libxtb.so",
+  "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/gradient-stmp/libxtb.so",
   "sha256": "08f0b567ddbcaa0f81627d40bc17a51cafabf733e3f98f4a398d881c86bbfc4e",
   "accuracy": 0.0001,
   "step_bohr": 0.0001,

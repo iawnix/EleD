@@ -7,11 +7,11 @@ import time
 import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import (run_xtb_batch, run_descriptor_batch, XTBOptions, XTBCache,
+from eled import (run_xtb_batch, run_descriptor_batch, XTBOptions, XTBCache,
                        XTBTimeoutError, XTBWorkerError, ReactivityJob, run_reactivity_batch)
-from rdkit_eth.workers import isolated_map, validate_execution
-from rdkit_eth.runtime import _extended_libxtb_build, _find_xtb_library
-from rdkit_eth.errors import XTBNativeNotFoundError
+from eled.workers import isolated_map, validate_execution
+from eled.runtime import _extended_libxtb_build, _find_xtb_library
+from eled.errors import XTBNativeNotFoundError
 
 
 def task(value):
@@ -28,7 +28,7 @@ def molecule(smiles='O'):
 
 
 def delayed_reactivity(payload):
-    from rdkit_eth import run_reactivity
+    from eled import run_reactivity
     binary, kwargs = payload
     mol = Chem.Mol(binary)
     if mol.GetNumAtoms() > 3: time.sleep(10)
@@ -107,8 +107,8 @@ def test_reactivity_timeout_checkpoint_retry_and_resume(tmp_path, extended_runti
 @pytest.mark.integration
 def test_completed_rows_commit_before_a_slow_neighbor_finishes(tmp_path, monkeypatch, extended_runtime):
     from concurrent.futures import ThreadPoolExecutor
-    from rdkit_eth import ReactivityCheckpoint
-    import rdkit_eth.workers as workers
+    from eled import ReactivityCheckpoint
+    import eled.workers as workers
     monkeypatch.setattr(workers, 'reactivity', delayed_reactivity)
     checkpoint = ReactivityCheckpoint(tmp_path/'completion.sqlite')
     # Slow input comes first; completion commits must not wait for input ordering.

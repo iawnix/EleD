@@ -7,10 +7,10 @@ from pathlib import Path
 import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import calc_descriptor_report
-from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _SCF_DIAGNOSTICS_PATCH
-from rdkit_eth.scf import scf_record
-from rdkit_eth.errors import XTBEnvironmentError, XTBNativeNotFoundError
+from eled import calc_descriptor_report
+from eled.runtime import _find_xtb_library, _extended_libxtb_build, _SCF_DIAGNOSTICS_PATCH
+from eled.scf import scf_record
+from eled.errors import XTBEnvironmentError, XTBNativeNotFoundError
 
 
 @pytest.fixture
@@ -49,10 +49,10 @@ def test_success_diagnostics_and_compiled_parity(library, method):
         assert 1 <= diagnostic['iterations'] <= 250 and diagnostic['criteria_satisfied']
         assert diagnostic['energy_change_hartree'] < diagnostic['energy_threshold_hartree']
         assert calc_descriptor_report(molecule, result, include_orbitals=False)['quality']['scf_iterations'] == diagnostic['iterations']
-    try: from rdkit_eth import rdXTBTools
+    try: from eled import rdXTBTools
     except ImportError: return  # native coverage still runs without the optional extension
     if not hasattr(rdXTBTools.XTBResults, 'scfIterations'): return
-    from rdkit_eth.electronic_descriptors import _as_result
+    from eled.electronic_descriptors import _as_result
     ok, compiled = rdXTBTools.RunMol(molecule, method=method, xtbLibrary=library)
     assert ok
     compiled_diagnostic = _as_result(compiled).metadata['scf']
@@ -69,7 +69,7 @@ def test_success_diagnostics_and_compiled_parity(library, method):
 
 @pytest.mark.integration
 def test_c_api_copy_failed_reuse_and_gfn0_invalidate(library):
-    from rdkit_eth.backends.native import _NativeXTB
+    from eled.backends.native import _NativeXTB
     api = _NativeXTB(library)
     h = ctypes.c_void_p
     getter = api._bind('xtb_rdkit_getSCFDiagnostics', ctypes.c_int,

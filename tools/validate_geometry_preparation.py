@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 import time
 
-from rdkit_eth import prepare_conformers
-from rdkit_eth.persistence import _implementation_identity
+from eled import prepare_conformers
+from eled.persistence import _implementation_identity
 
 
 def main():

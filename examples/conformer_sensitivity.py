@@ -6,7 +6,7 @@ from pathlib import Path
 
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem
-from rdkit_eth import XTBDiskCache, run_conformer_analysis
+from eled import XTBDiskCache, run_conformer_analysis
 
 
 def main():

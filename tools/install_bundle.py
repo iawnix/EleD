@@ -55,7 +55,7 @@ def install(bundle, destination):
         artifact = runtime / relative
         if not artifact.is_file() or digest(artifact) != expected:
             raise ValueError('unpacked extended xTB artifact differs from the verified build: ' + relative)
-    old_record = runtime/'share/xtb/rdkit-eth/build.json'
+    old_record = runtime/'share/xtb/eled/build.json'
     old_digest = digest(old_record)
     for label in ('toolchain', 'runtime'):
         prefix = destination/label
@@ -82,10 +82,10 @@ def install(bundle, destination):
         if (runtime/name).is_file(): record['files'][name] = digest(runtime/name)
     old_record.write_text(json.dumps(record, indent=2)+'\n')
     reports = []
-    with tempfile.TemporaryDirectory(prefix='rdkit-eth-bundle-check-') as neutral:
+    with tempfile.TemporaryDirectory(prefix='eled-bundle-check-') as neutral:
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
             for interface in ('native', 'compiled'):
-                check = run([runtime/'bin/python', '-I', '-m', 'rdkit_eth', 'doctor', '--check', interface,
+                check = run([runtime/'bin/python', '-I', '-m', 'eled', 'doctor', '--check', interface,
                     '--method', method, '--keep-overlap', '--json',
                     *(['--reactivity'] if method != 'GFN0-xTB' else [])],
                     env=env, cwd=neutral, capture_output=True, text=True)
@@ -97,7 +97,7 @@ def install(bundle, destination):
                     raise ValueError('check imported an external package')
                 reports.append(report)
     dependencies = {}
-    candidates = [library, *runtime.glob('lib/python*/site-packages/rdkit_eth/*.so')]
+    candidates = [library, *runtime.glob('lib/python*/site-packages/eled/*.so')]
     for binary in candidates:
         listing = subprocess.check_output(['ldd', binary], text=True, env=env)
         if 'not found' in listing or any(old in listing for old in manifest['prefixes'].values()):

@@ -1,6 +1,6 @@
 import json
 
-from rdkit_eth.diagnostics import main
+from eled.diagnostics import main
 
 
 def test_inventory_does_not_require_xtb(monkeypatch, tmp_path, capsys):
@@ -9,7 +9,7 @@ def test_inventory_does_not_require_xtb(monkeypatch, tmp_path, capsys):
     report = json.loads(capsys.readouterr().out)
     assert report["status"] == "inventory"
     assert report["compiled_module_import_checked"] is False
-    assert report["package_path"].endswith("rdkit_eth/__init__.py")
+    assert report["package_path"].endswith("eled/__init__.py")
 
 
 def test_explicit_broken_library_reports_failure_without_fallback(tmp_path, capsys):

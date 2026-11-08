@@ -1,4 +1,4 @@
-# Installing rdkit-eth 0.11
+# Installing EleD 0.11
 
 The standard profile uses **one extended libxtb for GFN0/1/2 and all current
 descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux
@@ -10,16 +10,16 @@ Install conda, clone this repository, then run from its root:
 
 ```bash
 python tools/install_native.py --jobs 6
-conda activate "$PWD/.rdkit-eth/runtime"
-python -m rdkit_eth doctor --check compiled --keep-overlap
+conda activate "$PWD/.eled/runtime"
+python -m eled doctor --check compiled --keep-overlap
 python examples/electronic_descriptors.py --populations
 ```
 
 The installer creates two dedicated prefixes from the supplied exact locks:
 
-- `.rdkit-eth/runtime`: matched RDKit/Boost/Python SDK, the extended shared
+- `.eled/runtime`: matched RDKit/Boost/Python SDK, the extended shared
   libxtb and parameters, and the installed `rdXTBTools` wheel.
-- `.rdkit-eth/toolchain`: Fortran compiler, mctc-lib and numerical dependencies.
+- `.eled/toolchain`: Fortran compiler, mctc-lib and numerical dependencies.
 
 It fetches the pinned xTB revision containing upstream PR #1490, applies
 our basis-export and SCC-diagnostics patches, runs upstream and installed-library regressions, builds
@@ -30,7 +30,7 @@ or `XTBPATH`. Both interfaces discover the same library in the runtime prefix.
 The installer also runs the in-process-vs-CLI geometry optimization comparison
 on water and ethanol and stores its numerical report in `installation.json`.
 
-Artifacts are retained in `.rdkit-eth/artifacts/build-*/`; `installation.json`
+Artifacts are retained in `.eled/artifacts/build-*/`; `installation.json`
 records wheel/source identity, the installed calculation checks and the
 optimization comparison. No
 upload is performed. Use `--directory /absolute/path` to select another root.
@@ -59,8 +59,8 @@ Since 0.9.1, a venv created from the standard runtime with
 This supports isolated research dependencies without modifying the locked runtime:
 
 ```bash
-.rdkit-eth/runtime/bin/python -m venv --system-site-packages build/research-env
-build/research-env/bin/python -I -m rdkit_eth doctor --check native --keep-overlap
+.eled/runtime/bin/python -m venv --system-site-packages build/research-env
+build/research-env/bin/python -I -m eled doctor --check native --keep-overlap
 ```
 
 Library discovery checks the venv, then its base Python prefix, then environment
@@ -73,7 +73,7 @@ back. The base runtime must already have been installed.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import XTBCalculator, rdXTBTools, calc_orbital_populations
+from eled import XTBCalculator, rdXTBTools, calc_orbital_populations
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
@@ -147,18 +147,18 @@ For engine-only development, see [the source-build guide](xtb-patched-build.md).
 To build the adapter against an already verified installation:
 
 ```bash
-RDKIT_ETH_BUILD_RDXTB=1 RDXTB_XTB_PREFIX=/path/to/extended-xtb \
+ELED_BUILD_RDXTB=1 RDXTB_XTB_PREFIX=/path/to/extended-xtb \
   python -m pip install --no-deps --no-build-isolation .
 ```
 
 Run this in the matched RDKit SDK. The selected prefix must contain the
-project-built extended library and its `share/xtb/rdkit-eth/build.json`
+project-built extended library and its `share/xtb/eled/build.json`
 manifest. An upstream xTB 6.7.1 library, even when loadable, is rejected
 because it lacks the project ABI extensions.
 
 ## Diagnostics and release artifacts
 
-`python -m rdkit_eth doctor --check native` or `--check compiled` runs a water
+`python -m eled doctor --check native` or `--check compiled` runs a water
 calculation. Add `--method GFN0-xTB --keep-overlap` to check the full capability.
 Add `--reactivity` with GFN1/2 to check the three charge states.
 `--json` records the actual library, parameters and descriptor checks. Missing

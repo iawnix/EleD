@@ -1,8 +1,8 @@
-"""Run after installing rdkit-eth in an environment containing RDKit and xTB."""
+"""Run after installing eled in an environment containing RDKit and xTB."""
 import json
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import (
+from eled import (
     XTBCache, XTBOptions, run_xtb_batch, annotate_mol, calc_xtb_descriptors,
 )
 

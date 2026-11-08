@@ -12,23 +12,23 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import (
+from eled import (
     run_xtb_batch, XTBCache, DescriptorUnavailableError,
     calc_orbital_populations, calc_frontier_descriptors, calc_xtb_bond_descriptors, annotate_mol,
     calc_density_descriptors,
 )
-from rdkit_eth.runtime import _find_xtb_library, _native_basis_build, _BASIS_EXPORT_PATCH
+from eled.runtime import _find_xtb_library, _native_basis_build, _BASIS_EXPORT_PATCH
 
 CASES = json.loads((Path(__file__).parent/'data/orbital_alignment_cases.json').read_text())['cases']
 
 
 @pytest.fixture
 def library():
-    from rdkit_eth import XTBNativeNotFoundError
+    from eled import XTBNativeNotFoundError
     try: path = _find_xtb_library()
     except XTBNativeNotFoundError: pytest.skip('libxtb not installed')
     if not _native_basis_build(path):
-        if os.environ.get('RDKIT_ETH_EXPECT_BASIS') == '1': pytest.fail('verified native basis extension required')
+        if os.environ.get('ELED_EXPECT_BASIS') == '1': pytest.fail('verified native basis extension required')
         pytest.skip('native basis extension unavailable')
     return path
 
@@ -70,7 +70,7 @@ def test_native_basis_on_frozen_corpus(method,case,library):
 @pytest.mark.parametrize('method',['gfn0','gfn1','gfn2'])
 @pytest.mark.parametrize('smiles',['CCO','[CH3]','[NH4+]'])
 def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
-    rdXTBTools = pytest.importorskip("rdkit_eth.rdXTBTools")
+    rdXTBTools = pytest.importorskip("eled.rdXTBTools")
     m=molecule(smiles)
     r=calculate_xtb(m,method=method,xtb_library=library,keep_overlap=True)
     ok,compiled=rdXTBTools.RunMol(m,method=method,xtbLibrary=library,keepOverlap=True)
@@ -143,7 +143,7 @@ def test_benzene_degenerate_subspaces(library):
 @pytest.mark.parametrize('damage',['missing','capability','patch','hash','binary','version','malformed'])
 def test_capability_requires_exact_verified_binary(tmp_path,damage):
     lib=tmp_path/'lib/libxtb.so'; lib.parent.mkdir(); lib.write_bytes(b'test-binary')
-    manifest=tmp_path/'share/xtb/rdkit-eth/build.json'; manifest.parent.mkdir(parents=True)
+    manifest=tmp_path/'share/xtb/eled/build.json'; manifest.parent.mkdir(parents=True)
     record={'schema_version':1,'capabilities':{'orbital_basis_api':1},
             'source':{'commit':'test','basis_extension':{'api_version':1,'patch_sha256':_BASIS_EXPORT_PATCH}},
             'files':{'lib/libxtb.so':hashlib.sha256(lib.read_bytes()).hexdigest()}}
@@ -162,14 +162,14 @@ def test_capability_requires_exact_verified_binary(tmp_path,damage):
 
 @pytest.mark.integration
 def test_standard_library_basic_support_and_missing_capability():
-    from rdkit_eth.runtime import _find_xtb_library
-    from rdkit_eth import XTBNativeNotFoundError, XTBEnvironmentError
+    from eled.runtime import _find_xtb_library
+    from eled import XTBNativeNotFoundError, XTBEnvironmentError
     try: library=_find_xtb_library()
     except XTBNativeNotFoundError: pytest.skip('libxtb not installed')
     if _native_basis_build(library): pytest.skip('requires an unextended library')
     m=molecule()
     with pytest.raises(XTBEnvironmentError,match='extended libxtb'):
         calculate_xtb(m,xtb_library=library)
-    rdXTBTools = pytest.importorskip("rdkit_eth.rdXTBTools")
+    rdXTBTools = pytest.importorskip("eled.rdXTBTools")
     with pytest.raises(ValueError,match='extended libxtb'):
         rdXTBTools.RunMol(m,xtbLibrary=library)

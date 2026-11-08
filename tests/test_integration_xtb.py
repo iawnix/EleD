@@ -10,9 +10,9 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import annotate_mol, run_xtb_batch, XTBCache
-from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
-from rdkit_eth.errors import XTBNativeNotFoundError
+from eled import annotate_mol, run_xtb_batch, XTBCache
+from eled.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
+from eled.errors import XTBNativeNotFoundError
 
 pytestmark = pytest.mark.integration
 
@@ -86,10 +86,10 @@ def test_fixed_water_matches_archived_reference(library, no_executable):
 
 
 def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable):
-    from rdkit_eth.backends.native import run_xtb_native
+    from eled.backends.native import run_xtb_native
     mol = molecule('CCO')
     verified = _native_gfn0_build(library)
-    expected = os.environ.get('RDKIT_ETH_EXPECT_NATIVE_GFN0')
+    expected = os.environ.get('ELED_EXPECT_NATIVE_GFN0')
     if expected is not None:
         assert bool(verified) == (expected == '1')
     before = calculate_xtb(mol, xtb_library=library)
@@ -114,10 +114,10 @@ def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable)
 def test_native_batch_and_cache_without_executable(method, library, no_executable):
     if method == 'GFN0-xTB' and not _native_gfn0_build(library):
         pytest.skip('native GFN0 needs a verified patched installation')
-    from rdkit_eth.backends.native import run_xtb_native
+    from eled.backends.native import run_xtb_native
     mol = molecule('CCO')
     cache = XTBCache()
-    with patch('rdkit_eth.xtb.run_xtb_native', wraps=run_xtb_native) as calculate:
+    with patch('eled.xtb.run_xtb_native', wraps=run_xtb_native) as calculate:
         results = run_xtb_batch([mol, mol], method=method, cache=cache, xtb_library=library)
     assert calculate.call_count == 1
     assert len(cache) == 1

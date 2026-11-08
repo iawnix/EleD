@@ -6,7 +6,7 @@
 ## 单点描述符
 
 ```python
-from rdkit_eth import (
+from eled import (
     XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors,
 )
@@ -31,7 +31,7 @@ HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不�
 ## 密度和 shell 描述符
 
 ```python
-from rdkit_eth import XTBCalculator, calc_shell_populations, calc_density_matrix
+from eled import XTBCalculator, calc_shell_populations, calc_density_matrix
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 shells = calc_shell_populations(result)
@@ -58,7 +58,7 @@ P = C · diag(occupation) · Cᵀ
 ## 前线、Mayer 和 π 描述符
 
 ```python
-from rdkit_eth import (
+from eled import (
     calc_frontier_descriptors, calc_mayer_bond_descriptors,
     calc_frontier_bond_descriptors, calc_pi_descriptors,
 )
@@ -76,7 +76,7 @@ pi = calc_pi_descriptors(mol, result)
 ## 反应性描述符
 
 ```python
-from rdkit_eth import run_reactivity
+from eled import run_reactivity
 
 report = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
 ```

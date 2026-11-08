@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from rdkit_eth import runtime
-from rdkit_eth.errors import XTBNativeNotFoundError
+from eled import runtime
+from eled.errors import XTBNativeNotFoundError
 
 
 @pytest.fixture

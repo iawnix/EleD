@@ -35,4 +35,4 @@ fi
 
 echo "Installed xTB shared libraries:"
 printf '  %s\n' "${shared_libraries[@]}"
-echo "Use XTB_LIBRARY=${shared_libraries[0]} with rdkit_eth's native backend."
+echo "Use XTB_LIBRARY=${shared_libraries[0]} with eled's native backend."

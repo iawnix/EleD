@@ -3,11 +3,11 @@
 `prepare_conformers` builds an explicit-H RDKit molecule plus an auditable
 preparation report. It uses RDKit embedding and MMFF94/UFF by default. With
 `optimize="xTB"`, it can run the separate gradient optimizer from
-`rdkit_eth.optimize_xtb` after embedding. This is a workflow around RDKit,
+`eled.optimize_xtb` after embedding. This is a workflow around RDKit,
 not a new embedding algorithm.
 
 ```python
-from rdkit_eth import prepare_conformers, XTBCalculator
+from eled import prepare_conformers, XTBCalculator
 
 prepared = prepare_conformers(
     'C[C@H](O)C(=O)O', num_conformers=8, random_seed=42,

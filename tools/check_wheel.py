@@ -34,7 +34,7 @@ def main():
     env = os.environ.copy()
     env.pop("PYTHONPATH", None)
     env.pop("PYTHONHOME", None)
-    with tempfile.TemporaryDirectory(prefix="rdkit-eth-wheel-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="eled-wheel-") as temporary:
         directory = Path(temporary)
         venv.EnvBuilder(with_pip=True, system_site_packages=True).create(directory / "venv")
         python = directory / "venv/bin/python"
@@ -43,7 +43,7 @@ def main():
         subprocess.run([str(python), "-I", "-m", "pip", "check"], cwd=directory, env=env, check=True)
 
         def doctor(extra):
-            completed = subprocess.run([str(python), "-I", "-m", "rdkit_eth", "doctor", "--json", *extra],
+            completed = subprocess.run([str(python), "-I", "-m", "eled", "doctor", "--json", *extra],
                                        cwd=directory, env=env, capture_output=True, text=True)
             report = json.loads(completed.stdout)
             if completed.returncode:
@@ -56,7 +56,7 @@ def main():
         if bool(inventory["compiled_module_path"]) != (args.kind == "compiled"):
             raise RuntimeError("installed wheel does not have the requested module variant")
         # Check the installed console script too, from the neutral directory.
-        subprocess.run([str(directory / "venv/bin/rdkit-eth"), "doctor"], cwd=directory, env=env, check=True)
+        subprocess.run([str(directory / "venv/bin/eled"), "doctor"], cwd=directory, env=env, check=True)
         checks = []
         for backend in args.check:
             extra = ["--check", backend, "--method", args.method]

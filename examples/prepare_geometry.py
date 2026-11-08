@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from rdkit import Chem
-from rdkit_eth import XTBCalculator, prepare_conformers
+from eled import XTBCalculator, prepare_conformers
 
 
 def main():

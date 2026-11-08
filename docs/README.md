@@ -1,10 +1,13 @@
 # Documentation / 文档
 
-`rdkit-eth` keeps the detailed API references in English and provides Chinese
+`EleD` (Electronic Descriptors) is an RDKit extension for electronic-structure
+descriptors. This
+documentation keeps the detailed API references in English and provides Chinese
 translations for the main user workflows. Code names, field names and units are
 kept identical in both languages.
 
-`rdkit-eth` 的详细 API 文档以英文为主，同时为主要使用流程提供中文页面。
+`EleD` 是面向 RDKit 的电子结构描述符扩展。详细 API 文档以英文为主，
+同时为主要使用流程提供中文页面。
 两种语言中的代码接口、字段名和单位保持一致。
 
 ## Start here / 从这里开始
@@ -16,7 +19,10 @@ kept identical in both languages.
 | Reports and reactivity / 报告与反应性 | [descriptor-reports.md](descriptor-reports.md) | [zh-CN/descriptor-reports.md](zh-CN/descriptor-reports.md) |
 | Descriptor catalog / 描述符目录 | [descriptor-catalog.md](descriptor-catalog.md) | [zh-CN/descriptor-catalog.md](zh-CN/descriptor-catalog.md) |
 | Density descriptors / 密度描述符 | [density-descriptors.md](density-descriptors.md) | [zh-CN/density-descriptors.md](zh-CN/density-descriptors.md) |
+| YAeHMOP/EHT comparison / YAeHMOP/EHT 对照 | [eht-comparison.md](eht-comparison.md) | [zh-CN/eht-comparison.md](zh-CN/eht-comparison.md) |
 | EAS research plan / EAS 研究方案 | [research-plan-eas-en.md](research-plan-eas-en.md) | [zh-CN/research-plan-eas.md](zh-CN/research-plan-eas.md) |
+| EAS protocol audit / EAS 协议审计 | [protocol-audit.md](protocol-audit.md) | English reference |
+| EAS benchmark layer / EAS benchmark 层 | [../benchmarks/eas/README.md](../benchmarks/eas/README.md) | English reference |
 | Project positioning / 项目定位 | [project-positioning.md](project-positioning.md) | [zh-CN/project-positioning.md](zh-CN/project-positioning.md) |
 | C++ interface / C++ 接口 | [rdxtb-tools.md](rdxtb-tools.md) | English reference |
 | Extended xTB build / 扩展版 xTB 编译 | [xtb-patched-build.md](xtb-patched-build.md) | English reference |

@@ -8,12 +8,12 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import (XTBOptions, XTBResult, XTBRunError, XTBEnvironmentError,
+from eled import (XTBOptions, XTBResult, XTBRunError, XTBEnvironmentError,
                        XTBCacheError, XTBDiskCache, run_conformer_analysis,
                        conformer_descriptor_columns)
-from rdkit_eth import conformers
-from rdkit_eth.input import _input_metadata, _xyz_from_mol
-from rdkit_eth.options import calculation_settings
+from eled import conformers
+from eled.input import _input_metadata, _xyz_from_mol
+from eled.options import calculation_settings
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def synthetic(monkeypatch):
         conf = Chem.Conformer(3); conf.Set3D(True); conf.SetId(identifier)
         for i, xyz in enumerate(((0, 0, 0), (1+shift, 0, 0), (0, 1, 0))): conf.SetAtomPosition(i, xyz)
         mol.AddConformer(conf, assignId=False)
-    monkeypatch.setattr('rdkit_eth.batch._resolve_options', lambda options: options)
+    monkeypatch.setattr('eled.batch._resolve_options', lambda options: options)
     def calculate(self, molecule, **kwargs):
         identifier = kwargs.get('conf_id', self.options.conf_id)
         h = {3: -3., 8: -2., 12: -1.}[identifier]
@@ -118,7 +118,7 @@ def test_cache_errors_are_fatal(synthetic, monkeypatch):
 
 def test_missing_gfn0_parameters_are_environment_errors(monkeypatch):
     from pathlib import Path
-    from rdkit_eth.runtime import _parameter_file
+    from eled.runtime import _parameter_file
     monkeypatch.setattr(Path, 'is_file', lambda self: False)
     with pytest.raises(XTBEnvironmentError, match='param_gfn0'):
         _parameter_file('GFN0-xTB', '/missing/lib/libxtb.so')
@@ -133,7 +133,7 @@ def test_charged_dipoles_and_cartesian_fields_excluded():
 @pytest.mark.integration
 @pytest.mark.parametrize('smiles', ['O', '[NH4+]'])
 def test_real_engine_rigid_transform_and_disk_cache(smiles, tmp_path, monkeypatch):
-    if os.environ.get('RDKIT_ETH_EXPECT_BASIS') != '1': pytest.skip('extended libxtb required')
+    if os.environ.get('ELED_EXPECT_BASIS') != '1': pytest.skip('extended libxtb required')
     mol = Chem.AddHs(Chem.MolFromSmiles(smiles)); assert AllChem.EmbedMolecule(mol, randomSeed=49) == 0
     conf = Chem.Conformer(mol.GetConformer()); conf.SetId(7)
     xyz = conf.GetPositions(); transformed = xyz @ np.array([[0., -1., 0.], [1., 0., 0.], [0., 0., 1.]]) + [3., -2., 5.]

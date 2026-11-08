@@ -6,7 +6,7 @@ checkpoints. It uses the existing libxtb protocol (300 K and reference copies by
 default). It does not optimize structures or search spin states.
 
 ```python
-from rdkit_eth import (
+from eled import (
     ReactivityJob, XTBOptions, XTBDiskCache, ReactivityCheckpoint,
     run_reactivity_batch, export_descriptor_reports,
 )
@@ -120,8 +120,8 @@ python examples/reactivity_batch.py --output build/my-dataset
 python examples/reactivity_batch.py --output build/my-dataset  # resumes
 python tools/validate_reactivity_dataset.py --output build/corpus-check
 python tools/compare_fukui_cli.py \
-  --executable .rdkit-eth/runtime/bin/xtb \
-  --library .rdkit-eth/runtime/lib/libxtb.so \
+  --executable .eled/runtime/bin/xtb \
+  --library .eled/runtime/lib/libxtb.so \
   --cases tests/data/reactivity_cases.json --output build/cli-check
 ```
 

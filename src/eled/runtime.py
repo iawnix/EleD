@@ -32,7 +32,7 @@ def _native_gfn0_build(path: str) -> dict | None:
     try:
         library = Path(path).resolve(strict=True)
         prefix = library.parent.parent
-        record = prefix / 'share/xtb/rdkit-eth/build.json'
+        record = prefix / 'share/xtb/eled/build.json'
         data = json.loads(record.read_text())
         if not isinstance(data, dict) or data.get('schema_version') != 1:
             return None
@@ -68,7 +68,7 @@ _SCF_DIAGNOSTICS_PATCH = 'fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911
 def _native_diagnostics_build(path):
     try:
         if not _native_gfn0_build(path): return False
-        record = Path(path).resolve().parent.parent/'share/xtb/rdkit-eth/build.json'
+        record = Path(path).resolve().parent.parent/'share/xtb/eled/build.json'
         data = json.loads(record.read_text())
         extension = data['source']['diagnostics_extension']
         return (data['capabilities']['scf_diagnostics_api'] == extension['api_version'] == 1 and
@@ -98,7 +98,7 @@ def _require_extended_libxtb(path: str) -> dict:
     if build is None:
         from .errors import XTBEnvironmentError
         raise XTBEnvironmentError(
-            'rdkit-eth requires the reviewed extended libxtb build with '
+            'eled requires the reviewed extended libxtb build with '
             'basis-export and SCC-diagnostics APIs; run tools/install_native.py '
             'or tools/build_patched_xtb.py'
         )
@@ -110,7 +110,7 @@ def _native_basis_build(path: str) -> dict | None:
     try:
         library = Path(path).resolve(strict=True)
         prefix = library.parent.parent
-        record = prefix / 'share/xtb/rdkit-eth/build.json'
+        record = prefix / 'share/xtb/eled/build.json'
         data = json.loads(record.read_text())
         extension = data['source']['basis_extension']
         if (data['schema_version'] != 1 or data['capabilities']['orbital_basis_api'] != 1

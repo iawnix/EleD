@@ -28,7 +28,7 @@ provenance record; molecule-bound helpers reject missing provenance.
 ## Molecular, atomic and fragment descriptors
 
 ```python
-from rdkit_eth import (
+from eled import (
     XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors, annotate_mol,
 )
@@ -116,7 +116,7 @@ separate alpha/beta densities and spin populations are not supplied.
 ## Löwdin and Mulliken populations
 
 ```python
-from rdkit_eth import calc_orbital_populations
+from eled import calc_orbital_populations
 
 lowdin = calc_orbital_populations(result)
 mulliken = calc_orbital_populations(result, scheme="mulliken")
@@ -151,7 +151,7 @@ data raises `ValueError`. Descriptor extraction never invokes another engine.
 ## Frontier subspaces and spatial proxies
 
 ```python
-from rdkit_eth import calc_frontier_descriptors
+from eled import calc_frontier_descriptors
 
 frontier = calc_frontier_descriptors(
     mol, result,
@@ -206,7 +206,7 @@ failed SCF, Hessian invalidation and recovery. No tblite or ASE is imported.
 ## Shell, Mayer, frontier-bond and π descriptors
 
 ```python
-from rdkit_eth import calc_density_descriptors
+from eled import calc_density_descriptors
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 density = calc_density_descriptors(mol, result)

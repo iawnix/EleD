@@ -1,15 +1,15 @@
 {
-  "wheel": "/home/iaw/project/rdkit_eth/dist/0.4.0/pure/rdkit_eth-0.4.0-py3-none-any.whl",
+  "wheel": "/home/iaw/project/eled/dist/0.4.0/pure/eled-0.4.0-py3-none-any.whl",
   "kind": "pure",
   "inventory": {
     "schema_version": 1,
-    "python": "/tmp/rdkit-eth-wheel-49nd2o1o/venv/bin/python",
+    "python": "/tmp/eled-wheel-49nd2o1o/venv/bin/python",
     "python_version": "3.11.18",
     "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-    "package_path": "/tmp/rdkit-eth-wheel-49nd2o1o/venv/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-    "rdkit_path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+    "package_path": "/tmp/eled-wheel-49nd2o1o/venv/lib/python3.11/site-packages/eled/__init__.py",
+    "rdkit_path": "/home/iaw/project/eled/build/install-validation/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
     "versions": {
-      "rdkit-eth": "0.4.0",
+      "eled": "0.4.0",
       "rdkit": "2026.9.1",
       "numpy": "2.4.6"
     },
@@ -20,13 +20,13 @@
   "checks": [
     {
       "schema_version": 1,
-      "python": "/tmp/rdkit-eth-wheel-49nd2o1o/venv/bin/python",
+      "python": "/tmp/eled-wheel-49nd2o1o/venv/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/tmp/rdkit-eth-wheel-49nd2o1o/venv/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/build/install-validation/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/tmp/eled-wheel-49nd2o1o/venv/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/build/install-validation/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.4.0",
+        "eled": "0.4.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
@@ -42,11 +42,11 @@
         "charge_sum_e": 1.887379141862766e-15,
         "engine": {
           "backend": "native",
-          "path": "/home/iaw/project/rdkit_eth/.xtb-native/lib/libxtb.so.6.7.1",
+          "path": "/home/iaw/project/eled/.xtb-native/lib/libxtb.so.6.7.1",
           "sha256": "6a8e2c7f01c6c95e29096369fb6130e97aefa3c2bcbf91982ede695c4aa48428",
           "version": null,
           "native_gfn0": {
-            "manifest": "/home/iaw/project/rdkit_eth/.xtb-native/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.xtb-native/share/xtb/eled/build.json",
             "manifest_sha256": "e71889581c086c0288d2468d59bc991349c41af6aec73ba4b2c3e875f3712e22",
             "library_sha256": "6a8e2c7f01c6c95e29096369fb6130e97aefa3c2bcbf91982ede695c4aa48428",
             "patch_sha256": "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859",
@@ -56,7 +56,7 @@
             "api_version": 1,
             "library_sha256": "6a8e2c7f01c6c95e29096369fb6130e97aefa3c2bcbf91982ede695c4aa48428",
             "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-            "manifest": "/home/iaw/project/rdkit_eth/.xtb-native/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.xtb-native/share/xtb/eled/build.json",
             "manifest_sha256": "e71889581c086c0288d2468d59bc991349c41af6aec73ba4b2c3e875f3712e22",
             "source_commit": "a9040512dd7c15793472aa20f9647d36a266f7cd"
           }

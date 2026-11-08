@@ -2,18 +2,18 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from rdkit_eth.descriptors import calc_eht_descriptors
-from rdkit_eth.xtb import _frontier_energies
+from eled.descriptors import calc_eht_descriptors
+from eled.xtb import _frontier_energies
 
 
 class AdapterTests(unittest.TestCase):
     def test_unknown_native_api_is_rejected_before_binding_calculations(self):
-        from rdkit_eth.backends.native import _NativeXTB
-        from rdkit_eth.errors import XTBNativeNotFoundError
+        from eled.backends.native import _NativeXTB
+        from eled.errors import XTBNativeNotFoundError
         # Deliberately expose no calculator functions: an unknown ABI must
         # be rejected on its version before those functions are bound/used.
         library = SimpleNamespace(xtb_getAPIVersion=lambda: 30000)
-        with patch('rdkit_eth.backends.native.ctypes.CDLL', return_value=library):
+        with patch('eled.backends.native.ctypes.CDLL', return_value=library):
             with self.assertRaisesRegex(XTBNativeNotFoundError, 'version 30000'):
                 _NativeXTB('future-library')
 

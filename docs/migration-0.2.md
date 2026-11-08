@@ -25,7 +25,7 @@ GFN0 requires the verified patched xTB build; an official/unverified library
 is rejected before GFN0 initialization. Install using [these instructions](install.md).
 
 ```python
-from rdkit_eth import run_xtb
+from eled import run_xtb
 result = run_xtb(mol, xtb_library="/absolute/prefix/lib/libxtb.so")
 print(result.total_energy_hartree)
 print(result.metadata["engine"])
@@ -35,7 +35,7 @@ The conda xTB dependency and the upstream source builder still contain an
 executable as part of that distribution. The adapter does not launch it for
 calculations. Upstream diagnostic scripts and archived 0.1 evidence may still
 refer to executable runs; those records describe historical experiments.
-The `rdkit-eth doctor` command remains an installation diagnostic utility.
+The `eled doctor` command remains an installation diagnostic utility.
 
 Existing `dist/0.1.0` files are historical artifacts and still contain the old
 backend. Use the 0.2 source or newly built 0.2 wheels. Compiled wheels continue

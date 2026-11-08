@@ -10,7 +10,7 @@ extended library's overlap/basis data, as do descriptor reports.
 import json
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import run_conformer_analysis, XTBDiskCache
+from eled import run_conformer_analysis, XTBDiskCache
 
 mol = Chem.AddHs(Chem.MolFromSmiles("OCCO"))
 params = AllChem.ETKDGv3()

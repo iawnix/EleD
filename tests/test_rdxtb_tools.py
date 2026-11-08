@@ -14,15 +14,15 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdEHTTools
 
-from rdkit_eth.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
+from eled.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
 
-if importlib.util.find_spec('rdkit_eth.rdXTBTools') is None:
-    if os.environ.get('RDKIT_ETH_REQUIRE_RDXTB') == '1':
+if importlib.util.find_spec('eled.rdXTBTools') is None:
+    if os.environ.get('ELED_REQUIRE_RDXTB') == '1':
         raise RuntimeError('The compiled rdXTBTools module is required for this run')
     pytest.skip('optional rdXTBTools extension is not built', allow_module_level=True)
 
 # A present but broken extension must fail collection, never silently skip.
-from rdkit_eth import rdXTBTools
+from eled import rdXTBTools
 
 pytestmark = pytest.mark.integration
 
@@ -178,8 +178,8 @@ def test_scf_failure_is_inspectable_and_recovers(library):
 
 
 def test_native_calculation_does_not_delegate_to_python_backends(library, monkeypatch):
-    import rdkit_eth.backends.native as native
-    import rdkit_eth.xtb as adapter
+    import eled.backends.native as native
+    import eled.xtb as adapter
     def forbidden(*args, **kwargs):
         pytest.fail('compiled calculations must call libxtb directly')
     monkeypatch.setattr(native._NativeXTB, '__init__', forbidden)
@@ -189,7 +189,7 @@ def test_native_calculation_does_not_delegate_to_python_backends(library, monkey
 
 
 def test_mixed_threads_share_lock_and_preserve_method_state(library):
-    from rdkit_eth.backends.native import _native_lock
+    from eled.backends.native import _native_lock
     mol = molecule()
     ok, baseline = rdXTBTools.RunMol(mol, xtbLibrary=library)
     assert ok
@@ -226,7 +226,7 @@ def test_gfn0_verification_rejects_missing_or_mismatched_manifest(library, tmp_p
     copied = tmp_path / 'lib/libxtb.so'
     copied.parent.mkdir()
     shutil.copy2(library, copied)
-    manifest = tmp_path / 'share/xtb/rdkit-eth/build.json'
+    manifest = tmp_path / 'share/xtb/eled/build.json'
     manifest.parent.mkdir(parents=True)
     record = json.loads(Path(evidence['manifest']).read_text())
     mol = molecule('O')
@@ -250,7 +250,7 @@ def test_gfn0_verification_rejects_missing_or_mismatched_manifest(library, tmp_p
 
 
 def test_common_descriptors_accept_compiled_results(library):
-    from rdkit_eth import (calc_xtb_descriptors, calc_xtb_atom_descriptors,
+    from eled import (calc_xtb_descriptors, calc_xtb_atom_descriptors,
                            calc_xtb_fragment_descriptors, calc_orbital_populations,
                            DescriptorUnavailableError)
     mol = molecule()

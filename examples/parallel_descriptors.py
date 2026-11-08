@@ -1,5 +1,5 @@
 """Run with OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 in the installed runtime."""
-from rdkit_eth import prepare_conformers, run_descriptor_batch
+from eled import prepare_conformers, run_descriptor_batch
 
 
 def main():

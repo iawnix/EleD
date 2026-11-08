@@ -4,7 +4,7 @@
 生成显式氢、3D 坐标并记录失败原因。它不是新的嵌入算法。
 
 ```python
-from rdkit_eth import prepare_conformers
+from eled import prepare_conformers
 
 prepared = prepare_conformers(
     "C[C@H](O)C(=O)O",

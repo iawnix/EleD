@@ -1,5 +1,5 @@
 {
-  "library": "/tmp/rdkit-xtb-check/lib/libxtb.so.6.7.1",
+  "library": "/tmp/eled-check/lib/libxtb.so.6.7.1",
   "sha256": "c405797f34ed96470f23158406e6d8a8e102681d3c3cbbaea16692f514f22853",
   "accuracy": 0.0001,
   "step_bohr": 0.0001,

@@ -26,7 +26,7 @@ jobs:
     env:
       OMP_NUM_THREADS: '1'
       OPENBLAS_NUM_THREADS: '1'
-      RDKIT_ETH_REQUIRE_RDXTB: '1'
+      ELED_REQUIRE_RDXTB: '1'
     defaults:
       run:
         shell: bash -el {0}
@@ -45,11 +45,11 @@ jobs:
           echo "RDXTB_XTB_PREFIX=$PWD/.xtb-rdkit" >> "$GITHUB_ENV"
           echo "XTB_LIBRARY=$PWD/.xtb-rdkit/lib/libxtb.so" >> "$GITHUB_ENV"
           echo "XTBPATH=$PWD/.xtb-rdkit/share/xtb" >> "$GITHUB_ENV"
-          echo 'RDKIT_ETH_EXPECT_BASIS=1' >> "$GITHUB_ENV"
-          echo 'RDKIT_ETH_EXPECT_NATIVE_GFN0=1' >> "$GITHUB_ENV"
+          echo 'ELED_EXPECT_BASIS=1' >> "$GITHUB_ENV"
+          echo 'ELED_EXPECT_NATIVE_GFN0=1' >> "$GITHUB_ENV"
       - name: Install compiled adapter and locked build tools
         run: |
-          RDKIT_ETH_BUILD_RDXTB=1 conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python -m pip install --no-deps --no-build-isolation -e .
+          ELED_BUILD_RDXTB=1 conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python -m pip install --no-deps --no-build-isolation -e .
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python -m pip install --no-deps --require-hashes -r locks/linux-64/release-tools-py311.txt
       - name: Verify Python interfaces
         run: |
@@ -78,5 +78,5 @@ jobs:
           include-hidden-files: true
           path: |
             dist/0.11.0/
-            .xtb-rdkit/share/xtb/rdkit-eth/build.json
-            .xtb-rdkit/share/xtb/rdkit-eth/ctest.log
+            .xtb-rdkit/share/xtb/eled/build.json
+            .xtb-rdkit/share/xtb/eled/ctest.log

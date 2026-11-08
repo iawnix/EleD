@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from rdkit_eth.orbital_alignment import (
+from eled.orbital_alignment import (
     compare_orbitals, libxtb_to_tblite_rows, validate_tblite_basis,
 )
 

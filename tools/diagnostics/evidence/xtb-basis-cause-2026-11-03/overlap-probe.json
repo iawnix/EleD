@@ -3,7 +3,7 @@
   "cases": [
     {
       "name": "water",
-      "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/tag-release/libxtb.so",
+      "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/tag-release/libxtb.so",
       "library_sha256": "eded1d7ebbf00b8f67615ef42b30b533b0689f92e780bf33a8e9936b911c8867",
       "coefficient_condition_number": 2.3133370677061795,
       "same_atom_overlap_difference": 8.504010980419317e-10,
@@ -97,7 +97,7 @@
     },
     {
       "name": "bromomethane",
-      "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/tag-release/libxtb.so",
+      "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/tag-release/libxtb.so",
       "library_sha256": "eded1d7ebbf00b8f67615ef42b30b533b0689f92e780bf33a8e9936b911c8867",
       "coefficient_condition_number": 2.770823917589522,
       "same_atom_overlap_difference": 2.079644060293262e-07,
@@ -301,7 +301,7 @@
     },
     {
       "name": "iodomethane",
-      "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/tag-release/libxtb.so",
+      "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/tag-release/libxtb.so",
       "library_sha256": "eded1d7ebbf00b8f67615ef42b30b533b0689f92e780bf33a8e9936b911c8867",
       "coefficient_condition_number": 2.7720745001753855,
       "same_atom_overlap_difference": 8.504012101372215e-10,

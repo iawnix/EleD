@@ -8,7 +8,7 @@ import json
 
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import (
+from eled import (
     XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
     calc_orbital_populations, calc_frontier_descriptors,

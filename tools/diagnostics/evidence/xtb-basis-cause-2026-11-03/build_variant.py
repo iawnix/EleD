@@ -2,7 +2,7 @@ import json,os,subprocess,sys,hashlib
 from pathlib import Path
 root=Path.cwd(); stage=root/'build/xtb-orbital-investigation'
 name=sys.argv[1];src=stage/(name+'-src');prefix=stage/(name+'-install');build=stage/(name+'-build')
-reference=json.loads((root/'.xtb-rdkit/share/xtb/rdkit-eth/build.json').read_text())
+reference=json.loads((root/'.xtb-rdkit/share/xtb/eled/build.json').read_text())
 cache={}
 for line in (root/'.xtb-rdkit/build/CMakeCache.txt').read_text().splitlines():
  if line and not line.startswith(('#','//')) and '=' in line:

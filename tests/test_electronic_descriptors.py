@@ -6,13 +6,13 @@ import numpy as np
 import pytest
 from rdkit import Chem
 
-from rdkit_eth import (
+from eled import (
     XTBResult, XTBOptions, calc_xtb_descriptors, calc_xtb_atom_descriptors,
     calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
     calc_orbital_populations, calc_frontier_descriptors, DescriptorUnavailableError,
     annotate_mol,
 )
-from rdkit_eth.input import _input_metadata, _xyz_from_mol
+from eled.input import _input_metadata, _xyz_from_mol
 
 
 @pytest.fixture
@@ -188,7 +188,7 @@ def test_bad_or_mismatched_basis_fails(basis, change):
 
 def test_missing_basis_has_no_implicit_fallback(simple, monkeypatch):
     def forbidden(*args, **kwargs): pytest.fail('descriptor extraction must not run a calculation')
-    monkeypatch.setattr('rdkit_eth.xtb.run_xtb_native', forbidden)
+    monkeypatch.setattr('eled.xtb.run_xtb_native', forbidden)
     with pytest.raises(DescriptorUnavailableError, match='same-calculation'):
         calc_orbital_populations(simple[1])
     assert XTBOptions(keep_overlap=True).to_dict()['keep_overlap'] is True

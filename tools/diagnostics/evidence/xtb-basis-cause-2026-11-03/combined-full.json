@@ -3,13 +3,13 @@
   "created_utc": "2026-11-03T08:51:34.107391+00:00",
   "implementation_sha256": {
     "tools/compare_orbitals.py": "b1f3aeac740402ddc29a2a6d7ce6d0e04bc75087748abb93b8d96427e58446cf",
-    "src/rdkit_eth/orbital_alignment.py": "3df9d52f96e8f66326247f3792d90637145c336d00b0f59deb5211ea1f284313",
-    "src/rdkit_eth/backends/tblite.py": "50ec954299684def1653738076b01becb2118737d8b889cd6f499d4c0c1ecc1d",
+    "src/eled/orbital_alignment.py": "3df9d52f96e8f66326247f3792d90637145c336d00b0f59deb5211ea1f284313",
+    "src/eled/backends/tblite.py": "50ec954299684def1653738076b01becb2118737d8b889cd6f499d4c0c1ecc1d",
     "cpp/rdXTBTools/XTBTools.cpp": "1dd35aaa66534c88ce6a6b65fa937692d16b73a012c84c8990d6a15d7cfbda9c",
     "cpp/rdXTBTools/Wrap.cpp": "c46cb2c21a1b0753f93b2d271073d2ce4f1a453b4df038d0f85dce95484b73b8"
   },
   "dataset": {
-    "path": "/home/iaw/project/rdkit_eth/tests/data/orbital_alignment_cases.json",
+    "path": "/home/iaw/project/eled/tests/data/orbital_alignment_cases.json",
     "sha256": "a358b8db57cebddeceba542d74275196cd39c1ba72e76287c14fa27763efcd81",
     "metadata": {
       "schema_version": 1,
@@ -87,18 +87,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -142,18 +142,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -197,18 +197,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -252,18 +252,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -307,18 +307,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -362,18 +362,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -417,18 +417,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -472,18 +472,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -527,18 +527,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -582,18 +582,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -637,18 +637,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -711,18 +711,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -785,18 +785,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -840,18 +840,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -895,18 +895,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -950,18 +950,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1005,18 +1005,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1060,18 +1060,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1115,18 +1115,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1170,18 +1170,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1225,18 +1225,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1280,18 +1280,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1335,18 +1335,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1390,18 +1390,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1445,18 +1445,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1500,18 +1500,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1555,18 +1555,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1610,18 +1610,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1665,18 +1665,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1720,18 +1720,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1775,18 +1775,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1830,18 +1830,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1885,18 +1885,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1940,18 +1940,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -1995,18 +1995,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2050,18 +2050,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2105,18 +2105,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2160,18 +2160,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2215,18 +2215,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2270,18 +2270,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2325,18 +2325,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2380,18 +2380,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2435,18 +2435,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2490,18 +2490,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2545,18 +2545,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2600,18 +2600,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2655,18 +2655,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2710,18 +2710,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2765,18 +2765,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2820,18 +2820,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2875,18 +2875,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2940,18 +2940,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -2995,18 +2995,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3050,18 +3050,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3105,18 +3105,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3160,18 +3160,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3215,18 +3215,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3280,18 +3280,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3345,18 +3345,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3400,18 +3400,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3455,18 +3455,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3510,18 +3510,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3575,18 +3575,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3630,18 +3630,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3685,18 +3685,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },
@@ -3740,18 +3740,18 @@
       },
       "engines": {
         "rdXTBTools": {
-          "library": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
+          "library": "/home/iaw/project/eled/build/xtb-orbital-investigation/onsite-and-5sp/libxtb.so",
           "sha256": "4f29cb2bf6966ba9cb2d89b41585f1771decf276b0b007f1033b186160275fd3",
           "api_version": 10000,
           "source_commit": "",
-          "parameter_file": "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
         },
         "tblite": {
           "backend": "tblite",
           "package": "tblite",
           "version": "0.8.0",
-          "path": "/home/iaw/project/rdkit_eth/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
+          "path": "/home/iaw/project/eled/.rdxtb-build-env/lib/python3.11/site-packages/tblite/_libtblite.cpython-311-x86_64-linux-gnu.so",
           "sha256": "3ad2c2646ab563749717909e411f5d65120c141848835a7044bc55202cd679c0"
         }
       },

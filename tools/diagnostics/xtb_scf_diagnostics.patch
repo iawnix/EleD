@@ -4,7 +4,7 @@
                             xtb_TResults /* res */,
                             double* /* c */) XTB_API_SUFFIX__VERSION_2_0_0;
  
-+/* rdkit-eth SCC diagnostics ABI v1. getSCFDiagnostics returns 1 only for a
++/* eled SCC diagnostics ABI v1. getSCFDiagnostics returns 1 only for a
 + * successful GFN1/2 singlepoint; otherwise 0 and leaves buffers untouched.
 + * Buffers: one integer and four doubles [abs(delta E) Hartree, mixer RMS,
 + * energy threshold Hartree, mixer threshold]. Copies own their snapshots.
@@ -14,7 +14,7 @@
 +extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getSCFDiagnostics(
 +    xtb_TEnvironment, xtb_TResults, int*, double*);
 +
- /* rdkit-eth extension ABI v1; upstream API version remains unchanged.
+ /* eled extension ABI v1; upstream API version remains unchanged.
   * Enable on Results BEFORE singlepoint. Copies own their snapshots.
   * Failed/repeated calculations and toggling retention invalidate old snapshots.
 --- a/src/api/interface.f90

@@ -1,11 +1,11 @@
 # 项目定位
 
-`rdkit-eth` 是 RDKit 的电子结构能力扩展层。RDKit 继续作为分子图、原子和
-键编号、构象、立体化学以及坐标单位的唯一来源；`rdkit-eth` 在此基础上增加
-电子结构计算、描述符分析和来源记录。
+`EleD` 是一个面向 RDKit 的电子结构描述符扩展。RDKit 继续作为分子图、
+原子和键编号、构象、立体化学以及坐标单位的唯一来源。扩展版 xTB C API
+负责底层计算；项目对外提供的是围绕 RDKit 分子模型的描述符、分析和来源信息层。
 
 最接近的参考项目是 DScribe 一类的描述符库。ASE 的 calculator 设计可以借鉴，
-但 `rdkit-eth` 不会发展成通用原子模拟环境。周期体系、分子动力学、轨迹管理
+但 `EleD` 不会发展成通用原子模拟环境。周期体系、分子动力学、轨迹管理
 和完整溶剂工作流不属于核心范围。
 
 ## 扩展边界
@@ -22,7 +22,7 @@ RDKit Mol / Conformer
         │                         ├── 固定几何反应性描述符
         │                         └── RDKit 属性标注和报告
         │
-        └── 可选 YAeHMOP 对照接口
+        └── 可选 YAeHMOP 对照适配器（不属于核心协议）
 ```
 
 公开层次保持独立：
@@ -33,12 +33,22 @@ RDKit Mol / Conformer
 4. **描述符层**：只消费结果，不再次调用引擎；
 5. **报告层**：保存单位、缺失原因、质量标志和哈希。
 
+YAeHMOP 适配器只整理 RDKit 已有接口，供结果对照使用；它不修改 YAeHMOP，
+也不属于 xTB 描述符目录或研究协议。
+
+## 命名约定
+
+`EleD` 是对外使用的项目名称。可导入的 Python 包使用小写 `eled`，遵循 Python
+和 RDKit 顶层包的命名习惯。编译扩展模块使用 `rdXTBTools`，遵循 RDKit 中以
+`rd` 开头、后接驼峰名称的扩展模块风格；其 C++ 命名空间仍为
+`RDKit::XTBTools`。
+
 ## API 方向
 
 公开计算接口使用可复用的计算器对象：
 
 ```python
-from rdkit_eth import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, calc_xtb_descriptors
 
 calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
 result = calculator.calculate(mol, keep_overlap=True)

@@ -5,7 +5,7 @@ are retained for reproducibility. See the
 [active development priorities](../../docs/development-priorities.md).
 
 These tools observe RDKit's embedding internals. They do not implement a new
-conformer generator and are not part of the installed `rdkit_eth` API.
+conformer generator and are not part of the installed `eled` API.
 The initial findings and proposed experiments are in
 [the research report](../../docs/embedding-algorithm-research.md).
 

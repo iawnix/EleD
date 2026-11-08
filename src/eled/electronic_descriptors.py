@@ -21,7 +21,7 @@ def _as_result(result):
     if isinstance(result, XTBResult):
         return result
     # Avoid importing the optional compiled module just for type discovery.
-    if (type(result).__module__ != 'rdkit_eth.rdXTBTools'
+    if (type(result).__module__ != 'eled.rdXTBTools'
             or type(result).__name__ != 'XTBResults'):
         raise TypeError('expected XTBResult or rdXTBTools.XTBResults')
     if not result.success:

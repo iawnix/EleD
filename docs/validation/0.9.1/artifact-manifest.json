@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+  "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
   "source": {
-    "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-pw6980h0/rdkit_eth-0.9.1.tar.gz",
+    "file": "/home/iaw/project/eled/.eled/artifacts/build-pw6980h0/eled-0.9.1.tar.gz",
     "sha256": "68506762df47282f6bb0862491a1f078f44941494d1aeb4eec8ac6b9fe1444ba"
   },
   "wheels": [
     {
-      "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-pw6980h0/pure/rdkit_eth-0.9.1-py3-none-any.whl",
+      "file": "/home/iaw/project/eled/.eled/artifacts/build-pw6980h0/pure/eled-0.9.1-py3-none-any.whl",
       "sha256": "b09ce5cc3c1a04397c495b14250223e7f84955b7553ac9ec0ae68908ed0f1ce4",
       "compiled": false,
       "version": "0.9.1",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-pw6980h0/compiled/rdkit_eth-0.9.1-cp311-cp311-linux_x86_64.whl",
+      "file": "/home/iaw/project/eled/.eled/artifacts/build-pw6980h0/compiled/eled-0.9.1-cp311-cp311-linux_x86_64.whl",
       "sha256": "f8b2241179cd0f04e8c1032ce7daec901e40cf4332aa7853c7975115e6d556b8",
       "compiled": true,
       "version": "0.9.1",
@@ -46,7 +46,7 @@
   "xtb_source_lock_sha256": "5876a8aa64daf9c9dc90a397964340d9cfb4922608acc6d161e56ea4858d39fa",
   "compiled_wheel_scope": "local Linux SDK/prefix; external libraries are not bundled",
   "compiled_default_xtb": {
-    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so",
+    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so",
     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223"
   }
 }

@@ -3,7 +3,7 @@
 This audit fixes the wording used for the new descriptors. It is a scope
 check, not a claim that the descriptors are experimentally unique observables.
 
-| Feature | Established baseline | xTB + ML status | Position in `rdkit-eth` |
+| Feature | Established baseline | xTB + ML status | Position in `eled` |
 | --- | --- | --- | --- |
 | Shell-resolved s/p/d populations | Mulliken and Löwdin population analyses are standard; xTB supplies a minimal-basis wavefunction | Charge and orbital features are used in molecular ML, but a portable xTB C API for shell maps/populations is not a standard public feature | **new extraction layer**, validated by `trace(P S)` and shell-to-atom sums |
 | π population / π bond order | π projections are standard in localized orbital and bond analysis | No general GFN1/GFN2 xTB API convention for local p-normal projection or RDKit bond mapping was found | **method-defined feature**, only reported when the plane and p shell are defined |

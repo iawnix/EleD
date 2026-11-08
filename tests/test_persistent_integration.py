@@ -9,9 +9,9 @@ from unittest.mock import patch
 import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import (XTBDiskCache,ReactivityJob,XTBOptions,run_xtb_batch,
+from eled import (XTBDiskCache,ReactivityJob,XTBOptions,run_xtb_batch,
     run_reactivity_batch,XTBNativeNotFoundError,DescriptorUnavailableError)
-from rdkit_eth.runtime import _find_xtb_library,_extended_libxtb_build,_native_basis_build
+from eled.runtime import _find_xtb_library,_extended_libxtb_build,_native_basis_build
 
 pytestmark=pytest.mark.integration
 
@@ -33,14 +33,14 @@ def test_real_single_point_disk_cache_and_process_roundtrip(library,tmp_path):
     mol=molecule();path=tmp_path/'cache.sqlite';cache=XTBDiskCache(path)
     opts=XTBOptions(xtb_library=library,keep_overlap=bool(_native_basis_build(library)))
     first=run_xtb_batch([mol],options=opts,cache=cache)[0]
-    with patch('rdkit_eth.batch._run_xtb',side_effect=AssertionError('recalculated')):
+    with patch('eled.batch._run_xtb',side_effect=AssertionError('recalculated')):
         again=run_xtb_batch([mol],options=opts,cache=XTBDiskCache(path))[0]
     assert first==again
-    from rdkit_eth.batch import _prepare,_key
+    from eled.batch import _prepare,_key
     config,metadata=_prepare(mol,opts);key=_key(config,metadata)
     source = Path(__file__).resolve().parents[1] / 'src'
     command=(f'import sys; sys.path.insert(0, {str(source)!r}); '
-             'from rdkit_eth import XTBDiskCache; import sys,json; '
+             'from eled import XTBDiskCache; import sys,json; '
              'r=XTBDiskCache(sys.argv[1]).get(sys.argv[2]); '
              'print(json.dumps([r.total_energy_hartree,r.partial_charges]))')
     child=subprocess.run([sys.executable,'-I','-c',command,str(path),key],capture_output=True,text=True,check=True)
@@ -50,13 +50,13 @@ def test_real_single_point_disk_cache_and_process_roundtrip(library,tmp_path):
 
 @pytest.mark.parametrize('interface',['native','compiled'])
 def test_real_reactivity_resume_preserves_failures_and_requires_capabilities(library,tmp_path,interface):
-    if interface=='compiled':pytest.importorskip('rdkit_eth.rdXTBTools')
+    if interface=='compiled':pytest.importorskip('eled.rdXTBTools')
     opts=XTBOptions(xtb_library=library)
     jobs=[ReactivityJob('water',molecule(),opts),
           ReactivityJob('forced-scf-failure',molecule(),replace(opts,max_iterations=1))]
     rows=run_reactivity_batch(jobs,interface=interface,cache=XTBDiskCache(tmp_path/'cache.sqlite'),checkpoint=tmp_path/'rows.sqlite')
     assert rows[0]['error'] is None and rows[1]['error']['type']=='ChargeStateCalculationError'
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=AssertionError('recalculated')):
+    with patch('eled.reactivity_batch.run_reactivity',side_effect=AssertionError('recalculated')):
         resumed=run_reactivity_batch(jobs,interface=interface,checkpoint=tmp_path/'rows.sqlite')
     assert resumed[0]['values']==rows[0]['values'] and resumed[1]['error']==rows[1]['error']
     if not _native_basis_build(library):

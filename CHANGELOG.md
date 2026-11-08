@@ -1,5 +1,13 @@
 # Changes
 
+## Unreleased — project identity is `EleD`
+
+- Renamed the distribution and import package from `rdkit-eth`/`rdkit_eth` to
+  `EleD`/`eled`, matching the extended `libxtb` backend that defines
+  the project. The C++ extension remains `rdXTBTools`.
+- Updated the CLI, environment variables, runtime manifest paths, build
+  metadata, examples, tests and bilingual documentation to use the new name.
+
 ## 0.11.0 — isolated execution, SCC diagnostics and validated runtime bundles
 
 - Added spawned libxtb workers for single-point, descriptor and reactivity batches,
@@ -166,7 +174,7 @@ Breaking API changes; see [migration notes](docs/migration-0.2.md).
 - Fixed-conformer numerical comparisons and source-reviewed s/p/d coefficient
   alignment, including orbital signs, subspaces and overlap metrics.
 - SHA256-locked Linux/Python 3.11 installation profiles, source-to-wheel build
-  tooling, installed-wheel checks, and `rdkit-eth doctor` diagnostics.
+  tooling, installed-wheel checks, and `eled doctor` diagnostics.
 
 The compiled wheel depends on the matching local RDKit/Boost and xTB prefixes;
 it is not a portable manylinux wheel. Installing official RDKit alone does not

@@ -19,9 +19,9 @@ jobs:
         run: python tools/install_native.py --jobs 2
       - name: Package outside the locked runtime
         run: |
-          .rdkit-eth/runtime/bin/python -m venv build/packaging
+          .eled/runtime/bin/python -m venv build/packaging
           build/packaging/bin/python -m pip install -r tools/distribution-requirements.txt
-          PATH="$PWD/build/packaging/bin:$PATH" build/packaging/bin/python tools/build_runtime_bundle.py --runtime .rdkit-eth/runtime --toolchain .rdkit-eth/toolchain --output dist/linux-runtime-bundle
+          PATH="$PWD/build/packaging/bin:$PATH" build/packaging/bin/python tools/build_runtime_bundle.py --runtime .eled/runtime --toolchain .eled/toolchain --output dist/linux-runtime-bundle
       - name: Install offline into a different prefix and verify
         run: |
           python tools/install_bundle.py --bundle dist/linux-runtime-bundle --directory build/relocated

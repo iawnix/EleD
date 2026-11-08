@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 
 from rdkit import Chem
-from rdkit_eth.geometry import _check_geometry, _stereo_constraints
-from rdkit_eth.persistence import _implementation_identity
+from eled.geometry import _check_geometry, _stereo_constraints
+from eled.persistence import _implementation_identity
 
 
 def main():

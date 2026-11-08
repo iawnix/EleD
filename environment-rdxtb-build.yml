@@ -1,5 +1,5 @@
 # Matched RDKit/Boost/Python development ABI, Linux x86-64.
-name: rdkit-eth-rdxtb-build
+name: eled-rdxtb-build
 channels:
   - conda-forge
 dependencies:

@@ -9,8 +9,8 @@ dist/
 .xtb-build-env/
 .rdxtb-build-env/
 .runtime-env/
-src/rdkit_eth/rdXTBTools*.so
+src/eled/rdXTBTools*.so
 .venv/
 .xtb-native/
-.rdkit-eth/
+.eled/
 .xtb-native-0.5/

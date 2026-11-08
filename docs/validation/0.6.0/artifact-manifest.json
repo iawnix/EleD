@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+  "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
   "source": {
-    "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-gvx1jub7/rdkit_eth-0.6.0.tar.gz",
+    "file": "/home/iaw/project/eled/.eled/artifacts/build-gvx1jub7/eled-0.6.0.tar.gz",
     "sha256": "19574092d2fd4994266cd41cc6f368f5368711812b4eb430a0439098ea5329f9"
   },
   "wheels": [
     {
-      "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-gvx1jub7/pure/rdkit_eth-0.6.0-py3-none-any.whl",
+      "file": "/home/iaw/project/eled/.eled/artifacts/build-gvx1jub7/pure/eled-0.6.0-py3-none-any.whl",
       "sha256": "f1a8824c2bee1875a190a2d508c22754037d2db6679270ebea51b284be9b09e4",
       "compiled": false,
       "version": "0.6.0",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "file": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-gvx1jub7/compiled/rdkit_eth-0.6.0-cp311-cp311-linux_x86_64.whl",
+      "file": "/home/iaw/project/eled/.eled/artifacts/build-gvx1jub7/compiled/eled-0.6.0-cp311-cp311-linux_x86_64.whl",
       "sha256": "9bed9deb88269344032304e69ef99086def8a06ff8e065098a32ea9ba82b42ab",
       "compiled": true,
       "version": "0.6.0",
@@ -46,7 +46,7 @@
   "xtb_source_lock_sha256": "5876a8aa64daf9c9dc90a397964340d9cfb4922608acc6d161e56ea4858d39fa",
   "compiled_wheel_scope": "local Linux SDK/prefix; external libraries are not bundled",
   "compiled_default_xtb": {
-    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so",
+    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so",
     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223"
   }
 }

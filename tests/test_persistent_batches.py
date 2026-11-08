@@ -8,10 +8,10 @@ from unittest.mock import patch
 import pytest
 from rdkit import Chem
 
-from rdkit_eth import (XTBOptions, XTBResult, XTBDiskCache, ReactivityCheckpoint,
+from eled import (XTBOptions, XTBResult, XTBDiskCache, ReactivityCheckpoint,
     ReactivityJob, run_reactivity_batch, XTBCacheError, XTBEnvironmentError,
     run_reactivity, export_descriptor_reports)
-from rdkit_eth.reactivity import _empty_report, REACTIVITY_UNITS
+from eled.reactivity import _empty_report, REACTIVITY_UNITS
 
 
 def molecule(smi='O'):
@@ -34,7 +34,7 @@ def report(failed=False):
 
 @pytest.fixture
 def environment(monkeypatch):
-    import rdkit_eth.reactivity_batch as batch
+    import eled.reactivity_batch as batch
     monkeypatch.setattr(batch,'_resolve_options',lambda c:replace(c,xtb_library='/fake/libxtb.so'))
     monkeypatch.setattr(batch,'_engine_identity',lambda *a:{'sha256':'engine-v1','orbital_basis':True})
     monkeypatch.setattr(batch,'_parameter_file',lambda *a:{'sha256':'parameters-v1'})
@@ -72,15 +72,15 @@ def test_cache_refuses_failed_nonfinite_and_unrelated_database(tmp_path):
 def test_interruption_commits_only_completed_rows_and_resumes(environment,tmp_path):
     jobs=[ReactivityJob('water',molecule()),ReactivityJob('ammonia',molecule('N'))]
     checkpoint=tmp_path/'checkpoint.sqlite'
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=[report(),KeyboardInterrupt]):
+    with patch('eled.reactivity_batch.run_reactivity',side_effect=[report(),KeyboardInterrupt]):
         with pytest.raises(KeyboardInterrupt):run_reactivity_batch(jobs,checkpoint=checkpoint)
     assert len(ReactivityCheckpoint(checkpoint).reports())==1
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',return_value=report()) as calculate:
+    with patch('eled.reactivity_batch.run_reactivity',return_value=report()) as calculate:
         rows=run_reactivity_batch(jobs,checkpoint=checkpoint)
     assert calculate.call_count==1
     assert [r['record_id'] for r in rows]==['water','ammonia']
     assert rows[0]['execution']['source']=='checkpoint'
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=AssertionError('recalculated')):
+    with patch('eled.reactivity_batch.run_reactivity',side_effect=AssertionError('recalculated')):
         run_reactivity_batch(jobs,checkpoint=checkpoint)
     with pytest.raises(XTBCacheError,match='differs'):
         run_reactivity_batch(jobs[::-1],checkpoint=checkpoint)
@@ -91,12 +91,12 @@ def test_interruption_commits_only_completed_rows_and_resumes(environment,tmp_pa
 def test_failure_history_is_preserved_and_only_explicitly_retried(environment,tmp_path):
     jobs=[ReactivityJob('water',molecule())];checkpoint=ReactivityCheckpoint(tmp_path/'checkpoint.sqlite')
     cache=XTBDiskCache(tmp_path/'cache.sqlite')
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',return_value=report(True)):
+    with patch('eled.reactivity_batch.run_reactivity',return_value=report(True)):
         rows=run_reactivity_batch(jobs,checkpoint=checkpoint,cache=cache)
     assert rows[0]['error'] and len(cache)==0
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=AssertionError('retried')):
+    with patch('eled.reactivity_batch.run_reactivity',side_effect=AssertionError('retried')):
         assert run_reactivity_batch(jobs,checkpoint=checkpoint)[0]['error']
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',return_value=report()) as calculate:
+    with patch('eled.reactivity_batch.run_reactivity',return_value=report()) as calculate:
         rows=run_reactivity_batch(jobs,checkpoint=checkpoint,cache=cache,retry_failed=True)
     assert calculate.call_count==1 and len(cache)==1 and rows[0]['execution']['attempt']==2
     history=checkpoint.history('water')
@@ -106,7 +106,7 @@ def test_failure_history_is_preserved_and_only_explicitly_retried(environment,tm
 def test_cached_reports_are_independent_of_record_ids_and_export_execution(environment,tmp_path):
     cache=XTBDiskCache(tmp_path/'cache.sqlite')
     jobs=[ReactivityJob('a',molecule()),ReactivityJob('b',molecule())]
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',return_value=report()) as calculate:
+    with patch('eled.reactivity_batch.run_reactivity',return_value=report()) as calculate:
         rows=run_reactivity_batch(jobs,cache=cache)
     assert calculate.call_count==1 and rows[1]['execution']['source']=='cache'
     assert [r['record_id'] for r in rows]==['a','b']
@@ -122,7 +122,7 @@ def test_cached_reports_are_independent_of_record_ids_and_export_execution(envir
 @pytest.mark.parametrize('change',['temperature','accuracy','iterations','method','initialization',
                                   'geometry','spin','fragments','scheme','interface','engine','parameters','adapter'])
 def test_protocol_changes_do_not_hit_old_cache(environment,tmp_path,monkeypatch,change):
-    import rdkit_eth.reactivity_batch as batch
+    import eled.reactivity_batch as batch
     cache=XTBDiskCache(tmp_path/'cache.sqlite');job=ReactivityJob('a',molecule())
     kwargs={}
     with patch.object(batch,'run_reactivity',side_effect=lambda *a,**k:report()) as calculate:
@@ -147,7 +147,7 @@ def test_protocol_changes_do_not_hit_old_cache(environment,tmp_path,monkeypatch,
 def test_invalid_geometry_is_a_row_but_spin_configuration_is_fatal(environment):
     missing=Chem.AddHs(Chem.MolFromSmiles('O'))
     jobs=[ReactivityJob('missing',missing),ReactivityJob('parse-failed',None),ReactivityJob('empty',Chem.Mol())]
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=AssertionError('must not calculate')):
+    with patch('eled.reactivity_batch.run_reactivity',side_effect=AssertionError('must not calculate')):
         rows=run_reactivity_batch(jobs)
         assert all(r['error']['stage']=='input' and all(v is None for v in r['values'].values()) for r in rows)
         with pytest.raises(ValueError,match='open-shell'):
@@ -160,7 +160,7 @@ def test_invalid_geometry_is_a_row_but_spin_configuration_is_fatal(environment):
                                 RuntimeError('unexpected failure')])
 def test_runtime_failures_abort_without_recording_a_molecular_failure(environment,tmp_path,error):
     cp=ReactivityCheckpoint(tmp_path/'checkpoint.sqlite')
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=error):
+    with patch('eled.reactivity_batch.run_reactivity',side_effect=error):
         with pytest.raises(type(error)):run_reactivity_batch([ReactivityJob('a',molecule())],checkpoint=cp)
     assert cp.reports()==[]
 
@@ -169,14 +169,14 @@ def test_checkpoint_concurrent_writer_and_tampered_row_are_rejected(environment,
     cp=ReactivityCheckpoint(tmp_path/'checkpoint.sqlite');jobs=[ReactivityJob('a',molecule())]
     with cp._locked():
         with pytest.raises(XTBCacheError,match='writer'):run_reactivity_batch(jobs,checkpoint=cp.path)
-    with patch('rdkit_eth.reactivity_batch.run_reactivity',return_value=report()):run_reactivity_batch(jobs,checkpoint=cp)
+    with patch('eled.reactivity_batch.run_reactivity',return_value=report()):run_reactivity_batch(jobs,checkpoint=cp)
     with sqlite3.connect(cp.path) as db:db.execute("UPDATE records SET payload='{}' WHERE namespace='rows'")
     with pytest.raises(XTBCacheError,match='checksum'):run_reactivity_batch(jobs,checkpoint=cp)
 
 
 def test_single_reactivity_does_not_hide_runtime_errors():
-    with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda c:c), \
-         patch('rdkit_eth.reactivity.XTBCalculator.calculate',side_effect=ImportError('broken runtime')):
+    with patch('eled.reactivity._resolve_options',side_effect=lambda c:c), \
+         patch('eled.reactivity.XTBCalculator.calculate',side_effect=ImportError('broken runtime')):
         with pytest.raises(ImportError):run_reactivity(molecule(),return_errors=True,initialization='independent')
 
 
@@ -199,7 +199,7 @@ def test_checkpoint_write_error_aborts_and_keeps_prior_commit(environment,tmp_pa
     def save(identifier,*args):
         if identifier=='ammonia':raise sqlite3.OperationalError('disk full')
         original(identifier,*args)
-    with patch.object(cp,'_save',save),patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=lambda *a,**k:report()):
+    with patch.object(cp,'_save',save),patch('eled.reactivity_batch.run_reactivity',side_effect=lambda *a,**k:report()):
         with pytest.raises(sqlite3.OperationalError,match='disk full'):
             run_reactivity_batch(jobs,checkpoint=cp)
     assert [r['record_id'] for r in cp.reports()]==['water']

@@ -10,7 +10,7 @@ from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import (XTBOptions, run_descriptor_batch, run_reactivity,
+from eled import (XTBOptions, run_descriptor_batch, run_reactivity,
                        export_descriptor_reports)
 
 

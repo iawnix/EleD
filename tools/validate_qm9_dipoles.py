@@ -18,9 +18,9 @@ import time
 
 import numpy as np
 from rdkit import Chem, rdBase
-from rdkit_eth import XTBCalculator, calc_xtb_descriptors, XTBEnvironmentError, XTBRunError
-from rdkit_eth.input import _xyz_from_mol, _geometry_hash
-from rdkit_eth.persistence import _implementation_identity
+from eled import XTBCalculator, calc_xtb_descriptors, XTBEnvironmentError, XTBRunError
+from eled.input import _xyz_from_mol, _geometry_hash
+from eled.persistence import _implementation_identity
 
 SHA256 = '45255048ac6d83ea4b923ecdf7d6fb6dc62bfec5e80fbc5bcfd93a62157a31db'
 PROTOCOL = 'qm9-nine-heavy-dipole-v1'

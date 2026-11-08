@@ -37,7 +37,7 @@ def main():
     patcher = shutil.which('patchelf')
     if not patcher: raise ValueError('patchelf required')
     runtime = args.runtime.resolve(); toolchain = args.toolchain.resolve()
-    record = json.loads((runtime/'share/xtb/rdkit-eth/build.json').read_text())
+    record = json.loads((runtime/'share/xtb/eled/build.json').read_text())
     engine_files = [runtime/'lib/libxtb.so', runtime/'bin/xtb',
                     *(runtime/'share/xtb'/f'param_gfn{i}-xtb.txt' for i in range(3))]
     if any(not path.is_file() for path in engine_files):
@@ -51,7 +51,7 @@ def main():
     for key in ('PYTHONPATH','PYTHONHOME','XTB_LIBRARY','XTBPATH','XTB_PREFIX','LD_LIBRARY_PATH','LD_PRELOAD'):
         env.pop(key, None)
     env.update(OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
-    subprocess.run([runtime/'bin/python', '-I', '-m', 'rdkit_eth', 'doctor',
+    subprocess.run([runtime/'bin/python', '-I', '-m', 'eled', 'doctor',
                     '--check', 'compiled', '--keep-overlap'], env=env, check=True)
     args.output.mkdir(parents=True)
     # Archives can be large. Keep conda-pack's staging on the output filesystem,
@@ -83,7 +83,7 @@ def main():
     manifest = {'schema_version': 1, 'platform': 'linux-x86_64',
         'prefixes': {'runtime': str(runtime), 'toolchain': str(toolchain)},
         'original_library_sha256': library_hash,
-        'extended_xtb': {'files': engine_hashes, 'build_manifest_sha256': digest(runtime/'share/xtb/rdkit-eth/build.json')},
+        'extended_xtb': {'files': engine_hashes, 'build_manifest_sha256': digest(runtime/'share/xtb/eled/build.json')},
         'source_lock': record['source'],
         'rpaths': rpaths, 'build_host': platform.platform(),
         'scope': 'offline conda environment bundle; target glibc/CPU compatibility requires validation',

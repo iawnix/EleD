@@ -1,10 +1,10 @@
 {
   "reference": {
-    "library": "/home/iaw/project/rdkit_eth/.xtb-native/lib/libxtb.so.6.7.1",
+    "library": "/home/iaw/project/eled/.xtb-native/lib/libxtb.so.6.7.1",
     "sha256": "6a8e2c7f01c6c95e29096369fb6130e97aefa3c2bcbf91982ede695c4aa48428"
   },
   "candidate": {
-    "library": "/home/iaw/project/rdkit_eth/build/upstream-1490-native/lib/libxtb.so.6.7.1",
+    "library": "/home/iaw/project/eled/build/upstream-1490-native/lib/libxtb.so.6.7.1",
     "sha256": "6537b498674650d17ea37c665b6b15c7d556955b1329ba7ce633ea1fc1562869"
   },
   "comparison": "frozen geometry; separate processes; candidate minus reference",

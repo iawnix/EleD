@@ -16,7 +16,7 @@ import subprocess
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import XTBOptions, run_reactivity
+from eled import XTBOptions, run_reactivity
 
 
 def main():

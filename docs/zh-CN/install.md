@@ -1,22 +1,22 @@
-# 安装 rdkit-eth
+# 安装 EleD
 
 ## 完整原生环境
 
 推荐使用 Linux x86-64、Python 3.11 和 conda-forge RDKit/Boost：
 
 ```bash
-git clone https://github.com/iawnix/rdkit-eth.git
-cd rdkit-eth
+git clone https://github.com/iawnix/EleD.git
+cd EleD
 python tools/install_native.py --jobs 6
-conda activate "$PWD/.rdkit-eth/runtime"
-python -m rdkit_eth doctor --check compiled --method GFN2-xTB --keep-overlap
+conda activate "$PWD/.eled/runtime"
+python -m eled doctor --check compiled --method GFN2-xTB --keep-overlap
 ```
 
 安装器会创建两个相互匹配的目录：
 
-- `.rdkit-eth/runtime`：Python、RDKit、扩展版 `libxtb`、参数文件和
+- `.eled/runtime`：Python、RDKit、扩展版 `libxtb`、参数文件和
   `rdXTBTools`；
-- `.rdkit-eth/toolchain`：编译器和原生构建依赖。
+- `.eled/toolchain`：编译器和原生构建依赖。
 
 两个目录需要一起保留在原始路径。安装完成后，`doctor` 会检查 GFN0/1/2、
 overlap/basis 导出、描述符和固定几何反应性流程。
@@ -27,13 +27,13 @@ overlap/basis 导出、描述符和固定几何反应性流程。
 
 ```bash
 python -m pip install .
-python -m rdkit_eth doctor --check native --method GFN2-xTB
+python -m eled doctor --check native --method GFN2-xTB
 ```
 
 也可以显式指定库：
 
 ```python
-from rdkit_eth import XTBCalculator
+from eled import XTBCalculator
 
 result = XTBCalculator(xtb_library="/absolute/path/to/libxtb.so").calculate(mol)
 ```
@@ -46,7 +46,7 @@ Mulliken/Löwdin shell 描述符。程序会检查扩展能力并记录库路径
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, calc_xtb_descriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
@@ -62,7 +62,7 @@ print(calc_xtb_descriptors(result))
 ## 构建 C++ 接口
 
 ```bash
-RDKIT_ETH_BUILD_RDXTB=1 \
+ELED_BUILD_RDXTB=1 \
 RDXTB_XTB_PREFIX=/absolute/path/to/extended-xtb \
 python -m pip install --no-deps --no-build-isolation .
 ```

@@ -32,6 +32,6 @@ class CMakeBuild(build_ext):
                         os.environ.get('CMAKE_BUILD_PARALLEL_LEVEL', '4')], check=True)
 
 
-compiled = os.environ.get('RDKIT_ETH_BUILD_RDXTB') == '1'
-setup(ext_modules=[Extension('rdkit_eth.rdXTBTools', sources=[])] if compiled else [],
+compiled = os.environ.get('ELED_BUILD_RDXTB') == '1'
+setup(ext_modules=[Extension('eled.rdXTBTools', sources=[])] if compiled else [],
       cmdclass={'build_ext': CMakeBuild} if compiled else {})

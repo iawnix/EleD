@@ -61,9 +61,9 @@ Run the optional native regression tests with:
 
 ```bash
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-RDKIT_ETH_RING_ANGLE_CONTROL="$PWD/build/ring-angle-control/embedding_probe" \
-RDKIT_ETH_RING_ANGLE_CANDIDATE="$PWD/build/ring-angle-candidate/embedding_probe" \
-RDKIT_ETH_RING_ANGLE_COMBINED="$PWD/build/ring-angle-and-planarity/embedding_probe" \
+ELED_RING_ANGLE_CONTROL="$PWD/build/ring-angle-control/embedding_probe" \
+ELED_RING_ANGLE_CANDIDATE="$PWD/build/ring-angle-candidate/embedding_probe" \
+ELED_RING_ANGLE_COMBINED="$PWD/build/ring-angle-and-planarity/embedding_probe" \
 build/install-validation/sdk/bin/python -m pytest -q \
   tests/test_ring_angle_prototype.py tests/test_embedding_constraint_audit.py \
   tests/test_geometry.py

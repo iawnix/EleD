@@ -106,7 +106,7 @@
           |                Calculation Setup                |
            -------------------------------------------------
 
-          program call               : /home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/xtb input.xyz --gfn 2 --chrg 0 --uhf 1 --etemp 300 --acc .1 --iterations 250 --vfukui
+          program call               : /home/iaw/project/eled/.eled/runtime/bin/xtb input.xyz --gfn 2 --chrg 0 --uhf 1 --etemp 300 --acc .1 --iterations 250 --vfukui
           hostname                   : FED1
           coordinate file            : input.xyz
           omp threads                :                     1

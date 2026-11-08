@@ -3,7 +3,7 @@
 ## 单点报告
 
 ```python
-from rdkit_eth import XTBCalculator, calc_descriptor_report
+from eled import XTBCalculator, calc_descriptor_report
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 report = calc_descriptor_report(mol, result, record_id="molecule-1")
@@ -23,7 +23,7 @@ report = calc_descriptor_report(mol, result, record_id="molecule-1")
 ## 批量计算和导出
 
 ```python
-from rdkit_eth import run_descriptor_batch, export_descriptor_reports
+from eled import run_descriptor_batch, export_descriptor_reports
 
 reports = run_descriptor_batch(
     molecules, record_ids=ids, max_workers=4, isolate=True,
@@ -39,7 +39,7 @@ export_descriptor_reports(reports, "features.csv")
 ## 固定几何反应性
 
 ```python
-from rdkit_eth import run_reactivity, XTBOptions
+from eled import run_reactivity, XTBOptions
 
 report = run_reactivity(
     mol,

@@ -10,8 +10,8 @@ Windows/macOS and package-index publication remain outside this release.
 Given a trusted bundle directory containing `install.py` and `bundle.json`:
 
 ```bash
-python3 /path/to/bundle/install.py --directory /absolute/new/rdkit-eth
-/absolute/new/rdkit-eth/runtime/bin/python -m rdkit_eth doctor --check compiled --keep-overlap
+python3 /path/to/bundle/install.py --directory /absolute/new/eled
+/absolute/new/eled/runtime/bin/python -m eled doctor --check compiled --keep-overlap
 ```
 
 Use Python 3.10+ with tarfile's backported `data` extraction filter (or Python

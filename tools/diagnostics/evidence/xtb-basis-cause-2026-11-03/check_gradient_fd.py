@@ -2,7 +2,7 @@
 import ctypes as ct,hashlib,json,sys
 from pathlib import Path
 import numpy as np
-from rdkit_eth.backends.native import _NativeXTB
+from eled.backends.native import _NativeXTB
 library=Path(sys.argv[1]).resolve();params=Path(sys.argv[2]).resolve();output=Path(sys.argv[3])
 api=_NativeXTB(str(library));h=ct.c_void_p;dptr=ct.POINTER(ct.c_double)
 get_gradient=api._bind('xtb_getGradient',None,[h,h,dptr]);accuracy=api._bind('xtb_setAccuracy',None,[h,h,ct.c_double])

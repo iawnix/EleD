@@ -8,16 +8,16 @@ import numpy as np
 import pytest
 from rdkit import Chem
 
-from rdkit_eth import XTBNativeNotFoundError
-from rdkit_eth.backends.tblite import run_xtb_tblite
-from rdkit_eth.orbital_alignment import compare_orbitals, libxtb_to_tblite_rows
-from rdkit_eth.runtime import _find_xtb_library
+from eled import XTBNativeNotFoundError
+from eled.backends.tblite import run_xtb_tblite
+from eled.orbital_alignment import compare_orbitals, libxtb_to_tblite_rows
+from eled.runtime import _find_xtb_library
 
 if (importlib.util.find_spec("tblite") is None
-        or importlib.util.find_spec("rdkit_eth.rdXTBTools") is None):
+        or importlib.util.find_spec("eled.rdXTBTools") is None):
     pytest.skip("compiled rdXTBTools and optional tblite are required", allow_module_level=True)
 
-from rdkit_eth import rdXTBTools
+from eled import rdXTBTools
 
 pytestmark = pytest.mark.integration
 CASES = {c["name"]: c for c in json.loads(

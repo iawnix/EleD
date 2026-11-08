@@ -6,9 +6,9 @@
 > Current population analysis uses the [native basis extension](xtb-patched-build.md).
 
 The diagnostic in `tools/compare_orbitals.py` directly compares the compiled
-`rdkit_eth.rdXTBTools.RunMol()` with tblite 0.8.0. It does not replace either
+`eled.rdXTBTools.RunMol()` with tblite 0.8.0. It does not replace either
 backend's returned coefficients. The experimental conversion helpers live in
-`rdkit_eth.orbital_alignment`; tblite remains an optional dependency.
+`eled.orbital_alignment`; tblite remains an optional dependency.
 
 ## Conventions verified from source
 
@@ -41,7 +41,7 @@ Source references:
 For a matrix `C` from libxtb, the diagnostic conversion is:
 
 ```python
-from rdkit_eth.orbital_alignment import libxtb_to_tblite_rows
+from eled.orbital_alignment import libxtb_to_tblite_rows
 
 rows, phases, labels = libxtb_to_tblite_rows(
     atomic_numbers, native.parameterFile,

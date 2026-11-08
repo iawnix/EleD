@@ -48,7 +48,7 @@ metadata. There is no skip-tests option. The installation includes:
   include/xtb.h
   bin/xtb
   share/xtb/                  # matching GFN parameter files
-  share/xtb/rdkit-eth/         # build.json, source.diff, patches, licenses, test log
+  share/xtb/eled/         # build.json, source.diff, patches, licenses, test log
   activate.sh
 ```
 

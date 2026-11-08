@@ -30,20 +30,20 @@
       "file_sha256": "5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c"
     }
   },
-  "source_directory": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/source",
-  "prefix": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime",
+  "source_directory": "/home/iaw/project/eled/.eled/runtime/source",
+  "prefix": "/home/iaw/project/eled/.eled/runtime",
   "built_at": "2026-11-04T13:03:14.857102+00:00",
   "source_diff_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
   "configure_command": [
     "cmake",
     "-S",
-    "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/source",
+    "/home/iaw/project/eled/.eled/runtime/source",
     "-B",
-    "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/build",
+    "/home/iaw/project/eled/.eled/runtime/build",
     "-G",
     "Ninja",
     "-DCMAKE_BUILD_TYPE=Release",
-    "-DCMAKE_INSTALL_PREFIX=/home/iaw/project/rdkit_eth/.rdkit-eth/runtime",
+    "-DCMAKE_INSTALL_PREFIX=/home/iaw/project/eled/.eled/runtime",
     "-DCMAKE_INSTALL_LIBDIR=lib",
     "-DBUILD_SHARED_LIBS=ON",
     "-DWITH_OBJECT=ON",
@@ -54,14 +54,14 @@
     "-DCMAKE_C_STANDARD=17",
     "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
     "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON",
-    "-DCMAKE_PREFIX_PATH=/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain",
-    "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/lib",
-    "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/lib"
+    "-DCMAKE_PREFIX_PATH=/home/iaw/project/eled/.eled/toolchain",
+    "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/eled/.eled/toolchain/lib",
+    "-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/eled/.eled/toolchain/lib"
   ],
-  "dependency_prefix": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain",
+  "dependency_prefix": "/home/iaw/project/eled/.eled/toolchain",
   "compilers": {
-    "CMAKE_C_COMPILER": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/bin/x86_64-conda-linux-gnu-cc",
-    "CMAKE_Fortran_COMPILER": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain/bin/x86_64-conda-linux-gnu-gfortran"
+    "CMAKE_C_COMPILER": "/home/iaw/project/eled/.eled/toolchain/bin/x86_64-conda-linux-gnu-cc",
+    "CMAKE_Fortran_COMPILER": "/home/iaw/project/eled/.eled/toolchain/bin/x86_64-conda-linux-gnu-gfortran"
   },
   "cli_version_output": "-----------------------------------------------------------      \n     |                   =====================                   |     \n     |                           x T B                           |     \n     |                   =====================                   |     \n     |                         S. Grimme                         |     \n     |          Mulliken Center for Theoretical Chemistry        |     \n     |                    University of Bonn                     |     \n      -----------------------------------------------------------      \n\n   * xtb version 6.7.1 (33fe381adde775c4992610c0f90d8914b7572bb5) compiled by '@Linux' on 2026/11/04",
   "files": {

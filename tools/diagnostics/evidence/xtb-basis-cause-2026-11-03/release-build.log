@@ -1,14 +1,14 @@
-COMMAND ['cmake', '-S', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src', '-B', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build', '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_INSTALL_PREFIX=/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-install', '-DCMAKE_INSTALL_LIBDIR=lib', '-DBUILD_SHARED_LIBS=ON', '-DWITH_OBJECT=ON', '-DCMAKE_POSITION_INDEPENDENT_CODE=ON', '-DWITH_TESTS=ON', '-DWITH_TBLITE=OFF', '-DWITH_CPCMX=OFF', '-DCMAKE_C_STANDARD=17', '-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON', '-DCMAKE_PREFIX_PATH=/home/iaw/project/rdkit_eth/.xtb-build-env', '-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib', '-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/rdkit_eth/.xtb-build-env/lib', '-DCMAKE_C_COMPILER=/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc', '-DCMAKE_Fortran_COMPILER=/home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran', '-DCMAKE_C_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include', '-DCMAKE_Fortran_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/rdkit_eth/.xtb-build-env/include -I/home/iaw/project/rdkit_eth/.xtb-build-env/include', '-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -Wl,-rpath-link,/home/iaw/project/rdkit_eth/.xtb-build-env/lib -L/home/iaw/project/rdkit_eth/.xtb-build-env/lib']
+COMMAND ['cmake', '-S', '/home/iaw/project/eled/build/xtb-orbital-investigation/release-src', '-B', '/home/iaw/project/eled/build/xtb-orbital-investigation/release-build', '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_INSTALL_PREFIX=/home/iaw/project/eled/build/xtb-orbital-investigation/release-install', '-DCMAKE_INSTALL_LIBDIR=lib', '-DBUILD_SHARED_LIBS=ON', '-DWITH_OBJECT=ON', '-DCMAKE_POSITION_INDEPENDENT_CODE=ON', '-DWITH_TESTS=ON', '-DWITH_TBLITE=OFF', '-DWITH_CPCMX=OFF', '-DCMAKE_C_STANDARD=17', '-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON', '-DCMAKE_PREFIX_PATH=/home/iaw/project/eled/.xtb-build-env', '-DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath-link,/home/iaw/project/eled/.xtb-build-env/lib', '-DCMAKE_INSTALL_RPATH=$ORIGIN;$ORIGIN/../lib;/home/iaw/project/eled/.xtb-build-env/lib', '-DCMAKE_C_COMPILER=/home/iaw/project/eled/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc', '-DCMAKE_Fortran_COMPILER=/home/iaw/project/eled/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran', '-DCMAKE_C_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/eled/.xtb-build-env/include', '-DCMAKE_Fortran_FLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -isystem /home/iaw/project/eled/.xtb-build-env/include -I/home/iaw/project/eled/.xtb-build-env/include', '-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,--allow-shlib-undefined -Wl,-rpath,/home/iaw/project/eled/.xtb-build-env/lib -Wl,-rpath-link,/home/iaw/project/eled/.xtb-build-env/lib -L/home/iaw/project/eled/.xtb-build-env/lib']
 -- The C compiler identification is GNU 16.2.0
 -- The Fortran compiler identification is GNU 16.2.0
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
--- Check for working C compiler: /home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc - skipped
+-- Check for working C compiler: /home/iaw/project/eled/.xtb-build-env/bin/x86_64-conda-linux-gnu-cc - skipped
 -- Detecting C compile features
 -- Detecting C compile features - done
 -- Detecting Fortran compiler ABI info
 -- Detecting Fortran compiler ABI info - done
--- Check for working Fortran compiler: /home/iaw/project/rdkit_eth/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran - skipped
+-- Check for working Fortran compiler: /home/iaw/project/eled/.xtb-build-env/bin/x86_64-conda-linux-gnu-gfortran - skipped
 致命错误：不是 Git 仓库（或者任何父目录）：.git
 -- Found OpenMP_C: -fopenmp (found version "5.2")
 -- Found OpenMP_Fortran: -fopenmp (found version "5.2")
@@ -20,10 +20,10 @@ COMMAND ['cmake', '-S', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investiga
 -- Found Threads: TRUE
 -- Looking for Fortran sgemm
 -- Looking for Fortran sgemm - found
--- Found BLAS: /home/iaw/project/rdkit_eth/.xtb-build-env/lib/libblas.so
+-- Found BLAS: /home/iaw/project/eled/.xtb-build-env/lib/libblas.so
 -- Looking for Fortran cheev
 -- Looking for Fortran cheev - found
--- Found LAPACK: /home/iaw/project/rdkit_eth/.xtb-build-env/lib/libblas.so;-lm;-ldl
+-- Found LAPACK: /home/iaw/project/eled/.xtb-build-env/lib/libblas.so;-lm;-ldl
 -- Configuring done (0.9s)
 -- Generating done (0.0s)
 CMake Warning (unused-cli):
@@ -32,8 +32,8 @@ CMake Warning (unused-cli):
     WITH_TESTS
 
 
--- Build files have been written to: /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build
-COMMAND ['cmake', '--build', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build', '--parallel', '6']
+-- Build files have been written to: /home/iaw/project/eled/build/xtb-orbital-investigation/release-build
+COMMAND ['cmake', '--build', '/home/iaw/project/eled/build/xtb-orbital-investigation/release-build', '--parallel', '6']
 [1/749] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/interface.f90-pp.f90
 [2/749] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/results.f90-pp.f90
 [3/749] Building Fortran preprocessed CMakeFiles/xtb-object.dir/src/api/molecule.f90-pp.f90
@@ -484,7 +484,7 @@ COMMAND ['cmake', '--build', '/home/iaw/project/rdkit_eth/build/xtb-orbital-inve
 [448/749] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/lapack/eigensolve.F90.o
 [449/749] Building Fortran object CMakeFiles/xtb-object.dir/src/type/solvation.f90.o
 [450/749] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/frag_hess.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/gfnff/frag_hess.f90:483:1:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/gfnff/frag_hess.f90:483:1:
 
    43 |       subroutine eigsort4(lab,ew,u)
       |       2~~~~~~~~~~~~~~~~~~
@@ -492,7 +492,7 @@ COMMAND ['cmake', '--build', '/home/iaw/project/rdkit_eth/build/xtb-orbital-inve
   483 | subroutine eigsort4(lab,u,ew)
       | 1~~~~~~~~~~~~~~~~~~
 Warning: INTENT mismatch in argument 'lab' between (1) and (2)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/gfnff/frag_hess.f90:415:0:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/gfnff/frag_hess.f90:415:0:
 
    24 |      function shortest_distance(nspin, start, goal, numnb, neighbours, input_distances, visited, precessor)
 ......
@@ -517,7 +517,7 @@ Warning: Rank mismatch in argument 'neighbours' (2/3) between (1) and (2)
 [467/749] Building Fortran object CMakeFiles/xtb-object.dir/src/constrain_pot.f90.o
 [468/749] Building Fortran object CMakeFiles/xtb-object.dir/src/solv/ddcosmo/solver.f90.o
 [469/749] Building Fortran object CMakeFiles/xtb-object.dir/src/mctc/linalg.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/mctc/linalg.f90:232:109:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/mctc/linalg.f90:232:109:
 
    21 |    use xtb_mctc_blas
       |       2                                                                                                      
@@ -530,27 +530,27 @@ Warning: Mismatch in PURE attribute between (1) and (2)
 [472/749] Building Fortran object CMakeFiles/xtb-object.dir/src/define.f90.o
 [473/749] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/data.f90.o
 [474/749] Building Fortran object CMakeFiles/xtb-object.dir/src/drsp.f.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/drsp.f:185:72:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/drsp.f:185:72:
 
   185 |    10 E(I-1) = E(I)
       |                                                                        1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/drsp.f:214:72:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/drsp.f:214:72:
 
   214 |    50    D(I) = D(I) - H
       |                                                                        1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 50 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/drsp.f:336:72:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/drsp.f:336:72:
 
   336 |    10 E2(I-1) = E2(I)
       |                                                                        1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 10 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/drsp.f:368:72:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/drsp.f:368:72:
 
   368 |    60    D(I) = D(I) - H
       |                                                                        1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/drsp.f:611:72:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/drsp.f:611:72:
 
   611 |             DO 80   K = 1, J
       |                                                                        1
@@ -586,7 +586,7 @@ Warning: Fortran 2018 deleted feature: Shared DO termination label 80 at (1)
 [503/749] Building Fortran object CMakeFiles/xtb-object.dir/src/neighbor.f90.o
 [504/749] Building Fortran object CMakeFiles/xtb-object.dir/src/matinv.f90.o
 [505/749] Building Fortran object CMakeFiles/xtb-object.dir/src/onetri.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/onetri.f90:59:68:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/onetri.f90:59:68:
 
    19 |    use xtb_mctc_blas, only : blas_symm, blas_gemm
       |       2                                                             
@@ -594,7 +594,7 @@ Warning: Fortran 2018 deleted feature: Shared DO termination label 80 at (1)
    59 |       call dgemm('t','n',ival,ival,n,1.d0,array,n,s2,n,0.d0,s1,ival)
       |                                                                    1
 Warning: Mismatch in PURE attribute between (1) and (2)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/onetri.f90:58:60:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/onetri.f90:58:60:
 
    19 |    use xtb_mctc_blas, only : blas_symm, blas_gemm
       |       2                                                     
@@ -616,142 +616,142 @@ Warning: Mismatch in PURE attribute between (1) and (2)
 [517/749] Building Fortran object CMakeFiles/xtb-object.dir/src/readl.f90.o
 [518/749] Building Fortran object CMakeFiles/xtb-object.dir/src/rmrottr.f90.o
 [519/749] Building Fortran object CMakeFiles/xtb-object.dir/src/prmat.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:130:19:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:130:19:
 
   130 |       IF(M)10,10,80
       |                   1
 Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:149:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:149:14:
 
   149 |    20 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:162:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:162:14:
 
   162 |    30 K2=K2+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:163:16:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:163:16:
 
   163 |    40 KD=KD+NKPB
       |                1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:175:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:175:14:
 
   175 |    60 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:188:17:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:188:17:
 
   188 |       DO 90 J=1,N
       |                 1
 Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:191:22:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:191:22:
 
   191 |    90 I2=I1+(NKPB-1)*N
       |                      1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:221:19:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:221:19:
 
   221 |       IF(M)10,10,80
       |                   1
 Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:240:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:240:14:
 
   240 |    20 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:253:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:253:14:
 
   253 |    30 K2=K2+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:254:16:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:254:16:
 
   254 |    40 KD=KD+NKPB
       |                1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:266:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:266:14:
 
   266 |    60 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:279:17:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:279:17:
 
   279 |       DO 90 J=1,N
       |                 1
 Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:282:22:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:282:22:
 
   282 |    90 I2=I1+(NKPB-1)*N
       |                      1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:313:19:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:313:19:
 
   313 |       IF(M)10,10,80
       |                   1
 Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:332:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:332:14:
 
   332 |    20 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:345:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:345:14:
 
   345 |    30 K2=K2+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:346:16:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:346:16:
 
   346 |    40 KD=KD+NKPB
       |                1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:358:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:358:14:
 
   358 |    60 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:371:17:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:371:17:
 
   371 |       DO 90 J=1,N
       |                 1
 Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:374:22:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:374:22:
 
   374 |    90 I2=I1+(NKPB-1)*N
       |                      1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:404:19:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:404:19:
 
   404 |       IF(M)10,10,80
       |                   1
 Warning: Fortran 2018 deleted feature: Arithmetic IF statement at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:423:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:423:14:
 
   423 |    20 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:436:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:436:14:
 
   436 |    30 K2=K2+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 30 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:437:16:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:437:16:
 
   437 |    40 KD=KD+NKPB
       |                1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 40 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:449:14:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:449:14:
 
   449 |    60 K2=K1+KK
       |              1
 Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 60 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:462:17:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:462:17:
 
   462 |       DO 90 J=1,N
       |                 1
 Warning: Fortran 2018 deleted feature: Shared DO termination label 90 at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prmat.f90:465:22:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prmat.f90:465:22:
 
   465 |    90 I2=I1+(NKPB-1)*N
       |                      1
@@ -799,7 +799,7 @@ Warning: Fortran 2018 deleted feature: DO termination statement which is not END
 [560/749] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_param.f90.o
 [561/749] Building Fortran object CMakeFiles/xtb-object.dir/src/lbfgs_anc/optimizer.f90.o
 [562/749] Building Fortran object CMakeFiles/xtb-object.dir/src/type/anc.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/type/anc.f90:500:89:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/type/anc.f90:500:89:
 
    20 |    use xtb_mctc_blas
       |       2                                                                                  
@@ -822,7 +822,7 @@ Warning: Mismatch in PURE attribute between (1) and (2)
 [575/749] Building Fortran object CMakeFiles/xtb-object.dir/src/gfn_paramset.f90.o
 [576/749] Building Fortran object CMakeFiles/xtb-object.dir/src/coulomb/klopmanohno.f90.o
 [577/749] Building Fortran object CMakeFiles/xtb-object.dir/src/printout.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/printout.f90:102:15:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/printout.f90:102:15:
 
   102 |    !$omp master
       |               1
@@ -870,12 +870,12 @@ Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-W
 [618/749] Building Fortran object CMakeFiles/xtb-object.dir/src/extern/driver.f90.o
 [619/749] Building Fortran object CMakeFiles/xtb-object.dir/src/iff/iff_energy.f90.o
 [620/749] Building Fortran object CMakeFiles/xtb-object.dir/src/extern/orca.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/extern/orca.f90:285:15:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/extern/orca.f90:285:15:
 
   285 |    !$omp master
       |               1
 Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-Wdeprecated-openmp]
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/extern/orca.f90:759:15:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/extern/orca.f90:759:15:
 
   759 |    !$omp master
       |               1
@@ -948,7 +948,7 @@ Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-W
 [686/749] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/irmod.f90.o
 [687/749] Building Fortran object CMakeFiles/xtb-object.dir/src/xtb/calculator.f90.o
 [688/749] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/gfnff_eg.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/gfnff/gfnff_eg.f90:1071:68:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/gfnff/gfnff_eg.f90:1071:68:
 
  1071 |            write(*,'(10x,"No H-atom found in this bond ",i0,1x,i0)'), iat,jat
       |                                                                    1
@@ -977,7 +977,7 @@ Warning: Legacy Extension: Comma before i/o item list at (1)
 [710/749] Building Fortran object CMakeFiles/xtb-object.dir/src/gfnff/calculator.f90.o
 [711/749] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/topology.f90.o
 [712/749] Building Fortran object CMakeFiles/xtb-object.dir/src/optimizer.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/optimizer.f90:852:36:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/optimizer.f90:852:36:
 
   852 |       write(env%unit,'(1x,"("f7.2"%)")')         (depred-echng)/echng*100
       |                                    1
@@ -1003,17 +1003,17 @@ Warning: Legacy Extension: Missing comma in FORMAT string at (1)
 [731/749] Building Fortran object CMakeFiles/xtb-object.dir/src/screening.f90.o
 [732/749] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/test_gfnff.f90.o
 [733/749] Building Fortran object CMakeFiles/xtb-object.dir/src/modef.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/modef.f90:170:52:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/modef.f90:170:52:
 
   170 |          write(*,'(''Erel (w.r.t input min / kcal :'' f8.3)') &
       |                                                    1
 Warning: Legacy Extension: Missing comma in FORMAT string at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/modef.f90:468:58:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/modef.f90:468:58:
 
   468 |                write(*,'(''Erel (w.r.t input min / kcal :'' f8.3)')  &
       |                                                          1
 Warning: Legacy Extension: Missing comma in FORMAT string at (1)
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/modef.f90:504:52:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/modef.f90:504:52:
 
   504 |          write(*,'(''Erel (w.r.t input min / kcal :'' f8.3)')  &
       |                                                    1
@@ -1031,7 +1031,7 @@ Warning: Legacy Extension: Missing comma in FORMAT string at (1)
 [744/749] Building Fortran object test/unit/CMakeFiles/xtb-tester.dir/main.f90.o
 [745/749] Linking Fortran executable test/unit/xtb-tester
 [746/749] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/dock.f90.o
-/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-src/src/prog/dock.f90:711:18:
+/home/iaw/project/eled/build/xtb-orbital-investigation/release-src/src/prog/dock.f90:711:18:
 
   711 |       !$omp master
       |                  1
@@ -1039,8 +1039,8 @@ Warning: 'master' construct at (1) deprecated since OpenMP 5.1, use 'masked' [-W
 [747/749] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/main.F90.o
 [748/749] Building Fortran object CMakeFiles/xtb-exe.dir/src/prog/primary.f90.o
 [749/749] Linking Fortran executable xtb
-COMMAND ['ctest', '--test-dir', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build', '--output-on-failure', '--parallel', '6']
-Test project /home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build
+COMMAND ['ctest', '--test-dir', '/home/iaw/project/eled/build/xtb-orbital-investigation/release-build', '--output-on-failure', '--parallel', '6']
+Test project /home/iaw/project/eled/build/xtb-orbital-investigation/release-build
       Start  1: xtb/CAPI
       Start  2: xtb/atomlist
       Start  3: xtb/coordinationnumber
@@ -1405,9 +1405,9 @@ The following tests FAILED:
 	 17 - xtb/oniom (Failed)
 Errors while running CTest
 Traceback (most recent call last):
-  File "/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/build_variant.py", line 20, in <module>
+  File "/home/iaw/project/eled/build/xtb-orbital-investigation/build_variant.py", line 20, in <module>
     print('COMMAND',cmd,flush=True);subprocess.run(cmd,env=env,check=True)
                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/iaw/project/rdkit_eth/.xtb-build-env/lib/python3.11/subprocess.py", line 571, in run
+  File "/home/iaw/project/eled/.xtb-build-env/lib/python3.11/subprocess.py", line 571, in run
     raise CalledProcessError(retcode, process.args,
-subprocess.CalledProcessError: Command '['ctest', '--test-dir', '/home/iaw/project/rdkit_eth/build/xtb-orbital-investigation/release-build', '--output-on-failure', '--parallel', '6']' returned non-zero exit status 8.
+subprocess.CalledProcessError: Command '['ctest', '--test-dir', '/home/iaw/project/eled/build/xtb-orbital-investigation/release-build', '--output-on-failure', '--parallel', '6']' returned non-zero exit status 8.

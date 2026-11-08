@@ -15,21 +15,21 @@ import sys
 def installation_info():
     """Report installed packages without importing optional calculation engines."""
     import rdkit
-    import rdkit_eth
+    import eled
 
     versions = {}
-    for name in ("rdkit-eth", "rdkit", "numpy"):
+    for name in ("eled", "rdkit", "numpy"):
         try:
             versions[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
             versions[name] = None
-    spec = importlib.util.find_spec("rdkit_eth.rdXTBTools")
+    spec = importlib.util.find_spec("eled.rdXTBTools")
     return {
         "schema_version": 1,
         "python": sys.executable,
         "python_version": platform.python_version(),
         "platform": platform.platform(),
-        "package_path": str(Path(rdkit_eth.__file__).resolve()),
+        "package_path": str(Path(eled.__file__).resolve()),
         "rdkit_path": str(Path(rdkit.__file__).resolve()),
         "versions": versions,
         "compiled_module_path": spec.origin if spec else None,
@@ -53,7 +53,7 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
         except ImportError as exc:
             raise RuntimeError(
                 "rdXTBTools is unavailable or incompatible. Build with "
-                "RDKIT_ETH_BUILD_RDXTB=1 in the locked RDKit SDK environment; "
+                "ELED_BUILD_RDXTB=1 in the locked RDKit SDK environment; "
                 "see docs/install.md. " + str(exc)
             ) from exc
         ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library or "", keepOverlap=keep_overlap)
@@ -121,7 +121,7 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="rdkit-eth")
+    parser = argparse.ArgumentParser(prog="eled")
     commands = parser.add_subparsers(dest="command", required=True)
     doctor = commands.add_parser("doctor", help="show installation identity and optionally test a backend")
     doctor.add_argument("--json", action="store_true", help="emit a machine-readable report")
@@ -147,7 +147,7 @@ def main(argv=None):
     if args.json:
         print(json.dumps(report, indent=2, allow_nan=False))
     else:
-        print(f"rdkit-eth {report['versions']['rdkit-eth'] or '(source checkout)'}")
+        print(f"eled {report['versions']['eled'] or '(source checkout)'}")
         print(f"Python: {report['python']}")
         print(f"Package: {report['package_path']}")
         print(f"RDKit: {report['versions']['rdkit']}")

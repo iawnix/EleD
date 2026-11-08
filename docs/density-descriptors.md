@@ -1,6 +1,6 @@
 # Density-derived descriptors
 
-`rdkit-eth` can analyze the density returned by the extended `libxtb` build
+`eled` can analyze the density returned by the extended `libxtb` build
 without a second engine call.  Request `keep_overlap=True`; the result then
 contains the same calculation's overlap matrix, orbital coefficients and
 AO/shell maps.

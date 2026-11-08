@@ -244,14 +244,14 @@ numerical evidence and the archived 0.1 packages have been preserved.
 
 Environment: Linux x86-64; Python 3.11.18; RDKit 2026.09.1; conda-forge
 xTB 6.7.1 (`gfortran_ha02e54d_5`); C API version 10000. The isolated test
-environment is at `/tmp/rdkit-xtb-check`; no existing user environment was
+environment is at `/tmp/eled-check`; no existing user environment was
 modified. CLI and shared library came from the same conda package.
 
 Run from the project root:
 
 ```bash
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  /tmp/rdkit-xtb-check/bin/python -m pytest -q
+  /tmp/eled-check/bin/python -m pytest -q
 ```
 
 Result: **28 tests passed**, including 9 real-engine integration cases.
@@ -314,7 +314,7 @@ gas-phase calls and still rejects unknown major versions. The changed
 The added source-preparation tests verify repeatable patch application,
 rejection of a different commit, and preservation of unrelated source edits.
 Build provenance, binary/parameter hashes, licenses, and regression results
-are installed under `.xtb-rdkit/share/xtb/rdkit-eth/`.
+are installed under `.xtb-rdkit/share/xtb/eled/`.
 
 ## Native GFN0 enablement — 2026-11-02
 
@@ -382,13 +382,13 @@ To repeat the patched Python run from the project root:
 ```bash
 source .xtb-rdkit/activate.sh
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  RDKIT_ETH_REQUIRE_RDXTB=1 RDKIT_ETH_EXPECT_NATIVE_GFN0=1 \
+  ELED_REQUIRE_RDXTB=1 ELED_EXPECT_NATIVE_GFN0=1 \
   .rdxtb-build-env/bin/python -m pytest -q
 ```
 
 For the release run, start a fresh Python process and set `XTB_LIBRARY`,
 `XTB_PATH`, and `XTBPATH` to the matching official installation, with
-`RDKIT_ETH_EXPECT_NATIVE_GFN0=0`. The [build/API guide](rdxtb-tools.md)
+`ELED_EXPECT_NATIVE_GFN0=0`. The [build/API guide](rdxtb-tools.md)
 documents installation, C++ consumers and platform/ABI limitations.
 
 ## Optional tblite backend — 2026-11-02

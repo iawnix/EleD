@@ -1,5 +1,5 @@
 # Linux x86-64 developer toolchain for the pinned xTB source build.
-name: rdkit-eth-xtb-build
+name: eled-xtb-build
 channels:
   - conda-forge
 dependencies:

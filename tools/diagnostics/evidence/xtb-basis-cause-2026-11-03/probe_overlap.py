@@ -2,9 +2,9 @@ import json,sys,numpy as np
 from pathlib import Path
 sys.path.insert(0,str(Path.cwd()/'tools'))
 from compare_orbitals import molecule
-from rdkit_eth import rdXTBTools
-from rdkit_eth.backends.tblite import run_xtb_tblite
-from rdkit_eth.orbital_alignment import libxtb_to_tblite_rows
+from eled import rdXTBTools
+from eled.backends.tblite import run_xtb_tblite
+from eled.orbital_alignment import libxtb_to_tblite_rows
 fixtures=json.load(open('tests/data/orbital_alignment_cases.json'))['cases']
 records=[]
 for name in ['water','bromomethane','iodomethane']:

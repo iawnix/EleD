@@ -29,15 +29,23 @@ replaced by zero.
 ## Frozen calculation protocol
 
 Use the public RegioML/RegioSQM EAS atom labels and the selection rules in
-`protocol.json`. RDKit generates and checks the conformers. GFN2 supplies the
+`protocol.json`. RDKit generates and checks at most ten conformers with ETKDGv3;
+other embedding presets are not used as silent fallbacks. GFN2 supplies the
 predeclared geometry, while GFN1 and GFN2 single points use identical coordinates.
+Every manifest carries the protocol SHA256 and a leakage-safe five-fold
+`cv_fold` in addition to the primary scaffold split.
 The extended `libxtb` build retains `C`, `S` and AO/shell maps for density analysis.
 
-The primary electronic temperature is 300 K. A second 1000 K calculation is a
-deliberately amplified occupation-sensitivity diagnostic; it is not a nuclear
+The primary electronic temperature is 300 K. Feature generation also records a
+same-geometry GFN1/300 K comparison and a GFN2/1000 K calculation. The latter is
+a deliberately amplified occupation-sensitivity diagnostic; it is not a nuclear
 temperature, thermal conformer ensemble or excited-state calculation.
 
 ## Models and evaluation
+
+This section is a benchmark specification, not part of the descriptor API. Its
+machine-readable contract is [`benchmarks/eas/model_protocol.json`](../benchmarks/eas/model_protocol.json);
+the feature protocol remains [`protocol.json`](../protocol.json).
 
 Use regularized logistic regression and gradient-boosted trees. Keep molecules
 sharing a Bemis--Murcko scaffold or Morgan Tanimoto cluster in the same partition.
@@ -62,3 +70,9 @@ parameter hashes; and conformer-level atom/bond index checks.
 The final package contains the frozen protocol and hash, selected-record manifest,
 feature files, failure manifest, training scripts, locked environment, test logs,
 models and bootstrap results. A negative result is retained as a valid outcome.
+
+The model command is isolated under `benchmarks/eas/` and
+`tools/run_eas_benchmark.py`. It consumes a validated feature archive, performs
+training-fold tuning, evaluates the untouched test partition, and reports paired
+molecule bootstrap intervals. It is an optional benchmark dependency and is not
+imported by the `eled` runtime package.

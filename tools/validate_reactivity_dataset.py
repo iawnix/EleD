@@ -12,7 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from rdkit import Chem
-from rdkit_eth import (ReactivityJob, XTBDiskCache, XTBOptions, run_reactivity_batch,
+from eled import (ReactivityJob, XTBDiskCache, XTBOptions, run_reactivity_batch,
                        export_descriptor_reports)
 
 
@@ -49,7 +49,7 @@ def main():
                 checkpoint=args.output/f'{label}.sqlite'
                 rows=run_reactivity_batch(jobs,interface=interface,initialization=initialization,
                                            checkpoint=checkpoint,cache=cache)
-                with patch('rdkit_eth.reactivity_batch.run_reactivity',side_effect=AssertionError('resume recalculated')):
+                with patch('eled.reactivity_batch.run_reactivity',side_effect=AssertionError('resume recalculated')):
                     resumed=run_reactivity_batch(jobs,interface=interface,initialization=initialization,
                                                 checkpoint=checkpoint,cache=cache)
                 assert all(r['execution']['source']=='checkpoint' for r in resumed)

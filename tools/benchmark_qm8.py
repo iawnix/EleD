@@ -23,10 +23,10 @@ from rdkit import Chem, rdBase
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
-from rdkit_eth import XTBEnvironmentError, XTBOptions, XTBRunError, calc_descriptor_report, XTBCalculator
-from rdkit_eth.input import _xyz_from_mol, _geometry_hash
-from rdkit_eth.persistence import _implementation_identity
-from rdkit_eth.backends.native import HARTREE_TO_EV
+from eled import XTBEnvironmentError, XTBOptions, XTBRunError, calc_descriptor_report, XTBCalculator
+from eled.input import _xyz_from_mol, _geometry_hash
+from eled.persistence import _implementation_identity
+from eled.backends.native import HARTREE_TO_EV
 
 URL = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb8.tar.gz'
 SHA256 = 'e668b58f8dfba329bc20cd7e0eb3944e8a73a5d9db37160f686a8b31b20548a0'

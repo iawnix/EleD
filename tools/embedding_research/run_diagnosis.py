@@ -18,7 +18,7 @@ import time
 import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import rdDistGeom
-from rdkit_eth.geometry import _check_geometry, _stereo_constraints
+from eled.geometry import _check_geometry, _stereo_constraints
 
 from audit_constraints import audit
 

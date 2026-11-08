@@ -94,7 +94,7 @@ def test_basis_patch_is_idempotent_and_modified_source_is_preserved(source_case,
 
 def test_native_capability_constants_match_reviewed_patch():
     import json
-    from rdkit_eth.runtime import _BASIS_EXPORT_PATCH
+    from eled.runtime import _BASIS_EXPORT_PATCH
     root = Path(__file__).resolve().parents[1]
     lock = json.loads((root / 'tools/xtb-source.json').read_text())['basis_extension']
     assert lock['patch_sha256'] == _BASIS_EXPORT_PATCH == builder.digest(root / 'tools' / lock['patch'])
@@ -116,7 +116,7 @@ def test_upstream_source_is_verified_without_d4_patch(source_case, tmp_path):
 
 def test_upstream_capability_constants_match_source_lock():
     import json
-    from rdkit_eth.runtime import _UPSTREAM_GFN0_COMMIT, _UPSTREAM_D4_SHA256
+    from eled.runtime import _UPSTREAM_GFN0_COMMIT, _UPSTREAM_D4_SHA256
     root = Path(__file__).resolve().parents[1]
     lock = json.loads((root / 'tools/xtb-source.json').read_text())
     assert 'patch' not in lock

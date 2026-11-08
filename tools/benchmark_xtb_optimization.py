@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare :func:`rdkit_eth.optimize_xtb` with the xTB CLI optimizer.
+"""Compare :func:`eled.optimize_xtb` with the xTB CLI optimizer.
 
 The two calculations start from the same RDKit-generated coordinates and use
 the same GFN method, charge, spin, accuracy and SCF iteration limit.  The
@@ -23,9 +23,9 @@ import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem
 
-from rdkit_eth import optimize_xtb
-from rdkit_eth.input import _effective_charge_uhf, _geometry_hash, _xyz_from_mol
-from rdkit_eth.runtime import _find_xtb_library
+from eled import optimize_xtb
+from eled.input import _effective_charge_uhf, _geometry_hash, _xyz_from_mol
+from eled.runtime import _find_xtb_library
 
 
 DEFAULT_SMILES = ("O", "CCO", "c1ccccc1", "CC(=O)O")
@@ -216,7 +216,7 @@ def main() -> None:
     args.output.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
     rows = []
-    with tempfile.TemporaryDirectory(prefix="rdkit-eth-optimization-", dir=args.output) as temporary:
+    with tempfile.TemporaryDirectory(prefix="eled-optimization-", dir=args.output) as temporary:
         workroot = Path(temporary)
         for index, smiles in enumerate(cases):
             case_dir = workroot / str(index)

@@ -42,7 +42,7 @@ def _entry(function, payload, output):
 def _one(function, payload, timeout, cancelled):
     if cancelled.is_set(): return XTBWorkerError('batch cancelled')
     context = multiprocessing.get_context('spawn')
-    with tempfile.TemporaryDirectory(prefix='rdkit-eth-worker-') as directory:
+    with tempfile.TemporaryDirectory(prefix='eled-worker-') as directory:
         output = Path(directory)/'result.pickle'
         process = context.Process(target=_entry, args=(function, payload, str(output)))
         started = time.monotonic()

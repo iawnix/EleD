@@ -3,9 +3,9 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import optimize_xtb, prepare_conformers
-from rdkit_eth.errors import XTBNativeNotFoundError
-from rdkit_eth.runtime import _extended_libxtb_build, _find_xtb_library
+from eled import optimize_xtb, prepare_conformers
+from eled.errors import XTBNativeNotFoundError
+from eled.runtime import _extended_libxtb_build, _find_xtb_library
 
 
 def molecule(smiles='CCO'):

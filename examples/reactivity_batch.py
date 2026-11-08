@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from rdkit_eth import (ReactivityJob, ReactivityCheckpoint, XTBDiskCache,
+from eled import (ReactivityJob, ReactivityCheckpoint, XTBDiskCache,
                        run_reactivity_batch, export_descriptor_reports)
 
 

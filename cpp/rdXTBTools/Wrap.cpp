@@ -112,9 +112,9 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   // Use the active Python runtime, including relocated distributions. An explicit
   // path remains authoritative; the standalone C++ default is unchanged.
   options.libraryPath = library.empty() ? py::extract<std::string>(
-      py::import("rdkit_eth.runtime").attr("_find_xtb_library")()) : library;
+      py::import("eled.runtime").attr("_find_xtb_library")()) : library;
   options.parameterDirectory = parameterDirectory;
-  py::object settings = py::import("rdkit_eth.options").attr("calculation_settings")(
+  py::object settings = py::import("eled.options").attr("calculation_settings")(
       maxIterations, accuracy, electronicTemperature);
   options.maxIterations = py::extract<int>(settings["max_iterations"]);
   options.accuracy = py::extract<double>(settings["accuracy"]);
@@ -123,7 +123,7 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   RDKit::ROMol snapshot(mol);
   auto result = std::make_shared<XTBResults>();
   // Coordinate with the existing ctypes adapter as well as the core C++ mutex.
-  py::object lock = py::import("rdkit_eth.backends.native").attr("_native_lock");
+  py::object lock = py::import("eled.backends.native").attr("_native_lock");
   lock.attr("acquire")();
   bool ok = false;
   try {
@@ -137,7 +137,7 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   if (ok) {
     // Hash the immutable snapshot actually passed to C++, not the caller's
     // molecule (which another Python thread could change while GIL is released).
-    py::object input = py::import("rdkit_eth.input");
+    py::object input = py::import("eled.input");
     py::object snapshotObject(py::ptr(&snapshot));
     py::object xyz = input.attr("_xyz_from_mol")(snapshotObject, result->conformerId);
     py::object metadata = input.attr("_input_metadata")(snapshotObject, result->conformerId,
@@ -161,7 +161,7 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   options.numUnpairedElectrons = optionalInteger(config.attr("uhf"), "uhf");
   options.libraryPath = py::extract<std::string>(config.attr("xtb_library"));
   options.keepOverlap = py::extract<bool>(config.attr("keep_overlap"));
-  py::object settings = py::import("rdkit_eth.options").attr("calculation_settings")(
+  py::object settings = py::import("eled.options").attr("calculation_settings")(
       py::object(config.attr("max_iterations")), py::object(config.attr("accuracy")),
       py::object(config.attr("electronic_temperature")));
   options.maxIterations = py::extract<int>(settings["max_iterations"]);
@@ -172,7 +172,7 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   if (!ionSpin || !attachSpin) throw std::invalid_argument("Adjacent spins must be explicit");
   RDKit::ROMol snapshot(mol);
   std::vector<XTBResults> results;
-  py::object lock = py::import("rdkit_eth.backends.native").attr("_native_lock");
+  py::object lock = py::import("eled.backends.native").attr("_native_lock");
   lock.attr("acquire")();
   try {
     ReleaseGIL released;
@@ -185,7 +185,7 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   py::list output;
   for (auto &value : results) {
     if (value.success) {
-      py::object input = py::import("rdkit_eth.input");
+      py::object input = py::import("eled.input");
       py::object snapshotObject(py::ptr(&snapshot));
       py::object xyz = input.attr("_xyz_from_mol")(snapshotObject, value.conformerId);
       py::object metadata = input.attr("_input_metadata")(snapshotObject, value.conformerId,

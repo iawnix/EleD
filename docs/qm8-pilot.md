@@ -99,7 +99,7 @@ we have not shown that conformer averaging improves these predictions.
 Install the standard package/runtime first. Keep research dependencies separate:
 
 ```bash
-.rdkit-eth/runtime/bin/python -m venv --system-site-packages build/benchmark-env
+.eled/runtime/bin/python -m venv --system-site-packages build/benchmark-env
 build/benchmark-env/bin/python -m pip install -r tools/benchmark-requirements.txt
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
   build/benchmark-env/bin/python tools/benchmark_qm8.py \

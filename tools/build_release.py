@@ -29,17 +29,17 @@ def digest(path):
 def wheel_record(path, compiled):
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
-        extensions = [n for n in names if n.startswith("rdkit_eth/") and n.endswith(".so")]
+        extensions = [n for n in names if n.startswith("eled/") and n.endswith(".so")]
         if bool(extensions) != compiled:
             raise RuntimeError(f"unexpected compiled module presence in {path}")
         if compiled and not any("rdXTBTools" in n for n in extensions):
             raise RuntimeError("compiled wheel is missing rdXTBTools")
         metadata = BytesParser().parsebytes(archive.read(next(n for n in names if n.endswith(".dist-info/METADATA"))))
-        if "rdkit_eth/backends/tblite.py" in names:
+        if "eled/backends/tblite.py" in names:
             raise RuntimeError("wheel contains the removed tblite backend")
-        if "rdkit_eth/backends/cli.py" in names:
+        if "eled/backends/cli.py" in names:
             raise RuntimeError("wheel contains the removed CLI backend")
-        if "rdkit_eth/__main__.py" not in names:
+        if "eled/__main__.py" not in names:
             raise RuntimeError("wheel is missing the installation diagnostic entry point")
         requirements = metadata.get_all("Requires-Dist", [])
         if any(r.startswith("tblite") for r in requirements):
@@ -61,7 +61,7 @@ def main():
         parser.error("--compiled requires --xtb-prefix containing include/xtb.h")
     output.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    env.pop("RDKIT_ETH_BUILD_RDXTB", None)
+    env.pop("ELED_BUILD_RDXTB", None)
     # Do not run the build frontend from the checkout root: a repository-local
     # ``build/`` directory would shadow the installed ``build`` package as a
     # namespace package on sys.path.
@@ -80,13 +80,13 @@ def main():
     for compiled in ([False, True] if args.compiled else [False]):
         destination = output / ("compiled" if compiled else "pure")
         destination.mkdir()
-        with tempfile.TemporaryDirectory(prefix="rdkit-eth-build-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="eled-build-") as temporary:
             with tarfile.open(source) as archive:
                 archive.extractall(temporary, filter="data")
             checkout, = Path(temporary).iterdir()
             build_env = env.copy()
             if compiled:
-                build_env.update(RDKIT_ETH_BUILD_RDXTB="1", RDXTB_XTB_PREFIX=str(args.xtb_prefix.resolve()),
+                build_env.update(ELED_BUILD_RDXTB="1", RDXTB_XTB_PREFIX=str(args.xtb_prefix.resolve()),
                                  RDXTB_RDKIT_PREFIX=os.environ.get("RDXTB_RDKIT_PREFIX", sys.prefix))
             subprocess.run([sys.executable, "-m", "build", "--wheel", "--no-isolation",
                             "--outdir", str(destination), str(checkout)], env=build_env,

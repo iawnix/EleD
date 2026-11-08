@@ -1,25 +1,25 @@
 {
   "schema_version": 1,
   "installed_at": "2026-11-04T13:51:03.555330+00:00",
-  "runtime": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime",
-  "toolchain": "/home/iaw/project/rdkit_eth/.rdkit-eth/toolchain",
-  "wheel": "/home/iaw/project/rdkit_eth/.rdkit-eth/artifacts/build-gvx1jub7/compiled/rdkit_eth-0.6.0-cp311-cp311-linux_x86_64.whl",
+  "runtime": "/home/iaw/project/eled/.eled/runtime",
+  "toolchain": "/home/iaw/project/eled/.eled/toolchain",
+  "wheel": "/home/iaw/project/eled/.eled/artifacts/build-gvx1jub7/compiled/eled-0.6.0-cp311-cp311-linux_x86_64.whl",
   "wheel_sha256": "9bed9deb88269344032304e69ef99086def8a06ff8e065098a32ea9ba82b42ab",
   "source_lock_sha256": "5876a8aa64daf9c9dc90a397964340d9cfb4922608acc6d161e56ea4858d39fa",
   "checks": [
     {
       "schema_version": 1,
-      "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+      "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.6.0",
+        "eled": "0.6.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
-      "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+      "compiled_module_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
       "compiled_module_import_checked": false,
       "status": "ok",
       "check": {
@@ -31,11 +31,11 @@
         "charge_sum_e": 1.887379141862766e-15,
         "engine": {
           "backend": "native",
-          "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
           "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
           "version": null,
           "native_gfn0": {
-            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
             "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
             "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
             "patch_sha256": null,
@@ -46,7 +46,7 @@
             "api_version": 1,
             "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
             "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
             "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
             "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
           }
@@ -263,11 +263,11 @@
             "solvent": null,
             "engine": {
               "backend": "native",
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
               "version": null,
               "native_gfn0": {
-                "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                 "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                 "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                 "patch_sha256": null,
@@ -278,13 +278,13 @@
                 "api_version": 1,
                 "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                 "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                 "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                 "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
               }
             },
             "parameter_file": {
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn0-xtb.txt",
+              "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn0-xtb.txt",
               "sha256": "278461cabbf89b14379aedc78ef3e141c8cef1f911f3a3c72530aec7a52b6d34"
             },
             "native_api_version": 20000,
@@ -547,17 +547,17 @@
     },
     {
       "schema_version": 1,
-      "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+      "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.6.0",
+        "eled": "0.6.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
-      "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+      "compiled_module_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
       "compiled_module_import_checked": true,
       "status": "ok",
       "check": {
@@ -568,10 +568,10 @@
         "num_orbitals": 8,
         "charge_sum_e": 1.887379141862766e-15,
         "engine": {
-          "library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
           "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
           "api_version": 20000,
-          "parameter_file": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn0-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn0-xtb.txt",
           "parameter_sha256": "278461cabbf89b14379aedc78ef3e141c8cef1f911f3a3c72530aec7a52b6d34",
           "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
           "native_gfn0_verified": true,
@@ -789,13 +789,13 @@
             },
             "engine": {
               "backend": "compiled",
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
               "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
               "api_version": 20000
             },
             "parameter_file": {
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn0-xtb.txt",
+              "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn0-xtb.txt",
               "sha256": "278461cabbf89b14379aedc78ef3e141c8cef1f911f3a3c72530aec7a52b6d34"
             }
           },
@@ -1051,17 +1051,17 @@
     },
     {
       "schema_version": 1,
-      "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+      "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.6.0",
+        "eled": "0.6.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
-      "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+      "compiled_module_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
       "compiled_module_import_checked": false,
       "status": "ok",
       "check": {
@@ -1073,11 +1073,11 @@
         "charge_sum_e": -1.2212453270876722e-15,
         "engine": {
           "backend": "native",
-          "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
           "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
           "version": null,
           "native_gfn0": {
-            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
             "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
             "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
             "patch_sha256": null,
@@ -1088,7 +1088,7 @@
             "api_version": 1,
             "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
             "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
             "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
             "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
           }
@@ -1305,11 +1305,11 @@
             "solvent": null,
             "engine": {
               "backend": "native",
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
               "version": null,
               "native_gfn0": {
-                "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                 "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                 "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                 "patch_sha256": null,
@@ -1320,13 +1320,13 @@
                 "api_version": 1,
                 "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                 "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                 "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                 "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
               }
             },
             "parameter_file": {
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+              "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
               "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
             },
             "native_api_version": 20000,
@@ -1623,7 +1623,7 @@
               "method": "GFN1-xTB",
               "charge": 0,
               "uhf": 0,
-              "xtb_library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "xtb_library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "backend": "native",
               "keep_overlap": true,
               "max_iterations": 250,
@@ -1679,11 +1679,11 @@
                 "solvent": null,
                 "engine": {
                   "backend": "native",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "version": null,
                   "native_gfn0": {
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": null,
@@ -1694,13 +1694,13 @@
                     "api_version": 1,
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                   }
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                   "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                 },
                 "native_api_version": 20000,
@@ -1747,11 +1747,11 @@
                 "solvent": null,
                 "engine": {
                   "backend": "native",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "version": null,
                   "native_gfn0": {
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": null,
@@ -1762,13 +1762,13 @@
                     "api_version": 1,
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                   }
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                   "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                 },
                 "native_api_version": 20000,
@@ -1815,11 +1815,11 @@
                 "solvent": null,
                 "engine": {
                   "backend": "native",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "version": null,
                   "native_gfn0": {
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": null,
@@ -1830,13 +1830,13 @@
                     "api_version": 1,
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                   }
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                   "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                 },
                 "native_api_version": 20000,
@@ -1886,11 +1886,11 @@
                   "solvent": null,
                   "engine": {
                     "backend": "native",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "version": null,
                     "native_gfn0": {
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": null,
@@ -1901,13 +1901,13 @@
                       "api_version": 1,
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                     }
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                     "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                   },
                   "native_api_version": 20000,
@@ -1954,11 +1954,11 @@
                   "solvent": null,
                   "engine": {
                     "backend": "native",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "version": null,
                     "native_gfn0": {
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": null,
@@ -1969,13 +1969,13 @@
                       "api_version": 1,
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                     }
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                     "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                   },
                   "native_api_version": 20000,
@@ -2022,11 +2022,11 @@
                   "solvent": null,
                   "engine": {
                     "backend": "native",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "version": null,
                     "native_gfn0": {
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": null,
@@ -2037,13 +2037,13 @@
                       "api_version": 1,
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                     }
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                     "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                   },
                   "native_api_version": 20000,
@@ -2151,17 +2151,17 @@
     },
     {
       "schema_version": 1,
-      "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+      "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.6.0",
+        "eled": "0.6.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
-      "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+      "compiled_module_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
       "compiled_module_import_checked": true,
       "status": "ok",
       "check": {
@@ -2172,10 +2172,10 @@
         "num_orbitals": 8,
         "charge_sum_e": -1.2212453270876722e-15,
         "engine": {
-          "library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
           "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
           "api_version": 20000,
-          "parameter_file": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
           "parameter_sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399",
           "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
           "native_gfn0_verified": true,
@@ -2393,13 +2393,13 @@
             },
             "engine": {
               "backend": "compiled",
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
               "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
               "api_version": 20000
             },
             "parameter_file": {
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+              "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
               "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
             }
           },
@@ -2689,7 +2689,7 @@
               "method": "GFN1-xTB",
               "charge": 0,
               "uhf": 0,
-              "xtb_library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "xtb_library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "backend": "native",
               "keep_overlap": true,
               "max_iterations": 250,
@@ -2743,13 +2743,13 @@
                 },
                 "engine": {
                   "backend": "compiled",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                   "api_version": 20000
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                   "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                 }
               }
@@ -2787,13 +2787,13 @@
                 },
                 "engine": {
                   "backend": "compiled",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                   "api_version": 20000
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                   "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                 }
               }
@@ -2831,13 +2831,13 @@
                 },
                 "engine": {
                   "backend": "compiled",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                   "api_version": 20000
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                   "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                 }
               }
@@ -2878,13 +2878,13 @@
                   },
                   "engine": {
                     "backend": "compiled",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                     "api_version": 20000
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                     "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                   }
                 }
@@ -2922,13 +2922,13 @@
                   },
                   "engine": {
                     "backend": "compiled",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                     "api_version": 20000
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                     "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                   }
                 }
@@ -2966,13 +2966,13 @@
                   },
                   "engine": {
                     "backend": "compiled",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                     "api_version": 20000
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn1-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn1-xtb.txt",
                     "sha256": "81a9d7afdee31f5d8fd67a4d8ec966179317c7b100261c9c82d724bafb460399"
                   }
                 }
@@ -3073,17 +3073,17 @@
     },
     {
       "schema_version": 1,
-      "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+      "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.6.0",
+        "eled": "0.6.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
-      "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+      "compiled_module_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
       "compiled_module_import_checked": false,
       "status": "ok",
       "check": {
@@ -3095,11 +3095,11 @@
         "charge_sum_e": -6.217248937900877e-15,
         "engine": {
           "backend": "native",
-          "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
           "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
           "version": null,
           "native_gfn0": {
-            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
             "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
             "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
             "patch_sha256": null,
@@ -3110,7 +3110,7 @@
             "api_version": 1,
             "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
             "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-            "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+            "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
             "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
             "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
           }
@@ -3327,11 +3327,11 @@
             "solvent": null,
             "engine": {
               "backend": "native",
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
               "version": null,
               "native_gfn0": {
-                "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                 "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                 "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                 "patch_sha256": null,
@@ -3342,13 +3342,13 @@
                 "api_version": 1,
                 "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                 "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                 "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                 "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
               }
             },
             "parameter_file": {
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+              "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
               "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
             },
             "native_api_version": 20000,
@@ -3626,7 +3626,7 @@
               "method": "GFN2-xTB",
               "charge": 0,
               "uhf": 0,
-              "xtb_library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "xtb_library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "backend": "native",
               "keep_overlap": true,
               "max_iterations": 250,
@@ -3682,11 +3682,11 @@
                 "solvent": null,
                 "engine": {
                   "backend": "native",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "version": null,
                   "native_gfn0": {
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": null,
@@ -3697,13 +3697,13 @@
                     "api_version": 1,
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                   }
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                   "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                 },
                 "native_api_version": 20000,
@@ -3750,11 +3750,11 @@
                 "solvent": null,
                 "engine": {
                   "backend": "native",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "version": null,
                   "native_gfn0": {
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": null,
@@ -3765,13 +3765,13 @@
                     "api_version": 1,
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                   }
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                   "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                 },
                 "native_api_version": 20000,
@@ -3818,11 +3818,11 @@
                 "solvent": null,
                 "engine": {
                   "backend": "native",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "version": null,
                   "native_gfn0": {
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": null,
@@ -3833,13 +3833,13 @@
                     "api_version": 1,
                     "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                    "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                    "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                     "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                   }
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                   "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                 },
                 "native_api_version": 20000,
@@ -3889,11 +3889,11 @@
                   "solvent": null,
                   "engine": {
                     "backend": "native",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "version": null,
                     "native_gfn0": {
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": null,
@@ -3904,13 +3904,13 @@
                       "api_version": 1,
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                     }
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                     "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                   },
                   "native_api_version": 20000,
@@ -3957,11 +3957,11 @@
                   "solvent": null,
                   "engine": {
                     "backend": "native",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "version": null,
                     "native_gfn0": {
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": null,
@@ -3972,13 +3972,13 @@
                       "api_version": 1,
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                     }
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                     "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                   },
                   "native_api_version": 20000,
@@ -4025,11 +4025,11 @@
                   "solvent": null,
                   "engine": {
                     "backend": "native",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "version": null,
                     "native_gfn0": {
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": null,
@@ -4040,13 +4040,13 @@
                       "api_version": 1,
                       "library_sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                       "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
-                      "manifest": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/rdkit-eth/build.json",
+                      "manifest": "/home/iaw/project/eled/.eled/runtime/share/xtb/eled/build.json",
                       "manifest_sha256": "4f447dd40f095af5fba0a2b3a42c6fb194f445ff42db3b6a244820cb5d1fb400",
                       "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5"
                     }
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                     "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                   },
                   "native_api_version": 20000,
@@ -4154,17 +4154,17 @@
     },
     {
       "schema_version": 1,
-      "python": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/bin/python",
+      "python": "/home/iaw/project/eled/.eled/runtime/bin/python",
       "python_version": "3.11.18",
       "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
-      "package_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/__init__.py",
-      "rdkit_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
+      "package_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/__init__.py",
+      "rdkit_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/rdkit/__init__.py",
       "versions": {
-        "rdkit-eth": "0.6.0",
+        "eled": "0.6.0",
         "rdkit": "2026.9.1",
         "numpy": "2.4.6"
       },
-      "compiled_module_path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/python3.11/site-packages/rdkit_eth/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
+      "compiled_module_path": "/home/iaw/project/eled/.eled/runtime/lib/python3.11/site-packages/eled/rdXTBTools.cpython-311-x86_64-linux-gnu.so",
       "compiled_module_import_checked": true,
       "status": "ok",
       "check": {
@@ -4175,10 +4175,10 @@
         "num_orbitals": 6,
         "charge_sum_e": -6.217248937900877e-15,
         "engine": {
-          "library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+          "library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
           "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
           "api_version": 20000,
-          "parameter_file": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+          "parameter_file": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
           "parameter_sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545",
           "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
           "native_gfn0_verified": true,
@@ -4396,13 +4396,13 @@
             },
             "engine": {
               "backend": "compiled",
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
               "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
               "api_version": 20000
             },
             "parameter_file": {
-              "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+              "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
               "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
             }
           },
@@ -4673,7 +4673,7 @@
               "method": "GFN2-xTB",
               "charge": 0,
               "uhf": 0,
-              "xtb_library": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+              "xtb_library": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
               "backend": "native",
               "keep_overlap": true,
               "max_iterations": 250,
@@ -4727,13 +4727,13 @@
                 },
                 "engine": {
                   "backend": "compiled",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                   "api_version": 20000
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                   "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                 }
               }
@@ -4771,13 +4771,13 @@
                 },
                 "engine": {
                   "backend": "compiled",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                   "api_version": 20000
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                   "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                 }
               }
@@ -4815,13 +4815,13 @@
                 },
                 "engine": {
                   "backend": "compiled",
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                  "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                   "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                   "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                   "api_version": 20000
                 },
                 "parameter_file": {
-                  "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                  "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                   "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                 }
               }
@@ -4862,13 +4862,13 @@
                   },
                   "engine": {
                     "backend": "compiled",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                     "api_version": 20000
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                     "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                   }
                 }
@@ -4906,13 +4906,13 @@
                   },
                   "engine": {
                     "backend": "compiled",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                     "api_version": 20000
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                     "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                   }
                 }
@@ -4950,13 +4950,13 @@
                   },
                   "engine": {
                     "backend": "compiled",
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/lib/libxtb.so.6.7.1",
+                    "path": "/home/iaw/project/eled/.eled/runtime/lib/libxtb.so.6.7.1",
                     "sha256": "8e8b6025faf9019c936c43088ed85b31a318ed5e3a9f35ccad3f6f87a9a6d223",
                     "source_commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
                     "api_version": 20000
                   },
                   "parameter_file": {
-                    "path": "/home/iaw/project/rdkit_eth/.rdkit-eth/runtime/share/xtb/param_gfn2-xtb.txt",
+                    "path": "/home/iaw/project/eled/.eled/runtime/share/xtb/param_gfn2-xtb.txt",
                     "sha256": "f6f05c6c5264cb2f75c54f8ac6838044541c1e493b16f1a4d4ee4fa64de5f545"
                   }
                 }

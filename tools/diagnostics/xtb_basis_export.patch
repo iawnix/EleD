@@ -6,7 +6,7 @@ index e661490..534cf84 100644
                             xtb_TResults /* res */,
                             double* /* c */) XTB_API_SUFFIX__VERSION_2_0_0;
  
-+/* rdkit-eth extension ABI v1; upstream API version remains unchanged.
++/* eled extension ABI v1; upstream API version remains unchanged.
 + * Enable on Results BEFORE singlepoint. Copies own their snapshots.
 + * Failed/repeated calculations and toggling retention invalidate old snapshots.
 + * Sizes: [natoms, nshell, nao]. All map indices are ZERO-based, in native AO order.

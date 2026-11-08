@@ -53,7 +53,7 @@ def environment(conda, prefix, lock, env):
 def clean_environment():
     env = os.environ.copy()
     for name in ('XTB_LIBRARY', 'XTBPATH', 'XTBHOME', 'XTB_PREFIX', 'LD_LIBRARY_PATH',
-                 'LD_PRELOAD', 'PYTHONPATH', 'PYTHONHOME', 'RDKIT_ETH_BUILD_RDXTB',
+                 'LD_PRELOAD', 'PYTHONPATH', 'PYTHONHOME', 'ELED_BUILD_RDXTB',
                  'RDXTB_XTB_PREFIX', 'RDXTB_RDKIT_PREFIX'):
         env.pop(name, None)
     env.update(OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1', MKL_NUM_THREADS='1')
@@ -62,8 +62,8 @@ def clean_environment():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--directory', type=Path, default=ROOT / '.rdkit-eth',
-                        help='dedicated installation root (default: .rdkit-eth in checkout)')
+    parser.add_argument('--directory', type=Path, default=ROOT / '.eled',
+                        help='dedicated installation root (default: .eled in checkout)')
     parser.add_argument('--jobs', type=int, default=min(os.cpu_count() or 1, 6))
     args = parser.parse_args()
     if platform.system() != 'Linux' or platform.machine() not in ('x86_64', 'amd64'):
@@ -95,10 +95,10 @@ def main():
     run([runtime / 'bin/python', '-m', 'pip', 'install', '--no-deps', '--force-reinstall', wheel], env=env)
     run([runtime / 'bin/python', '-m', 'pip', 'check'], env=env)
     reports = []
-    with tempfile.TemporaryDirectory(prefix='rdkit-eth-installed-check-') as neutral:
+    with tempfile.TemporaryDirectory(prefix='eled-installed-check-') as neutral:
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
             for backend in ('native', 'compiled'):
-                checked = run([runtime / 'bin/python', '-I', '-m', 'rdkit_eth', 'doctor',
+                checked = run([runtime / 'bin/python', '-I', '-m', 'eled', 'doctor',
                                '--check', backend, '--method', method, '--keep-overlap', '--json',
                                *(['--reactivity'] if method != 'GFN0-xTB' else [])],
                               env=env, cwd=neutral, capture_output=True, text=True)

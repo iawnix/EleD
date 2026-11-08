@@ -7,11 +7,11 @@ import numpy as np
 import pytest
 from rdkit import Chem
 
-from rdkit_eth import (XTBOptions, XTBResult, XTBRunError, calc_reactivity_descriptors,
+from eled import (XTBOptions, XTBResult, XTBRunError, calc_reactivity_descriptors,
                        run_reactivity, ChargeStateCalculationError)
-from rdkit_eth.input import _input_metadata,_xyz_from_mol
-from rdkit_eth.options import calculation_settings
-from rdkit_eth.backends.native import HARTREE_TO_EV
+from eled.input import _input_metadata,_xyz_from_mol
+from eled.options import calculation_settings
+from eled.backends.native import HARTREE_TO_EV
 
 
 def states(ip=10.,ea=2.):
@@ -71,8 +71,8 @@ def test_mixed_or_invalid_charge_states_are_rejected(damage):
 
 def test_failed_required_state_never_yields_partial_reactivity():
     mol,r=states()
-    with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('rdkit_eth.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
+    with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \
+         patch('eled.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
         report=run_reactivity(mol,return_errors=True,initialization="independent")
     assert calculate.call_count==2
     assert report['states']['attached']['status']=='not_run'
@@ -81,8 +81,8 @@ def test_failed_required_state_never_yields_partial_reactivity():
     assert report['analysis_settings']['unpaired_electrons']=={'reference':0,'ionized':1,'attached':1}
     assert report['analysis_settings']['requested_options']['electronic_temperature']==300.
     assert all(v is None for v in report['values'].values())
-    with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('rdkit_eth.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]):
+    with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \
+         patch('eled.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]):
         with pytest.raises(ChargeStateCalculationError) as error:run_reactivity(mol,initialization="independent")
     assert error.value.state=='ionized'
 
@@ -111,7 +111,7 @@ def test_invalid_spin_or_failed_state_is_rejected(change):
 
 def test_open_shell_and_gfn0_policies_are_checked_before_engine_lookup():
     mol,r=states()
-    with patch('rdkit_eth.reactivity._resolve_options',side_effect=AssertionError('must not load')):
+    with patch('eled.reactivity._resolve_options',side_effect=AssertionError('must not load')):
         with pytest.raises(ValueError,match='open-shell'):
             run_reactivity(mol,options=XTBOptions(charge=1,uhf=1))
         with pytest.raises(ValueError,match='GFN1/2'):
@@ -125,8 +125,8 @@ def test_open_shell_and_gfn0_policies_are_checked_before_engine_lookup():
 def test_default_protocol_uses_300k_reference_copies_and_records_version():
     mol,r=states()
     r=[replace(v,metadata={**v.metadata,'calculation_settings':calculation_settings()}) for v in r]
-    with patch('rdkit_eth.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('rdkit_eth.reactivity._charge_state_results',return_value=iter(r)) as calculate:
+    with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \
+         patch('eled.reactivity._charge_state_results',return_value=iter(r)) as calculate:
         # A generator is required because early returns explicitly close it.
         calculate.return_value=(v for v in r)
         report=run_reactivity(mol)

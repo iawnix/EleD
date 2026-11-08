@@ -10,9 +10,9 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from rdkit_eth import (XTBOptions, XTBNativeNotFoundError, run_xtb_batch, XTBCache,
+from eled import (XTBOptions, XTBNativeNotFoundError, run_xtb_batch, XTBCache,
     calc_descriptor_report, run_reactivity, calc_reactivity_descriptors, assess_descriptor_quality)
-from rdkit_eth.runtime import _find_xtb_library, _native_basis_build
+from eled.runtime import _find_xtb_library, _native_basis_build
 
 pytestmark = pytest.mark.integration
 
@@ -33,7 +33,7 @@ def molecule(smiles='O'):
 @pytest.mark.parametrize('method',['gfn0','gfn1','gfn2'])
 @pytest.mark.parametrize('temperature',[0.,1200.])
 def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temperature):
-    mod=pytest.importorskip('rdkit_eth.rdXTBTools');m=molecule('CCO')
+    mod=pytest.importorskip('eled.rdXTBTools');m=molecule('CCO')
     a=calculate_xtb(m,method=method,xtb_library=library,accuracy=.1,max_iterations=333,
               electronic_temperature=temperature,keep_overlap=True)
     ok,b=mod.RunMol(m,method=method,xtbLibrary=library,accuracy=.1,maxIterations=333,
@@ -65,7 +65,7 @@ def test_cache_distinguishes_each_numerical_setting(library):
 @pytest.mark.parametrize('smiles',['O','CCO','[CH3]','[NH4+]'])
 @pytest.mark.parametrize('initialization',['reference','independent'])
 def test_vertical_states_interfaces_and_population_definitions(library,method,smiles,initialization):
-    pytest.importorskip('rdkit_eth.rdXTBTools');m=molecule(smiles);original=m.ToBinary()
+    pytest.importorskip('eled.rdXTBTools');m=molecule(smiles);original=m.ToBinary()
     opts=XTBOptions(method=method,xtb_library=library,accuracy=.1,electronic_temperature=300.)
     spins={'ionized_uhf':0,'attached_uhf':0} if smiles=='[CH3]' else {}
     a=run_reactivity(m,options=opts,population_scheme='mulliken',initialization=initialization,**spins)
@@ -84,7 +84,7 @@ def test_vertical_states_interfaces_and_population_definitions(library,method,sm
 
 
 def test_reference_restart_is_copied_for_each_neighbor_and_freed(library):
-    from rdkit_eth.backends.native import _NativeXTB, _native_charge_states
+    from eled.backends.native import _NativeXTB, _native_charge_states
     original=_NativeXTB._bind
     copies,deleted=[],[]
     def bind(instance,name,*args):
@@ -117,7 +117,7 @@ def test_reference_restart_is_copied_for_each_neighbor_and_freed(library):
 
 @pytest.mark.parametrize('fail_on,state',[(1,'reference'),(2,'ionized'),(3,'attached')])
 def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_on,state):
-    from rdkit_eth.backends.native import _NativeXTB
+    from eled.backends.native import _NativeXTB
     original=_NativeXTB._bind
     count=0
     def bind(instance,name,*args):
@@ -129,7 +129,7 @@ def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_o
                 return None if count==fail_on else fn(source)
             return copy
         return fn
-    from rdkit_eth import XTBEnvironmentError
+    from eled import XTBEnvironmentError
     with patch.object(_NativeXTB,'_bind',bind):
         with pytest.raises(XTBEnvironmentError,match='copy'):
             run_reactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
@@ -138,7 +138,7 @@ def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_o
 
 @pytest.mark.parametrize('interface',['native','compiled'])
 def test_actual_scf_failure_keeps_protocol_and_does_not_poison_next_call(library,interface):
-    if interface=='compiled': pytest.importorskip('rdkit_eth.rdXTBTools')
+    if interface=='compiled': pytest.importorskip('eled.rdXTBTools')
     report=run_reactivity(molecule('CCO'), interface=interface, return_errors=True,
         options=XTBOptions(xtb_library=library,max_iterations=1,electronic_temperature=0.))
     assert report['error']['state']=='reference'
@@ -163,7 +163,7 @@ def test_lowdin_fukui_and_finite_temperature_label(library):
 def test_report_does_not_recalculate_and_labels_thermal_occupations(library):
     m=molecule('c1ccccc1')
     result=calculate_xtb(m,xtb_library=library,electronic_temperature=50000.,keep_overlap=True)
-    with patch('rdkit_eth.xtb._run_xtb',side_effect=AssertionError('must not calculate')):
+    with patch('eled.xtb._run_xtb',side_effect=AssertionError('must not calculate')):
         report=calc_descriptor_report(m,result)
     assert report['quality']['fractional_orbital_indices']
     assert 'fractional_occupations' in {f['code'] for f in report['quality']['flags']}
