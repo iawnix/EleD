@@ -32,16 +32,16 @@ def test_report_records_missing_basis_and_exports_fixed_columns(tmp_path):
     mol,r = sample(); report = CalcDescriptorReport(mol,r,record_id='water')
     assert report['quality']['status']=='partial'
     assert report['missing']['populations']=='basis_not_retained'
-    assert report['values']['frontier_homo_participation_ratio'] is None
+    assert report['values']['homo_pr'] is None
     assert set(report['values'])==set(DescriptorColumns())
-    assert report['units']['xtb_total_energy_hartree']=='Hartree'
+    assert report['units']['xtb_energy_ha']=='Hartree'
     assert report['units']['xtb_homo_ev']=='eV'
     assert report['quality']['scf_iterations'] is None
     for kind in ['csv','jsonl']:
         p=ExportDescriptorReports([report],tmp_path/f'data.{kind}')
         if kind=='csv':
             row=list(csv.DictReader(p.open()))[0]
-            assert row['record_id']=='water' and row['frontier_homo_participation_ratio']==''
+            assert row['record_id']=='water' and row['homo_pr']==''
             assert json.loads(row['missing_json'])['frontier']=='basis_not_retained'
             assert json.loads(row['provenance_json'])['geometry_sha256']==r.metadata['geometry_sha256']
         else: assert json.loads(p.read_text())==report
@@ -55,7 +55,7 @@ def test_quality_flags_fractional_and_threshold_sensitive_frontiers():
     quality=AssessDescriptorQuality(mixed)
     assert 'frontier_threshold_sensitive' in {f['code'] for f in quality['flags']}
     quality=AssessDescriptorQuality(replace(r,orbital_occupations=(2.,1.5,.5)))
-    assert quality['fractional_orbital_indices']==[1,2]
+    assert quality['fractional_orb_idx']==[1,2]
     assert quality['status']=='warning'
     q=AssessDescriptorQuality(replace(r,partial_charges=(1.,1.,1.)))
     assert q['status']=='error' and q['charge_sum_error_e']==3

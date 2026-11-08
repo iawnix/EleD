@@ -199,7 +199,7 @@ def main():
             t = time.perf_counter(); report = CalcDescriptorReport(mol, result)
             analysis_seconds = time.perf_counter()-t
             basic = [report['values'][k] for k in pilot.BASIC]
-            orbital = [report['values'][k] for k in pilot.ORBITAL]
+            orbital = [report['values'][k] for k in pilot.CURRENT_ORBITAL]
             if report['quality']['status'] == 'error' or any(v is None or not np.isfinite(v) for v in basic+orbital):
                 failures.append({'id': identifier, 'stage': 'features', 'reason': 'quality_error_or_missing_features',
                                  'quality': report['quality']}); continue

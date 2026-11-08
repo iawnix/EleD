@@ -23,18 +23,14 @@ _HYBRIDIZATION = {
 
 _BASE_FIELDS = ('atomic_number', 'formal_charge', 'degree', 'total_hydrogens',
                 'is_aromatic', 'is_in_ring', 'hybridization')
-_GFN_FIELDS = ('partial_charge_e', 'wiberg_sum')
+_GFN_FIELDS = ('q_e', 'wbo_sum')
 _SHELL_FIELDS = (
-    'mulliken_s_electron_count_e', 'mulliken_p_electron_count_e',
-    'mulliken_d_electron_count_e', 'mulliken_p_to_s_ratio',
-    'lowdin_s_electron_count_e', 'lowdin_p_electron_count_e',
-    'lowdin_d_electron_count_e', 'lowdin_p_to_s_ratio',
+    'mul_s_e', 'mul_p_e', 'mul_d_e', 'mul_ps',
+    'low_s_e', 'low_p_e', 'low_d_e', 'low_ps',
 )
 _REACTIVITY_FIELDS = ('f_plus', 'f_minus', 'f_radical', 'dual',
-                      'local_softness_per_ev', 'local_electrophilicity_ev',
-                      'local_nucleophilicity_per_ev')
-_BOND_FIELDS = ('wiberg_order', 'mayer_bond_order',
-                'mulliken_overlap_population', 'pi_bond_order')
+                      's_loc_1ev', 'omega_loc_ev', 'n_loc_1ev')
+_BOND_FIELDS = ('wbo', 'mbo', 'mul_ovlp_e', 'pi_bo')
 
 
 def _canonical_sha256(payload: Mapping) -> str:

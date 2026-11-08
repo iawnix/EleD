@@ -1,4 +1,4 @@
-# Conformer sensitivity (0.9)
+# Conformer sensitivity (1.2)
 
 `RunConformerAnalysis` evaluates **explicitly supplied conformers of one RDKit
 molecule** using native libxtb. It does not generate or optimize geometries.
@@ -80,10 +80,25 @@ change composition with conformation; inspect counts and quality flags.
 ## Interpretation
 
 These are equally weighted statistics over the **supplied geometries**, including
-any duplicates. They are not Boltzmann populations, free energies or predictions
-at a conformational temperature. The xTB electronic temperature describes
-orbital occupations, not conformer weights. No geometries are deduplicated or
-chosen by their calculated energy inside this API.
+any duplicates. This is the default and remains the main sensitivity report.
+For an optional ensemble-style summary, pass `boltzmann_weighted=True`:
+
+```python
+report = RunConformerAnalysis(
+    mol, conf_ids=ids, boltzmann_weighted=True,
+    boltzmann_temperature=300.0,
+)
+weighted = report["boltzmann"]["statistics"]["xtb_gap_ev"]
+weights = report["boltzmann"]["weights"]
+```
+
+The optional weights use xTB electronic energies,
+`exp(-(E_i-E_min)/(k_B T))`. They describe an energy-weighted descriptor
+aggregate; they are not a free-energy conformer population because vibrational
+entropy, zero-point energy and solvent effects are not included. The temperature
+is a conformer-aggregation parameter and is separate from xTB's electronic
+occupation temperature. Both the equal-weight statistics and the weighted
+statistics are retained in the report.
 
 The recorded example retains 11 MMFF-converged conformers across five molecules.
 The GFN2 HOMO–LUMO gap spans about 0.250 eV for ethylene glycol, 0.333 eV for

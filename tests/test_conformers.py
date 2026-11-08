@@ -30,7 +30,7 @@ def synthetic(monkeypatch):
         metadata = _input_metadata(molecule, identifier, 0, 0, _xyz_from_mol(molecule, identifier))
         metadata.update(CalculationSettings=CalculationSettings(), calculation_status='success',
                         engine={'sha256': 'fixture-engine'}, initialization='independent')
-        return XTBResult('GFN2-xTB', None, -1., 3., 3, 4, 0,
+        return XTBResult('GFN2-xTB', None, -1. + h * .001, 3., 3, 4, 0,
             orbital_energies_ev=(-10., h, 1.), orbital_occupations=(2., 2., 0.),
             partial_charges=(-.6, .3, .3), dipole_e_bohr=(0., 0., 1.),
             wiberg_bond_orders=((0., 1., 1.), (1., 0., 0.), (1., 0., 0.)), metadata=metadata)
@@ -46,7 +46,7 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
     stats = report['statistics']['xtb_homo_ev']
     assert stats == dict(n_total=3, n_valid=3, n_missing=0, n_failed=0,
                          mean=-2., std=np.std([-3., -2., -1.]), min=-3., max=-1., range=2.)
-    missing = report['statistics']['frontier_homo_participation_ratio']
+    missing = report['statistics']['homo_pr']
     assert missing['n_missing'] == 3 and missing['mean'] is None and missing['n_failed'] == 0
     reverse = RunConformerAnalysis(mol, conf_ids=[12, 8, 3])
     assert reverse['statistics'] == report['statistics']
@@ -54,6 +54,21 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
     assert json.loads(json.dumps(report, allow_nan=False)) == report
     single = RunConformerAnalysis(mol, conf_ids=[8], columns=['xtb_homo_ev'])
     assert single['status'] == 'complete' and single['statistics']['xtb_homo_ev']['std'] == 0
+
+
+def test_boltzmann_statistics_are_separate_and_energy_weighted(synthetic):
+    mol, _ = synthetic
+    report = RunConformerAnalysis(mol, columns=['xtb_homo_ev'],
+                                  boltzmann_weighted=True,
+                                  boltzmann_temperature=300.)
+    weights = report['boltzmann']['weights']
+    assert report['weighting'] == 'uniform_supplied_geometries'
+    assert report['boltzmann']['enabled'] is True
+    assert sum(weights) == pytest.approx(1.)
+    assert weights[0] > weights[1] > weights[2]
+    stats = report['boltzmann']['statistics']['xtb_homo_ev']
+    assert stats['weighting'] == 'electronic_energy_not_free_energy'
+    assert stats['mean'] < -2.
 
 
 def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
@@ -79,8 +94,8 @@ def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
 
 
 @pytest.mark.parametrize('kwargs', [dict(conf_ids=[]), dict(conf_ids=[3, 3]), dict(conf_ids=[True]),
-    dict(conf_ids=[-1]), dict(conf_ids=[999]), dict(columns=['xtb_homo_index']),
-    dict(columns=['xtb_dipole_x_e_bohr']), dict(columns=[]), dict(degeneracy_ev=-1),
+    dict(conf_ids=[-1]), dict(conf_ids=[999]), dict(columns=['xtb_homo_idx']),
+    dict(columns=['xtb_dip_x_ebohr']), dict(columns=[]), dict(degeneracy_ev=-1),
     dict(options=XTBOptions(conf_id=3)), dict(return_errors=1)])
 def test_invalid_inputs_do_not_calculate(synthetic, monkeypatch, kwargs):
     mol, _ = synthetic
@@ -125,8 +140,8 @@ def test_missing_gfn0_parameters_are_environment_errors(monkeypatch):
 
 
 def test_charged_dipoles_and_cartesian_fields_excluded():
-    assert 'xtb_dipole_norm_debye' in ConformerDescriptorColumns()
-    assert 'xtb_dipole_norm_debye' not in ConformerDescriptorColumns(charge=1)
+    assert 'xtb_dip_debye' in ConformerDescriptorColumns()
+    assert 'xtb_dip_debye' not in ConformerDescriptorColumns(charge=1)
     assert not any('_centroid_x_' in k or k.endswith('_index') for k in ConformerDescriptorColumns())
 
 

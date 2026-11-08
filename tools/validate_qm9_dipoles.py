@@ -87,7 +87,7 @@ def main():
                 row={'id':original['id'],'method':method,'reference_debye':original['reference_dipole_debye']}
                 try:
                     result=XTBCalculator(method=method).calculate(mol)
-                    row.update(predicted_debye=CalcXTBDescriptors(result)['xtb_dipole_norm_debye'],
+                    row.update(predicted_debye=CalcXTBDescriptors(result)['xtb_dip_debye'],
                                provenance=result.metadata,error=None)
                 except XTBEnvironmentError: raise
                 except XTBRunError as exc: row.update(predicted_debye=None,error=str(exc))

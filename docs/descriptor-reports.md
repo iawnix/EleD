@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (1.1)
+# Descriptor reports and vertical reactivity (1.2)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
@@ -42,7 +42,7 @@ degeneracy-aware frontier distributions. `RunDescriptorBatch` retains overlap by
 is used for basic and overlap-aware features; set `keep_overlap=False` only
 when the additional basis snapshot is not needed.
 
-The report schema version is **2** and descriptor-definition version is **1.1**;
+The report schema version is **2** and descriptor-definition version is **1.2**;
 neither is the package version. `DescriptorColumns(frontier_depth=2)` returns
 the ordered scalar schema and units. Each report includes:
 
@@ -88,7 +88,7 @@ from eled import RunReactivity, XTBOptions, CalcReactivityDescriptors
 
 # Default protocol: GFN2, 300 K, reference wavefunction copies, fixed geometry.
 reaction = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
-print(reaction["values"]["vertical_ip_ev"])
+print(reaction["values"]["ip_v_ev"])
 print(reaction["atoms"])  # f_plus, f_minus, f_radical, dual
 
 # Explicit independent initialization for comparison; no automatic selection.
@@ -98,9 +98,9 @@ reaction = RunReactivity(mol, options=XTBOptions(electronic_temperature=300.),
 # CalcReactivityDescriptors(mol, reference, ionized, attached)
 ```
 
-Each atom row also contains `local_softness_per_ev = s f+`,
-`local_electrophilicity_ev = ω f+`, and the explicitly named
-`local_nucleophilicity_per_ev = s f−` proxy. Their units and missing-value
+Each atom row also contains `s_loc_1ev = s f+`,
+`omega_loc_ev = ω f+`, and the explicitly named
+`n_loc_1ev = s f−` proxy. Their units and missing-value
 semantics are in `atom_units`, `atom_invariance`, and
 `atom_missing_semantics`; no absolute nucleophilicity reference is assumed.
 
@@ -130,7 +130,7 @@ triplet workflow, including failures. Returned results contain owned arrays.
 0.6 initialization. To reproduce the complete 0.6 default protocol, also set
 `electronic_temperature=0.` explicitly. Reports record `protocol_version="2.0"`
 and requested initialization in `analysis_settings`; successful state provenance
-records the actual initialization. Descriptor version 1.1 and schema 2 identify
+records the actual initialization. Descriptor version 1.2 and schema 2 identify
 the added nested density sections; existing scalar columns remain unchanged.
 
 Reference reuse can improve convergence, but neither initialization guarantees
@@ -142,13 +142,13 @@ With N modeled electrons and energies converted from Hartree to eV:
 
 | Field | Definition |
 | --- | --- |
-| `vertical_ip_ev` | E(N−1) − E(N) |
-| `vertical_ea_ev` | E(N) − E(N+1) |
-| `chemical_potential_ev` | −(IP+EA)/2 |
-| `electronegativity_ev` | (IP+EA)/2 |
-| `hardness_ev` | η = (IP−EA)/2 |
-| `softness_per_ev` | 1/(IP−EA) = 1/(2η) |
-| `electrophilicity_ev` | μ²/(2η) |
+| `ip_v_ev` | E(N−1) − E(N) |
+| `ea_v_ev` | E(N) − E(N+1) |
+| `mu_ev` | −(IP+EA)/2 |
+| `chi_ev` | (IP+EA)/2 |
+| `eta_ev` | η = (IP−EA)/2 |
+| `s_1ev` | 1/(IP−EA) = 1/(2η) |
+| `omega_ev` | μ²/(2η) |
 
 The softness convention is explicit because literature conventions differ.
 When η ≤ 1e-8 eV, softness/electrophilicity are null with a reason. Negative IP

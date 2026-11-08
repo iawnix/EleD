@@ -36,8 +36,8 @@ constexpr const char *upstreamGFN0Commit = "33fe381adde775c4992610c0f90d8914b757
 constexpr const char *upstreamD4SHA256 = "5c4022078296e46dfe6a21a36505ec07402bb1eee88448d735c588676dd6e61c";
 constexpr const char *d4PatchSHA256 =
     "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859";
-constexpr const char *basisPatchSHA256 = "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2";
-constexpr const char *scfPatchSHA256 = "fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911738afdaa75";
+constexpr const char *basisPatchSHA256 = "3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c";
+constexpr const char *scfPatchSHA256 = "d8db37846002ebc19ed6808356cbd83304cc1608915e69956c1a7afc174d18fd";
 std::mutex calculationMutex;
 
 std::string sha256(const fs::path &path) {

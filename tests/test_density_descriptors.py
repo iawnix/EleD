@@ -46,13 +46,13 @@ def molecule():
 def test_density_and_shell_conservation():
     r = result()
     d = CalcDensityMatrix(r)
-    assert d['trace_PS_e'] == pytest.approx(8.)
-    assert d['electron_conservation_error_e'] == pytest.approx(0.)
+    assert d['tr_ps_e'] == pytest.approx(8.)
+    assert d['n_err_e'] == pytest.approx(0.)
     shells = CalcShellPopulations(r)
-    assert sum(x['lowdin_s_electron_count_e'] + x['lowdin_p_electron_count_e']
+    assert sum(x['low_s_e'] + x['low_p_e']
                for x in shells['atoms']) == pytest.approx(8.)
-    assert shells['atoms'][0]['lowdin_p_to_s_ratio'] == pytest.approx(3.)
-    assert shells['atoms'][0]['charge_reconstruction_e'] == pytest.approx(-4.)
+    assert shells['atoms'][0]['low_ps'] == pytest.approx(3.)
+    assert shells['atoms'][0]['qrec_e'] == pytest.approx(-4.)
 
 
 def test_mayer_and_frontier_bonds_and_open_shell_missing_reason():
@@ -60,19 +60,19 @@ def test_mayer_and_frontier_bonds_and_open_shell_missing_reason():
     mol.RemoveAllConformers()
     r = result()
     mayer = CalcMayerBondDescriptors(mol, r)
-    assert mayer['bonds'][0]['wiberg_bond_order'] == 1.
-    assert mayer['bonds'][0]['mayer_bond_order'] == pytest.approx(0.)
+    assert mayer['bonds'][0]['wbo'] == 1.
+    assert mayer['bonds'][0]['mbo'] == pytest.approx(0.)
     frontier = CalcFrontierBondDescriptors(mol, r)
     assert frontier['bonds']
     open_shell = replace(r, number_of_unpaired_electrons=1)
-    assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mayer_bond_order'] is None
+    assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mbo'] is None
     assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mayer_missing_reason']
 
 
 def test_gfn0_shell_population_is_not_eeq_charge():
     r = replace(result(), method='GFN0-xTB', partial_charges=(.3, -.3))
     rows = CalcShellPopulations(r)['atoms']
-    assert rows[0]['charge_reconstruction_e'] is None
+    assert rows[0]['qrec_e'] is None
 
 
 def test_density_descriptors_are_invariant_to_ao_permutation_and_phase():
@@ -86,12 +86,12 @@ def test_density_descriptors_are_invariant_to_ao_permutation_and_phase():
                       overlap_matrix=tuple(map(tuple, s)), ao_atom_indices=tuple(ao_atom),
                       ao_shell_indices=tuple(ao_shell))
     a = CalcShellPopulations(r)['atoms']; b = CalcShellPopulations(changed)['atoms']
-    for key in ('mulliken_s_electron_count_e', 'mulliken_p_electron_count_e',
-                'lowdin_s_electron_count_e', 'lowdin_p_electron_count_e'):
+    for key in ('mul_s_e', 'mul_p_e',
+                'low_s_e', 'low_p_e'):
         np.testing.assert_allclose([x[key] for x in a], [x[key] for x in b], atol=1e-12)
     np.testing.assert_allclose(
-        [x['mulliken_overlap_population'] for x in CalcFrontierBondDescriptors(mol, r)['bonds']],
-        [x['mulliken_overlap_population'] for x in CalcFrontierBondDescriptors(mol, changed)['bonds']], atol=1e-12)
+        [x['mul_ovlp_e'] for x in CalcFrontierBondDescriptors(mol, r)['bonds']],
+        [x['mul_ovlp_e'] for x in CalcFrontierBondDescriptors(mol, changed)['bonds']], atol=1e-12)
 
 
 def test_pi_missing_is_explicit_for_result_without_matching_p_map():
@@ -104,17 +104,17 @@ def test_sensitivity_keeps_missing_comparisons_explicit():
     other = {'values': {'x': 1.5}}
     d = DescriptorSensitivity(reference, gfn1=other, gfn2={'values': {'x': 1.0}})
     assert d['values']['x']['conformer_dispersion'] == .2
-    assert d['values']['x']['gfn1_vs_gfn2_abs_difference'] == .5
-    assert d['values']['x']['electronic_temperature_300_vs_1000_abs_difference'] is None
+    assert d['values']['x']['gfn12_delta'] == .5
+    assert d['values']['x']['et300_1000_delta'] is None
     assert d['values']['x']['missing']['electronic_temperature']
 
 
 def test_descriptor_catalog_and_scalar_units_are_explicit():
     catalog = DescriptorCatalog()
     assert {'molecular', 'atom', 'bond', 'density', 'reactivity', 'diagnostic'} <= set(catalog)
-    assert catalog['bond']['mayer_bond_order']['unit'] == 'dimensionless'
-    assert catalog['atom']['pi_electron_count_e']['unit'] == 'e'
-    assert catalog['reactivity']['vertical_ip_ev']['unit'] == 'eV'
-    assert catalog['molecular']['xtb_dipole_*_e_bohr']['unit'] == 'e*Bohr'
-    assert DescriptorColumns()['xtb_occupation_threshold'] == 'dimensionless'
+    assert catalog['bond']['mbo']['unit'] == 'dimensionless'
+    assert catalog['atom']['pi_n_e']['unit'] == 'e'
+    assert catalog['reactivity']['ip_v_ev']['unit'] == 'eV'
+    assert catalog['molecular']['xtb_dip_*_ebohr']['unit'] == 'e*Bohr'
+    assert DescriptorColumns()['xtb_occ_cut'] == 'dimensionless'
     assert all(item['missing'] for group in catalog.values() for item in group.values())

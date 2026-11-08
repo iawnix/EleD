@@ -51,17 +51,17 @@ report = RunReactivity(
 
 反应性报告的能量定义为：
 
-- `vertical_ip_ev = E(Q+1) - E(Q)`；
-- `vertical_ea_ev = E(Q) - E(Q-1)`；
-- `hardness_ev = (IP - EA) / 2`；
-- `softness_per_ev = 1 / (IP - EA)`。
+- `ip_v_ev = E(Q+1) - E(Q)`；
+- `ea_v_ev = E(Q) - E(Q-1)`；
+- `eta_ev = (IP - EA) / 2`；
+- `s_1ev = 1 / (IP - EA)`。
 
 三种电荷态使用相同几何、方法、参数、电子温度和引擎。300 K 是电子占据
 平滑的计算设置，不是分子热力学温度。GFN0 不参与 ΔSCF 反应性分析。
 
 ## 报告版本
 
-当前单点报告使用 schema 2、descriptor version 1.1。报告字段带有显式单位，
+当前单点报告使用 schema 2、descriptor version 1.2。报告字段带有显式单位，
 原子编号固定遵循输入分子。修改公开字段时需要同步更新目录、测试和版本说明。
 
 英文详细说明见 [descriptor-reports.md](../descriptor-reports.md)。

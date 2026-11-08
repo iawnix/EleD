@@ -62,7 +62,7 @@ def test_native_results_and_mapping_without_executable(smiles, method, library, 
     target = AnnotateMol(mol, native)
     for bond in mol.GetBonds():
         i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-        assert target.GetBondWithIdx(bond.GetIdx()).GetDoubleProp('xtb_wiberg_order') == native.wiberg_bond_orders[i][j]
+        assert target.GetBondWithIdx(bond.GetIdx()).GetDoubleProp('xtb_wbo') == native.wiberg_bond_orders[i][j]
     assert native.metadata['engine']['sha256']
     api_version = ctypes.CDLL(library).xtb_getAPIVersion
     api_version.argtypes = []

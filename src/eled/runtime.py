@@ -61,8 +61,8 @@ def _native_gfn0_build(path: str) -> dict | None:
         return None
 
 
-_BASIS_EXPORT_PATCH = '30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2'
-_SCF_DIAGNOSTICS_PATCH = 'fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911738afdaa75'
+_BASIS_EXPORT_PATCH = '3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c'
+_SCF_DIAGNOSTICS_PATCH = 'd8db37846002ebc19ed6808356cbd83304cc1608915e69956c1a7afc174d18fd'
 
 
 def _native_diagnostics_build(path):

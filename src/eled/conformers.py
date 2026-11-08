@@ -1,7 +1,8 @@
-"""Uniform descriptive sensitivity across explicitly supplied conformers.
+"""Descriptor statistics across explicitly supplied conformers.
 
-These statistics describe the supplied geometries, not a thermodynamic ensemble.
-No embedding, optimization, deduplication, alignment or Boltzmann weighting.
+Equal-weight statistics are the default. Optional Boltzmann-style statistics use
+xTB electronic energies as weights and are reported separately from the default
+geometry statistics.
 """
 from __future__ import annotations
 
@@ -33,9 +34,9 @@ def ConformerDescriptorColumns(*, charge=0, frontier_depth=2):
     if isinstance(charge, bool) or not isinstance(charge, Integral):
         raise ValueError('charge must be an integer')
     return {k: u for k, u in DescriptorColumns(frontier_depth).items()
-            if u is not None and u != 'index' and k != 'xtb_occupation_threshold'
-            and not any(k == f'xtb_dipole_{a}_e_bohr' or k.endswith(f'centroid_{a}_angstrom') for a in 'xyz')
-            and not (charge and k.startswith('xtb_dipole_'))}
+            if u is not None and u != 'index' and k != 'xtb_occ_cut'
+            and not any(k == f'xtb_dip_{a}_ebohr' or k.endswith(f'c{a}_a') for a in 'xyz')
+            and not (charge and k.startswith('xtb_dip_'))}
 
 
 def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
@@ -160,13 +161,14 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
     frontier_compositions = []
     for report, bad in zip(reports, failed):
         if bad or not report.get('frontier_bonds'): continue
-        frontier_compositions.append({row['frontier_group']: tuple(row['orbital_indices'])
+        frontier_compositions.append({row['frontier_group']: tuple(row['orb_idx'])
                                       for row in report['frontier_bonds'].get('bonds', [])})
     composition_changed = bool(frontier_compositions and
                                any(c != frontier_compositions[0] for c in frontier_compositions[1:]))
     weighted_statistics = None
+    boltzmann_weights = [0.0] * len(ids)
     if boltzmann_weighted:
-        energies = np.asarray([r['values'].get('xtb_total_energy_hartree') if not bad else np.nan
+        energies = np.asarray([r['values'].get('xtb_energy_ha') if not bad else np.nan
                                for r, bad in zip(reports, failed)], dtype=float)
         valid = np.isfinite(energies)
         weights = np.zeros(len(ids), dtype=float)
@@ -174,17 +176,22 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
             shifted = energies[valid] - np.nanmin(energies[valid])
             weights[valid] = np.exp(-shifted / (_KB_EH_PER_K * boltzmann_temperature))
             weights /= weights.sum()
+            boltzmann_weights = weights.tolist()
         weighted_statistics = {}
         for name in chosen:
             vals = np.asarray([r['values'][name] if not bad else np.nan for r, bad in zip(reports, failed)], dtype=float)
             good = np.isfinite(vals) & (weights > 0)
             if not good.any():
-                weighted_statistics[name] = {'mean': None, 'std': None, 'n_valid': 0,
+                weighted_statistics[name] = {'mean': None, 'std': None, 'n_total': len(ids),
+                                             'n_valid': 0, 'n_missing': len(ids),
                                              'weighting': 'electronic_energy_not_free_energy'}
                 continue
             w = weights[good] / weights[good].sum(); x = vals[good]; mean = float(np.sum(w*x))
-            weighted_statistics[name] = {'mean': mean, 'std': float(np.sqrt(np.sum(w*(x-mean)**2))),
-                                         'n_valid': int(good.sum()), 'weighting': 'electronic_energy_not_free_energy'}
+            weighted_statistics[name] = {
+                'mean': mean, 'std': float(np.sqrt(np.sum(w*(x-mean)**2))),
+                'n_total': len(ids), 'n_valid': int(good.sum()),
+                'n_missing': int(len(ids) - good.sum()),
+                'weighting': 'electronic_energy_not_free_energy'}
     complete = all(v['n_valid'] == len(ids) for v in statistics.values())
     report = {'schema_version': 2, 'descriptor_version': DESCRIPTOR_VERSION,
         'report_type': 'conformer_sensitivity', 'record_id': record_id,
@@ -203,6 +210,7 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
         },
         'boltzmann': ({'enabled': True, 'temperature_K': float(boltzmann_temperature),
                        'energy_definition': 'xTB electronic energy; not a free energy',
+                       'weights': boltzmann_weights,
                        'statistics': weighted_statistics} if boltzmann_weighted else
                       {'enabled': False, 'statistics': None}),
         'excluded_columns': [k for k in all_units if k not in chosen]}

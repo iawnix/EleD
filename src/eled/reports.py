@@ -20,7 +20,7 @@ from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
 from .density_descriptors import (CalcDensityMatrix, CalcShellPopulations,
     CalcMayerBondDescriptors, CalcFrontierBondDescriptors, CalcPiDescriptors)
 
-DESCRIPTOR_VERSION = '1.1'
+DESCRIPTOR_VERSION = '1.2'
 SCHEMA_VERSION = 2
 
 
@@ -30,24 +30,24 @@ def DescriptorColumns(frontier_depth=2):
     values = CalcXTBDescriptors(empty, frontier_depth=frontier_depth)
     units = {}
     for name in values:
-        if name.endswith('_hartree'): unit = 'Hartree'
+        if name.endswith('_ha'): unit = 'Hartree'
         elif name.endswith('_ev'): unit = 'eV'
-        elif name.endswith('_e_bohr'): unit = 'e*Bohr'
+        elif name.endswith('_ebohr'): unit = 'e*Bohr'
         elif name.endswith('_debye'): unit = 'Debye'
-        elif '_charge_' in name: unit = 'e'
-        elif name == 'xtb_occupation_threshold': unit = 'dimensionless'
-        elif name.startswith('xtb_num_'): unit = 'count'
-        elif name.endswith('_index'): unit = 'index'
-        elif name == 'xtb_wiberg_pair_sum': unit = 'dimensionless'
+        elif '_q_' in name or name.endswith('_q_e'): unit = 'e'
+        elif name == 'xtb_occ_cut': unit = 'dimensionless'
+        elif name.startswith('xtb_n_'): unit = 'count'
+        elif name.endswith('_idx'): unit = 'index'
+        elif name == 'xtb_wbo_sum': unit = 'dimensionless'
         else: unit = None
         units[name] = unit
     for label in ('homo', 'lumo'):
-        for field, unit in [('num_orbitals','count'), ('energy_min_ev','eV'), ('energy_max_ev','eV'),
-                            ('inverse_participation_ratio','dimensionless'), ('participation_ratio','dimensionless'),
-                            ('entropy_nats','nat'), *[(f'centroid_{a}_angstrom','angstrom') for a in 'xyz']]:
-            units[f'frontier_{label}_{field}'] = unit
-    units['frontier_homo_lumo_atom_overlap'] = 'dimensionless'
-    units['frontier_homo_lumo_atom_centroid_separation_angstrom'] = 'angstrom'
+        for field, unit in [('n_orb','count'), ('emin_ev','eV'), ('emax_ev','eV'),
+                            ('ipr','dimensionless'), ('pr','dimensionless'),
+                            ('ent_nat','nat'), *[(f'c{a}_a','angstrom') for a in 'xyz']]:
+            units[f'{label}_{field}'] = unit
+    units['hl_ovlp'] = 'dimensionless'
+    units['hl_dist_a'] = 'angstrom'
     return units
 
 
@@ -76,11 +76,11 @@ def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tol
     if result.number_of_unpaired_electrons:
         flag('open_shell_spin_summed', 'info', 'No separate alpha/beta population analysis or spin-state search.')
     expected_charge = result.metadata.get('charge')
-    charge_error = None
+    q_error = None
     if len(result.partial_charges) and expected_charge is not None:
-        charge_error = float(sum(result.partial_charges) - expected_charge)
-        if not np.isfinite(charge_error): raise ValueError('charges must be finite')
-        if abs(charge_error) > conservation_tolerance:
+        q_error = float(sum(result.partial_charges) - expected_charge)
+        if not np.isfinite(q_error): raise ValueError('charges must be finite')
+        if abs(q_error) > conservation_tolerance:
             flag('charge_conservation_failed', 'error', 'Atomic charges do not sum to the requested molecular charge.')
     if expected_charge:
         flag('charged_dipole_origin_dependent', 'info', 'Dipole components and norm depend on the coordinate origin.')
@@ -99,9 +99,9 @@ def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tol
         flag('scf_criteria_not_satisfied', 'error', 'Final SCC diagnostics do not satisfy engine thresholds.')
     severity = {f['severity'] for f in flags}
     return {'status': 'error' if 'error' in severity else 'warning' if 'warning' in severity else 'ok',
-            'flags': flags, 'fractional_orbital_indices': fractional,
+            'flags': flags, 'fractional_orb_idx': fractional,
             'occupied_counts_threshold_window': counts,
-            'charge_sum_error_e': charge_error, 'electron_sum_error_e': electron_error,
+            'charge_sum_error_e': q_error, 'electron_sum_error_e': electron_error,
             'scf_iterations': scf.get('iterations'), 'scf_residual': scf.get('mixer_rms'),
             'scf_details': scf or None,
             'scf_details_unavailable_reason': None if scf.get('available') else scf.get('reason', 'not_exposed_by_libxtb_c_api'),
@@ -138,8 +138,8 @@ def DescriptorSensitivity(reference, *, gfn1=None, gfn2=None,
             except (TypeError, ValueError): return None
         output[key] = {
             'conformer_dispersion': base.get(key),
-            'gfn1_vs_gfn2_abs_difference': delta(g1.get(key), g2.get(key)),
-            'electronic_temperature_300_vs_1000_abs_difference': delta(t3.get(key), t10.get(key)),
+            'gfn12_delta': delta(g1.get(key), g2.get(key)),
+            'et300_1000_delta': delta(t3.get(key), t10.get(key)),
             'missing': {
                 'gfn1_vs_gfn2': gfn1 is None or g2.get(key) is None or g1.get(key) is None,
                 'electronic_temperature': temperature_300 is None or temperature_1000 is None or t3.get(key) is None or t10.get(key) is None,
@@ -221,13 +221,13 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
         for label in ('homo', 'lumo'):
             group = frontier[label]
             if group is None: continue
-            for field in ('num_orbitals','energy_min_ev','energy_max_ev','inverse_participation_ratio',
-                          'participation_ratio','entropy_nats'):
-                report['values'][f'frontier_{label}_{field}'] = group[field]
-            for axis, value in zip('xyz', group['atom_centroid_angstrom']):
-                report['values'][f'frontier_{label}_centroid_{axis}_angstrom'] = value
-        for key in ('homo_lumo_atom_overlap','homo_lumo_atom_centroid_separation_angstrom'):
-            report['values']['frontier_' + key] = frontier[key]
+            for field in ('n_orb','emin_ev','emax_ev','ipr',
+                          'pr','ent_nat'):
+                report['values'][f'{label}_{field}'] = group[field]
+            for axis, value in zip('xyz', group['cent_a']):
+                report['values'][f'{label}_c{axis}_a'] = value
+        for key in ('hl_ovlp','hl_dist_a'):
+            report['values'][key] = frontier[key]
         for name, function in (
             ('density', CalcDensityMatrix),
             ('shell_populations', CalcShellPopulations),
@@ -249,7 +249,10 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
                                  frontier_bonds=reason, pi=reason)
         if include_orbitals and report['quality']['status'] == 'ok': report['quality']['status'] = 'partial'
     for key, value in report['values'].items():
-        if key.startswith('frontier_') and value is None:
+        if key in ('homo_n_orb','homo_emin_ev','homo_emax_ev','homo_ipr','homo_pr','homo_ent_nat',
+                   'homo_cx_a','homo_cy_a','homo_cz_a','lumo_n_orb','lumo_emin_ev','lumo_emax_ev',
+                   'lumo_ipr','lumo_pr','lumo_ent_nat','lumo_cx_a','lumo_cy_a','lumo_cz_a',
+                   'hl_ovlp','hl_dist_a') and value is None:
             report['missing'][key] = report['missing'].get('frontier', 'frontier_group_unavailable')
     json.dumps(report, allow_nan=False)
     return report

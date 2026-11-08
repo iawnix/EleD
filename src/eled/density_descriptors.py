@@ -65,10 +65,10 @@ def CalcDensityMatrix(result):
     result, c, s, p, _, _, _, _, _, _, _ = _basis(result)
     electron_count = float(np.sum(result.orbital_occupations))
     trace = float(np.trace(p @ s))
-    return {'density_matrix': p.tolist(), 'trace_PS_e': trace,
-            'electron_count_e': electron_count,
-            'electron_conservation_error_e': trace - electron_count,
-            'units': {'density_matrix': 'basis-dependent (trace with S gives e)', 'trace_PS_e': 'e'},
+    return {'density_matrix': p.tolist(), 'tr_ps_e': trace,
+            'n_e': electron_count,
+            'n_err_e': trace - electron_count,
+            'units': {'density_matrix': 'basis-dependent (trace with S gives e)', 'tr_ps_e': 'e'},
             'invariance': 'invariant to AO and orbital phase changes when maps and S are transformed together'}
 
 
@@ -76,22 +76,22 @@ def _rows(result, mull, low, shell_atom, shell_l, natoms):
     out = []
     for a in range(natoms):
         row = {'atom_index': a}
-        for label, values in (('mulliken', mull), ('lowdin', low)):
+        for label, values in (('mul', mull), ('low', low)):
             for l, name in ((0, 's'), (1, 'p'), (2, 'd')):
-                row[f'{label}_{name}_electron_count_e'] = float(values[a, l])
+                row[f'{label}_{name}_e'] = float(values[a, l])
             p = values[a, 1]; s = values[a, 0]
-            row[f'{label}_p_to_s_ratio'] = float(p / s) if abs(s) > 1e-14 else None
+            row[f'{label}_ps'] = float(p / s) if abs(s) > 1e-14 else None
         if result.method == 'GFN0-xTB':
-            row['mulliken_charge_reconstruction_e'] = None
-            row['lowdin_charge_reconstruction_e'] = None
+            row['mul_qrec_e'] = None
+            row['low_qrec_e'] = None
         else:
             numbers = result.metadata.get('atomic_numbers', ())
             valence = _VALENCE.get(int(numbers[a]), None) if a < len(numbers) else None
-            row['mulliken_charge_reconstruction_e'] = float(valence - np.sum(mull[a])) if valence is not None else None
-            row['lowdin_charge_reconstruction_e'] = float(valence - np.sum(low[a])) if valence is not None else None
+            row['mul_qrec_e'] = float(valence - np.sum(mull[a])) if valence is not None else None
+            row['low_qrec_e'] = float(valence - np.sum(low[a])) if valence is not None else None
         # Backward-friendly alias: the Löwdin reconstruction is the default
         # positive-definite population convention in this package.
-        row['charge_reconstruction_e'] = row['lowdin_charge_reconstruction_e']
+        row['qrec_e'] = row['low_qrec_e']
         out.append(row)
     return out
 
@@ -115,18 +115,18 @@ def CalcShellPopulations(result):
         m = float(np.trace(ps[np.ix_(ao, ao)]))
         q = float(np.trace(lowdin[np.ix_(ao, ao)]))
         shell_rows.append({'shell_index': int(sh), 'atom_index': int(a),
-                           'angular_momentum': int(l), 'mulliken_electron_count_e': m,
-                           'lowdin_electron_count_e': q})
+                           'angular_momentum': int(l), 'mul_n_e': m,
+                           'low_n_e': q})
         shell_mull_total[a] += m; shell_low_total[a] += q
         if l in supported and l < 3:
             mull[a, l] += m; low[a, l] += q
     trace = float(np.trace(p @ s)); electrons = float(np.sum(result.orbital_occupations))
     atom_rows = _rows(result, mull, low, shell_atom, shell_l, natoms)
     return {'atoms': atom_rows,
-            'shells': shell_rows, 'trace_PS_e': trace,
-            'electron_count_e': electrons,
-            'electron_conservation_error_e': trace - electrons,
-            'shell_atom_conservation_error_e': {
+            'shells': shell_rows, 'tr_ps_e': trace,
+            'n_e': electrons,
+            'n_err_e': trace - electrons,
+            'shell_err_e': {
                 'mulliken': float(np.max(np.abs(shell_mull_total - np.asarray(mull).sum(axis=1)))),
                 'lowdin': float(np.max(np.abs(shell_low_total - np.asarray(low).sum(axis=1)))),
             },
@@ -156,9 +156,9 @@ def CalcMayerBondDescriptors(mol, result):
         ia, ib = np.flatnonzero(atom == a), np.flatnonzero(atom == b)
         value = None if open_shell else float(np.sum(ps[np.ix_(ia, ib)] * ps[np.ix_(ib, ia)].T))
         rows.append({'bond_index': index, 'begin_atom_index': a, 'end_atom_index': b,
-                     'mayer_bond_order': value, 'wiberg_bond_order': float(wbo[a, b]),
+                     'mbo': value, 'wbo': float(wbo[a, b]),
                      'mayer_missing_reason': 'spin_density_unavailable_for_open_shell' if open_shell else None})
-    return {'bonds': rows, 'units': {'mayer_bond_order': 'dimensionless', 'wiberg_bond_order': 'dimensionless'},
+    return {'bonds': rows, 'units': {'mbo': 'dimensionless', 'wbo': 'dimensionless'},
             'invariance': 'invariant to AO permutation and orbital phase'}
 
 
@@ -189,10 +189,10 @@ def CalcFrontierBondDescriptors(mol, result, *, degeneracy_ev=1e-3,
         for bond, a, b in _bond_atom_pairs(mol):
             ia, ib = np.flatnonzero(atom == a), np.flatnonzero(atom == b)
             overlap = float(np.sum(pg[np.ix_(ia, ib)] * s[np.ix_(ia, ib)]) * 2.0)
-            rows.append({'frontier_group': label, 'orbital_indices': indices,
+            rows.append({'frontier_group': label, 'orb_idx': indices,
                          'bond_index': bond, 'begin_atom_index': a, 'end_atom_index': b,
-                         'mulliken_overlap_population': overlap})
-    return {'bonds': rows, 'units': {'mulliken_overlap_population': 'e'},
+                         'mul_ovlp_e': overlap})
+    return {'bonds': rows, 'units': {'mul_ovlp_e': 'e'},
             'invariance': 'degenerate groups use a projector; orbital phase and group rotation invariant',
             'missing': {} if rows else {'frontier_bonds': 'no occupied or virtual frontier group'}}
 
@@ -239,8 +239,8 @@ def CalcPiDescriptors(mol, result, *, scheme='lowdin'):
         d = p if scheme == 'mulliken' else lowdin
         electron = float(v @ d @ v)
         valence = _VALENCE.get(int(result.metadata.get('atomic_numbers', [])[a]))
-        values.append({'atom_index': a, 'pi_electron_count_e': electron,
-                       'pi_charge_e': float(valence - electron) if valence is not None else None,
+        values.append({'atom_index': a, 'pi_n_e': electron,
+                       'pi_q_e': float(valence - electron) if valence is not None else None,
                        'normal': n.tolist()})
     bonds = []
     for bond, a, b in _bond_atom_pairs(mol):
@@ -251,9 +251,9 @@ def CalcPiDescriptors(mol, result, *, scheme='lowdin'):
         # Reversing either local normal changes the sign of the projected
         # orbital, but cannot change a bond order.  Report its magnitude.
         bond_order = float(abs(2.0 * (va @ p @ vb) * (va @ s @ vb)))
-        bonds.append({'bond_index': bond, 'begin_atom_index': a, 'end_atom_index': b, 'pi_bond_order': bond_order})
+        bonds.append({'bond_index': bond, 'begin_atom_index': a, 'end_atom_index': b, 'pi_bo': bond_order})
     return {'atoms': values, 'bonds': bonds, 'missing': missing,
-            'units': {'pi_electron_count_e': 'e', 'pi_charge_e': 'e', 'pi_bond_order': 'dimensionless'},
+            'units': {'pi_n_e': 'e', 'pi_q_e': 'e', 'pi_bo': 'dimensionless'},
             'invariance': 'rigid-motion invariant; normal sign does not change atom populations or bond order'}
 
 

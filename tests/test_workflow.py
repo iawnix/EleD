@@ -62,7 +62,7 @@ def test_mapping_preserves_input_and_bond_types():
     assert mol.ToBinary() == before
     assert [b.GetBondType() for b in target.GetBonds()] == [b.GetBondType() for b in mol.GetBonds()]
     assert target.GetAtomWithIdx(2).GetDoubleProp('xtb_partial_charge') == .02
-    assert target.GetBondWithIdx(0).GetDoubleProp('xtb_wiberg_order') == .8
+    assert target.GetBondWithIdx(0).GetDoubleProp('xtb_wbo') == .8
     assert json.loads(target.GetProp('xtb_metadata_json'))['conformer_id'] == 0
 
 

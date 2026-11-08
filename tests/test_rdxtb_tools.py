@@ -265,8 +265,8 @@ def test_common_descriptors_accept_compiled_results(library):
     assert len(CalcXTBAtomDescriptors(compiled)) == mol.GetNumAtoms()
     fragments = {'heavy': [a.GetIdx() for a in mol.GetAtoms() if a.GetAtomicNum() != 1],
                  'hydrogen': [a.GetIdx() for a in mol.GetAtoms() if a.GetAtomicNum() == 1]}
-    assert CalcXTBFragmentDescriptors(compiled, fragments)['pairs'][0]['wiberg_sum'] == pytest.approx(
-        CalcXTBFragmentDescriptors(native, fragments)['pairs'][0]['wiberg_sum'], abs=1e-8)
+    assert CalcXTBFragmentDescriptors(compiled, fragments)['pairs'][0]['wbo'] == pytest.approx(
+        CalcXTBFragmentDescriptors(native, fragments)['pairs'][0]['wbo'], abs=1e-8)
     with pytest.raises(DescriptorUnavailableError): CalcOrbitalPopulations(compiled)
     ok, failed = rdXTBTools.RunMol(mol, xtbLibrary=library, maxIterations=1)
     assert not ok

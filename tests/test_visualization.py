@@ -11,16 +11,16 @@ def _report():
     mol = Chem.MolFromSmiles('CC(=O)Oc1ccccc1')
     return mol, {
         'atoms': [
-            {'atom_index': i, 'partial_charge_e': (i - 4) / 100.,
+            {'atom_index': i, 'q_e': (i - 4) / 100.,
              'f_plus': (i + 1) / 55.}
             for i in range(mol.GetNumAtoms())
         ],
         'fragments': {
             'fragments': {
-                'acetyl': {'atom_indices': [0, 1, 2], 'charge_e': -0.10, 'f_plus': 0.31},
-                'phenoxy': {'atom_indices': [3, 4, 5, 6, 7, 8, 9], 'charge_e': 0.10, 'f_plus': 0.69},
+                'acetyl': {'atom_indices': [0, 1, 2], 'q_e': -0.10, 'f_plus': 0.31},
+                'phenoxy': {'atom_indices': [3, 4, 5, 6, 7, 8, 9], 'q_e': 0.10, 'f_plus': 0.69},
             },
-            'pairs': [{'fragment_a': 'acetyl', 'fragment_b': 'phenoxy', 'wiberg_sum': 1.2}],
+            'pairs': [{'fragment_a': 'acetyl', 'fragment_b': 'phenoxy', 'wbo': 1.2}],
         },
     }
 
@@ -36,8 +36,8 @@ def test_visual_data_preserves_rdkit_indices_and_pair_values():
 
 def test_rdkit_map_and_svg_views_are_self_contained():
     mol, report = _report()
-    molecule = DrawDescriptorMap(mol, report, atom_field='partial_charge_e')
-    summary = PlotFragmentSummary(report, field='charge_e')
+    molecule = DrawDescriptorMap(mol, report, atom_field='q_e')
+    summary = PlotFragmentSummary(report, field='q_e')
     network = PlotFragmentInteractions(report)
     html = RenderFragmentAnalysis(mol, report)
     assert '<svg' in molecule and '<?xml' not in molecule

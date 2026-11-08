@@ -36,17 +36,21 @@ TWO_D = ('MolWt', 'MolLogP', 'TPSA', 'NumHDonors', 'NumHAcceptors',
          'FractionCSP3', 'HeavyAtomCount', 'NHOHCount', 'NOCount', 'LabuteASA',
          'BalabanJ', 'BertzCT', 'Chi0v', 'Chi1v', 'Kappa1', 'Kappa2', 'Kappa3',
          'NumValenceElectrons', 'NumHeteroatoms', 'MolMR')
-BASIC = ('xtb_total_energy_hartree', 'xtb_homo_ev', 'xtb_lumo_ev', 'xtb_gap_ev',
-         'xtb_dipole_norm_debye', 'xtb_charge_min_e', 'xtb_charge_max_e',
-         'xtb_charge_std_e', 'xtb_wiberg_pair_sum')
+BASIC = ('xtb_energy_ha', 'xtb_homo_ev', 'xtb_lumo_ev', 'xtb_gap_ev',
+         'xtb_dip_debye', 'xtb_q_min_e', 'xtb_q_max_e',
+         'xtb_q_sd_e', 'xtb_wbo_sum')
 # Immutable 0.9 evidence stores the former column spellings. This tuple is
 # only for validating that archival manifest; new calculations use BASIC.
 FROZEN_BASIC = ('xtb_total_energy_Eh', 'xtb_homo_eV', 'xtb_lumo_eV', 'xtb_gap_eV',
                 'xtb_dipole_norm_debye', 'xtb_charge_min_e', 'xtb_charge_max_e',
                 'xtb_charge_std_e', 'xtb_wiberg_pair_sum')
+# Frozen 0.9 evidence retains the former frontier column names. New archives
+# use CURRENT_ORBITAL after the compact descriptor schema migration.
 ORBITAL = tuple(f'frontier_{label}_{field}' for label in ('homo', 'lumo')
                 for field in ('inverse_participation_ratio', 'participation_ratio', 'entropy_nats')) + (
     'frontier_homo_lumo_atom_overlap', 'frontier_homo_lumo_atom_centroid_separation_angstrom')
+CURRENT_ORBITAL = tuple(f'{label}_{field}' for label in ('homo', 'lumo')
+                        for field in ('ipr', 'pr', 'ent_nat')) + ('hl_ovlp', 'hl_dist_a')
 
 
 def write_json(path, value):
@@ -207,7 +211,7 @@ def main():
         'geometry': 'provided ground-state geometry, SDF coordinates rounded to 4 decimals; no reoptimization',
         'options': options.to_dict(), 'selected': [row for row, mol in selected],
         'rdkit_features': list(TWO_D) + ['Morgan radius2, 1024bits, no chirality'],
-        'basic_features': BASIC, 'orbital_features': ORBITAL,
+        'basic_features': BASIC, 'orbital_features': CURRENT_ORBITAL,
         'seeds': SEEDS, 'test_fraction_of_groups': .2,
         'implementation': _implementation_identity()}
     write_json(args.output/'manifest.json', manifest)  # freeze before any calculation/model
@@ -233,7 +237,7 @@ def main():
             if report['quality']['status'] == 'error':
                 failures.append({**metadata, 'reason': report['quality']}); continue
             row['basic'] = [report['values'][k] for k in BASIC]
-            row['orbital'] = [report['values'][k] for k in ORBITAL]
+            row['orbital'] = [report['values'][k] for k in CURRENT_ORBITAL]
             if any(v is None or not np.isfinite(v) for v in row['basic'] + row['orbital']):
                 failures.append({**metadata, 'reason': 'missing_or_nonfinite_xtb_features'}); continue
             row['quality'] = report['quality']; row['provenance'] = report['provenance']

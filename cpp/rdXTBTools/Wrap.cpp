@@ -114,7 +114,7 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.libraryPath = library.empty() ? py::extract<std::string>(
       py::import("eled.runtime").attr("_find_xtb_library")()) : library;
   options.parameterDirectory = parameterDirectory;
-  py::object settings = py::import("eled.options").attr("calculation_settings")(
+  py::object settings = py::import("eled.options").attr("CalculationSettings")(
       maxIterations, accuracy, electronicTemperature);
   options.maxIterations = py::extract<int>(settings["max_iterations"]);
   options.accuracy = py::extract<double>(settings["accuracy"]);
@@ -161,7 +161,7 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   options.numUnpairedElectrons = optionalInteger(config.attr("uhf"), "uhf");
   options.libraryPath = py::extract<std::string>(config.attr("xtb_library"));
   options.keepOverlap = py::extract<bool>(config.attr("keep_overlap"));
-  py::object settings = py::import("eled.options").attr("calculation_settings")(
+  py::object settings = py::import("eled.options").attr("CalculationSettings")(
       py::object(config.attr("max_iterations")), py::object(config.attr("accuracy")),
       py::object(config.attr("electronic_temperature")));
   options.maxIterations = py::extract<int>(settings["max_iterations"]);

@@ -6,7 +6,7 @@
   "basis_extension": {
     "api_version": 1,
     "patch": "diagnostics/xtb_basis_export.patch",
-    "patch_sha256": "30f93f19b52a688727cb8af30cd0b856fe47977a96bef3c52436be707bcb75a2",
+    "patch_sha256": "3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c",
     "patched_files": {
       "include/xtb.h": "2f7174839f177226223a8b80b38a25ac4af4dbc5bdfab71d3e1c32db317d8eba",
       "src/api/interface.f90": "79c7ffd35cd2e315eb63f32dcedc851604948f96691c3558d3c995d181beebab",
@@ -26,7 +26,7 @@
   "diagnostics_extension": {
     "api_version": 1,
     "patch": "diagnostics/xtb_scf_diagnostics.patch",
-    "patch_sha256": "fe33c3a62d4079e2a1690f7ea50b27e0bc214e76b5c2102efcc911738afdaa75",
+    "patch_sha256": "d8db37846002ebc19ed6808356cbd83304cc1608915e69956c1a7afc174d18fd",
     "patched_files": {
       "src/type/data.F90": "c4357d7d79d407f144d902247bb00ae5f3f7d582cc13a65e6bf3fca04970cbf8",
       "src/scc_core.f90": "541983b9329dc824173984669c1f05c6a56f6b9bd13026da57312f5e81a29964",

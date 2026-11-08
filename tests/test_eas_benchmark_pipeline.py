@@ -18,22 +18,22 @@ def _protocol_hash():
 def _archive():
     atom_stats = {
         '0': {
-            'atoms.partial_charge_e.mean': -0.2,
-            'atoms.partial_charge_e.std': 0.01,
-            'atoms.wiberg_sum.mean': 1.2,
-            'shell_populations.mulliken_s_electron_count_e.mean': 1.0,
-            'shell_populations.mulliken_p_electron_count_e.mean': 2.0,
-            'shell_populations.lowdin_s_electron_count_e.mean': 1.1,
-            'shell_populations.lowdin_p_electron_count_e.mean': 1.9,
+            'atoms.q_e.mean': -0.2,
+            'atoms.q_e.std': 0.01,
+            'atoms.wbo_sum.mean': 1.2,
+            'shell_populations.mul_s_e.mean': 1.0,
+            'shell_populations.mul_p_e.mean': 2.0,
+            'shell_populations.low_s_e.mean': 1.1,
+            'shell_populations.low_p_e.mean': 1.9,
         },
         '1': {
-            'atoms.partial_charge_e.mean': 0.2,
-            'atoms.partial_charge_e.std': 0.02,
-            'atoms.wiberg_sum.mean': 1.1,
-            'shell_populations.mulliken_s_electron_count_e.mean': 1.2,
-            'shell_populations.mulliken_p_electron_count_e.mean': 1.8,
-            'shell_populations.lowdin_s_electron_count_e.mean': 1.3,
-            'shell_populations.lowdin_p_electron_count_e.mean': 1.7,
+            'atoms.q_e.mean': 0.2,
+            'atoms.q_e.std': 0.02,
+            'atoms.wbo_sum.mean': 1.1,
+            'shell_populations.mul_s_e.mean': 1.2,
+            'shell_populations.mul_p_e.mean': 1.8,
+            'shell_populations.low_s_e.mean': 1.3,
+            'shell_populations.low_p_e.mean': 1.7,
         },
     }
     analysis = {'status': 'complete', 'atom_statistics': atom_stats, 'reports': []}
@@ -73,6 +73,6 @@ def test_feature_archive_validation_and_atom_rows():
 def test_feature_groups_keep_missing_values_explicit():
     matrix = feature_matrix(_archive(), 'D')
     assert matrix[0]['features']['rdkit_atomic_number'] == 6
-    assert matrix[0]['features']['gfn2_partial_charge_e'] == -0.2
-    assert matrix[0]['features']['gfn2_mulliken_s_electron_count_e'] == 1.0
-    assert matrix[0]['missing']['gfn2_mulliken_d_electron_count_e'] is True
+    assert matrix[0]['features']['gfn2_q_e'] == -0.2
+    assert matrix[0]['features']['gfn2_mul_s_e'] == 1.0
+    assert matrix[0]['missing']['gfn2_mul_d_e'] is True

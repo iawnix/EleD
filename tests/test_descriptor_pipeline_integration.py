@@ -149,7 +149,7 @@ def test_actual_scf_failure_keeps_protocol_and_does_not_poison_next_call(library
     successful=RunReactivity(molecule(),interface=interface,
         options=XTBOptions(xtb_library=library,electronic_temperature=0.))
     assert successful['error'] is None
-    assert successful['values']['vertical_ip_ev'] > 0
+    assert successful['values']['ip_v_ev'] > 0
 
 
 def test_lowdin_fukui_and_finite_temperature_label(library):
@@ -165,5 +165,5 @@ def test_report_does_not_recalculate_and_labels_thermal_occupations(library):
     result=calculate_xtb(m,xtb_library=library,electronic_temperature=50000.,keep_overlap=True)
     with patch('eled.xtb._run_xtb',side_effect=AssertionError('must not calculate')):
         report=CalcDescriptorReport(m,result)
-    assert report['quality']['fractional_orbital_indices']
+    assert report['quality']['fractional_orb_idx']
     assert 'fractional_occupations' in {f['code'] for f in report['quality']['flags']}

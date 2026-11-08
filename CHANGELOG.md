@@ -2,11 +2,24 @@
 
 ## Unreleased — project identity is `EleD`
 
+- Descriptor schema 1.2 uses compact unit-aware feature names such as
+  `xtb_energy_ha`, `q_e`, `wbo`, `eta_ev` and `s_1ev`; frontier and shell
+  fields follow the same short naming rules.
+- YAeHMOP scalar fields now use the same compact convention (`eht_energy_ev`,
+  `eht_n_e`). The descriptor catalog also covers fragment summaries, density
+  charge reconstructions and `chi_ev`.
+- Conformer analysis keeps equal-weight statistics as the default and can
+  additionally report 300 K electronic-energy-weighted means and spreads.
+  The weighted block records its weights and identifies them as electronic
+  energy weights rather than free-energy populations.
 - Renamed the distribution and import package from `rdkit-eth`/`rdkit_eth` to
   `EleD`/`eled`, matching the extended `libxtb` backend that defines
   the project. The C++ extension remains `rdXTBTools`.
 - Updated the CLI, environment variables, runtime manifest paths, build
   metadata, examples, tests and bilingual documentation to use the new name.
+- Synchronized reviewed xTB patch hashes across the manifest, Python runtime
+  and C++ extension, and fixed compiled option validation to use the public
+  `CalculationSettings` validator.
 
 ## 0.11.0 — isolated execution, SCC diagnostics and validated runtime bundles
 

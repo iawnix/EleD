@@ -1,4 +1,4 @@
-# Electronic descriptors and density analysis (1.1)
+# Electronic descriptors and density analysis (1.2)
 
 For standardized reports, quality flags, CSV/JSONL export and vertical charge-state
 analysis, see [descriptor reports](descriptor-reports.md).
@@ -16,7 +16,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcXTBAtomDescriptors(result)` | One row per atom | Both result paths |
 | `CalcXTBBondDescriptors(mol, result)` | One row per existing RDKit bond | Either result type with matching input provenance |
 | `CalcXTBFragmentDescriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
-| `CalcOrbitalPopulations(result, scheme="lowdin", orbital_indices=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
+| `CalcOrbitalPopulations(result, scheme="lowdin", orb_idx=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
 | `CalcFrontierDescriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
 | `CalcDensityDescriptors(mol, result)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond and π descriptors | Same-calculation C/S/maps; `keep_overlap=True` |
 
@@ -45,15 +45,15 @@ annotated = AnnotateMol(mol, result)
 `CalcXTBDescriptors` retains the original method/backend/version, total energy
 (Hartree), HOMO/LUMO/gap (eV) and electron/orbital counts. It adds:
 
-- `xtb_homo_index`, `xtb_lumo_index`: zero-based indices; `None` if absent.
-- `xtb_homo_minus_1_ev`, `xtb_lumo_plus_1_ev`, etc., up to `frontier_depth`.
+- `xtb_homo_idx`, `xtb_lumo_idx`: zero-based indices; `None` if absent.
+- `xtb_homo_m1_ev`, `xtb_lumo_p1_ev`, etc., up to `frontier_depth`.
   Values beyond the occupied/virtual lists are `None`; depth zero omits them.
-- `xtb_dipole_x_e_bohr`, `_y_e_bohr`, `_z_e_bohr`, `xtb_dipole_norm_e_bohr` and
-  `xtb_dipole_norm_debye`. One e·Bohr = 2.541746473 Debye.
-- `xtb_charge_sum_e`, `_min_e`, `_max_e`, `_mean_e`, `_std_e`, `_abs_sum_e`.
+- `xtb_dip_x_ebohr`, `xtb_dip_y_ebohr`, `xtb_dip_z_ebohr`, `xtb_dip_ebohr` and
+  `xtb_dip_debye`. One e·Bohr = 2.541746473 Debye.
+- `xtb_q_sum_e`, `_min_e`, `_max_e`, `_mean_e`, `_sd_e`, `_abs_e`.
   Standard deviation uses all atoms and `ddof=0`, including explicit hydrogens.
-- `xtb_wiberg_pair_sum`: sum over all `i < j`, including pairs outside RDKit bonds.
-- `xtb_occupation_threshold`: records the frontier convention used.
+- `xtb_wbo_sum`: sum over all `i < j`, including pairs outside RDKit bonds.
+- `xtb_occ_cut`: records the frontier convention used.
 
 An orbital is occupied when its occupation exceeds the specified threshold.
 HOMO is the last occupied MO and LUMO the first unoccupied MO in energy order.
@@ -62,10 +62,10 @@ excitation energy; the input unpaired-electron count is not a predicted spin sta
 For charged molecules, the dipole and its norm depend on the supplied coordinate
 origin. Total energies have method-specific references.
 
-Atom rows contain `atom_index`, `partial_charge_e` and `wiberg_sum`. The latter
+Atom rows contain `atom_index`, `q_e` and `wbo_sum`. The latter
 is the sum of all off-diagonal WBOs involving that atom, not formal valence.
 Bond rows contain `bond_index`, `begin_atom_index`, `end_atom_index` and
-`wiberg_order`. They do not create bonds or change RDKit bond orders.
+`wbo`. They do not create bonds or change RDKit bond orders.
 
 Fragment groups are nonempty **disjoint** collections of unique integer indices
 into the calculation's original atom order. Indices include hydrogen atoms;
@@ -73,19 +73,24 @@ hydrogens are not added to a fragment implicitly. A complete partition is option
 Duplicate, negative, Boolean, out-of-range or overlapping indices are rejected.
 Each named fragment reports:
 
-- `charge_e`, `charge_min_e`, `charge_max_e`, `charge_std_e`, `num_atoms`;
-- `internal_wiberg_sum`: each pair inside the fragment counted once;
-- `external_wiberg_sum`: all pairs to atoms outside, including unassigned atoms.
+- `q_e`, `q_min_e`, `q_max_e`, `q_sd_e`, `num_atoms`;
+- `wbo_intra`: each pair inside the fragment counted once;
+- `wbo_inter`: all pairs to atoms outside, including unassigned atoms.
 
 `pairs` reports each fragment pair's WBO sum once. `unassigned_atom_indices`
 identifies omitted atoms. For a complete partition, fragment charges sum to the
 molecular charge, and internal plus interfragment WBO sums recover the total
 pair sum. No spatial criterion or bond-order cutoff is silently applied.
 
-`AnnotateMol` now writes `xtb_wiberg_sum` on atoms, in addition to partial charges,
+`AnnotateMol` now writes `xtb_wbo_sum` on atoms, in addition to partial charges,
 bond WBOs and molecular scalar descriptors. `atom_wiberg_prop` can override its
 name. Atomic charge and WBO property names must differ. All validation precedes
 in-place writes; geometry/topology changes are rejected.
+
+The optional YAeHMOP adapter follows the same compact convention. Its scalar
+fields are `eht_homo_ev`, `eht_lumo_ev`, `eht_gap_ev`, `eht_fermi_ev`,
+`eht_energy_ev`, `eht_n_orb` and `eht_n_e`; the `eht_` prefix distinguishes
+the RDKit EHT calculation from xTB fields.
 
 ## Obtain same-calculation basis data
 
@@ -120,7 +125,7 @@ from eled import CalcOrbitalPopulations
 
 lowdin = CalcOrbitalPopulations(result)
 mulliken = CalcOrbitalPopulations(result, scheme="mulliken")
-selected = CalcOrbitalPopulations(result, orbital_indices=[3, 4])
+selected = CalcOrbitalPopulations(result, orb_idx=[3, 4])
 ```
 
 For real AO coefficients `C`, overlap `S`, and atom A:
@@ -134,8 +139,8 @@ well-conditioned overlap, a valid AO map covering every atom, and
 is reported. After this check, each MO column is divided by its measured
 norm to remove roundoff; large norm defects are rejected rather than hidden.
 
-`atom_populations` has axes `[atom, selected orbital]`, and each column sums
-to one. `orbital_indices` records its column identities. `electron_populations_e`
+`atom_pop` has axes `[atom, selected orbital]`, and each column sums
+to one. `orb_idx` records its column identities. `mo_n_e`
 weights those columns by their actual occupations; selecting only virtual MOs
 gives zero electrons despite nonzero orbital populations. Mulliken values can
 be negative or exceed one and are never clipped. Löwdin values are nonnegative.
@@ -158,9 +163,9 @@ frontier = CalcFrontierDescriptors(
     fragments={"donor": donor_atom_indices, "acceptor": acceptor_atom_indices},
     degeneracy_ev=1e-3,
 )
-print(frontier["homo"]["fragment_populations"])
-print(frontier["lumo"]["participation_ratio"])
-print(frontier["homo_lumo_atom_centroid_separation_angstrom"])
+print(frontier["homo"]["frag_pop"])
+print(frontier["lumo"]["pr"])
+print(frontier["hl_dist_a"])
 ```
 
 HOMO/LUMO groups collect contiguous orbitals in the same occupied/virtual class,
@@ -178,7 +183,7 @@ ratio 1; equal weights on N atoms give N. Missing frontier groups are `None`.
 
 The two-group summary includes:
 
-- `homo_lumo_atom_overlap = sum_A sqrt(p_H,A * p_L,A)`; a dimensionless
+- `hl_ovlp = sum_A sqrt(p_H,A * p_L,A)`; a dimensionless
   atom-distribution similarity, not an orbital overlap integral.
 - Distance between the two atom-weighted centroids. This is a ground-state
   spatial proxy, **not an excited-state electron–hole separation** and not the
@@ -212,7 +217,7 @@ result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 density = CalcDensityDescriptors(mol, result)
 ```
 
-`CalcDensityMatrix` exposes `P`, `trace_PS_e` and the electron-conservation
+`CalcDensityMatrix` exposes `P`, `tr_ps_e` and the electron-conservation
 error. `CalcShellPopulations` reports Mulliken and Löwdin s/p/d electron
 counts, p/s ratios and shell rows. `CalcMayerBondDescriptors` places Mayer
 and Wiberg values beside each RDKit bond; open-shell Mayer entries are `None`

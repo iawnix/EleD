@@ -6,8 +6,19 @@ layers are appropriate for validation.
 
 Python functions, report fields and analysis arguments use RDKit/Python's
 `snake_case`. Unit suffixes are lower-case and explicit, for example
-`xtb_gap_ev`, `xtb_total_energy_hartree`, `xtb_dipole_norm_e_bohr` and
-`softness_per_ev`. There is one public spelling for each field.
+`xtb_gap_ev`, `xtb_energy_ha`, `xtb_dip_ebohr` and
+`s_1ev`. There is one public spelling for each field.
+
+The naming rules keep feature columns short while retaining their meaning:
+
+- `ha`, `ev`, `e`, `ebohr`, `debye` and `a` identify Hartree, eV, electron,
+  e·Bohr, Debye and Ångström values;
+- `q`, `wbo`, `mbo`, `mul`, `low`, `eta`, `s` and `omega` identify charge,
+  Wiberg, Mayer, Mulliken, Löwdin, hardness, softness and electrophilicity;
+- `idx`, `n`, `sd`, `ipr`, `pr` and `ent` mean index, count, standard deviation,
+  inverse participation ratio, participation ratio and entropy;
+- `xtb_` marks molecular fields directly reported by xTB. Atom and bond rows
+  use their shorter local names (`q_e`, `wbo`, `mul_p_e`, `low_ps`).
 
 | Layer | Main API | What it means | Engine calls during extraction |
 | --- | --- | --- | --- |

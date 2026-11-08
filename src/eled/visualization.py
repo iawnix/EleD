@@ -37,27 +37,29 @@ def _svg_color(rgb):
 
 
 def _unit(field):
-    if field.endswith('_per_ev'):
+    if field.endswith('_1ev'):
         return '1/eV'
+    if field.endswith('_ebohr'):
+        return 'e*Bohr'
     if field.endswith('_ev'):
         return 'eV'
-    if field.endswith('_e') or field in {'charge', 'charge_e'}:
+    if field.endswith('_e') or field in {'charge', 'q_e'}:
         return 'e'
     return 'dimensionless'
 
 
 def _field_label(field):
     return {
-        'partial_charge_e': 'partial charge',
-        'charge_e': 'fragment charge',
+        'q_e': 'partial charge',
+        'q_e': 'fragment charge',
         'f_plus': 'Fukui f+',
         'f_minus': 'Fukui f−',
-        'local_softness_per_ev': 'local softness',
-        'local_electrophilicity_ev': 'local electrophilicity',
-        'local_nucleophilicity_per_ev': 'local nucleophilicity',
+        's_loc_1ev': 'local softness',
+        'omega_loc_ev': 'local electrophilicity',
+        'n_loc_1ev': 'local nucleophilicity',
         'homo_population': 'HOMO population',
         'lumo_population': 'LUMO population',
-        'wiberg_sum': 'Wiberg sum',
+        'wbo_sum': 'Wiberg sum',
     }.get(field, field.replace('_', ' '))
 
 
@@ -121,7 +123,7 @@ def BuildFragmentVisualData(mol, report, *, atom_field=None):
             assignments[index] = record['name']
     atom_rows = _atom_rows(report)
     if atom_field is None:
-        for candidate in ('partial_charge_e', 'f_plus', 'local_softness_per_ev', 'homo_population'):
+        for candidate in ('q_e', 'f_plus', 's_loc_1ev', 'homo_population'):
             if any(candidate in row for row in atom_rows.values()):
                 atom_field = candidate
                 break
@@ -136,10 +138,10 @@ def BuildFragmentVisualData(mol, report, *, atom_field=None):
         first, second = pair.get('fragment_a'), pair.get('fragment_b')
         if first not in names or second not in names:
             continue
-        value = pair.get('wiberg_sum', pair.get('value'))
+        value = pair.get('wbo', pair.get('value'))
         normalized_pairs.append({'fragment_a': str(first), 'fragment_b': str(second),
                                  'value': _finite_number(value),
-                                 'wiberg_sum': _finite_number(pair.get('wiberg_sum'))})
+                                 'wbo': _finite_number(pair.get('wbo'))})
     return {
         'atom_field': atom_field,
         'atom_unit': _unit(atom_field or ''),
@@ -186,7 +188,7 @@ def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=320,
     return _strip_xml_header(drawer.GetDrawingText())
 
 
-def PlotFragmentSummary(report, *, field='charge_e', width=620, row_height=38):
+def PlotFragmentSummary(report, *, field='q_e', width=620, row_height=38):
     """Return an SVG signed bar chart for one fragment field."""
     data = BuildFragmentVisualData(_report_atom_count(report), report)
     records = data['fragments']
@@ -271,7 +273,7 @@ def RenderFragmentAnalysis(mol, report, *, atom_field=None, width=620):
     data = BuildFragmentVisualData(mol, report, atom_field=atom_field)
     title = escape(_field_label(data['atom_field'] or 'descriptor'))
     molecule = DrawDescriptorMap(mol, report, atom_field=atom_field, width=width, height=320)
-    summary = PlotFragmentSummary(report, field='charge_e', width=width)
+    summary = PlotFragmentSummary(report, field='q_e', width=width)
     interactions = PlotFragmentInteractions(report, width=width)
     return f'''<div class="eled-fragment-analysis">
 <style>

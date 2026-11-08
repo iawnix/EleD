@@ -38,9 +38,9 @@ def CalcEHTDescriptors(result: Any) -> dict[str, float | int | str | None]:
         "eht_lumo_ev": lumo,
         "eht_gap_ev": lumo - homo if homo is not None and lumo is not None else None,
         "eht_fermi_ev": float(result.fermiEnergy),
-        "eht_total_energy_ev": float(result.totalEnergy),
-        "eht_num_orbitals": int(result.numOrbitals),
-        "eht_num_electrons": int(result.numElectrons),
+        "eht_energy_ev": float(result.totalEnergy),
+        "eht_n_orb": int(result.numOrbitals),
+        "eht_n_e": int(result.numElectrons),
     }
 
 

@@ -7,10 +7,10 @@
 
 适合作为第一版模型输入：
 
-- `xtb_total_energy_hartree`、`xtb_homo_ev`、`xtb_lumo_ev`、`xtb_gap_ev`；
+- `xtb_energy_ha`、`xtb_homo_ev`、`xtb_lumo_ev`、`xtb_gap_ev`；
 - 偶极分量和模长；
-- 原子 `partial_charge_e`、`wiberg_sum`；
-- RDKit 键的 `wiberg_order`；
+- 原子 `q_e`、`wbo_sum`；
+- RDKit 键的 `wbo`；
 - Mulliken/Löwdin s/p/d 布居和 p/s 比；
 - GFN1/2 固定几何 ΔSCF 的 IP、EA、硬度、软度和 Fukui 指数。
 

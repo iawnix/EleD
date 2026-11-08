@@ -88,19 +88,19 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
     descriptors = CalcXTBDescriptors(result)
     atoms = CalcXTBAtomDescriptors(result)
     fragments = CalcXTBFragmentDescriptors(result, {"oxygen": [0], "hydrogens": [1, 2]})
-    if len(atoms) != 3 or abs(sum(a["partial_charge_e"] for a in atoms)) > 1e-5:
+    if len(atoms) != 3 or abs(sum(a["q_e"] for a in atoms)) > 1e-5:
         raise RuntimeError("atomic descriptors failed the charge check")
     population_check = None
     if keep_overlap:
         from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
         populations = CalcOrbitalPopulations(result)
         frontier = CalcFrontierDescriptors(mol, result)
-        electrons = sum(populations["electron_populations_e"])
-        if abs(electrons - descriptors["xtb_num_electrons"]) > 1e-6:
+        electrons = sum(populations["mo_n_e"])
+        if abs(electrons - descriptors["xtb_n_e"]) > 1e-6:
             raise RuntimeError("orbital populations failed the electron count check")
         population_check = {"electron_sum_e": electrons,
                             "orthonormality_error": populations["orthonormality_error"],
-                            "homo_lumo_atom_overlap": frontier["homo_lumo_atom_overlap"]}
+                            "hl_ovlp": frontier["hl_ovlp"]}
     from .reports import CalcDescriptorReport
     descriptor_report = CalcDescriptorReport(mol, result, include_orbitals=keep_overlap)
     if descriptor_report['quality']['status'] == 'error':
@@ -113,7 +113,7 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
             options=XTBOptions(method=method, xtb_library=library),
             population_scheme='lowdin' if keep_overlap else 'charges')
     return {"backend": backend, "method": method, "molecule": "water",
-            "total_energy_hartree": energy, "num_orbitals": nao,
+            "total_energy_hartree": energy, "n_orb": nao,
             "charge_sum_e": float(sum(charges)), "engine": engine,
             "descriptors": descriptors, "fragment_descriptors": fragments,
             "population_check": population_check,

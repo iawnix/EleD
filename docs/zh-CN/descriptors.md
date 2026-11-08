@@ -19,12 +19,17 @@ bonds = CalcXTBBondDescriptors(mol, result)
 
 主要字段包括：
 
-- `xtb_total_energy_hartree`：总电子能，Hartree；
+- `xtb_energy_ha`：总电子能，Hartree；
 - `xtb_homo_ev`、`xtb_lumo_ev`、`xtb_gap_ev`：eV；
-- `xtb_dipole_*_e_bohr`、`xtb_dipole_norm_debye`：偶极分量和模长；
-- `xtb_charge_*_e`：原子部分电荷统计；
-- `partial_charge_e`、`wiberg_sum`：原子级特征；
-- `wiberg_order`：对应 RDKit 键的 Wiberg 键级。
+- `xtb_dip_*_ebohr`、`xtb_dip_debye`：偶极分量和模长；
+- `xtb_q_*_e`：原子部分电荷统计；
+- `q_e`、`wbo_sum`：原子级特征；
+- `wbo`：对应 RDKit 键的 Wiberg 键级。
+
+YAeHMOP 适配器也使用同一套短字段规则，字段为
+`eht_homo_ev`、`eht_lumo_ev`、`eht_gap_ev`、`eht_fermi_ev`、
+`eht_energy_ev`、`eht_n_orb` 和 `eht_n_e`。`eht_` 前缀表示这是 RDKit
+EHT 计算的结果。
 
 HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不是光学激发能。
 
@@ -47,10 +52,10 @@ P = C · diag(occupation) · Cᵀ
 
 并检查 `trace(P S)` 是否等于电子数。可用字段包括：
 
-- `mulliken_s/p/d_electron_count_e`；
-- `lowdin_s/p/d_electron_count_e`；
-- `mulliken_p_to_s_ratio`、`lowdin_p_to_s_ratio`；
-- `trace_PS_e`、`electron_conservation_error_e`。
+- `mul_s_e`、`mul_p_e`、`mul_d_e`；
+- `low_s_e`、`low_p_e`、`low_d_e`；
+- `mul_ps`、`low_ps`；
+- `tr_ps_e`、`n_err_e`。
 
 这些是基组相关的密度分区量，不是唯一的实验可观测量。GFN0 的 EEQ 电荷
 与 Mulliken/Löwdin 布居不是同一个定义。
@@ -81,8 +86,8 @@ from eled import RunReactivity
 report = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
 ```
 
-固定几何计算 Q、Q+1、Q−1，得到 `vertical_ip_ev`、`vertical_ea_ev`、
-`hardness_ev`、`softness_per_ev`、`electrophilicity_ev`，以及原子级
+固定几何计算 Q、Q+1、Q−1，得到 `ip_v_ev`、`ea_v_ev`、
+`eta_ev`、`s_1ev`、`omega_ev`，以及原子级
 `f_plus`、`f_minus`、`f_radical`、`dual` 和局部软度。该流程支持 GFN1/2，
 不自动搜索自旋态，也不进行电荷态几何优化。
 

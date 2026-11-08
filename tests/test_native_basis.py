@@ -56,14 +56,14 @@ def test_native_basis_on_frozen_corpus(method,case,library):
     assert set(ao)==set(range(mol.GetNumAtoms()))
     for scheme in ['lowdin','mulliken']:
         pop=CalcOrbitalPopulations(result,scheme=scheme)
-        assert sum(pop['electron_populations_e'])==pytest.approx(result.number_of_electrons,abs=1e-7)
-        np.testing.assert_allclose(np.sum(pop['atom_populations'],axis=0),1.,atol=1e-10)
+        assert sum(pop['mo_n_e'])==pytest.approx(result.number_of_electrons,abs=1e-7)
+        np.testing.assert_allclose(np.sum(pop['atom_pop'],axis=0),1.,atol=1e-10)
     assert result.metadata['overlap_source']=='same libxtb calculation'
     # Native density populations must recover independent engine charges.
     valence={1:1,6:4,7:5,8:6,9:7,14:4,15:5,16:6,17:7,35:7,53:7}
     if all(a.GetAtomicNum() in valence for a in mol.GetAtoms()):
         reference=[valence[a.GetAtomicNum()] for a in mol.GetAtoms()]
-        np.testing.assert_allclose(np.asarray(reference)-pop['electron_populations_e'],result.partial_charges,atol=1e-7,rtol=0)
+        np.testing.assert_allclose(np.asarray(reference)-pop['mo_n_e'],result.partial_charges,atol=1e-7,rtol=0)
 
 
 @pytest.mark.integration
@@ -84,22 +84,22 @@ def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
         value[:]=-1
         np.testing.assert_array_equal(getattr(compiled,getter)(),expected)
     for scheme in ['lowdin','mulliken']:
-        np.testing.assert_allclose(CalcOrbitalPopulations(compiled,scheme=scheme)['atom_populations'],
-                                   CalcOrbitalPopulations(r,scheme=scheme)['atom_populations'],atol=1e-8)
+        np.testing.assert_allclose(CalcOrbitalPopulations(compiled,scheme=scheme)['atom_pop'],
+                                   CalcOrbitalPopulations(r,scheme=scheme)['atom_pop'],atol=1e-8)
     py_density = CalcDensityDescriptors(m, r)
     compiled_density = CalcDensityDescriptors(m, compiled)
-    assert compiled_density['density']['electron_conservation_error_e'] == pytest.approx(
-        py_density['density']['electron_conservation_error_e'], abs=1e-10)
+    assert compiled_density['density']['n_err_e'] == pytest.approx(
+        py_density['density']['n_err_e'], abs=1e-10)
     np.testing.assert_allclose(
-        [row['mulliken_s_electron_count_e'] for row in compiled_density['shell_populations']['atoms']],
-        [row['mulliken_s_electron_count_e'] for row in py_density['shell_populations']['atoms']], atol=1e-8)
+        [row['mul_s_e'] for row in compiled_density['shell_populations']['atoms']],
+        [row['mul_s_e'] for row in py_density['shell_populations']['atoms']], atol=1e-8)
     np.testing.assert_allclose(
-        [row['mayer_bond_order'] for row in compiled_density['mayer_bonds']['bonds'] if row['mayer_bond_order'] is not None],
-        [row['mayer_bond_order'] for row in py_density['mayer_bonds']['bonds'] if row['mayer_bond_order'] is not None], atol=1e-8)
+        [row['mbo'] for row in compiled_density['mayer_bonds']['bonds'] if row['mbo'] is not None],
+        [row['mbo'] for row in py_density['mayer_bonds']['bonds'] if row['mbo'] is not None], atol=1e-8)
     f=CalcFrontierDescriptors(m,compiled)
     assert f['homo'] is not None
     assert CalcXTBBondDescriptors(m,compiled)
-    assert AnnotateMol(m,compiled).GetAtomWithIdx(0).HasProp('xtb_wiberg_sum')
+    assert AnnotateMol(m,compiled).GetAtomWithIdx(0).HasProp('xtb_wbo_sum')
     old=compiled.GetOverlapMatrix().copy()
     calculate_xtb(molecule('CC'),xtb_library=library,keep_overlap=True)
     np.testing.assert_array_equal(compiled.GetOverlapMatrix(),old)
@@ -133,11 +133,11 @@ def test_benzene_degenerate_subspaces(library):
     r=calculate_xtb(m,xtb_library=library,keep_overlap=True)
     baseline=CalcFrontierDescriptors(m,r); c=np.array(r.orbital_coefficients)
     for label in ['homo','lumo']:
-        selected=baseline[label]['orbital_indices']; assert len(selected)==2
+        selected=baseline[label]['orb_idx']; assert len(selected)==2
         c[:,selected]=c[:,selected]@np.array([[.6,-.8],[.8,.6]])
     changed=CalcFrontierDescriptors(m,replace(r,orbital_coefficients=tuple(map(tuple,c))))
     for label in ['homo','lumo']:
-        np.testing.assert_allclose(baseline[label]['atom_populations'],changed[label]['atom_populations'],atol=1e-12)
+        np.testing.assert_allclose(baseline[label]['atom_pop'],changed[label]['atom_pop'],atol=1e-12)
 
 
 @pytest.mark.parametrize('damage',['missing','capability','patch','hash','binary','version','malformed'])

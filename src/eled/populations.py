@@ -12,7 +12,7 @@ from .errors import DescriptorUnavailableError
 from .result import XTBResult
 
 
-def CalcOrbitalPopulations(result, *, orbital_indices=None, scheme='lowdin',
+def CalcOrbitalPopulations(result, *, orb_idx=None, scheme='lowdin',
                              orthonormality_tolerance=1e-6):
     """Return atom-by-orbital fractions and occupation-weighted populations.
 
@@ -57,7 +57,7 @@ def CalcOrbitalPopulations(result, *, orbital_indices=None, scheme='lowdin',
     error = float(np.max(np.abs(metric - np.eye(n))))
     if error > orthonormality_tolerance or np.any(np.diag(metric) <= 0):
         raise ValueError(f'coefficients are not orthonormal in the supplied overlap: error={error:g}')
-    selected = np.arange(n) if orbital_indices is None else _indices(orbital_indices, n, 'orbital_indices')
+    selected = np.arange(n) if orb_idx is None else _indices(orb_idx, n, 'orb_idx')
     c = coefficients[:, selected]
     if scheme == 'lowdin':
         root = (eigenvectors * np.sqrt(eigenvalues)) @ eigenvectors.T
@@ -69,10 +69,10 @@ def CalcOrbitalPopulations(result, *, orbital_indices=None, scheme='lowdin',
     np.add.at(atom, mapping, ao)
     return {
         'scheme': scheme, 'axes': ['atom', 'orbital'],
-        'orbital_indices': selected.tolist(),
+        'orb_idx': selected.tolist(),
         'orbital_occupations': occupations[selected].tolist(),
-        'atom_populations': atom.tolist(),
-        'electron_populations_e': (atom @ occupations[selected]).tolist(),
+        'atom_pop': atom.tolist(),
+        'mo_n_e': (atom @ occupations[selected]).tolist(),
         'orthonormality_error': error,
         'normalization': 'unit norm per MO; electron populations include occupations',
     }
@@ -98,7 +98,7 @@ def CalcFrontierDescriptors(mol, result, *, fragments=None,
     _nonnegative(occupation_tolerance, 'occupation_tolerance')
     energies, occupations, occupied, virtual = _orbitals(result, occupation_threshold)
     populations = CalcOrbitalPopulations(result, scheme='lowdin')
-    atom = np.asarray(populations['atom_populations'])
+    atom = np.asarray(populations['atom_pop'])
     groups = _fragments(fragments, mol.GetNumAtoms()) if fragments is not None else {}
     positions = np.asarray(mol.GetConformer(result.metadata['conformer_id']).GetPositions())
 
@@ -120,28 +120,28 @@ def CalcFrontierDescriptors(mol, result, *, fragments=None,
         ipr = float(weights @ weights)
         positive = weights[weights > 0]
         return {
-            'orbital_indices': selected, 'num_orbitals': len(selected),
-            'energy_min_ev': float(energies[selected].min()),
-            'energy_max_ev': float(energies[selected].max()),
-            'atom_populations': weights.tolist(),
-            'fragment_populations': {name: float(weights[indices].sum()) for name, indices in groups.items()},
-            'inverse_participation_ratio': ipr, 'participation_ratio': 1. / ipr,
-            'entropy_nats': float(-(positive * np.log(positive)).sum()),
-            'atom_centroid_angstrom': (weights @ positions).tolist(),
+            'orb_idx': selected, 'n_orb': len(selected),
+            'emin_ev': float(energies[selected].min()),
+            'emax_ev': float(energies[selected].max()),
+            'atom_pop': weights.tolist(),
+            'frag_pop': {name: float(weights[indices].sum()) for name, indices in groups.items()},
+            'ipr': ipr, 'pr': 1. / ipr,
+            'ent_nat': float(-(positive * np.log(positive)).sum()),
+            'cent_a': (weights @ positions).tolist(),
         }
 
     homo, lumo = frontier(occupied, True), frontier(virtual, False)
     overlap = separation = None
     if homo is not None and lumo is not None:
-        overlap = float(np.sqrt(np.asarray(homo['atom_populations']) * lumo['atom_populations']).sum())
-        separation = float(np.linalg.norm(np.asarray(homo['atom_centroid_angstrom']) - lumo['atom_centroid_angstrom']))
+        overlap = float(np.sqrt(np.asarray(homo['atom_pop']) * lumo['atom_pop']).sum())
+        separation = float(np.linalg.norm(np.asarray(homo['cent_a']) - lumo['cent_a']))
     assigned = set(np.concatenate(list(groups.values())).tolist()) if groups else set()
     return {
         'scheme': 'lowdin', 'occupation_threshold': float(occupation_threshold),
         'degeneracy_ev': float(degeneracy_ev), 'occupation_tolerance': float(occupation_tolerance),
         'homo': homo, 'lumo': lumo,
-        'homo_lumo_atom_overlap': overlap,
-        'homo_lumo_atom_centroid_separation_angstrom': separation,
+        'hl_ovlp': overlap,
+        'hl_dist_a': separation,
         'unassigned_atom_indices': sorted(set(range(mol.GetNumAtoms())) - assigned),
         'orthonormality_error': populations['orthonormality_error'],
         'interpretation': 'ground-state frontier subspace populations and atom-centroid proxies; not excitation or transition-density descriptors',

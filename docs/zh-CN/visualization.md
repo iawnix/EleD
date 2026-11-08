@@ -17,8 +17,8 @@ fragments = {
 }
 report = CalcDescriptorReport(mol, result, fragments=fragments)
 
-molecule_svg = DrawDescriptorMap(mol, report, atom_field="partial_charge_e")
-summary_svg = PlotFragmentSummary(report, field="charge_e")
+molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
+summary_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
 html_fragment = RenderFragmentAnalysis(mol, report)
 ```

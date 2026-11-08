@@ -45,7 +45,7 @@ conda activate "$PWD/.eled/runtime"
 python -m eled doctor --check compiled --method GFN2-xTB
 ```
 
-For an existing EleD-compatible extended `libxtb`, install the Python layer
+For an existing EleD-compatible native xTB backend, install the Python layer
 directly:
 
 ```bash
@@ -70,7 +70,7 @@ AllChem.MMFFOptimizeMolecule(mol)
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol)
 descriptors = CalcXTBDescriptors(result)
-print(descriptors["xtb_total_energy_hartree"])
+print(descriptors["xtb_energy_ha"])
 print(descriptors["xtb_homo_ev"], descriptors["xtb_lumo_ev"])
 ```
 
@@ -115,7 +115,7 @@ report = RunReactivity(
     options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
     population_scheme="lowdin",
 )
-print(report["values"]["vertical_ip_ev"])
+print(report["values"]["ip_v_ev"])
 print(report["atoms"][0]["f_plus"])
 ```
 
@@ -154,8 +154,8 @@ report = CalcDescriptorReport(mol, result, fragments={
     "ethyl": [0, 1],
     "oxygen": [2],
 })
-molecule_svg = DrawDescriptorMap(mol, report, atom_field="partial_charge_e")
-summary_svg = PlotFragmentSummary(report, field="charge_e")
+molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
+summary_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
 html_fragment = RenderFragmentAnalysis(mol, report)
 ```

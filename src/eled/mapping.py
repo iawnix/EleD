@@ -42,8 +42,8 @@ def AnnotateMol(
     *,
     copy: bool = True,
     atom_charge_prop: str = 'xtb_partial_charge',
-    bond_order_prop: str = 'xtb_wiberg_order',
-    atom_wiberg_prop: str = 'xtb_wiberg_sum',
+    bond_order_prop: str = 'xtb_wbo',
+    atom_wiberg_prop: str = 'xtb_wbo_sum',
 ) -> Any:
     """Return an annotated copy; ``copy=False`` writes to the validated input.
 

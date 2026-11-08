@@ -159,28 +159,28 @@ def CalcXTBDescriptors(result, *, frontier_depth=2, occupation_threshold=1e-7):
     lumo = float(energies[virtual[0]]) if len(virtual) else None
     output = {
         'xtb_method': result.method, 'xtb_backend': result.backend, 'xtb_version': result.version,
-        'xtb_total_energy_hartree': energy, 'xtb_homo_ev': homo, 'xtb_lumo_ev': lumo,
+        'xtb_energy_ha': energy, 'xtb_homo_ev': homo, 'xtb_lumo_ev': lumo,
         'xtb_gap_ev': lumo - homo if homo is not None and lumo is not None else None,
-        'xtb_num_orbitals': result.number_of_molecular_orbitals,
-        'xtb_num_electrons': result.number_of_electrons,
-        'xtb_num_unpaired_electrons': result.number_of_unpaired_electrons,
-        'xtb_occupation_threshold': float(occupation_threshold),
-        'xtb_homo_index': int(occupied[-1]) if len(occupied) else None,
-        'xtb_lumo_index': int(virtual[0]) if len(virtual) else None,
+        'xtb_n_orb': result.number_of_molecular_orbitals,
+        'xtb_n_e': result.number_of_electrons,
+        'xtb_n_unpaired': result.number_of_unpaired_electrons,
+        'xtb_occ_cut': float(occupation_threshold),
+        'xtb_homo_idx': int(occupied[-1]) if len(occupied) else None,
+        'xtb_lumo_idx': int(virtual[0]) if len(virtual) else None,
     }
     for offset in range(1, frontier_depth + 1):
-        output[f'xtb_homo_minus_{offset}_ev'] = float(energies[occupied[-1-offset]]) if len(occupied) > offset else None
-        output[f'xtb_lumo_plus_{offset}_ev'] = float(energies[virtual[offset]]) if len(virtual) > offset else None
+        output[f'xtb_homo_m{offset}_ev'] = float(energies[occupied[-1-offset]]) if len(occupied) > offset else None
+        output[f'xtb_lumo_p{offset}_ev'] = float(energies[virtual[offset]]) if len(virtual) > offset else None
     for i, axis in enumerate('xyz'):
-        output[f'xtb_dipole_{axis}_e_bohr'] = float(dipole[i]) if len(dipole) else None
+        output[f'xtb_dip_{axis}_ebohr'] = float(dipole[i]) if len(dipole) else None
     norm = float(np.linalg.norm(dipole)) if len(dipole) else None
-    output['xtb_dipole_norm_e_bohr'] = norm
-    output['xtb_dipole_norm_debye'] = norm * AU_DIPOLE_TO_DEBYE if norm is not None else None
+    output['xtb_dip_ebohr'] = norm
+    output['xtb_dip_debye'] = norm * AU_DIPOLE_TO_DEBYE if norm is not None else None
     for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
-                        ('mean', np.mean), ('std', np.std), ('abs_sum', lambda q: np.abs(q).sum())]:
-        output[f'xtb_charge_{label}_e'] = float(func(charges)) if len(charges) else None
+                        ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
+        output[f'xtb_q_{label}_e'] = float(func(charges)) if len(charges) else None
     wbo = _wbo(result, len(charges))
-    output['xtb_wiberg_pair_sum'] = float(np.triu(wbo, 1).sum()) if wbo is not None else None
+    output['xtb_wbo_sum'] = float(np.triu(wbo, 1).sum()) if wbo is not None else None
     return output
 
 
@@ -195,8 +195,8 @@ def CalcXTBAtomDescriptors(result):
     if not len(charges):
         raise ValueError('atomic descriptors require partial charges')
     wbo = _wbo(result, len(charges))
-    return [{'atom_index': i, 'partial_charge_e': float(q),
-             'wiberg_sum': float(wbo[i].sum()) if wbo is not None else None}
+    return [{'atom_index': i, 'q_e': float(q),
+             'wbo_sum': float(wbo[i].sum()) if wbo is not None else None}
             for i, q in enumerate(charges)]
 
 
@@ -214,7 +214,7 @@ def CalcXTBBondDescriptors(mol, result):
         raise ValueError('bond descriptors require a Wiberg matrix')
     return [{'bond_index': b.GetIdx(), 'begin_atom_index': b.GetBeginAtomIdx(),
              'end_atom_index': b.GetEndAtomIdx(),
-             'wiberg_order': float(wbo[b.GetBeginAtomIdx(), b.GetEndAtomIdx()])}
+             'wbo': float(wbo[b.GetBeginAtomIdx(), b.GetEndAtomIdx()])}
             for b in mol.GetBonds()]
 
 
@@ -236,18 +236,18 @@ def CalcXTBFragmentDescriptors(result, fragments):
         outside = np.setdiff1d(np.arange(len(charges)), indices)
         records[name] = {
             'atom_indices': indices.tolist(), 'num_atoms': len(indices),
-            'charge_e': float(charges[indices].sum()),
-            'charge_min_e': float(charges[indices].min()),
-            'charge_max_e': float(charges[indices].max()),
-            'charge_std_e': float(charges[indices].std()),
-            'internal_wiberg_sum': float(np.triu(wbo[np.ix_(indices, indices)], 1).sum()) if wbo is not None else None,
-            'external_wiberg_sum': float(wbo[np.ix_(indices, outside)].sum()) if wbo is not None else None,
+            'q_e': float(charges[indices].sum()),
+            'q_min_e': float(charges[indices].min()),
+            'q_max_e': float(charges[indices].max()),
+            'q_sd_e': float(charges[indices].std()),
+            'wbo_intra': float(np.triu(wbo[np.ix_(indices, indices)], 1).sum()) if wbo is not None else None,
+            'wbo_inter': float(wbo[np.ix_(indices, outside)].sum()) if wbo is not None else None,
         }
     names = list(groups)
     for i, first in enumerate(names):
         for second in names[i+1:]:
             pairs.append({'fragment_a': first, 'fragment_b': second,
-                          'wiberg_sum': float(wbo[np.ix_(groups[first], groups[second])].sum()) if wbo is not None else None})
+                          'wbo': float(wbo[np.ix_(groups[first], groups[second])].sum()) if wbo is not None else None})
     assigned = set(np.concatenate(list(groups.values())).tolist())
     return {'fragments': records, 'pairs': pairs,
             'unassigned_atom_indices': sorted(set(range(len(charges))) - assigned)}

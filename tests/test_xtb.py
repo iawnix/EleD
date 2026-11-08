@@ -32,6 +32,8 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(descriptors["eht_homo_ev"], -1.0)
         self.assertEqual(descriptors["eht_lumo_ev"], 0.5)
         self.assertEqual(descriptors["eht_gap_ev"], 1.5)
+        self.assertEqual(descriptors["eht_energy_ev"], -10.0)
+        self.assertEqual(descriptors["eht_n_e"], 4)
 
 
     def test_frontier_energies_use_fractional_occupations(self):
