@@ -1,7 +1,7 @@
 # Descriptor catalog
 
 The public descriptor API has five layers. The complete machine-readable
-catalog is returned by `eled.descriptor_catalog()`; this page states which
+catalog is returned by `eled.DescriptorCatalog()`; this page states which
 layers are appropriate for validation.
 
 Python functions, report fields and analysis arguments use RDKit/Python's
@@ -11,11 +11,11 @@ Python functions, report fields and analysis arguments use RDKit/Python's
 
 | Layer | Main API | What it means | Engine calls during extraction |
 | --- | --- | --- | --- |
-| Molecular | `calc_xtb_descriptors` | Energy, frontier energies, dipole, charge and Wiberg summaries | 0 |
-| Atom/bond topology | `calc_xtb_atom_descriptors`, `calc_xtb_bond_descriptors` | Engine charges, incident Wiberg sums and RDKit-bond Wiberg orders | 0 |
-| Orbital density | `calc_orbital_populations`, `calc_shell_populations`, `calc_density_matrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keep_overlap=True` |
-| Frontier/bond | `calc_frontier_descriptors`, `calc_frontier_bond_descriptors`, `calc_mayer_bond_descriptors` | Degeneracy-invariant HOMO/LUMO localization and signed bond decompositions | 0; closed-shell Mayer only |
-| Reactivity | `calc_reactivity_descriptors`, `run_reactivity` | Vertical ΔSCF IP/EA, Fukui and local conceptual-DFT indices | 0 for `calc_*`; 3 single points for `run_*` |
+| Molecular | `CalcXTBDescriptors` | Energy, frontier energies, dipole, charge and Wiberg summaries | 0 |
+| Atom/bond topology | `CalcXTBAtomDescriptors`, `CalcXTBBondDescriptors` | Engine charges, incident Wiberg sums and RDKit-bond Wiberg orders | 0 |
+| Orbital density | `CalcOrbitalPopulations`, `CalcShellPopulations`, `CalcDensityMatrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keep_overlap=True` |
+| Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcMayerBondDescriptors` | Degeneracy-invariant HOMO/LUMO localization and signed bond decompositions | 0; closed-shell Mayer only |
+| Reactivity | `CalcReactivityDescriptors`, `RunReactivity` | Vertical ΔSCF IP/EA, Fukui and local conceptual-DFT indices | 0 for `calc_*`; 3 single points for `run_*` |
 
 Every value has four pieces of meaning:
 
@@ -48,7 +48,7 @@ The stable feature groups for the EAS study are:
   electronic-temperature differences. These describe reliability and are not
   model inputs by default.
 
-`descriptor_status()` exposes the maturity labels used by the project:
+`DescriptorStatus()` exposes the maturity labels used by the project:
 `recommended` is suitable for a first validation model, `diagnostic` records
 calculation or protocol sensitivity, and `exploratory` is retained for testing
 new hypotheses. Mayer bond order, signed frontier-bond overlap, π projections,

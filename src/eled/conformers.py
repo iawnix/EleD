@@ -17,13 +17,13 @@ from .batch import _prepare, _key
 from .errors import XTBEnvironmentError, XTBRunError
 from .input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
 from .options import XTBOptions
-from .reports import DESCRIPTOR_VERSION, _analysis_settings, _base_report, calc_descriptor_report, descriptor_columns
+from .reports import DESCRIPTOR_VERSION, _analysis_settings, _base_report, CalcDescriptorReport, DescriptorColumns
 from .calculator import XTBCalculator
 
 _KB_EH_PER_K = 3.166811563e-6
 
 
-def conformer_descriptor_columns(*, charge=0, frontier_depth=2):
+def ConformerDescriptorColumns(*, charge=0, frontier_depth=2):
     """Ordered units for frame-invariant scalar sensitivity statistics.
 
     Charged molecules omit dipole norms because those depend on coordinate origin.
@@ -32,13 +32,13 @@ def conformer_descriptor_columns(*, charge=0, frontier_depth=2):
     """
     if isinstance(charge, bool) or not isinstance(charge, Integral):
         raise ValueError('charge must be an integer')
-    return {k: u for k, u in descriptor_columns(frontier_depth).items()
+    return {k: u for k, u in DescriptorColumns(frontier_depth).items()
             if u is not None and u != 'index' and k != 'xtb_occupation_threshold'
             and not any(k == f'xtb_dipole_{a}_e_bohr' or k.endswith(f'centroid_{a}_angstrom') for a in 'xyz')
             and not (charge and k.startswith('xtb_dipole_'))}
 
 
-def run_conformer_analysis(mol, *, conf_ids=None, options=None, cache=None,
+def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
                            record_id=None, columns=None, return_errors=True,
                            boltzmann_weighted=False, boltzmann_temperature=300.0,
                            **analysis):
@@ -68,14 +68,14 @@ def run_conformer_analysis(mol, *, conf_ids=None, options=None, cache=None,
     ids = [int(i) for i in ids]
     if len(set(ids)) != len(ids): raise ValueError('duplicate conformer IDs')
     charge, uhf = _effective_charge_uhf(snapshot, config.charge, config.uhf)
-    available = conformer_descriptor_columns(charge=charge, frontier_depth=settings['frontier_depth'])
+    available = ConformerDescriptorColumns(charge=charge, frontier_depth=settings['frontier_depth'])
     chosen = list(available) if columns is None else list(columns)
     if not chosen or len(set(chosen)) != len(chosen) or any(k not in available for k in chosen):
         raise ValueError('columns must be unique supported invariant descriptor names')
     units = {k: available[k] for k in chosen}
     inputs = [_input_metadata(snapshot, i, charge, uhf, _xyz_from_mol(snapshot, i)) for i in ids]
     reports, signature = [], None
-    all_units = descriptor_columns(settings['frontier_depth'])
+    all_units = DescriptorColumns(settings['frontier_depth'])
     for conf_id, metadata in zip(ids, inputs):
         resolved, _ = _prepare(snapshot, replace(config, conf_id=conf_id))
         key = _key(resolved, metadata) if cache is not None else None
@@ -106,11 +106,11 @@ def run_conformer_analysis(mol, *, conf_ids=None, options=None, cache=None,
                 raise ValueError('result does not match the requested conformer/protocol')
             current = {'method': result.method, 'backend': result.backend, 'version': result.version,
                        **{k: result.metadata.get(k) for k in ('engine', 'parameter_file',
-                          'calculation_settings', 'initialization', 'optimize', 'solvent')}}
+                          'CalculationSettings', 'initialization', 'optimize', 'solvent')}}
             if signature is not None and signature != current:
                 raise ValueError('conformer results have inconsistent calculation provenance')
             signature = deepcopy(current)
-            report = calc_descriptor_report(snapshot, result, record_id=str(conf_id), **settings)
+            report = CalcDescriptorReport(snapshot, result, record_id=str(conf_id), **settings)
         reports.append(report)
     failed = [r['error'] is not None or r['quality']['status'] == 'error' for r in reports]
     statistics = {}

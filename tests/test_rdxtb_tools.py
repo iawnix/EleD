@@ -250,24 +250,24 @@ def test_gfn0_verification_rejects_missing_or_mismatched_manifest(library, tmp_p
 
 
 def test_common_descriptors_accept_compiled_results(library):
-    from eled import (calc_xtb_descriptors, calc_xtb_atom_descriptors,
-                           calc_xtb_fragment_descriptors, calc_orbital_populations,
+    from eled import (CalcXTBDescriptors, CalcXTBAtomDescriptors,
+                           CalcXTBFragmentDescriptors, CalcOrbitalPopulations,
                            DescriptorUnavailableError)
     mol = molecule()
     ok, compiled = rdXTBTools.RunMol(mol, xtbLibrary=library)
     assert ok
     native = calculate_xtb(mol, xtb_library=library)
-    a, b = calc_xtb_descriptors(compiled), calc_xtb_descriptors(native)
+    a, b = CalcXTBDescriptors(compiled), CalcXTBDescriptors(native)
     for key in a:
         if key in ('xtb_backend', 'xtb_version'): continue
         if a[key] is None or isinstance(a[key], str): assert a[key] == b[key]
         else: assert a[key] == pytest.approx(b[key], abs=1e-8)
-    assert len(calc_xtb_atom_descriptors(compiled)) == mol.GetNumAtoms()
+    assert len(CalcXTBAtomDescriptors(compiled)) == mol.GetNumAtoms()
     fragments = {'heavy': [a.GetIdx() for a in mol.GetAtoms() if a.GetAtomicNum() != 1],
                  'hydrogen': [a.GetIdx() for a in mol.GetAtoms() if a.GetAtomicNum() == 1]}
-    assert calc_xtb_fragment_descriptors(compiled, fragments)['pairs'][0]['wiberg_sum'] == pytest.approx(
-        calc_xtb_fragment_descriptors(native, fragments)['pairs'][0]['wiberg_sum'], abs=1e-8)
-    with pytest.raises(DescriptorUnavailableError): calc_orbital_populations(compiled)
+    assert CalcXTBFragmentDescriptors(compiled, fragments)['pairs'][0]['wiberg_sum'] == pytest.approx(
+        CalcXTBFragmentDescriptors(native, fragments)['pairs'][0]['wiberg_sum'], abs=1e-8)
+    with pytest.raises(DescriptorUnavailableError): CalcOrbitalPopulations(compiled)
     ok, failed = rdXTBTools.RunMol(mol, xtbLibrary=library, maxIterations=1)
     assert not ok
-    with pytest.raises(ValueError, match='failed'): calc_xtb_descriptors(failed)
+    with pytest.raises(ValueError, match='failed'): CalcXTBDescriptors(failed)

@@ -1,6 +1,6 @@
 # Persistent reactivity datasets (0.8)
 
-`run_reactivity_batch` calculates fixed-geometry triplets with explicit record IDs,
+`RunReactivityBatch` calculates fixed-geometry triplets with explicit record IDs,
 per-molecule spins/options/fragments, successful-result caching and resumable
 checkpoints. It uses the existing libxtb protocol (300 K and reference copies by
 default). It does not optimize structures or search spin states.
@@ -8,7 +8,7 @@ default). It does not optimize structures or search spin states.
 ```python
 from eled import (
     ReactivityJob, XTBOptions, XTBDiskCache, ReactivityCheckpoint,
-    run_reactivity_batch, export_descriptor_reports,
+    RunReactivityBatch, ExportDescriptorReports,
 )
 
 # Supply explicit-H molecules with finite 3D conformers.
@@ -20,16 +20,16 @@ jobs = [
 ]
 cache = XTBDiskCache("results/cache.sqlite")
 checkpoint = ReactivityCheckpoint("results/dataset.sqlite")
-rows = run_reactivity_batch(jobs, cache=cache, checkpoint=checkpoint)
-export_descriptor_reports(rows, "results/descriptors.csv")
-export_descriptor_reports(rows, "results/descriptors.jsonl")
+rows = RunReactivityBatch(jobs, cache=cache, checkpoint=checkpoint)
+ExportDescriptorReports(rows, "results/descriptors.csv")
+ExportDescriptorReports(rows, "results/descriptors.jsonl")
 ```
 
 Call the same function with the same jobs and checkpoint after interruption.
 IDs must be nonempty, unique strings; output order follows input order. A job's
 `options` overrides the batch `options` object as a whole, rather than merging
 individual fields. `population_scheme`, `interface` and `initialization` are
-batch-wide settings with the same meanings as `run_reactivity`. Open-shell jobs
+batch-wide settings with the same meanings as `RunReactivity`. Open-shell jobs
 must specify both adjacent spin counts. Every input molecule is snapshotted.
 
 ## Cache versus checkpoint
@@ -38,7 +38,7 @@ The **cache stores only successful results** and can be shared across datasets.
 Record IDs are excluded from cache identity, so the same calculation can serve
 different IDs. Only complete reactivity triplets are cached; failed reports and
 partial wavefunctions are not cached. `XTBDiskCache` also works with
-`run_xtb_batch` and `run_descriptor_batch`, preserving tuple/matrix structure in
+`RunXTBBatch` and `RunDescriptorBatch`, preserving tuple/matrix structure in
 normalized single-point results. No pickle, raw native handles or new Python
 dependency is used.
 
@@ -96,7 +96,7 @@ failures retain their three-state diagnostics and null derived descriptors.
 Missing open-shell spins, invalid spin parity, fragment definitions, duplicate
 IDs, unsupported methods, missing/incompatible libraries or basis capabilities
 raise. Unexpected programming/analysis errors also raise. Since 0.8,
-`run_reactivity(return_errors=True)` no longer suppresses arbitrary exceptions:
+`RunReactivity(return_errors=True)` no longer suppresses arbitrary exceptions:
 allocation/setup/extraction failures raise `XTBEnvironmentError`, while genuine
 single-point failures retain `ChargeStateCalculationError` reporting. C++ results
 expose `failureKind` for that distinction; rebuild compiled consumers on upgrade.

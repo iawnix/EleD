@@ -133,7 +133,7 @@ def _decode_result(value):
 class XTBDiskCache:
     """Successful single-point/report cache. JSON only; no pickle or native handles.
 
-    Works with run_xtb_batch, run_descriptor_batch and run_reactivity_batch.
+    Works with RunXTBBatch, RunDescriptorBatch and RunReactivityBatch.
     SQLite commits survive process interruption. Concurrent writers are safe,
     but concurrent identical misses may both calculate; no distributed work queue.
     Corruption or storage errors propagate rather than being treated as misses.

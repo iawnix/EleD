@@ -3,7 +3,7 @@
 
 ## Current scope: 0.10 checked geometry preparation
 
-[`prepare_conformers`](geometry-preparation.md) adds deterministic bounded RDKit
+[`PrepareConformers`](geometry-preparation.md) adds deterministic bounded RDKit
 retries, supported coordinate-derived stereo checks, converged force-field
 selection, provenance and partial/failure accounting. Full extended-engine
 development tests report **389 passed, 4 skipped**. The

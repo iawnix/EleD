@@ -18,7 +18,7 @@ import time
 
 import numpy as np
 from rdkit import Chem, rdBase
-from eled import XTBCalculator, calc_xtb_descriptors, XTBEnvironmentError, XTBRunError
+from eled import XTBCalculator, CalcXTBDescriptors, XTBEnvironmentError, XTBRunError
 from eled.input import _xyz_from_mol, _geometry_hash
 from eled.persistence import _implementation_identity
 
@@ -87,7 +87,7 @@ def main():
                 row={'id':original['id'],'method':method,'reference_debye':original['reference_dipole_debye']}
                 try:
                     result=XTBCalculator(method=method).calculate(mol)
-                    row.update(predicted_debye=calc_xtb_descriptors(result)['xtb_dipole_norm_debye'],
+                    row.update(predicted_debye=CalcXTBDescriptors(result)['xtb_dipole_norm_debye'],
                                provenance=result.metadata,error=None)
                 except XTBEnvironmentError: raise
                 except XTBRunError as exc: row.update(predicted_debye=None,error=str(exc))

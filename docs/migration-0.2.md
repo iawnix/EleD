@@ -1,19 +1,20 @@
 # Migrating from 0.1 to 0.2
 
-Version 0.2 removes the external xTB CLI calculation backend. The default
-`run_xtb(mol)` and `calc_orbital_descriptors(mol)` now use libxtb directly.
+Version 0.2 removed the external xTB CLI calculation backend. The current
+public calculation entry point is `XTBCalculator`; `CalcOrbitalDescriptors`
+uses the selected backend directly.
 The optional `rdXTBTools.RunMol()` C++ interface and its units are unchanged.
 
 | Previous API | 0.2 behavior / replacement |
 | --- | --- |
-| `backend="cli"` or `backend="auto"` | Rejected. Use `backend="native"` (default) or explicit `backend="tblite"`. |
+| `backend="cli"` or `backend="auto"` | Rejected. Use the native extended `libxtb` backend. |
 | `xtb_path` / `XTB_PATH` | Executable discovery removed. Use `xtb_library` / `XTB_LIBRARY` to select a shared library. |
 | `keep_files`, `timeout` | Removed; calculations run in process and do not create work directories. No wall-clock timeout is enforced. |
 | `optimize`, `solvent` | Removed. The current API supports gas-phase single points only. |
 | `add_optimized_conformer` | Removed with the geometry optimization API. |
 | `result.command`, `result.workdir`, `result.optimized_coordinates_angstrom` | Removed. Numerical results and provenance remain on the result object. |
 | `XTBNotFoundError` | Removed with executable lookup. Catch `XTBNativeNotFoundError` for library-loading failures. |
-| `run_xtb_batch(..., max_workers>1)` | Rejected; batch execution is sequential. Cache and per-molecule error handling remain available. |
+| `RunXTBBatch(..., max_workers>1)` | Rejected; batch execution is sequential. Cache and per-molecule error handling remain available. |
 | `doctor --check cli`, `doctor --executable` | Removed. Use `doctor --check native --library /path/libxtb.so`. |
 
 Removed keyword arguments raise `TypeError`; removed backend values raise
@@ -25,8 +26,8 @@ GFN0 requires the verified patched xTB build; an official/unverified library
 is rejected before GFN0 initialization. Install using [these instructions](install.md).
 
 ```python
-from eled import run_xtb
-result = run_xtb(mol, xtb_library="/absolute/prefix/lib/libxtb.so")
+from eled import XTBCalculator
+result = XTBCalculator(xtb_library="/absolute/prefix/lib/libxtb.so").calculate(mol)
 print(result.total_energy_hartree)
 print(result.metadata["engine"])
 ```

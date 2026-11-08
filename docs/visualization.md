@@ -7,6 +7,7 @@ assignment.
 
 ```python
 from eled import (
+    CalcDescriptorReport,
     DrawDescriptorMap, PlotFragmentSummary, PlotFragmentInteractions,
     RenderFragmentAnalysis,
 )
@@ -15,7 +16,7 @@ fragments = {
     "acetyl": [0, 1, 2],
     "phenoxy": [3, 4, 5, 6, 7, 8, 9],
 }
-report = calc_descriptor_report(mol, result, fragments=fragments)
+report = CalcDescriptorReport(mol, result, fragments=fragments)
 
 molecule_svg = DrawDescriptorMap(mol, report, atom_field="partial_charge_e")
 summary_svg = PlotFragmentSummary(report, field="charge_e")
@@ -29,9 +30,8 @@ Fukui indices or local softness. `PlotFragmentInteractions` uses the explicit
 fragment-pair Wiberg values from `report["fragments"]["pairs"]`; it does not add
 the two directional external sums a second time.
 
-The CamelCase functions are the documented RDKit-style entry points. Lowercase
-aliases (`draw_descriptor_map`, `plot_fragment_summary`, and so on) are also
-available for ordinary Python callers. The core package does not add
+The CamelCase functions are the documented RDKit-style public entry points. The
+core package does not add
 matplotlib, Plotly or NetworkX dependencies; the functions return SVG/HTML
 strings that can be embedded in notebooks, reports or a web view.
 

@@ -34,7 +34,7 @@ This research tooling adds no production dependency or public API.
 ## Frozen protocol and results
 
 The cohort is the existing 81-case preparation audit: 41 original embedding
-failures (22 subsequently accepted by `prepare_conformers`, 19 still rejected)
+failures (22 subsequently accepted by `PrepareConformers`, 19 still rejected)
 and 40 controls. The latter 19 are **workflow failures**, not all failures of
 initial embedding: IDs 17445, 12123 and 17312 can embed, but previous MMFF94
 relaxation produced coordinates rejected by the specified-stereo check.

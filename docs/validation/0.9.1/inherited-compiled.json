@@ -235,7 +235,7 @@
         "conformer_id": 0,
         "calculation_status": "success",
         "initialization": "independent",
-        "calculation_settings": {
+        "CalculationSettings": {
           "max_iterations": 250,
           "accuracy": 1.0,
           "electronic_temperature": 300.0,

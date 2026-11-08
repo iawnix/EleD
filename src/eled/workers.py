@@ -96,9 +96,9 @@ def single_point(payload):
 
 def reactivity(payload):
     from rdkit import Chem
-    from .reactivity import run_reactivity
+    from .reactivity import RunReactivity
     mol, kwargs = payload
-    return run_reactivity(Chem.Mol(mol), **kwargs)
+    return RunReactivity(Chem.Mol(mol), **kwargs)
 
 
 def molecule_bytes(mol):

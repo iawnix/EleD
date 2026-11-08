@@ -4,7 +4,7 @@ from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from eled import (ReactivityJob, ReactivityCheckpoint, XTBDiskCache,
-                       run_reactivity_batch, export_descriptor_reports)
+                       RunReactivityBatch, ExportDescriptorReports)
 
 
 def main():
@@ -20,9 +20,9 @@ def main():
         jobs.append(ReactivityJob(name,mol,**spins))
     jobs.append(ReactivityJob('failed-upstream-parse',None))
     checkpoint=ReactivityCheckpoint(args.output/'dataset.sqlite')
-    rows=run_reactivity_batch(jobs,cache=XTBDiskCache(args.output/'cache.sqlite'),
+    rows=RunReactivityBatch(jobs,cache=XTBDiskCache(args.output/'cache.sqlite'),
                               checkpoint=checkpoint,retry_failed=args.retry_failed)
-    for kind in ('csv','jsonl'):export_descriptor_reports(rows,args.output/f'descriptors.{kind}')
+    for kind in ('csv','jsonl'):ExportDescriptorReports(rows,args.output/f'descriptors.{kind}')
     for row in rows:
         print(row['record_id'],row['quality']['status'],row['execution']['source'])
 

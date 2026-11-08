@@ -8,16 +8,16 @@ The optional helpers in `eled.descriptors` only normalize YAeHMOP scalar
 outputs for side-by-side comparisons:
 
 ```python
-from eled.descriptors import calc_eht_descriptors, calc_orbital_descriptors
+from eled.descriptors import CalcEHTDescriptors, CalcOrbitalDescriptors
 
-# `calc_eht_descriptors` consumes an existing rdEHTTools result.
-# `calc_orbital_descriptors(..., backend="eht")` calls RDKit's YAeHMOP API.
+# `CalcEHTDescriptors` consumes an existing rdEHTTools result.
+# `CalcOrbitalDescriptors(..., backend="eht")` calls RDKit's YAeHMOP API.
 ```
 
 YAeHMOP and xTB have different Hamiltonians, basis conventions, charge models,
 energy definitions and reference zeros. Their total energies and populations
 must not be mixed or treated as interchangeable. EHT fields are excluded from
-`descriptor_catalog()`, the xTB report schema, the EAS feature protocol and the
+`DescriptorCatalog()`, the xTB report schema, the EAS feature protocol and the
 extended-libxtb capability checks.
 
 This adapter does not modify YAeHMOP and does not make it a dependency of the

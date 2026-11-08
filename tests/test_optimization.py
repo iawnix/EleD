@@ -3,7 +3,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from eled import optimize_xtb, prepare_conformers
+from eled import OptimizeXTB, PrepareConformers
 from eled.errors import XTBNativeNotFoundError
 from eled.runtime import _extended_libxtb_build, _find_xtb_library
 
@@ -27,16 +27,16 @@ def library():
 
 def test_optimization_validates_fixed_atoms():
     with pytest.raises(ValueError, match='every atom'):
-        optimize_xtb(molecule('O'), max_iterations=1, fixed_atoms=[0, 1, 2])
+        OptimizeXTB(molecule('O'), max_iterations=1, fixed_atoms=[0, 1, 2])
     with pytest.raises(ValueError, match='scf_max_iterations'):
-        optimize_xtb(molecule('O'), scf_max_iterations=0)
+        OptimizeXTB(molecule('O'), scf_max_iterations=0)
 
 
 @pytest.mark.integration
 def test_xtb_optimization_is_owned_and_reduces_energy(library):
     mol = molecule()
     before = mol.ToBinary()
-    result = optimize_xtb(mol, xtb_library=library, max_iterations=100)
+    result = OptimizeXTB(mol, xtb_library=library, max_iterations=100)
     assert result.success
     assert mol.ToBinary() == before
     report = result.report
@@ -49,7 +49,7 @@ def test_xtb_optimization_is_owned_and_reduces_energy(library):
 
 @pytest.mark.integration
 def test_prepare_conformers_can_use_xtb_optimization(library):
-    result = prepare_conformers('CCO', optimize='xTB', xtb_library=library,
+    result = PrepareConformers('CCO', optimize='xTB', xtb_library=library,
                                 optimization_iterations=100,
                                 attempts_per_strategy=1,
                                 retry_random_coords=False)

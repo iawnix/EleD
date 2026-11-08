@@ -10,7 +10,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from eled import annotate_mol, run_xtb_batch, XTBCache
+from eled import AnnotateMol, RunXTBBatch, XTBCache
 from eled.runtime import _find_xtb_library, _extended_libxtb_build, _native_gfn0_build
 from eled.errors import XTBNativeNotFoundError
 
@@ -59,7 +59,7 @@ def test_native_results_and_mapping_without_executable(smiles, method, library, 
     nao = native.number_of_molecular_orbitals
     assert np.shape(native.orbital_coefficients) == (nao, nao)
     np.testing.assert_allclose(native.wiberg_bond_orders, np.array(native.wiberg_bond_orders).T, atol=1e-10)
-    target = annotate_mol(mol, native)
+    target = AnnotateMol(mol, native)
     for bond in mol.GetBonds():
         i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
         assert target.GetBondWithIdx(bond.GetIdx()).GetDoubleProp('xtb_wiberg_order') == native.wiberg_bond_orders[i][j]
@@ -118,7 +118,7 @@ def test_native_batch_and_cache_without_executable(method, library, no_executabl
     mol = molecule('CCO')
     cache = XTBCache()
     with patch('eled.xtb.run_xtb_native', wraps=run_xtb_native) as calculate:
-        results = run_xtb_batch([mol, mol], method=method, cache=cache, xtb_library=library)
+        results = RunXTBBatch([mol, mol], method=method, cache=cache, xtb_library=library)
     assert calculate.call_count == 1
     assert len(cache) == 1
     assert results[0] == results[1]

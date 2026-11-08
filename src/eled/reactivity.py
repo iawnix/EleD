@@ -19,8 +19,8 @@ from .errors import XTBRunError, XTBEnvironmentError
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .mapping import _validate_mapping
 from .options import XTBOptions
-from .populations import calc_orbital_populations
-from .reports import SCHEMA_VERSION, DESCRIPTOR_VERSION, assess_descriptor_quality
+from .populations import CalcOrbitalPopulations
+from .reports import SCHEMA_VERSION, DESCRIPTOR_VERSION, AssessDescriptorQuality
 from .calculator import XTBCalculator
 from .xtb import _resolve_options
 
@@ -72,7 +72,7 @@ def _scheme(scheme):
         raise ValueError("population_scheme must be 'charges', 'mulliken' or 'lowdin'")
 
 
-def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=None,
+def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=None,
                                 population_scheme='charges', record_id=None):
     """Analyze three compatible successful results, without further engine calls.
 
@@ -86,12 +86,12 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
     ref = results['reference']
     if ref.method not in ('GFN1-xTB','GFN2-xTB'): raise ValueError('vertical Delta-SCF requires self-consistent GFN1/2, not GFN0')
     base = ref.metadata
-    if not base.get('engine',{}).get('sha256') or not base.get('calculation_settings'):
+    if not base.get('engine',{}).get('sha256') or not base.get('CalculationSettings'):
         raise ValueError('charge-state analysis requires engine identity and calculation settings')
     def identity(result):
         meta = result.metadata
         return (result.method, meta.get('engine',{}).get('sha256'),
-                (meta.get('parameter_file') or {}).get('sha256'), meta.get('calculation_settings'))
+                (meta.get('parameter_file') or {}).get('sha256'), meta.get('CalculationSettings'))
     states = {}; flags = []
     for label, result in results.items():
         _validate_mapping(mol, result)
@@ -115,7 +115,7 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
         if energy is None or not np.isfinite(energy): raise ValueError('all three energies must be finite')
         charges = _finite(result.partial_charges,'charges',1)
         if len(charges) != mol.GetNumAtoms(): raise ValueError('charges must match the indexed atoms')
-        quality = assess_descriptor_quality(result)
+        quality = AssessDescriptorQuality(result)
         if quality['status'] == 'error': raise ValueError(f'{label} failed charge/electron conservation checks')
         flags.extend(dict(flag, state=label) for flag in quality['flags'])
         states[label] = _summary(result)
@@ -138,14 +138,14 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
     if ip < 0:
         flags.append({'code':'negative_vertical_ip','severity':'warning',
                       'detail':'Ionization lowers the calculated energy; inspect charge/spin states.'})
-    if base['calculation_settings']['effective_electronic_temperature'] > 1e-6:
+    if base['CalculationSettings']['effective_electronic_temperature'] > 1e-6:
         flags.append({'code':'finite_electronic_temperature','severity':'warning',
                       'detail':'Energy differences use the configured finite-temperature libxtb energies.'})
     if population_scheme == 'charges':
         q0, qp, qm = [np.asarray(results[k].partial_charges) for k in ('reference','ionized','attached')]
         plus, minus = q0-qm, qp-q0
     else:
-        n0, np_, nm = [np.asarray(calc_orbital_populations(results[k],scheme=population_scheme)['electron_populations_e'])
+        n0, np_, nm = [np.asarray(CalcOrbitalPopulations(results[k],scheme=population_scheme)['electron_populations_e'])
                        for k in ('reference','ionized','attached')]
         plus, minus = nm-n0, n0-np_
     dual, radical = plus-minus, (plus+minus)/2
@@ -181,7 +181,7 @@ def calc_reactivity_descriptors(mol, reference, ionized, attached, *, fragments=
     return report
 
 
-def run_reactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
+def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
                    fragments=None, population_scheme='charges', interface='native',
                    record_id=None, return_errors=False, initialization='reference'):
     """Calculate fixed-geometry Q, Q+1, Q-1 states with explicit spin policy.
@@ -246,7 +246,7 @@ def run_reactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
                 report['quality'] = {'status':'error','flags':[{'code':'charge_state_failed','severity':'error','detail':str(error)}]}
                 report['missing'] = dict.fromkeys(REACTIVITY_UNITS,'required_charge_state_failed')
                 return report
-    report = calc_reactivity_descriptors(snapshot,**results,fragments=fragments,
+    report = CalcReactivityDescriptors(snapshot,**results,fragments=fragments,
               population_scheme=population_scheme,record_id=record_id)
     report['analysis_settings'].update(protocol)
     return report

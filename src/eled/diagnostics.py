@@ -84,32 +84,32 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
             or not all(math.isfinite(float(q)) for q in charges)
             or abs(sum(charges)) > 1e-5):
         raise RuntimeError("water single point returned invalid energy, orbital count or charges")
-    from .electronic_descriptors import calc_xtb_descriptors, calc_xtb_atom_descriptors, calc_xtb_fragment_descriptors
-    descriptors = calc_xtb_descriptors(result)
-    atoms = calc_xtb_atom_descriptors(result)
-    fragments = calc_xtb_fragment_descriptors(result, {"oxygen": [0], "hydrogens": [1, 2]})
+    from .electronic_descriptors import CalcXTBDescriptors, CalcXTBAtomDescriptors, CalcXTBFragmentDescriptors
+    descriptors = CalcXTBDescriptors(result)
+    atoms = CalcXTBAtomDescriptors(result)
+    fragments = CalcXTBFragmentDescriptors(result, {"oxygen": [0], "hydrogens": [1, 2]})
     if len(atoms) != 3 or abs(sum(a["partial_charge_e"] for a in atoms)) > 1e-5:
         raise RuntimeError("atomic descriptors failed the charge check")
     population_check = None
     if keep_overlap:
-        from .populations import calc_orbital_populations, calc_frontier_descriptors
-        populations = calc_orbital_populations(result)
-        frontier = calc_frontier_descriptors(mol, result)
+        from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
+        populations = CalcOrbitalPopulations(result)
+        frontier = CalcFrontierDescriptors(mol, result)
         electrons = sum(populations["electron_populations_e"])
         if abs(electrons - descriptors["xtb_num_electrons"]) > 1e-6:
             raise RuntimeError("orbital populations failed the electron count check")
         population_check = {"electron_sum_e": electrons,
                             "orthonormality_error": populations["orthonormality_error"],
                             "homo_lumo_atom_overlap": frontier["homo_lumo_atom_overlap"]}
-    from .reports import calc_descriptor_report
-    descriptor_report = calc_descriptor_report(mol, result, include_orbitals=keep_overlap)
+    from .reports import CalcDescriptorReport
+    descriptor_report = CalcDescriptorReport(mol, result, include_orbitals=keep_overlap)
     if descriptor_report['quality']['status'] == 'error':
         raise RuntimeError('descriptor report failed quality checks')
     reactivity_report = None
     if reactivity:
         from .options import XTBOptions
-        from .reactivity import run_reactivity
-        reactivity_report = run_reactivity(mol, interface=backend,
+        from .reactivity import RunReactivity
+        reactivity_report = RunReactivity(mol, interface=backend,
             options=XTBOptions(method=method, xtb_library=library),
             population_scheme='lowdin' if keep_overlap else 'charges')
     return {"backend": backend, "method": method, "molecule": "water",

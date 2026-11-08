@@ -12,7 +12,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from eled import XTBRunError, XTBNativeNotFoundError, run_xtb, xtb_cache_key
+from eled import XTBRunError, XTBNativeNotFoundError, run_xtb, XTBCacheKey
 from eled.runtime import _find_xtb_library
 
 if importlib.util.find_spec("tblite") is None:
@@ -78,19 +78,19 @@ def test_tblite_restrictions_are_clear():
         run_xtb(mol, method="gfn0", backend="tblite")
     with pytest.raises(XTBRunError, match="spin-polarized"):
         run_xtb(molecule("[CH3]"), backend="tblite")
-    assert xtb_cache_key(mol, backend="tblite")
+    assert XTBCacheKey(mol, backend="tblite")
 
 
 @pytest.mark.parametrize('method', ['GFN1-xTB', 'GFN2-xTB'])
 @pytest.mark.parametrize('smiles', ['O', 'CCO', '[NH4+]', 'CS(C)=O', 'CCl'])
 def test_population_descriptors_recover_engine_charges(method, smiles):
-    from eled import calc_orbital_populations, calc_frontier_descriptors
+    from eled import CalcOrbitalPopulations, CalcFrontierDescriptors
     mol = molecule(smiles)
     result = run_xtb(mol, backend='tblite', method=method, keep_overlap=True)
     assert result.metadata['overlap_source'] == 'same tblite calculation'
     assert len(result.ao_atom_indices) == result.number_of_molecular_orbitals
-    lowdin = calc_orbital_populations(result)
-    mulliken = calc_orbital_populations(result, scheme='mulliken')
+    lowdin = CalcOrbitalPopulations(result)
+    mulliken = CalcOrbitalPopulations(result, scheme='mulliken')
     # Independent engine output checks AO-to-atom mapping and density weighting,
     # including polarization d shells, hydrogens and a charged molecule.
     valence = [{1: 1, 6: 4, 7: 5, 8: 6, 16: 6, 17: 7}[a.GetAtomicNum()] for a in mol.GetAtoms()]
@@ -99,7 +99,7 @@ def test_population_descriptors_recover_engine_charges(method, smiles):
     for population in (lowdin, mulliken):
         assert sum(population['electron_populations_e']) == pytest.approx(result.number_of_electrons, abs=1e-8)
         np.testing.assert_allclose(np.sum(population['atom_populations'], axis=0), 1., atol=1e-10)
-    frontier = calc_frontier_descriptors(mol, result)
+    frontier = CalcFrontierDescriptors(mol, result)
     for label in ('homo', 'lumo'):
         assert 1 - 1e-10 <= frontier[label]['participation_ratio'] <= mol.GetNumAtoms() + 1e-10
     assert 0 <= frontier['homo_lumo_atom_overlap'] <= 1 + 1e-10
@@ -107,22 +107,22 @@ def test_population_descriptors_recover_engine_charges(method, smiles):
 
 
 def test_overlap_is_opt_in_and_cache_distinguishes_it():
-    from eled import XTBCache, run_xtb_batch, calc_orbital_populations, DescriptorUnavailableError
+    from eled import XTBCache, RunXTBBatch, CalcOrbitalPopulations, DescriptorUnavailableError
     mol = molecule('O')
     cache = XTBCache()
-    ordinary = run_xtb_batch([mol], backend='tblite', cache=cache)[0]
-    enriched = run_xtb_batch([mol], backend='tblite', keep_overlap=True, cache=cache)[0]
+    ordinary = RunXTBBatch([mol], backend='tblite', cache=cache)[0]
+    enriched = RunXTBBatch([mol], backend='tblite', keep_overlap=True, cache=cache)[0]
     assert len(cache) == 2
     assert not ordinary.overlap_matrix
     assert enriched.overlap_matrix
     assert ordinary.total_energy_eh == pytest.approx(enriched.total_energy_eh, abs=1e-12)
     with pytest.raises(DescriptorUnavailableError):
-        calc_orbital_populations(ordinary)
+        CalcOrbitalPopulations(ordinary)
 
 
 def test_real_benzene_degenerate_frontier_is_rotation_invariant():
     from dataclasses import replace
-    from eled import calc_frontier_descriptors
+    from eled import CalcFrontierDescriptors
     mol = Chem.AddHs(Chem.MolFromSmiles('c1ccccc1'))
     conf = Chem.Conformer(12)
     for i in range(6):
@@ -132,12 +132,12 @@ def test_real_benzene_degenerate_frontier_is_rotation_invariant():
     conf.Set3D(True)
     mol.AddConformer(conf)
     result = run_xtb(mol, backend='tblite', keep_overlap=True)
-    before = calc_frontier_descriptors(mol, result)
+    before = CalcFrontierDescriptors(mol, result)
     c = np.array(result.orbital_coefficients)
     for label in ('homo', 'lumo'):
         indices = before[label]['orbital_indices']
         assert len(indices) == 2
         c[:, indices] = c[:, indices] @ np.array([[.6, -.8], [.8, .6]])
-    after = calc_frontier_descriptors(mol, replace(result, orbital_coefficients=tuple(map(tuple, c))))
+    after = CalcFrontierDescriptors(mol, replace(result, orbital_coefficients=tuple(map(tuple, c))))
     for label in ('homo', 'lumo'):
         np.testing.assert_allclose(before[label]['atom_populations'], after[label]['atom_populations'], atol=1e-12)

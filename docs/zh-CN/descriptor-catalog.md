@@ -1,7 +1,7 @@
 # 描述符目录
 
-项目的机器可读目录由 `eled.descriptor_catalog()` 提供，成熟度由
-`eled.descriptor_status()` 提供。字段统一使用小写 `snake_case`。
+项目的机器可读目录由 `eled.DescriptorCatalog()` 提供，成熟度由
+`eled.DescriptorStatus()` 提供。字段统一使用小写 `snake_case`。
 
 ## 推荐特征
 

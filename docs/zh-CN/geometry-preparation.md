@@ -1,12 +1,12 @@
 # 构象准备
 
-`prepare_conformers()` 是 RDKit 构象生成和检查层，负责从 SMILES 或分子对象
+`PrepareConformers()` 是 RDKit 构象生成和检查层，负责从 SMILES 或分子对象
 生成显式氢、3D 坐标并记录失败原因。它不是新的嵌入算法。
 
 ```python
-from eled import prepare_conformers
+from eled import PrepareConformers
 
-prepared = prepare_conformers(
+prepared = PrepareConformers(
     "C[C@H](O)C(=O)O",
     num_conformers=4,
     method="ETKDGv3",

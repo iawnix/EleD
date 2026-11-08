@@ -15,7 +15,7 @@ import time
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
-from eled import prepare_conformers, XTBCalculator, calc_descriptor_report, XTBRunError, XTBEnvironmentError
+from eled import PrepareConformers, XTBCalculator, CalcDescriptorReport, XTBRunError, XTBEnvironmentError
 from eled.geometry import _check_geometry, _stereo_constraints
 from eled.input import _geometry_hash, _xyz_from_mol
 from eled.persistence import _implementation_identity
@@ -113,7 +113,7 @@ def main():
                     mol = None
             else:
                 seed = int(hashlib.sha256((protocol+':'+identifier).encode()).hexdigest()[:8], 16) % 2147483646 + 1
-                prepared = prepare_conformers(original['smiles'], random_seed=seed, **PREPARATION)
+                prepared = PrepareConformers(original['smiles'], random_seed=seed, **PREPARATION)
                 info = {'id': identifier, **prepared.report}
                 mol = prepared.molecule if prepared.success else None
                 if mol is None:
@@ -141,7 +141,7 @@ def main():
                     (result.metadata['parameter_file'] or {}).get('sha256') !=
                     (original['provenance']['parameter_file'] or {}).get('sha256')):
                     raise ValueError('engine identity differs from frozen source features')
-                report = calc_descriptor_report(mol, result)
+                report = CalcDescriptorReport(mol, result)
                 basic = [report['values'][k] for k in pilot.BASIC]
                 orbital = [report['values'][k] for k in pilot.ORBITAL]
                 if report['quality']['status'] == 'error' or any(v is None or not np.isfinite(v) for v in basic+orbital):

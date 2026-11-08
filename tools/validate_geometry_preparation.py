@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import time
 
-from eled import prepare_conformers
+from eled import PrepareConformers
 from eled.persistence import _implementation_identity
 
 
@@ -35,7 +35,7 @@ def main():
     methods, causes = Counter(), Counter()
     with gzip.open(args.output/'reports.jsonl.gz', 'wt') as handle:
         for row in rows:
-            start = time.perf_counter(); result = prepare_conformers(row['smiles'], num_conformers=1, random_seed=42)
+            start = time.perf_counter(); result = PrepareConformers(row['smiles'], num_conformers=1, random_seed=42)
             elapsed = time.perf_counter()-start; report = result.report
             group = summary['groups'].setdefault(row['group'], {'total': 0, 'accepted': 0, 'failed': 0})
             group['total'] += 1; group['accepted' if result.success else 'failed'] += 1

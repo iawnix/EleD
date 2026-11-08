@@ -9,7 +9,7 @@ from threading import RLock
 from typing import Any, Sequence
 
 from ..errors import XTBNativeNotFoundError, XTBRunError, XTBEnvironmentError, DescriptorUnavailableError
-from ..options import calculation_settings
+from ..options import CalculationSettings
 from ..result import XTBResult, _frontier_energies
 from ..input import _xyz_from_mol, _method_flag, _effective_charge_uhf, _input_metadata
 from ..runtime import _find_xtb_library, _engine_identity, _parameter_file, _require_extended_libxtb
@@ -195,7 +195,7 @@ def _run_xtb_native(
     """
 
     from rdkit import Chem
-    settings = calculation_settings(max_iterations, accuracy, electronic_temperature)
+    settings = CalculationSettings(max_iterations, accuracy, electronic_temperature)
     mol = Chem.Mol(mol)  # Own the exact geometry/topology while ctypes releases the GIL.
     if not isinstance(keep_overlap, bool):
         raise ValueError('keep_overlap must be a bool')
@@ -350,7 +350,7 @@ def _run_xtb_native(
             raw_json={"native_api_version": int(library.get_api_version())},
             metadata={
                 **_input_metadata(mol, conf_id, charge, uhf, xyz),
-                'calculation_settings': settings,
+                'CalculationSettings': settings,
                 'calculation_status': 'success',
                 'scf': scf,
                 'initialization': 'reference' if _restart else 'independent',
@@ -385,7 +385,7 @@ def run_xtb_native(mol, *, conf_id=-1, method='GFN2-xTB', charge=None, uhf=None,
 def _native_charge_states(mol, configurations):
     """Scoped reference restart; callers must close this iterator on early exit.
 
-    The fixed-geometry/settings configurations are validated by run_reactivity.
+    The fixed-geometry/settings configurations are validated by RunReactivity.
     Each neighbor receives its own deep copy of the untouched reference.
     """
     saved = []

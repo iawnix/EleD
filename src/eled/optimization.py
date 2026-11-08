@@ -78,7 +78,7 @@ def _lbfgs_direction(gradient: np.ndarray, pairs: list[tuple[np.ndarray, np.ndar
     return -vector.reshape(gradient.shape)
 
 
-def optimize_xtb(
+def OptimizeXTB(
     mol: Any,
     *,
     conf_id: int = -1,

@@ -16,7 +16,7 @@ import subprocess
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import XTBOptions, run_reactivity
+from eled import XTBOptions, RunReactivity
 
 
 def main():
@@ -74,7 +74,7 @@ def main():
                 cli = np.array([[float(v) for v in item[2:]] for item in matches])
                 row['cli_fukui'] = cli.tolist()
             for initialization in ('reference','independent'):
-                report = run_reactivity(mol, options=XTBOptions(method=f'gfn{method}',
+                report = RunReactivity(mol, options=XTBOptions(method=f'gfn{method}',
                     xtb_library=str(library), accuracy=.1, electronic_temperature=300.),
                     ionized_uhf=spin-1 if spin else 1, attached_uhf=spin-1 if spin else 1,
                     initialization=initialization, return_errors=True)

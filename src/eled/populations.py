@@ -12,7 +12,7 @@ from .errors import DescriptorUnavailableError
 from .result import XTBResult
 
 
-def calc_orbital_populations(result, *, orbital_indices=None, scheme='lowdin',
+def CalcOrbitalPopulations(result, *, orbital_indices=None, scheme='lowdin',
                              orthonormality_tolerance=1e-6):
     """Return atom-by-orbital fractions and occupation-weighted populations.
 
@@ -78,7 +78,7 @@ def calc_orbital_populations(result, *, orbital_indices=None, scheme='lowdin',
     }
 
 
-def calc_frontier_descriptors(mol, result, *, fragments=None,
+def CalcFrontierDescriptors(mol, result, *, fragments=None,
                               occupation_threshold=1e-7, degeneracy_ev=1e-3,
                               occupation_tolerance=1e-6):
     """Lowdin HOMO/LUMO group descriptors, with atom-centroid spatial proxies.
@@ -97,7 +97,7 @@ def calc_frontier_descriptors(mol, result, *, fragments=None,
     _nonnegative(degeneracy_ev, 'degeneracy_ev')
     _nonnegative(occupation_tolerance, 'occupation_tolerance')
     energies, occupations, occupied, virtual = _orbitals(result, occupation_threshold)
-    populations = calc_orbital_populations(result, scheme='lowdin')
+    populations = CalcOrbitalPopulations(result, scheme='lowdin')
     atom = np.asarray(populations['atom_populations'])
     groups = _fragments(fragments, mol.GetNumAtoms()) if fragments is not None else {}
     positions = np.asarray(mol.GetConformer(result.metadata['conformer_id']).GetPositions())

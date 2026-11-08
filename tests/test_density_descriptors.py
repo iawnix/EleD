@@ -5,13 +5,13 @@ import pytest
 from rdkit import Chem
 
 from eled import (
-    XTBResult, calc_density_matrix, calc_shell_populations,
-    calc_mayer_bond_descriptors, calc_frontier_bond_descriptors,
-    calc_pi_descriptors,
+    XTBResult, CalcDensityMatrix, CalcShellPopulations,
+    CalcMayerBondDescriptors, CalcFrontierBondDescriptors,
+    CalcPiDescriptors,
 )
 from eled.input import _input_metadata, _xyz_from_mol
-from eled.reports import descriptor_sensitivity
-from eled import descriptor_catalog, descriptor_columns
+from eled.reports import DescriptorSensitivity
+from eled import DescriptorCatalog, DescriptorColumns
 
 
 def result():
@@ -45,10 +45,10 @@ def molecule():
 
 def test_density_and_shell_conservation():
     r = result()
-    d = calc_density_matrix(r)
+    d = CalcDensityMatrix(r)
     assert d['trace_PS_e'] == pytest.approx(8.)
     assert d['electron_conservation_error_e'] == pytest.approx(0.)
-    shells = calc_shell_populations(r)
+    shells = CalcShellPopulations(r)
     assert sum(x['lowdin_s_electron_count_e'] + x['lowdin_p_electron_count_e']
                for x in shells['atoms']) == pytest.approx(8.)
     assert shells['atoms'][0]['lowdin_p_to_s_ratio'] == pytest.approx(3.)
@@ -59,19 +59,19 @@ def test_mayer_and_frontier_bonds_and_open_shell_missing_reason():
     mol = Chem.MolFromSmiles('CC')
     mol.RemoveAllConformers()
     r = result()
-    mayer = calc_mayer_bond_descriptors(mol, r)
+    mayer = CalcMayerBondDescriptors(mol, r)
     assert mayer['bonds'][0]['wiberg_bond_order'] == 1.
     assert mayer['bonds'][0]['mayer_bond_order'] == pytest.approx(0.)
-    frontier = calc_frontier_bond_descriptors(mol, r)
+    frontier = CalcFrontierBondDescriptors(mol, r)
     assert frontier['bonds']
     open_shell = replace(r, number_of_unpaired_electrons=1)
-    assert calc_mayer_bond_descriptors(mol, open_shell)['bonds'][0]['mayer_bond_order'] is None
-    assert calc_mayer_bond_descriptors(mol, open_shell)['bonds'][0]['mayer_missing_reason']
+    assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mayer_bond_order'] is None
+    assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mayer_missing_reason']
 
 
 def test_gfn0_shell_population_is_not_eeq_charge():
     r = replace(result(), method='GFN0-xTB', partial_charges=(.3, -.3))
-    rows = calc_shell_populations(r)['atoms']
+    rows = CalcShellPopulations(r)['atoms']
     assert rows[0]['charge_reconstruction_e'] is None
 
 
@@ -85,24 +85,24 @@ def test_density_descriptors_are_invariant_to_ao_permutation_and_phase():
     changed = replace(r, orbital_coefficients=tuple(map(tuple, c * np.array([1,-1,1,-1,1,-1,1,-1])[:,None])),
                       overlap_matrix=tuple(map(tuple, s)), ao_atom_indices=tuple(ao_atom),
                       ao_shell_indices=tuple(ao_shell))
-    a = calc_shell_populations(r)['atoms']; b = calc_shell_populations(changed)['atoms']
+    a = CalcShellPopulations(r)['atoms']; b = CalcShellPopulations(changed)['atoms']
     for key in ('mulliken_s_electron_count_e', 'mulliken_p_electron_count_e',
                 'lowdin_s_electron_count_e', 'lowdin_p_electron_count_e'):
         np.testing.assert_allclose([x[key] for x in a], [x[key] for x in b], atol=1e-12)
     np.testing.assert_allclose(
-        [x['mulliken_overlap_population'] for x in calc_frontier_bond_descriptors(mol, r)['bonds']],
-        [x['mulliken_overlap_population'] for x in calc_frontier_bond_descriptors(mol, changed)['bonds']], atol=1e-12)
+        [x['mulliken_overlap_population'] for x in CalcFrontierBondDescriptors(mol, r)['bonds']],
+        [x['mulliken_overlap_population'] for x in CalcFrontierBondDescriptors(mol, changed)['bonds']], atol=1e-12)
 
 
 def test_pi_missing_is_explicit_for_result_without_matching_p_map():
-    report = calc_pi_descriptors(molecule(), result())
+    report = CalcPiDescriptors(molecule(), result())
     assert report['missing']
 
 
 def test_sensitivity_keeps_missing_comparisons_explicit():
     reference = {'values': {'x': 1.0}, 'statistics': {'x': {'std': 0.2}}}
     other = {'values': {'x': 1.5}}
-    d = descriptor_sensitivity(reference, gfn1=other, gfn2={'values': {'x': 1.0}})
+    d = DescriptorSensitivity(reference, gfn1=other, gfn2={'values': {'x': 1.0}})
     assert d['values']['x']['conformer_dispersion'] == .2
     assert d['values']['x']['gfn1_vs_gfn2_abs_difference'] == .5
     assert d['values']['x']['electronic_temperature_300_vs_1000_abs_difference'] is None
@@ -110,11 +110,11 @@ def test_sensitivity_keeps_missing_comparisons_explicit():
 
 
 def test_descriptor_catalog_and_scalar_units_are_explicit():
-    catalog = descriptor_catalog()
+    catalog = DescriptorCatalog()
     assert {'molecular', 'atom', 'bond', 'density', 'reactivity', 'diagnostic'} <= set(catalog)
     assert catalog['bond']['mayer_bond_order']['unit'] == 'dimensionless'
     assert catalog['atom']['pi_electron_count_e']['unit'] == 'e'
     assert catalog['reactivity']['vertical_ip_ev']['unit'] == 'eV'
     assert catalog['molecular']['xtb_dipole_*_e_bohr']['unit'] == 'e*Bohr'
-    assert descriptor_columns()['xtb_occupation_threshold'] == 'dimensionless'
+    assert DescriptorColumns()['xtb_occupation_threshold'] == 'dimensionless'
     assert all(item['missing'] for group in catalog.values() for item in group.values())

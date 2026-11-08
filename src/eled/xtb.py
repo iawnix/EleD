@@ -16,7 +16,7 @@ from .errors import (
     XTBNativeNotFoundError,
 )
 from .result import XTBResult, _frontier_energies
-from .electronic_descriptors import calc_xtb_descriptors
+from .electronic_descriptors import CalcXTBDescriptors
 from .input import _xyz_from_mol, _effective_charge_uhf
 from .options import XTBOptions
 from .backends.native import run_xtb_native, _NativeXTB

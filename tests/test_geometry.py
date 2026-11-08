@@ -8,7 +8,7 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from eled import geometry, prepare_conformers
+from eled import geometry, PrepareConformers
 
 
 FAST = dict(fallback_methods=(), attempts_per_strategy=1, retry_random_coords=False)
@@ -16,8 +16,8 @@ FAST = dict(fallback_methods=(), attempts_per_strategy=1, retry_random_coords=Fa
 
 def test_deterministic_owned_conformer_pool_and_partial_coverage():
     source = Chem.MolFromSmiles('CCO'); before = source.ToBinary()
-    a = prepare_conformers(source, num_conformers=8, **FAST)
-    b = prepare_conformers(source, num_conformers=8, **FAST)
+    a = PrepareConformers(source, num_conformers=8, **FAST)
+    b = PrepareConformers(source, num_conformers=8, **FAST)
     assert source.ToBinary() == before
     assert a.success and 0 < a.molecule.GetNumConformers() <= 8
     assert a.report == b.report
@@ -33,7 +33,7 @@ def test_deterministic_owned_conformer_pool_and_partial_coverage():
 
 @pytest.mark.parametrize('smiles', ['C[C@H](O)C(=O)O', 'F/C=C/F', 'F/C=C\\F'])
 def test_coordinates_preserve_specified_tetrahedral_and_double_bond_stereo(smiles):
-    result = prepare_conformers(smiles, **FAST)
+    result = PrepareConformers(smiles, **FAST)
     assert result.success
     observed = Chem.Mol(result.molecule); Chem.RemoveStereochemistry(observed)
     Chem.AssignStereochemistryFrom3D(observed)
@@ -41,7 +41,7 @@ def test_coordinates_preserve_specified_tetrahedral_and_double_bond_stereo(smile
 
 
 def test_reflected_coordinates_rejected_even_with_original_chiral_tags():
-    r = prepare_conformers('C[C@H](O)C(=O)O', optimize=None, **FAST)
+    r = PrepareConformers('C[C@H](O)C(=O)O', optimize=None, **FAST)
     mol = r.molecule; expected = geometry._stereo_constraints(mol)
     conf = mol.GetConformer()
     for i, xyz in enumerate(conf.GetPositions()):
@@ -56,14 +56,14 @@ def test_optimizer_inversion_is_not_returned_as_a_success(monkeypatch):
             xyz[0] *= -1; c.SetAtomPosition(i, xyz)
         return [(0, -1.)]
     monkeypatch.setattr(AllChem, 'MMFFOptimizeMoleculeConfs', invert)
-    r = prepare_conformers('C[C@H](O)C(=O)O', **FAST)
+    r = PrepareConformers('C[C@H](O)C(=O)O', **FAST)
     assert not r.success and r.molecule.GetNumConformers() == 0
     assert r.report['attempts'][0]['candidates'][0]['after_optimization']['reason'] == 'stereo_mismatch'
 
 
 def test_nonconverged_force_field_is_not_returned(monkeypatch):
     monkeypatch.setattr(AllChem, 'MMFFOptimizeMoleculeConfs', lambda *a, **k: [(1, 1.)])
-    result = prepare_conformers('CCO', **FAST)
+    result = PrepareConformers('CCO', **FAST)
     assert not result.success
     assert result.report['attempts'][0]['candidates'][0]['rejection'] == 'force_field_not_converged'
 
@@ -72,7 +72,7 @@ def test_missing_parameters_reported_before_embedding(monkeypatch):
     monkeypatch.setattr(AllChem, 'MMFFHasAllMoleculeParams', lambda mol: False)
     def forbidden(*a, **k): raise AssertionError('must not embed')
     monkeypatch.setattr(AllChem, 'EmbedMultipleConfs', forbidden)
-    result = prepare_conformers('CCO')
+    result = PrepareConformers('CCO')
     assert not result.success and not result.report['attempts']
     assert result.report['error']['reason'] == 'force_field_parameters_unavailable'
 
@@ -83,7 +83,7 @@ def test_retries_use_fresh_seeds_and_keep_stereo(monkeypatch):
         p = kwargs['params']; seen.append((p.randomSeed, p.useRandomCoords, p.enforceChirality))
         return [] if len(seen) < 3 else embed(mol, **kwargs)
     monkeypatch.setattr(AllChem, 'EmbedMultipleConfs', fail_first)
-    r = prepare_conformers('CCO', fallback_methods=())
+    r = PrepareConformers('CCO', fallback_methods=())
     assert r.success and len(seen) == 3
     assert len({s[0] for s in seen}) == 3
     assert [s[1] for s in seen] == [False, False, True]
@@ -93,26 +93,26 @@ def test_retries_use_fresh_seeds_and_keep_stereo(monkeypatch):
 def test_unexpected_errors_propagate(monkeypatch):
     def broken(*a, **k): raise RuntimeError('unexpected backend bug')
     monkeypatch.setattr(AllChem, 'EmbedMultipleConfs', broken)
-    with pytest.raises(RuntimeError, match='unexpected'): prepare_conformers('CCO')
+    with pytest.raises(RuntimeError, match='unexpected'): PrepareConformers('CCO')
 
 
 def test_unavailable_default_preset_is_explicit_but_explicit_request_raises(monkeypatch):
     monkeypatch.delattr(AllChem, 'ETKDGv4', raising=False)
-    r = prepare_conformers('CCO')
+    r = PrepareConformers('CCO')
     assert r.success and r.report['retry_policy']['unavailable_default_fallbacks'] == ['ETKDGv4']
-    with pytest.raises(ValueError, match='lacks'): prepare_conformers('CCO', fallback_methods=['ETKDGv4'])
+    with pytest.raises(ValueError, match='lacks'): PrepareConformers('CCO', fallback_methods=['ETKDGv4'])
 
 
 def test_unspecified_stereo_is_flagged_or_rejected():
-    r = prepare_conformers('CC(O)C(=O)O', **FAST)
+    r = PrepareConformers('CC(O)C(=O)O', **FAST)
     assert r.success and r.report['unspecified_stereo'] and r.report['warnings']
     with pytest.raises(ValueError, match='unspecified'):
-        prepare_conformers('CC(O)C(=O)O', require_assigned_stereo=True)
+        PrepareConformers('CC(O)C(=O)O', require_assigned_stereo=True)
 
 
 def test_input_coordinates_are_discarded_from_a_copy():
     mol = Chem.AddHs(Chem.MolFromSmiles('O')); AllChem.EmbedMolecule(mol, randomSeed=1)
-    before = mol.ToBinary(); r = prepare_conformers(mol, **FAST)
+    before = mol.ToBinary(); r = PrepareConformers(mol, **FAST)
     assert r.success and r.report['discarded_input_conformers'] == 1
     assert not r.report['source_coordinates_used'] and mol.ToBinary() == before
 
@@ -124,16 +124,16 @@ def test_input_coordinates_are_discarded_from_a_copy():
 def test_invalid_configuration_rejected_before_embedding(monkeypatch, kwargs):
     def forbidden(*a, **k): raise AssertionError('must not embed')
     monkeypatch.setattr(AllChem, 'EmbedMultipleConfs', forbidden)
-    with pytest.raises(ValueError): prepare_conformers('CCO', **kwargs)
+    with pytest.raises(ValueError): PrepareConformers('CCO', **kwargs)
 
 
 @pytest.mark.parametrize('source', ['', '*C', '[Na+].[Cl-]', 'invalid smiles'])
 def test_unsupported_inputs_raise(source):
-    with pytest.raises(ValueError): prepare_conformers(source)
+    with pytest.raises(ValueError): PrepareConformers(source)
 
 
 def test_raw_failure_counters_and_exhausted_plan_are_retained():
-    r = prepare_conformers('C[C@H]1[C@H]2[C@@H]3C[C@]3(C)N21', optimize=None, **FAST)
+    r = PrepareConformers('C[C@H]1[C@H]2[C@@H]3C[C@]3(C)N21', optimize=None, **FAST)
     assert not r.success
     counts = r.report['attempts'][0]['failure_counts']
     assert counts['available'] and sum(counts['raw']) == sum(counts['named'].values()) > 0
@@ -143,6 +143,6 @@ def test_raw_failure_counters_and_exhausted_plan_are_retained():
 @pytest.mark.integration
 def test_prepared_molecule_connects_to_existing_xtb_api():
     if os.environ.get('ELED_REQUIRE_RDXTB') != '1': pytest.skip('native integration profile')
-    r = prepare_conformers('O', **FAST)
+    r = PrepareConformers('O', **FAST)
     result = calculate_xtb(r.molecule, conf_id=r.report['recommended_conformer_id'])
     assert result.metadata['geometry_sha256'] == r.report['conformers'][0]['geometry_sha256']

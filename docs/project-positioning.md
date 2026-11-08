@@ -52,16 +52,16 @@ The public calculation API is the reusable calculator object:
 
 ```python
 from eled import XTBCalculator
-from eled import calc_xtb_descriptors
+from eled import CalcXTBDescriptors
 
 calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
 result = calculator.calculate(mol, keep_overlap=True)
-features = calc_xtb_descriptors(result)
+features = CalcXTBDescriptors(result)
 ```
 
 Descriptor objects or registry entries should expose a common contract for
 name, units, required result capabilities, invariance and missing-value
-semantics. The current `descriptor_catalog()` and `descriptor_status()` are the
+semantics. The current `DescriptorCatalog()` and `DescriptorStatus()` are the
 initial registry implementation.
 
 ## Packaging direction

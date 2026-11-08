@@ -73,18 +73,18 @@ back. The base runtime must already have been installed.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import XTBCalculator, rdXTBTools, calc_orbital_populations
+from eled import XTBCalculator, rdXTBTools, CalcOrbitalPopulations
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
 print(result.total_energy_hartree)  # Hartree
-print(calc_orbital_populations(result))
+print(CalcOrbitalPopulations(result))
 
 ok, compiled = rdXTBTools.RunMol(mol, method="GFN0-xTB", keepOverlap=True)
 if not ok:
     raise RuntimeError(compiled.errorMessage)
-print(calc_orbital_populations(compiled))
+print(CalcOrbitalPopulations(compiled))
 ```
 
 Omit `keep_overlap` / `keepOverlap` for basic descriptors to avoid retaining

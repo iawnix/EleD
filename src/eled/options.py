@@ -8,7 +8,7 @@ from numbers import Integral, Real
 from .input import _method_flag
 
 
-def calculation_settings(max_iterations=250, accuracy=1.0, electronic_temperature=300.0):
+def CalculationSettings(max_iterations=250, accuracy=1.0, electronic_temperature=300.0):
     """Validate values before calling C; record xTB's minimum temperature."""
     if (isinstance(max_iterations, bool) or not isinstance(max_iterations, Integral)
             or not 1 <= max_iterations <= 2147483647):
@@ -39,7 +39,7 @@ class XTBOptions:
     electronic_temperature: float = 300.0
 
     def __post_init__(self):
-        settings = calculation_settings(self.max_iterations, self.accuracy, self.electronic_temperature)
+        settings = CalculationSettings(self.max_iterations, self.accuracy, self.electronic_temperature)
         for key in ("max_iterations", "accuracy", "electronic_temperature"):
             object.__setattr__(self, key, settings[key])
         object.__setattr__(self, 'method', _method_flag(self.method)[0])

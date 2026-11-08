@@ -11,20 +11,20 @@ from .xtb import (
     XTBResult,
     XTBRunError,
     XTBNativeNotFoundError,
-    calc_xtb_descriptors,
+    CalcXTBDescriptors,
 )
-from .mapping import annotate_mol
-from .batch import XTBCache, run_xtb_batch, xtb_cache_key
+from .mapping import AnnotateMol
+from .batch import XTBCache, RunXTBBatch, XTBCacheKey
 from .options import XTBOptions
 from .calculator import XTBCalculator
 
 from .electronic_descriptors import (
-    calc_xtb_atom_descriptors, calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
+    CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
 )
-from .populations import calc_orbital_populations, calc_frontier_descriptors
+from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
 from .density_descriptors import (
-    calc_density_matrix, calc_shell_populations, calc_mayer_bond_descriptors,
-    calc_frontier_bond_descriptors, calc_pi_descriptors, calc_density_descriptors,
+    CalcDensityMatrix, CalcShellPopulations, CalcMayerBondDescriptors,
+    CalcFrontierBondDescriptors, CalcPiDescriptors, CalcDensityDescriptors,
 )
 from .errors import DescriptorUnavailableError
 
@@ -33,81 +33,77 @@ __all__ = [
     "XTBResult",
     "XTBRunError",
     "XTBNativeNotFoundError",
-    "calc_xtb_descriptors",
-    "annotate_mol",
+    "CalcXTBDescriptors",
+    "AnnotateMol",
     "XTBCache",
-    "run_xtb_batch",
-    "xtb_cache_key",
+    "RunXTBBatch",
+    "XTBCacheKey",
     "XTBOptions",
     "XTBCalculator",
-    "calc_xtb_atom_descriptors",
-    "calc_xtb_bond_descriptors",
-    "calc_xtb_fragment_descriptors",
-    "calc_orbital_populations",
-    "calc_frontier_descriptors",
-    "calc_density_matrix",
-    "calc_shell_populations",
-    "calc_mayer_bond_descriptors",
-    "calc_frontier_bond_descriptors",
-    "calc_pi_descriptors",
-    "calc_density_descriptors",
+    "CalcXTBAtomDescriptors",
+    "CalcXTBBondDescriptors",
+    "CalcXTBFragmentDescriptors",
+    "CalcOrbitalPopulations",
+    "CalcFrontierDescriptors",
+    "CalcDensityMatrix",
+    "CalcShellPopulations",
+    "CalcMayerBondDescriptors",
+    "CalcFrontierBondDescriptors",
+    "CalcPiDescriptors",
+    "CalcDensityDescriptors",
     "DescriptorUnavailableError",
 ]
 
 from .reports import (
-    DESCRIPTOR_VERSION, descriptor_columns, assess_descriptor_quality,
-    calc_descriptor_report, run_descriptor_batch, export_descriptor_reports,
-    descriptor_sensitivity,
+    DESCRIPTOR_VERSION, DescriptorColumns, AssessDescriptorQuality,
+    CalcDescriptorReport, RunDescriptorBatch, ExportDescriptorReports,
+    DescriptorSensitivity,
 )
-from .reactivity import calc_reactivity_descriptors, run_reactivity, ChargeStateCalculationError
+from .reactivity import CalcReactivityDescriptors, RunReactivity, ChargeStateCalculationError
 
 __all__ += [
-    'DESCRIPTOR_VERSION', 'descriptor_columns', 'assess_descriptor_quality',
-    'calc_descriptor_report', 'run_descriptor_batch', 'export_descriptor_reports',
-    'descriptor_sensitivity',
-    'calc_reactivity_descriptors', 'run_reactivity', 'ChargeStateCalculationError',
+    'DESCRIPTOR_VERSION', 'DescriptorColumns', 'AssessDescriptorQuality',
+    'CalcDescriptorReport', 'RunDescriptorBatch', 'ExportDescriptorReports',
+    'DescriptorSensitivity',
+    'CalcReactivityDescriptors', 'RunReactivity', 'ChargeStateCalculationError',
 ]
 
 from .persistence import XTBDiskCache, ReactivityCheckpoint
-from .reactivity_batch import ReactivityJob, run_reactivity_batch
+from .reactivity_batch import ReactivityJob, RunReactivityBatch
 from .errors import XTBCacheError, XTBEnvironmentError
 from .errors import XTBTimeoutError, XTBWorkerError
 
 __all__ += ['XTBDiskCache', 'ReactivityCheckpoint', 'ReactivityJob',
-            'run_reactivity_batch', 'XTBCacheError', 'XTBEnvironmentError',
+            'RunReactivityBatch', 'XTBCacheError', 'XTBEnvironmentError',
             'XTBTimeoutError', 'XTBWorkerError']
 
-from .conformers import conformer_descriptor_columns, run_conformer_analysis
+from .conformers import ConformerDescriptorColumns, RunConformerAnalysis
 
-__all__ += ['conformer_descriptor_columns', 'run_conformer_analysis']
+__all__ += ['ConformerDescriptorColumns', 'RunConformerAnalysis']
 
-from .geometry import ConformerGenerationResult, prepare_conformers
+from .geometry import ConformerGenerationResult, PrepareConformers
 
-__all__ += ['ConformerGenerationResult', 'prepare_conformers']
+__all__ += ['ConformerGenerationResult', 'PrepareConformers']
 
-from .optimization import XTBOptimizationResult, optimize_xtb
+from .optimization import XTBOptimizationResult, OptimizeXTB
 
-__all__ += ['XTBOptimizationResult', 'optimize_xtb']
+__all__ += ['XTBOptimizationResult', 'OptimizeXTB']
 
-from .eas import (normalize_eas_records, cluster_keys, assign_eas_splits,
-                  assign_eas_folds, prepare_eas_dataset, load_frozen_protocol,
-                  frozen_protocol_sha256)
-from .descriptor_catalog import descriptor_catalog, descriptor_status
+from .eas import (NormalizeEASRecords, ClusterKeys, AssignEASSplits,
+                  AssignEASFolds, PrepareEASDataset, LoadFrozenProtocol,
+                  FrozenProtocolSHA256)
+from .descriptor_catalog import DescriptorCatalog, DescriptorStatus
 
 from .visualization import (
     BuildFragmentVisualData, DrawDescriptorMap, PlotFragmentSummary,
     PlotFragmentInteractions, RenderFragmentAnalysis,
-    build_fragment_visual_data, draw_descriptor_map, plot_fragment_summary,
-    plot_fragment_interactions, render_fragment_analysis,
 )
 
-__all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'assign_eas_folds',
-            'prepare_eas_dataset', 'load_frozen_protocol', 'frozen_protocol_sha256',
-            'descriptor_catalog', 'descriptor_status']
+__all__ += ['NormalizeEASRecords', 'ClusterKeys', 'AssignEASSplits', 'AssignEASFolds',
+            'PrepareEASDataset', 'LoadFrozenProtocol', 'FrozenProtocolSHA256',
+            'DescriptorCatalog', 'DescriptorStatus']
 
 __all__ += [
     'BuildFragmentVisualData', 'DrawDescriptorMap', 'PlotFragmentSummary',
     'PlotFragmentInteractions', 'RenderFragmentAnalysis',
-    'build_fragment_visual_data', 'draw_descriptor_map', 'plot_fragment_summary',
-    'plot_fragment_interactions', 'render_fragment_analysis',
 ]

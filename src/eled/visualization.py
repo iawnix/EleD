@@ -287,18 +287,7 @@ def RenderFragmentAnalysis(mol, report, *, atom_field=None, width=620):
 </div>'''
 
 
-# Snake-case aliases are convenient for ordinary Python callers. CamelCase
-# names remain the documented RDKit-style public entry points.
-build_fragment_visual_data = BuildFragmentVisualData
-draw_descriptor_map = DrawDescriptorMap
-plot_fragment_summary = PlotFragmentSummary
-plot_fragment_interactions = PlotFragmentInteractions
-render_fragment_analysis = RenderFragmentAnalysis
-
-
 __all__ = [
     'BuildFragmentVisualData', 'DrawDescriptorMap', 'PlotFragmentSummary',
     'PlotFragmentInteractions', 'RenderFragmentAnalysis',
-    'build_fragment_visual_data', 'draw_descriptor_map', 'plot_fragment_summary',
-    'plot_fragment_interactions', 'render_fragment_analysis',
 ]

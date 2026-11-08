@@ -23,7 +23,7 @@ from rdkit import Chem, rdBase
 from rdkit.Chem import Descriptors, rdFingerprintGenerator
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
-from eled import XTBEnvironmentError, XTBOptions, XTBRunError, calc_descriptor_report, XTBCalculator
+from eled import XTBEnvironmentError, XTBOptions, XTBRunError, CalcDescriptorReport, XTBCalculator
 from eled.input import _xyz_from_mol, _geometry_hash
 from eled.persistence import _implementation_identity
 from eled.backends.native import HARTREE_TO_EV
@@ -228,7 +228,7 @@ def main():
             except XTBRunError as exc:
                 failures.append({**metadata, 'reason': str(exc)}); continue
             row['xtb_seconds'] = time.perf_counter()-t
-            t = time.perf_counter(); report = calc_descriptor_report(mol, result)
+            t = time.perf_counter(); report = CalcDescriptorReport(mol, result)
             row['analysis_seconds'] = time.perf_counter()-t
             if report['quality']['status'] == 'error':
                 failures.append({**metadata, 'reason': report['quality']}); continue

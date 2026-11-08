@@ -95,7 +95,7 @@ if eht_ok:
 | Occupations | `GetOrbitalOccupancies()`, electrons, `[MO]` | xTB occupations can be fractional at finite electronic temperature |
 | Partial charges | `GetAtomicCharges()`, elementary charge, `[atom]` | xTB's charge model; do not equate it with EHT's population analysis |
 | Dipole | `GetDipole()`, e·Bohr, `[x,y,z]` | Origin-dependent for charged molecules; uses supplied coordinates |
-| Nuclear gradient | `GetGradient()`, Hartree/Bohr, `[atom,xyz]` | Used by `optimize_xtb`; it is not an excited-state gradient |
+| Nuclear gradient | `GetGradient()`, Hartree/Bohr, `[atom,xyz]` | Used by `OptimizeXTB`; it is not an excited-state gradient |
 | Bond orders | `GetWibergBondOrders()`, dimensionless, `[atom,atom]` | Not the EHT overlap population matrix |
 | MO coefficients | `GetOrbitalCoefficients()`, `[AO,MO]` | Optional; xTB basis ordering, not EHT basis ordering |
 | Overlap / maps | `GetOverlapMatrix()`, `GetAOAtomMap()`, `GetAOShellMap()`, `GetShellAtomMap()`, `GetShellAngularMomenta()` | Optional native basis data; not EHT matrices |
@@ -126,7 +126,7 @@ radical counts, with electron-count/parity validation. Electronic temperature
 is in kelvin; accuracy is xTB's dimensionless numerical accuracy setting.
 The C++ module scope is gas-phase single points, with no solvent option or
 optimizer method. The Python package exposes xTB gradient optimization through
-`optimize_xtb`, while `rdXTBTools` supplies the underlying single-point data.
+`OptimizeXTB`, while `rdXTBTools` supplies the underlying single-point data.
 
 Parameter discovery checks `parameterDirectory` first, then colon-separated
 `XTBPATH`, then the selected library's `share/xtb`. An explicit directory must
@@ -152,19 +152,19 @@ bindings and separately linked copies of the static C++ library do not share
 that lock. This does not establish general libxtb thread safety.
 
 The low-level `XTBResults` object is distinct from the `XTBResult` dataclass.
-Both work with the shared descriptor functions and `annotate_mol`. Batch/cache
+Both work with the shared descriptor functions and `AnnotateMol`. Batch/cache
 APIs continue to produce the dataclass through ctypes.
 
 ## Shared descriptor extraction
 
 ```python
-from eled import calc_xtb_descriptors, calc_orbital_populations, annotate_mol
+from eled import CalcXTBDescriptors, CalcOrbitalPopulations, AnnotateMol
 ok, xtb = rdXTBTools.RunMol(mol, keepOverlap=True)
 if not ok:
     raise RuntimeError(xtb.errorMessage)
-features = calc_xtb_descriptors(xtb)
-populations = calc_orbital_populations(xtb)
-annotated = annotate_mol(mol, xtb)
+features = CalcXTBDescriptors(xtb)
+populations = CalcOrbitalPopulations(xtb)
+annotated = AnnotateMol(mol, xtb)
 ```
 
 These helpers never rerun a calculation. The wrapper records provenance from
@@ -259,5 +259,5 @@ receive deep copies of the unchanged reference. Engine handles are scoped to
 the call, which holds the calculation lock. `XTBResults.initialization` records
 `independent` or `reference`. Recompile consumers after upgrading.
 
-Python users call `run_reactivity(..., interface="compiled")`; its internal
+Python users call `RunReactivity(..., interface="compiled")`; its internal
 compiled bridge also holds the shared ctypes lock while releasing the GIL.

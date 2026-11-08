@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Generate the frozen EAS feature triplet for a prepared manifest.
 
-The manifest must come from ``prepare_eas_dataset.py``. Failures are retained
+The manifest must come from ``PrepareEASDataset.py``. Failures are retained
 per molecule and are never converted into zero-valued atom features.
 """
 from __future__ import annotations
@@ -10,9 +10,9 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from rdkit import Chem
-from eled import (XTBOptions, prepare_conformers, run_conformer_analysis,
-                       run_reactivity, descriptor_sensitivity)
-from eled.eas import frozen_protocol_sha256, load_frozen_protocol
+from eled import (XTBOptions, PrepareConformers, RunConformerAnalysis,
+                       RunReactivity, DescriptorSensitivity)
+from eled.eas import FrozenProtocolSHA256, LoadFrozenProtocol
 
 
 def _atom_features(smiles):
@@ -41,7 +41,7 @@ def main(argv=None):
     parser.add_argument('--num-conformers', type=int, default=None)
     parser.add_argument('--seed', type=int, default=None)
     args = parser.parse_args(argv)
-    protocol = load_frozen_protocol()
+    protocol = LoadFrozenProtocol()
     requested_conformers = protocol['geometry']['conformers_per_molecule']
     if args.num_conformers is not None and args.num_conformers != requested_conformers:
         raise SystemExit(f'--num-conformers must equal frozen protocol value {requested_conformers}')
@@ -52,7 +52,7 @@ def main(argv=None):
     args.seed = protocol_seed
     manifest = json.loads(args.manifest.read_text(encoding='utf-8'))
     if (manifest.get('protocol_id') != protocol['protocol_id'] or
-            manifest.get('protocol_sha256') != frozen_protocol_sha256(protocol)):
+            manifest.get('protocol_sha256') != FrozenProtocolSHA256(protocol)):
         raise SystemExit('manifest was not produced by the frozen EAS protocol')
     records = []
     for row in manifest.get('records', []):
@@ -64,7 +64,7 @@ def main(argv=None):
                 'charge': row.get('charge', 0), 'uhf': row.get('uhf', 0),
                 'atom_features': _atom_features(row['smiles'])}
         try:
-            prepared = prepare_conformers(row['smiles'], num_conformers=args.num_conformers,
+            prepared = PrepareConformers(row['smiles'], num_conformers=args.num_conformers,
                 method=protocol['geometry']['embedding']['method'], fallback_methods=(),
                 attempts_per_strategy=protocol['geometry']['embedding']['attempts_per_strategy'],
                 retry_random_coords=protocol['geometry']['embedding']['retry_random_coords'],
@@ -78,15 +78,15 @@ def main(argv=None):
             common = dict(xtb_library=args.xtb_library, keep_overlap=True,
                           electronic_temperature=protocol['calculation']['electronic_temperature_K'],
                           charge=row.get('charge'), uhf=row.get('uhf'))
-            primary = run_conformer_analysis(prepared.molecule,
+            primary = RunConformerAnalysis(prepared.molecule,
                 options=XTBOptions(method='GFN2-xTB', **common), record_id=row['id'],
                 return_errors=True)
-            gfn1 = run_conformer_analysis(prepared.molecule,
+            gfn1 = RunConformerAnalysis(prepared.molecule,
                 options=XTBOptions(method='GFN1-xTB', **common), record_id=row['id'],
                 return_errors=True)
             hot_common = {**common, 'electronic_temperature':
                           protocol['calculation']['diagnostic_electronic_temperature_K']}
-            hot = run_conformer_analysis(prepared.molecule,
+            hot = RunConformerAnalysis(prepared.molecule,
                 options=XTBOptions(method='GFN2-xTB', **hot_common),
                 record_id=row['id'], return_errors=True)
             reactivity = []
@@ -94,7 +94,7 @@ def main(argv=None):
                                    if report.get('quality', {}).get('status') != 'error'
                                    and report.get('error') is None]
             for conformer_id in valid_conformer_ids:
-                reactivity.append(run_reactivity(
+                reactivity.append(RunReactivity(
                     prepared.molecule,
                     options=XTBOptions(method='GFN2-xTB', conf_id=conformer_id, **common),
                     ionized_uhf=row.get('ionized_uhf'),
@@ -103,7 +103,7 @@ def main(argv=None):
             item['analysis'] = primary
             item['analyses'] = {'gfn2_300K': primary, 'gfn1_300K': gfn1,
                                 'gfn2_1000K': hot, 'gfn2_reactivity_300K': reactivity}
-            item['sensitivity'] = descriptor_sensitivity(
+            item['sensitivity'] = DescriptorSensitivity(
                 primary, gfn1=gfn1, gfn2=primary,
                 temperature_300=primary, temperature_1000=hot)
             def _geometry_hashes(report):
@@ -132,7 +132,7 @@ def main(argv=None):
             item['error'] = {'type': type(exc).__name__, 'message': str(exc)}
         records.append(item)
     output = {'protocol_id': manifest['protocol_id'],
-              'protocol_sha256': frozen_protocol_sha256(protocol),
+              'protocol_sha256': FrozenProtocolSHA256(protocol),
               'feature_method': 'GFN2-xTB', 'electronic_temperature_K': 300.0,
               'diagnostic_electronic_temperature_K': 1000.0,
               'n_records': len(records), 'records': records}

@@ -3,13 +3,13 @@
 ## 单点报告
 
 ```python
-from eled import XTBCalculator, calc_descriptor_report
+from eled import XTBCalculator, CalcDescriptorReport
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-report = calc_descriptor_report(mol, result, record_id="molecule-1")
+report = CalcDescriptorReport(mol, result, record_id="molecule-1")
 ```
 
-`calc_descriptor_report()` 不会再次调用引擎。报告包含：
+`CalcDescriptorReport()` 不会再次调用引擎。报告包含：
 
 - `values`、`units`：固定的分子级字段和单位；
 - `atoms`、`bonds`、`fragments`：按 RDKit 原始编号排列；
@@ -23,13 +23,13 @@ report = calc_descriptor_report(mol, result, record_id="molecule-1")
 ## 批量计算和导出
 
 ```python
-from eled import run_descriptor_batch, export_descriptor_reports
+from eled import RunDescriptorBatch, ExportDescriptorReports
 
-reports = run_descriptor_batch(
+reports = RunDescriptorBatch(
     molecules, record_ids=ids, max_workers=4, isolate=True,
 )
-export_descriptor_reports(reports, "features.jsonl")
-export_descriptor_reports(reports, "features.csv")
+ExportDescriptorReports(reports, "features.jsonl")
+ExportDescriptorReports(reports, "features.csv")
 ```
 
 批处理保持输入顺序，并保留单分子失败行。JSONL 保存完整嵌套结构；CSV 保存
@@ -39,9 +39,9 @@ export_descriptor_reports(reports, "features.csv")
 ## 固定几何反应性
 
 ```python
-from eled import run_reactivity, XTBOptions
+from eled import RunReactivity, XTBOptions
 
-report = run_reactivity(
+report = RunReactivity(
     mol,
     options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
     population_scheme="charges",

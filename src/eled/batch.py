@@ -43,7 +43,7 @@ def _key(options: XTBOptions, metadata: dict) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
-def xtb_cache_key(mol: Any, **options: Any) -> str:
+def XTBCacheKey(mol: Any, **options: Any) -> str:
     """Identify indexed input, settings, resolved engine version and binary hash.
 
     Requires the requested backend to be installed. Bare library sonames are
@@ -108,7 +108,7 @@ class XTBCache:
             return len(self._values)
 
 
-def run_xtb_batch(
+def RunXTBBatch(
     molecules: Iterable[Any], *, cache: XTBCache | None = None,
     max_workers: int = 1, return_exceptions: bool = False,
     options: XTBOptions | None = None, timeout: float | None = None,

@@ -7,7 +7,7 @@ from typing import Any
 
 from .result import XTBResult
 from .input import _ordered_structure_hash, _geometry_hash, _xyz_from_mol
-from .xtb import calc_xtb_descriptors
+from .xtb import CalcXTBDescriptors
 
 
 def _validate_mapping(mol: Any, result: XTBResult) -> None:
@@ -36,7 +36,7 @@ def _set_mol_property(mol: Any, name: str, value: Any) -> None:
         mol.SetProp(name, str(value))
 
 
-def annotate_mol(
+def AnnotateMol(
     mol: Any,
     result: XTBResult,
     *,
@@ -67,7 +67,7 @@ def annotate_mol(
         raise ValueError('xTB charges and bond orders must be finite')
     if matrix and any(abs(matrix[i][j] - matrix[j][i]) > 1e-8 for i in range(natoms) for j in range(i)):
         raise ValueError('xTB bond-order matrix must be symmetric')
-    scalars = calc_xtb_descriptors(result)
+    scalars = CalcXTBDescriptors(result)
     if any(isinstance(v, float) and not math.isfinite(v) for v in scalars.values()):
         raise ValueError('xTB scalar properties must be finite')
     metadata_json = json.dumps(dict(result.metadata), sort_keys=True, allow_nan=False)

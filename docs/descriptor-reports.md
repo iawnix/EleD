@@ -23,27 +23,27 @@ retaining its settings does not imply an SCC iteration or finite-T SCF protocol.
 
 ```python
 from eled import (
-    XTBCalculator, calc_descriptor_report, run_descriptor_batch,
-    export_descriptor_reports, XTBOptions, XTBCache,
+    XTBCalculator, CalcDescriptorReport, RunDescriptorBatch,
+    ExportDescriptorReports, XTBOptions, XTBCache,
 )
 
 result = XTBCalculator(accuracy=0.1).calculate(mol, keep_overlap=True)
-report = calc_descriptor_report(mol, result, record_id="molecule-1")
-reports = run_descriptor_batch(molecules, record_ids=identifiers, cache=XTBCache())
-export_descriptor_reports(reports, "features.csv")
-export_descriptor_reports(reports, "features.jsonl")
+report = CalcDescriptorReport(mol, result, record_id="molecule-1")
+reports = RunDescriptorBatch(molecules, record_ids=identifiers, cache=XTBCache())
+ExportDescriptorReports(reports, "features.csv")
+ExportDescriptorReports(reports, "features.jsonl")
 ```
 
-`calc_descriptor_report` performs no engine calls. It checks original atom order,
+`CalcDescriptorReport` performs no engine calls. It checks original atom order,
 topology and geometry before attaching atom/bond/spatial descriptors. It combines
 the [existing descriptors](descriptors.md), both population definitions and
-degeneracy-aware frontier distributions. `run_descriptor_batch` retains overlap by default and supports
+degeneracy-aware frontier distributions. `RunDescriptorBatch` retains overlap by default and supports
 [isolated parallel execution](isolated-batches.md). The same extended library
 is used for basic and overlap-aware features; set `keep_overlap=False` only
 when the additional basis snapshot is not needed.
 
 The report schema version is **2** and descriptor-definition version is **1.1**;
-neither is the package version. `descriptor_columns(frontier_depth=2)` returns
+neither is the package version. `DescriptorColumns(frontier_depth=2)` returns
 the ordered scalar schema and units. Each report includes:
 
 - `values`, `units`: fixed molecular/frontier scalar fields. Numeric units are
@@ -84,18 +84,18 @@ Convergence criteria are not an experimental accuracy guarantee.
 ## Fixed-geometry charge-state analysis
 
 ```python
-from eled import run_reactivity, XTBOptions, calc_reactivity_descriptors
+from eled import RunReactivity, XTBOptions, CalcReactivityDescriptors
 
 # Default protocol: GFN2, 300 K, reference wavefunction copies, fixed geometry.
-reaction = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
+reaction = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
 print(reaction["values"]["vertical_ip_ev"])
 print(reaction["atoms"])  # f_plus, f_minus, f_radical, dual
 
 # Explicit independent initialization for comparison; no automatic selection.
-reaction = run_reactivity(mol, options=XTBOptions(electronic_temperature=300.),
+reaction = RunReactivity(mol, options=XTBOptions(electronic_temperature=300.),
                           interface="compiled", initialization="independent", return_errors=True)
 # Existing compatible results can instead be analyzed without new calculations:
-# calc_reactivity_descriptors(mol, reference, ionized, attached)
+# CalcReactivityDescriptors(mol, reference, ionized, attached)
 ```
 
 Each atom row also contains `local_softness_per_ev = s f+`,
@@ -113,7 +113,7 @@ For an open-shell reference, explicitly supply both `ionized_uhf` and
 `attached_uhf`; spin parity is validated. The selected states are not asserted
 to be ground states.
 
-Since 0.7, `run_reactivity()` and `XTBOptions()` both default to 300 K.
+Since 0.7, `RunReactivity()` and `XTBOptions()` both default to 300 K.
 Explicit `XTBOptions(electronic_temperature=0.)` still requests the 1e-6 K
 engine floor. Temperature is an electronic occupation setting, not a nuclear
 thermal ensemble or a solution free energy. Finite-T results retain their flag.

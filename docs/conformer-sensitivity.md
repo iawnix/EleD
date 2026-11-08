@@ -1,8 +1,8 @@
 # Conformer sensitivity (0.9)
 
-`run_conformer_analysis` evaluates **explicitly supplied conformers of one RDKit
+`RunConformerAnalysis` evaluates **explicitly supplied conformers of one RDKit
 molecule** using native libxtb. It does not generate or optimize geometries.
-Use [`optimize_xtb`](../README.md#xtb-geometry-optimization) before this
+Use [`OptimizeXTB`](../README.md#xtb-geometry-optimization) before this
 analysis when relaxed structures are required. The default requests the
 extended library's overlap/basis data, as do descriptor reports.
 
@@ -10,14 +10,14 @@ extended library's overlap/basis data, as do descriptor reports.
 import json
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import run_conformer_analysis, XTBDiskCache
+from eled import RunConformerAnalysis, XTBDiskCache
 
 mol = Chem.AddHs(Chem.MolFromSmiles("OCCO"))
 params = AllChem.ETKDGv3()
 params.randomSeed = 42
 params.numThreads = 1
 ids = list(AllChem.EmbedMultipleConfs(mol, numConfs=8, params=params))
-report = run_conformer_analysis(
+report = RunConformerAnalysis(
     mol, conf_ids=ids, record_id="ethylene-glycol",
     cache=XTBDiskCache("conformers.sqlite"),
 )
@@ -62,7 +62,7 @@ MMFF is RDKit's force field, not an xTB geometry optimizer.
 
 ## Which descriptors are summarized?
 
-`conformer_descriptor_columns(charge=0, frontier_depth=2)` returns the default
+`ConformerDescriptorColumns(charge=0, frontier_depth=2)` returns the default
 ordered scalar schema. Energies, frontier gaps, charge/WBO summaries, frontier
 participation/entropy/overlap and centroid **separation** are included. Counts
 are retained to expose changes in frontier classification. Indices, categorical

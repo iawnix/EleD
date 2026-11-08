@@ -4,7 +4,7 @@ As of 2026-11-05, embedding-algorithm research is paused at the user's request.
 Keep its source patches, negative results and frozen evidence for reproducibility.
 Neither experimental patch is promoted to the package, and no new embedding
 model or failure-only rescue integration is scheduled. The existing
-`prepare_conformers` API remains input preparation using RDKit algorithms.
+`PrepareConformers` API remains input preparation using RDKit algorithms.
 
 The active project is RDKit molecular input → extended libxtb → indexed,
 unit-defined electronic descriptors through the Python and C++ interfaces.
@@ -24,7 +24,7 @@ prediction benchmark. Complete this evidence before adding descriptor families:
    identical retained cohort, including the 2D baseline. Report excluded IDs and
    coverage against all 1,024 selected molecules. Filtering old predictions alone
    is insufficient because rejected rows may have been in training sets.
-2. Evaluate the current checked `prepare_conformers` workflow separately with a
+2. Evaluate the current checked `PrepareConformers` workflow separately with a
    frozen protocol. This changes geometry selection and retry budgets, so it must
    not be presented as merely correcting the old study. Record failures, costs,
    stereo checks, engine hashes and matched feature/model comparisons.

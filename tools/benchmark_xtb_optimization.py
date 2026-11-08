@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare :func:`eled.optimize_xtb` with the xTB CLI optimizer.
+"""Compare :func:`eled.OptimizeXTB` with the xTB CLI optimizer.
 
 The two calculations start from the same RDKit-generated coordinates and use
 the same GFN method, charge, spin, accuracy and SCF iteration limit.  The
@@ -23,7 +23,7 @@ import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem
 
-from eled import optimize_xtb
+from eled import OptimizeXTB
 from eled.input import _effective_charge_uhf, _geometry_hash, _xyz_from_mol
 from eled.runtime import _find_xtb_library
 
@@ -140,7 +140,7 @@ def run_case(smiles: str, *, executable: Path, library: str | None, method: str,
     charge, uhf = _effective_charge_uhf(mol, None, None)
     initial_geometry_sha256 = _geometry_hash(_xyz_from_mol(mol, -1))
     python_started = time.perf_counter()
-    optimized = optimize_xtb(
+    optimized = OptimizeXTB(
         mol, method=method, charge=charge, uhf=uhf, xtb_library=library,
         max_iterations=cycles, scf_max_iterations=scf_max_iterations,
         accuracy=accuracy,

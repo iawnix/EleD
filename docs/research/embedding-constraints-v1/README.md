@@ -24,4 +24,4 @@ There are 972 successful probe/library parity checks and 2,628 verified snapshot
 replays. Source coordinates were loaded only after generation. UFF and MMFF here
 refer to the existing embedding-bounds parameterization, not a post-generation
 optimization. These are initial-coordinate experiments, not corrected QM8
-prediction results or end-to-end `prepare_conformers` recovery rates.
+prediction results or end-to-end `PrepareConformers` recovery rates.

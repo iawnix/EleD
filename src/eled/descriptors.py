@@ -1,8 +1,8 @@
 """Optional adapters for RDKit EHT and xTB scalar orbital features.
 
 The main public descriptor protocol is xTB-based and lives in the dedicated
-modules exported by :mod:`eled`.  ``calc_eht_descriptors`` and the EHT
-branches of ``calc_orbital_descriptors`` only normalize RDKit's existing
+modules exported by :mod:`eled`.  ``CalcEHTDescriptors`` and the EHT
+branches of ``CalcOrbitalDescriptors`` only normalize RDKit's existing
 YAeHMOP interface for comparison; they do not modify or replace YAeHMOP.
 """
 
@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from .xtb import XTBResult, calc_xtb_descriptors
+from .xtb import XTBResult, CalcXTBDescriptors
 from .calculator import XTBCalculator
 
 
@@ -20,7 +20,7 @@ def _frontier_from_fermi(energies: tuple[float, ...], fermi: float) -> tuple[flo
     return (occupied[-1] if occupied else None, virtual[0] if virtual else None)
 
 
-def calc_eht_descriptors(result: Any) -> dict[str, float | int | str | None]:
+def CalcEHTDescriptors(result: Any) -> dict[str, float | int | str | None]:
     """Extract stable scalar descriptors from an RDKit ``EHTResults`` object."""
 
     energies = tuple(float(value) for value in result.GetOrbitalEnergies())
@@ -44,7 +44,7 @@ def calc_eht_descriptors(result: Any) -> dict[str, float | int | str | None]:
     }
 
 
-def calc_orbital_descriptors(
+def CalcOrbitalDescriptors(
     mol: Any,
     *,
     backend: str = "xtb",
@@ -77,13 +77,13 @@ def calc_orbital_descriptors(
         )
         if not ok:
             raise RuntimeError("RDKit YAeHMOP EHT calculation failed")
-        descriptors.update(calc_eht_descriptors(result))
+        descriptors.update(CalcEHTDescriptors(result))
     if normalized in {"xtb", "both"}:
         result: XTBResult = XTBCalculator(
             conf_id=conf_id,
             backend=xtb_backend,
             **xtb_options,
         ).calculate(mol)
-        descriptors.update(calc_xtb_descriptors(result, frontier_depth=frontier_depth,
+        descriptors.update(CalcXTBDescriptors(result, frontier_depth=frontier_depth,
                                                  occupation_threshold=occupation_threshold))
     return descriptors

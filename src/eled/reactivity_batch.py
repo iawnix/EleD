@@ -11,7 +11,7 @@ from .input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
 from .options import XTBOptions
 from .persistence import (XTBDiskCache, ReactivityCheckpoint, _digest,
                           _implementation_identity)
-from .reactivity import (run_reactivity, _empty_report, _scheme, REACTIVITY_UNITS,
+from .reactivity import (RunReactivity, _empty_report, _scheme, REACTIVITY_UNITS,
                          REACTIVITY_PROTOCOL_VERSION)
 from .reports import DESCRIPTOR_VERSION, SCHEMA_VERSION
 from .runtime import _engine_identity, _parameter_context, _parameter_file
@@ -111,7 +111,7 @@ def _prepare_jobs(jobs, options, population_scheme, interface, initialization):
     return prepared
 
 
-def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', interface='native',
+def RunReactivityBatch(jobs, *, options=None, population_scheme='charges', interface='native',
                          initialization='reference', cache=None, checkpoint=None, retry_failed=False,
                          max_workers=1, timeout=None, isolate=False):
     """Run ordered ReactivityJob records with molecule-level checkpoint commits.
@@ -186,7 +186,7 @@ def run_reactivity_batch(jobs, *, options=None, population_scheme='charges', int
                 if isolated:
                     tasks.append((molecule_bytes(mol), kwargs)); pending.append((index, attempt))
                     continue
-                report = run_reactivity(mol, **kwargs)
+                report = RunReactivity(mol, **kwargs)
             finish(index, report, source, attempt)
         if isolated:
             with closing(isolated_map(reactivity, tasks, max_workers=max_workers, timeout=timeout)) as completed:

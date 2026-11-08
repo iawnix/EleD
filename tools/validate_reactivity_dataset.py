@@ -12,8 +12,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from rdkit import Chem
-from eled import (ReactivityJob, XTBDiskCache, XTBOptions, run_reactivity_batch,
-                       export_descriptor_reports)
+from eled import (ReactivityJob, XTBDiskCache, XTBOptions, RunReactivityBatch,
+                       ExportDescriptorReports)
 
 
 def load_jobs(path, method):
@@ -47,13 +47,13 @@ def main():
             for interface in ('native','compiled'):
                 label=f'{method}-{initialization}-{interface}'
                 checkpoint=args.output/f'{label}.sqlite'
-                rows=run_reactivity_batch(jobs,interface=interface,initialization=initialization,
+                rows=RunReactivityBatch(jobs,interface=interface,initialization=initialization,
                                            checkpoint=checkpoint,cache=cache)
-                with patch('eled.reactivity_batch.run_reactivity',side_effect=AssertionError('resume recalculated')):
-                    resumed=run_reactivity_batch(jobs,interface=interface,initialization=initialization,
+                with patch('eled.reactivity_batch.RunReactivity',side_effect=AssertionError('resume recalculated')):
+                    resumed=RunReactivityBatch(jobs,interface=interface,initialization=initialization,
                                                 checkpoint=checkpoint,cache=cache)
                 assert all(r['execution']['source']=='checkpoint' for r in resumed)
-                for kind in ('csv','jsonl'):export_descriptor_reports(rows,args.output/f'{label}.{kind}')
+                for kind in ('csv','jsonl'):ExportDescriptorReports(rows,args.output/f'{label}.{kind}')
                 summaries[label]=dict(Counter('failed' if r['error'] else 'completed' for r in rows))
                 all_rows[label]=rows
     differences=[]

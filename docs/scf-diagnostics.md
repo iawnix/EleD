@@ -22,7 +22,7 @@ GFN2 mixing includes shell charges, atomic dipoles and quadrupoles. Its RMS is
 assigned to this mixed metric. These quantities describe numerical convergence,
 not physical accuracy or proof of the lowest SCF solution.
 
-`calc_descriptor_report` exposes the record under `quality.scf_details`, with
+`CalcDescriptorReport` exposes the record under `quality.scf_details`, with
 `scf_iterations` and `scf_residual` as compatibility fields. An observed failure
 of the reported criteria sets an error quality flag. The scalar descriptor
 definitions and prediction feature sets do not change.

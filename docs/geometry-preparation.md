@@ -1,15 +1,15 @@
 # Checked SMILES-to-3D preparation (0.10)
 
-`prepare_conformers` builds an explicit-H RDKit molecule plus an auditable
+`PrepareConformers` builds an explicit-H RDKit molecule plus an auditable
 preparation report. It uses RDKit embedding and MMFF94/UFF by default. With
 `optimize="xTB"`, it can run the separate gradient optimizer from
-`eled.optimize_xtb` after embedding. This is a workflow around RDKit,
+`eled.OptimizeXTB` after embedding. This is a workflow around RDKit,
 not a new embedding algorithm.
 
 ```python
-from eled import prepare_conformers, XTBCalculator
+from eled import PrepareConformers, XTBCalculator
 
-prepared = prepare_conformers(
+prepared = PrepareConformers(
     'C[C@H](O)C(=O)O', num_conformers=8, random_seed=42,
     optimize='MMFF94',
 )
@@ -21,7 +21,7 @@ else:
     print(prepared.report['error'], prepared.report['attempts'])
 ```
 
-The molecule can also be passed to `run_conformer_analysis`, including all its
+The molecule can also be passed to `RunConformerAnalysis`, including all its
 accepted conformers. Requested and accepted counts can differ. The
 [`prepare_geometry.py` example](../examples/prepare_geometry.py) writes the
 report and an SDF, with an optional `--xtb` calculation.
@@ -51,8 +51,8 @@ coordinate and stereo checks run again. Nonconverged or stereochemically changed
 coordinates never enter the returned molecule. `optimize='xTB'` uses GFN2-xTB by
 default (override with `xtb_method`), records the full gradient optimization
 report under each candidate, and requires the reviewed extended libxtb. The
-standalone `optimize_xtb()` API exposes convergence tolerances, bounded step
-size, fixed atoms and a separate `scf_max_iterations` limit. `prepare_conformers`
+standalone `OptimizeXTB()` API exposes convergence tolerances, bounded step
+size, fixed atoms and a separate `scf_max_iterations` limit. `PrepareConformers`
 uses `optimization_iterations` for the geometry-step limit and keeps the other
 optimizer controls at their documented defaults. Unexpected exceptions
 propagate; they are not hidden as ordinary embedding failures.

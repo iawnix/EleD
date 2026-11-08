@@ -44,7 +44,7 @@ shell features, while shell-resolved π and frontier-bond decompositions are
 treated here as explicitly testable extensions rather than established
 experimental observables.
 
-`descriptor_sensitivity(reference, gfn1=..., gfn2=..., temperature_300=...,
+`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature_300=...,
 temperature_1000=...)` compares reports that already exist. It records
 conformer standard deviation, the absolute GFN1/GFN2 difference, and the
 absolute 300 K/1000 K difference independently. Omitted comparison reports
@@ -53,7 +53,7 @@ produce `None` with a missing flag and never trigger a new calculation.
 The frozen dataset stage is reproducible from local public-data exports:
 
 ```bash
-python tools/prepare_eas_dataset.py regio-ml.jsonl \
+python tools/PrepareEASDataset.py regio-ml.jsonl \
   --source RegioML --output build/eas/manifest.json
 python tools/run_eas_features.py build/eas/manifest.json \
   --xtb-library /path/to/libxtb.so --output build/eas/features.json

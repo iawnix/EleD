@@ -46,14 +46,14 @@ Mulliken/Löwdin shell 描述符。程序会检查扩展能力并记录库路径
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, CalcXTBDescriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 AllChem.MMFFOptimizeMolecule(mol)
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol)
-print(calc_xtb_descriptors(result))
+print(CalcXTBDescriptors(result))
 ```
 
 输入需要显式氢、有限的 3D 构象和 RDKit 原子顺序。`XTBCalculator` 不修改输入

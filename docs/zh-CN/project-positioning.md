@@ -48,15 +48,15 @@ YAeHMOP 适配器只整理 RDKit 已有接口，供结果对照使用；它不�
 公开计算接口使用可复用的计算器对象：
 
 ```python
-from eled import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, CalcXTBDescriptors
 
 calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
 result = calculator.calculate(mol, keep_overlap=True)
-features = calc_xtb_descriptors(result)
+features = CalcXTBDescriptors(result)
 ```
 
 描述符注册表应统一提供名称、单位、所需结果能力、不变性和缺失值语义。当前
-的 `descriptor_catalog()` 和 `descriptor_status()` 已经是这一注册表的基础。
+的 `DescriptorCatalog()` 和 `DescriptorStatus()` 已经是这一注册表的基础。
 
 ## 发布方向
 

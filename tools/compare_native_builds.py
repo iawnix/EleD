@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def calculate(library):
     import numpy as np
     from rdkit import Chem
-    from eled import XTBCalculator, calc_orbital_populations
+    from eled import XTBCalculator, CalcOrbitalPopulations
     from eled.runtime import _fingerprint
     cases = json.loads((ROOT / 'tests/data/orbital_alignment_cases.json').read_text())['cases']
     rows = []
@@ -29,7 +29,7 @@ def calculate(library):
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
             result = XTBCalculator(method=method, xtb_library=str(library)).calculate(
                 mol, keep_overlap=True)
-            population = calc_orbital_populations(result, scheme='mulliken')
+            population = CalcOrbitalPopulations(result, scheme='mulliken')
             rows.append({'name': case['name'], 'method': method, 'energy_eh': result.total_energy_hartree,
                          'orbital_energies_ev': result.orbital_energies_ev,
                          'charges_e': result.partial_charges, 'dipole_e_bohr': result.dipole_e_bohr,

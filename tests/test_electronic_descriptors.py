@@ -7,10 +7,10 @@ import pytest
 from rdkit import Chem
 
 from eled import (
-    XTBResult, XTBOptions, calc_xtb_descriptors, calc_xtb_atom_descriptors,
-    calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
-    calc_orbital_populations, calc_frontier_descriptors, DescriptorUnavailableError,
-    annotate_mol,
+    XTBResult, XTBOptions, CalcXTBDescriptors, CalcXTBAtomDescriptors,
+    CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
+    CalcOrbitalPopulations, CalcFrontierDescriptors, DescriptorUnavailableError,
+    AnnotateMol,
 )
 from eled.input import _input_metadata, _xyz_from_mol
 
@@ -37,7 +37,7 @@ def simple():
 
 def test_scalar_units_frontier_depth_and_missing_boundaries(simple):
     _, result = simple
-    d = calc_xtb_descriptors(result, frontier_depth=3)
+    d = CalcXTBDescriptors(result, frontier_depth=3)
     assert d['xtb_gap_ev'] == 3
     assert d['xtb_homo_minus_1_ev'] == -10
     assert d['xtb_lumo_plus_1_ev'] == 3
@@ -49,53 +49,53 @@ def test_scalar_units_frontier_depth_and_missing_boundaries(simple):
     assert d['xtb_charge_std_e'] == pytest.approx(np.sqrt(.56 / 3))
     assert d['xtb_wiberg_pair_sum'] == pytest.approx(1.9)
     assert json.loads(json.dumps(d, allow_nan=False)) == d
-    assert not any('minus' in k for k in calc_xtb_descriptors(result, frontier_depth=0))
+    assert not any('minus' in k for k in CalcXTBDescriptors(result, frontier_depth=0))
     tiny = replace(result, orbital_occupations=(2., 2., 1e-8, 0.))
-    assert calc_xtb_descriptors(tiny)['xtb_homo_index'] == 1
-    assert calc_xtb_descriptors(tiny, occupation_threshold=1e-9)['xtb_homo_index'] == 2
+    assert CalcXTBDescriptors(tiny)['xtb_homo_index'] == 1
+    assert CalcXTBDescriptors(tiny, occupation_threshold=1e-9)['xtb_homo_index'] == 2
     filled = replace(result, orbital_occupations=(2., 2., 2., 2.))
-    assert calc_xtb_descriptors(filled)['xtb_lumo_ev'] is None
-    assert calc_xtb_descriptors(filled)['xtb_gap_ev'] is None
+    assert CalcXTBDescriptors(filled)['xtb_lumo_ev'] is None
+    assert CalcXTBDescriptors(filled)['xtb_gap_ev'] is None
 
 
 def test_missing_arrays_are_none_and_not_fake_zero(simple):
     _, result = simple
     missing = replace(result, partial_charges=(), dipole_e_bohr=(), wiberg_bond_orders=())
-    d = calc_xtb_descriptors(missing)
+    d = CalcXTBDescriptors(missing)
     assert d['xtb_charge_sum_e'] is None
     assert d['xtb_dipole_norm_debye'] is None
     assert d['xtb_wiberg_pair_sum'] is None
     with pytest.raises(ValueError, match='partial charges'):
-        calc_xtb_atom_descriptors(missing)
+        CalcXTBAtomDescriptors(missing)
 
 
 def test_atom_bond_and_fragment_accounting(simple):
     mol, result = simple
-    atoms = calc_xtb_atom_descriptors(result)
+    atoms = CalcXTBAtomDescriptors(result)
     assert [a['wiberg_sum'] for a in atoms] == pytest.approx([1.7, 1., 1.1])
-    bonds = calc_xtb_bond_descriptors(mol, result)
+    bonds = CalcXTBBondDescriptors(mol, result)
     assert [b['wiberg_order'] for b in bonds] == [.8, .9]
-    f = calc_xtb_fragment_descriptors(result, {'oxygen': [0], 'hydrogens': [1, 2]})
+    f = CalcXTBFragmentDescriptors(result, {'oxygen': [0], 'hydrogens': [1, 2]})
     assert f['fragments']['oxygen']['charge_e'] == -.6
     assert f['fragments']['hydrogens']['charge_e'] == pytest.approx(.6)
     assert f['fragments']['hydrogens']['internal_wiberg_sum'] == .2
     assert f['fragments']['oxygen']['external_wiberg_sum'] == pytest.approx(1.7)
     assert f['pairs'][0]['wiberg_sum'] == pytest.approx(1.7)
     assert not f['unassigned_atom_indices']
-    partial = calc_xtb_fragment_descriptors(result, {'OH': [0, 1]})
+    partial = CalcXTBFragmentDescriptors(result, {'OH': [0, 1]})
     assert partial['unassigned_atom_indices'] == [2]
     assert partial['fragments']['OH']['external_wiberg_sum'] == pytest.approx(1.1)
     assert json.loads(json.dumps(f)) == f
     altered = Chem.RenumberAtoms(mol, [1, 0, 2])
     with pytest.raises(ValueError, match='structure or atom order'):
-        calc_xtb_bond_descriptors(altered, result)
+        CalcXTBBondDescriptors(altered, result)
 
 
 @pytest.mark.parametrize('fragments', [{}, {'x': []}, {'x': [0, 0]}, {'x': [-1]},
     {'x': [3]}, {'x': [True]}, {'x': [1.5]}, {'': [0]}, {'a': [0], 'b': [0, 1]}])
 def test_fragment_indices_fail_explicitly(simple, fragments):
     with pytest.raises(ValueError):
-        calc_xtb_fragment_descriptors(simple[1], fragments)
+        CalcXTBFragmentDescriptors(simple[1], fragments)
 
 
 @pytest.mark.parametrize('change', [
@@ -108,7 +108,7 @@ def test_invalid_data_rejected_before_inplace_annotation(simple, change):
     mol, result = simple
     before = mol.ToBinary()
     with pytest.raises(ValueError):
-        annotate_mol(mol, replace(result, **change), copy=False)
+        AnnotateMol(mol, replace(result, **change), copy=False)
     assert mol.ToBinary() == before
 
 
@@ -129,11 +129,11 @@ def basis(simple):
 
 def test_lowdin_and_mulliken_use_the_metric_and_conserve_electrons(basis):
     _, result, q = basis
-    lowdin = calc_orbital_populations(result)
+    lowdin = CalcOrbitalPopulations(result)
     np.testing.assert_allclose(lowdin['atom_populations'], [[.5]*4, [.25]*4, [.25]*4], atol=1e-12)
     np.testing.assert_allclose(lowdin['electron_populations_e'], [2., 1., 1.], atol=1e-12)
     c = np.array(result.orbital_coefficients); s = np.array(result.overlap_matrix)
-    mulliken = calc_orbital_populations(result, scheme='mulliken', orbital_indices=[3, 0])
+    mulliken = CalcOrbitalPopulations(result, scheme='mulliken', orbital_indices=[3, 0])
     expected = c * (s @ c)
     expected = np.vstack([expected[:2].sum(axis=0), expected[2:]])[:, [3, 0]]
     np.testing.assert_allclose(mulliken['atom_populations'], expected, atol=1e-12)
@@ -141,7 +141,7 @@ def test_lowdin_and_mulliken_use_the_metric_and_conserve_electrons(basis):
     # Squared raw AO coefficients are not the Lowdin answer.
     assert not np.allclose(c**2, q**2)
     changed = replace(result, orbital_coefficients=tuple(map(tuple, c * [-1, 1, -1, 1])))
-    np.testing.assert_allclose(calc_orbital_populations(changed)['atom_populations'], lowdin['atom_populations'], atol=1e-12)
+    np.testing.assert_allclose(CalcOrbitalPopulations(changed)['atom_populations'], lowdin['atom_populations'], atol=1e-12)
 
 
 def test_degenerate_subspace_and_spatial_invariances(basis):
@@ -149,7 +149,7 @@ def test_degenerate_subspace_and_spatial_invariances(basis):
     c = np.array(result.orbital_coefficients) @ q.T
     result = replace(result, orbital_energies_ev=(-2., -2., 1., 1.),
                      orbital_coefficients=tuple(map(tuple, c)))
-    baseline = calc_frontier_descriptors(mol, result, fragments={'O': [0], 'H': [1, 2]})
+    baseline = CalcFrontierDescriptors(mol, result, fragments={'O': [0], 'H': [1, 2]})
     assert baseline['homo']['orbital_indices'] == [0, 1]
     assert baseline['lumo']['orbital_indices'] == [2, 3]
     assert baseline['homo']['participation_ratio'] == pytest.approx(1.)
@@ -159,7 +159,7 @@ def test_degenerate_subspace_and_spatial_invariances(basis):
     rotation = np.array([[.6, -.8], [.8, .6]])
     c[:, :2] = c[:, :2] @ rotation
     changed = replace(result, orbital_coefficients=tuple(map(tuple, c)))
-    after = calc_frontier_descriptors(mol, changed)
+    after = CalcFrontierDescriptors(mol, changed)
     np.testing.assert_allclose(after['homo']['atom_populations'], baseline['homo']['atom_populations'], atol=1e-12)
     # Translation/rotation affect centroids, not distances or populations.
     moved = Chem.Mol(mol)
@@ -167,9 +167,9 @@ def test_degenerate_subspace_and_spatial_invariances(basis):
     positions = mol.GetConformer().GetPositions() @ spatial_rotation + [2., 3., 4.]
     for i, xyz in enumerate(positions): moved.GetConformer().SetAtomPosition(i, xyz)
     with pytest.raises(ValueError, match='coordinates'):
-        calc_frontier_descriptors(moved, result)
+        CalcFrontierDescriptors(moved, result)
     moved_result = replace(result, metadata=_input_metadata(moved, -1, 0, 0, _xyz_from_mol(moved, -1)))
-    spatial = calc_frontier_descriptors(moved, moved_result)
+    spatial = CalcFrontierDescriptors(moved, moved_result)
     np.testing.assert_allclose(spatial['homo']['atom_centroid_angstrom'],
                                np.array(baseline['homo']['atom_centroid_angstrom']) @ spatial_rotation + [2., 3., 4.])
     assert spatial['homo_lumo_atom_centroid_separation_angstrom'] == pytest.approx(baseline['homo_lumo_atom_centroid_separation_angstrom'], abs=1e-12)
@@ -183,14 +183,14 @@ def test_degenerate_subspace_and_spatial_invariances(basis):
 ])
 def test_bad_or_mismatched_basis_fails(basis, change):
     with pytest.raises(ValueError):
-        calc_orbital_populations(replace(basis[1], **change))
+        CalcOrbitalPopulations(replace(basis[1], **change))
 
 
 def test_missing_basis_has_no_implicit_fallback(simple, monkeypatch):
     def forbidden(*args, **kwargs): pytest.fail('descriptor extraction must not run a calculation')
     monkeypatch.setattr('eled.xtb.run_xtb_native', forbidden)
     with pytest.raises(DescriptorUnavailableError, match='same-calculation'):
-        calc_orbital_populations(simple[1])
+        CalcOrbitalPopulations(simple[1])
     assert XTBOptions(keep_overlap=True).to_dict()['keep_overlap'] is True
 
 
@@ -206,10 +206,10 @@ def test_mulliken_signed_populations_are_not_clipped(simple):
                      orbital_occupations=(2., 0.), partial_charges=(0., 0.),
                      orbital_coefficients=tuple(map(tuple, c)), overlap_matrix=tuple(map(tuple, overlap)),
                      ao_atom_indices=(0, 1), metadata={'atom_count': 2})
-    populations = calc_orbital_populations(result, scheme='mulliken', orbital_indices=[0])
+    populations = CalcOrbitalPopulations(result, scheme='mulliken', orbital_indices=[0])
     assert populations['atom_populations'][1][0] < 0
     assert np.sum(populations['atom_populations']) == pytest.approx(1.)
-    assert np.min(calc_orbital_populations(result)['atom_populations']) >= 0
+    assert np.min(CalcOrbitalPopulations(result)['atom_populations']) >= 0
 
 
 def test_population_ao_permutation_preserves_atom_results(basis):
@@ -220,16 +220,16 @@ def test_population_ao_permutation_preserves_atom_results(basis):
                        overlap_matrix=tuple(map(tuple, s[np.ix_(permutation, permutation)])),
                        ao_atom_indices=tuple(mapping[permutation]))
     for scheme in ['lowdin', 'mulliken']:
-        np.testing.assert_allclose(calc_orbital_populations(result, scheme=scheme)['atom_populations'],
-                                   calc_orbital_populations(permuted, scheme=scheme)['atom_populations'], atol=1e-12)
+        np.testing.assert_allclose(CalcOrbitalPopulations(result, scheme=scheme)['atom_populations'],
+                                   CalcOrbitalPopulations(permuted, scheme=scheme)['atom_populations'], atol=1e-12)
 
 
 def test_annotation_includes_wbo_sum_and_prevents_property_collision(simple):
     mol, result = simple
-    target = annotate_mol(mol, result)
+    target = AnnotateMol(mol, result)
     assert target.GetAtomWithIdx(0).GetDoubleProp('xtb_wiberg_sum') == pytest.approx(1.7)
     assert target.GetDoubleProp('xtb_dipole_norm_debye') == pytest.approx(12.708732365)
     assert not mol.GetAtomWithIdx(0).HasProp('xtb_wiberg_sum')
     with pytest.raises(ValueError, match='must differ'):
-        annotate_mol(mol, result, copy=False, atom_charge_prop='same', atom_wiberg_prop='same')
+        AnnotateMol(mol, result, copy=False, atom_charge_prop='same', atom_wiberg_prop='same')
     assert not mol.GetAtomWithIdx(0).HasProp('same')

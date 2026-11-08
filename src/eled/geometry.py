@@ -91,7 +91,7 @@ def _check_geometry(mol, conf_id, constraints):
             'mismatched_atom_indices': atoms, 'mismatched_bond_indices': bonds}
 
 
-def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_methods=None,
+def PrepareConformers(source, *, num_conformers=1, method='ETKDGv3', fallback_methods=None,
                        random_seed=42, attempts_per_strategy=2, retry_random_coords=True,
                        max_embedding_iterations=300, optimize='MMFF94', optimization_iterations=500,
                        require_assigned_stereo=False, xtb_method='GFN2-xTB', xtb_library=None,
@@ -212,8 +212,8 @@ def prepare_conformers(source, *, num_conformers=1, method='ETKDGv3', fallback_m
                         if status != 0:
                             record['rejection'] = 'force_field_not_converged'; continue
                     elif optimize == 'xTB':
-                        from .optimization import optimize_xtb
-                        optimized = optimize_xtb(candidate, conf_id=0, method=xtb_method,
+                        from .optimization import OptimizeXTB
+                        optimized = OptimizeXTB(candidate, conf_id=0, method=xtb_method,
                                                  charge=charge, uhf=uhf, xtb_library=xtb_library,
                                                  max_iterations=iterations)
                         status = 0 if optimized.success else 1

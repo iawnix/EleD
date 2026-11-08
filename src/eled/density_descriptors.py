@@ -60,7 +60,7 @@ def _basis(result):
     return result, c, s, p, ps, lowdin_metric, atom, shell, shell_atom, shell_l, err
 
 
-def calc_density_matrix(result):
+def CalcDensityMatrix(result):
     """Return the spin-summed density ``P=C diag(n) C.T`` and its checks."""
     result, c, s, p, _, _, _, _, _, _, _ = _basis(result)
     electron_count = float(np.sum(result.orbital_occupations))
@@ -96,7 +96,7 @@ def _rows(result, mull, low, shell_atom, shell_l, natoms):
     return out
 
 
-def calc_shell_populations(result):
+def CalcShellPopulations(result):
     """Return atom/shell angular-momentum populations and electron checks."""
     result, _, s, p, ps, lowdin, atom, shell, shell_atom, shell_l, _ = _basis(result)
     natoms = len(result.partial_charges)
@@ -140,7 +140,7 @@ def _bond_atom_pairs(mol):
     return [(b.GetIdx(), b.GetBeginAtomIdx(), b.GetEndAtomIdx()) for b in mol.GetBonds()]
 
 
-def calc_mayer_bond_descriptors(mol, result):
+def CalcMayerBondDescriptors(mol, result):
     """Return Mayer and Wiberg orders for RDKit bonds.
 
     xTB exposes a spin-summed density here.  Mayer order is therefore withheld
@@ -174,7 +174,7 @@ def _frontier_group(energies, occ, occupied, virtual, last, degeneracy_ev, occup
     return sorted(selected)
 
 
-def calc_frontier_bond_descriptors(mol, result, *, degeneracy_ev=1e-3,
+def CalcFrontierBondDescriptors(mol, result, *, degeneracy_ev=1e-3,
                                    occupation_threshold=1e-7, occupation_tolerance=1e-6):
     """Mulliken overlap populations of the rotation-invariant HOMO/LUMO groups."""
     result, c, s, _, _, _, atom, _, _, _, _ = _basis(result)
@@ -212,7 +212,7 @@ def _normal_for_atom(mol, atom_index, conf_id=-1):
     return n / np.linalg.norm(n)
 
 
-def calc_pi_descriptors(mol, result, *, scheme='lowdin'):
+def CalcPiDescriptors(mol, result, *, scheme='lowdin'):
     """Project p shells onto local normals for sp2/aromatic atoms and bonds."""
     if scheme not in ('mulliken', 'lowdin'): raise ValueError("scheme must be 'mulliken' or 'lowdin'")
     from .mapping import _validate_mapping
@@ -257,11 +257,11 @@ def calc_pi_descriptors(mol, result, *, scheme='lowdin'):
             'invariance': 'rigid-motion invariant; normal sign does not change atom populations or bond order'}
 
 
-def calc_density_descriptors(mol, result, *, include_frontier_bonds=True, include_pi=True):
+def CalcDensityDescriptors(mol, result, *, include_frontier_bonds=True, include_pi=True):
     """Aggregate all zero-cost descriptors available from one retained result."""
-    out = {'density': calc_density_matrix(result), 'shell_populations': calc_shell_populations(result),
-           'mayer_bonds': calc_mayer_bond_descriptors(mol, result)}
-    if include_frontier_bonds: out['frontier_bonds'] = calc_frontier_bond_descriptors(mol, result)
-    if include_pi: out['pi'] = calc_pi_descriptors(mol, result)
+    out = {'density': CalcDensityMatrix(result), 'shell_populations': CalcShellPopulations(result),
+           'mayer_bonds': CalcMayerBondDescriptors(mol, result)}
+    if include_frontier_bonds: out['frontier_bonds'] = CalcFrontierBondDescriptors(mol, result)
+    if include_pi: out['pi'] = CalcPiDescriptors(mol, result)
     return out
 

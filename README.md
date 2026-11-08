@@ -71,7 +71,7 @@ the input molecule unchanged.
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, CalcXTBDescriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
@@ -80,7 +80,7 @@ AllChem.MMFFOptimizeMolecule(mol)
 
 calculator = XTBCalculator(method="GFN2-xTB")
 result = calculator.calculate(mol)
-features = calc_xtb_descriptors(result)
+features = CalcXTBDescriptors(result)
 print(features["xtb_total_energy_hartree"])
 print(features["xtb_homo_ev"], features["xtb_lumo_ev"])
 ```
@@ -89,15 +89,15 @@ print(features["xtb_homo_ev"], features["xtb_lumo_ev"])
 
 ```python
 from eled import (
-    XTBCalculator, calc_xtb_atom_descriptors, calc_xtb_bond_descriptors,
-    calc_shell_populations, calc_density_matrix,
+    XTBCalculator, CalcXTBAtomDescriptors, CalcXTBBondDescriptors,
+    CalcShellPopulations, CalcDensityMatrix,
 )
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-atoms = calc_xtb_atom_descriptors(result)
-bonds = calc_xtb_bond_descriptors(mol, result)
-shells = calc_shell_populations(result)
-density = calc_density_matrix(result)
+atoms = CalcXTBAtomDescriptors(result)
+bonds = CalcXTBBondDescriptors(mol, result)
+shells = CalcShellPopulations(result)
+density = CalcDensityMatrix(result)
 ```
 
 `keep_overlap=True` retains the native `C`, `S`, AO-atom map and shell map. The
@@ -109,9 +109,9 @@ analysis checks `trace(P S)` against the modeled electron count and preserves
 ### Fixed-geometry reactivity
 
 ```python
-from eled import run_reactivity, XTBOptions
+from eled import RunReactivity, XTBOptions
 
-report = run_reactivity(
+report = RunReactivity(
     mol,
     options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
     population_scheme="lowdin",
@@ -129,11 +129,11 @@ temperature or an excited-state calculation.
 ### Reports and batches
 
 ```python
-from eled import run_descriptor_batch, export_descriptor_reports
+from eled import RunDescriptorBatch, ExportDescriptorReports
 
-reports = run_descriptor_batch(molecules, record_ids=ids, max_workers=4,
+reports = RunDescriptorBatch(molecules, record_ids=ids, max_workers=4,
                                isolate=True)
-export_descriptor_reports(reports, "features.jsonl")
+ExportDescriptorReports(reports, "features.jsonl")
 ```
 
 Reports retain units, analysis settings, engine and parameter identity, quality
@@ -142,8 +142,8 @@ bond, population and density sections remain indexed nested data.
 
 ### Geometry preparation
 
-`prepare_conformers()` is an input layer around RDKit embedding and force-field
-optimization. `optimize_xtb()` is an opt-in xTB gradient optimizer for workflows
+`PrepareConformers()` is an input layer around RDKit embedding and force-field
+optimization. `OptimizeXTB()` is an opt-in xTB gradient optimizer for workflows
 that need xTB-consistent coordinates. Geometry optimization supports descriptor
 preparation; it is not a transition-state, solvent or excited-state module.
 
@@ -234,14 +234,14 @@ python -m eled doctor --check native --method GFN2-xTB
 ```python
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import XTBCalculator, calc_xtb_descriptors
+from eled import XTBCalculator, CalcXTBDescriptors
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 AllChem.MMFFOptimizeMolecule(mol)
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol)
-features = calc_xtb_descriptors(result)
+features = CalcXTBDescriptors(result)
 print(features["xtb_gap_ev"])
 ```
 

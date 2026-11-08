@@ -18,7 +18,7 @@ import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem, Descriptors, rdFingerprintGenerator
 
-from eled import XTBOptions, XTBCalculator, XTBEnvironmentError, XTBRunError, calc_descriptor_report
+from eled import XTBOptions, XTBCalculator, XTBEnvironmentError, XTBRunError, CalcDescriptorReport
 from eled.input import _geometry_hash, _xyz_from_mol
 from eled.persistence import _implementation_identity
 
@@ -196,7 +196,7 @@ def main():
                     or (result.metadata['parameter_file'] or {}).get('sha256') !=
                        (original['provenance']['parameter_file'] or {}).get('sha256')):
                 raise ValueError('engine/parameter identity differs from reference evidence')
-            t = time.perf_counter(); report = calc_descriptor_report(mol, result)
+            t = time.perf_counter(); report = CalcDescriptorReport(mol, result)
             analysis_seconds = time.perf_counter()-t
             basic = [report['values'][k] for k in pilot.BASIC]
             orbital = [report['values'][k] for k in pilot.ORBITAL]

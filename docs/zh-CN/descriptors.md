@@ -1,20 +1,20 @@
 # 描述符
 
 所有描述符都使用小写 `snake_case` 字段名，并明确单位。描述符函数只分析
-已有的 xTB 结果；只有 `XTBCalculator.calculate()`、`run_reactivity()` 等入口会调用引擎。
+已有的 xTB 结果；只有 `XTBCalculator.calculate()`、`RunReactivity()` 等入口会调用引擎。
 
 ## 单点描述符
 
 ```python
 from eled import (
-    XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
-    calc_xtb_bond_descriptors,
+    XTBCalculator, CalcXTBDescriptors, CalcXTBAtomDescriptors,
+    CalcXTBBondDescriptors,
 )
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol)
-molecular = calc_xtb_descriptors(result)
-atoms = calc_xtb_atom_descriptors(result)
-bonds = calc_xtb_bond_descriptors(mol, result)
+molecular = CalcXTBDescriptors(result)
+atoms = CalcXTBAtomDescriptors(result)
+bonds = CalcXTBBondDescriptors(mol, result)
 ```
 
 主要字段包括：
@@ -31,11 +31,11 @@ HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不�
 ## 密度和 shell 描述符
 
 ```python
-from eled import XTBCalculator, calc_shell_populations, calc_density_matrix
+from eled import XTBCalculator, CalcShellPopulations, CalcDensityMatrix
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-shells = calc_shell_populations(result)
-density = calc_density_matrix(result)
+shells = CalcShellPopulations(result)
+density = CalcDensityMatrix(result)
 ```
 
 扩展版 `libxtb` 会返回同一次计算中的 `C`、`S`、AO atom map 和 shell map。
@@ -59,14 +59,14 @@ P = C · diag(occupation) · Cᵀ
 
 ```python
 from eled import (
-    calc_frontier_descriptors, calc_mayer_bond_descriptors,
-    calc_frontier_bond_descriptors, calc_pi_descriptors,
+    CalcFrontierDescriptors, CalcMayerBondDescriptors,
+    CalcFrontierBondDescriptors, CalcPiDescriptors,
 )
 
-frontier = calc_frontier_descriptors(mol, result)
-mayer = calc_mayer_bond_descriptors(mol, result)
-frontier_bonds = calc_frontier_bond_descriptors(mol, result)
-pi = calc_pi_descriptors(mol, result)
+frontier = CalcFrontierDescriptors(mol, result)
+mayer = CalcMayerBondDescriptors(mol, result)
+frontier_bonds = CalcFrontierBondDescriptors(mol, result)
+pi = CalcPiDescriptors(mol, result)
 ```
 
 这些接口提供简并轨道组布居、participation ratio、熵、Mayer 键级、带符号
@@ -76,9 +76,9 @@ pi = calc_pi_descriptors(mol, result)
 ## 反应性描述符
 
 ```python
-from eled import run_reactivity
+from eled import RunReactivity
 
-report = run_reactivity(mol, population_scheme="lowdin", return_errors=True)
+report = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
 ```
 
 固定几何计算 Q、Q+1、Q−1，得到 `vertical_ip_ev`、`vertical_ea_ev`、

@@ -2,7 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from eled.descriptors import calc_eht_descriptors
+from eled.descriptors import CalcEHTDescriptors
 from eled.xtb import _frontier_energies
 
 
@@ -28,7 +28,7 @@ class AdapterTests(unittest.TestCase):
             def GetOrbitalEnergies():
                 return (-2.0, -1.0, 0.5)
 
-        descriptors = calc_eht_descriptors(FakeEHTResult())
+        descriptors = CalcEHTDescriptors(FakeEHTResult())
         self.assertEqual(descriptors["eht_homo_ev"], -1.0)
         self.assertEqual(descriptors["eht_lumo_ev"], 0.5)
         self.assertEqual(descriptors["eht_gap_ev"], 1.5)

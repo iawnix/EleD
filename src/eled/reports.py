@@ -12,22 +12,22 @@ import tempfile
 import numpy as np
 
 from .electronic_descriptors import (
-    _as_result, _orbitals, _nonnegative, calc_xtb_descriptors,
-    calc_xtb_atom_descriptors, calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors,
+    _as_result, _orbitals, _nonnegative, CalcXTBDescriptors,
+    CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
 )
 from .result import XTBResult
-from .populations import calc_orbital_populations, calc_frontier_descriptors
-from .density_descriptors import (calc_density_matrix, calc_shell_populations,
-    calc_mayer_bond_descriptors, calc_frontier_bond_descriptors, calc_pi_descriptors)
+from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
+from .density_descriptors import (CalcDensityMatrix, CalcShellPopulations,
+    CalcMayerBondDescriptors, CalcFrontierBondDescriptors, CalcPiDescriptors)
 
 DESCRIPTOR_VERSION = '1.1'
 SCHEMA_VERSION = 2
 
 
-def descriptor_columns(frontier_depth=2):
+def DescriptorColumns(frontier_depth=2):
     """Ordered scalar-column -> unit mapping, fixed for a chosen frontier depth."""
     empty = XTBResult('', None, None, None, None, None, None)
-    values = calc_xtb_descriptors(empty, frontier_depth=frontier_depth)
+    values = CalcXTBDescriptors(empty, frontier_depth=frontier_depth)
     units = {}
     for name in values:
         if name.endswith('_hartree'): unit = 'Hartree'
@@ -51,7 +51,7 @@ def descriptor_columns(frontier_depth=2):
     return units
 
 
-def assess_descriptor_quality(result, *, occupation_threshold=1e-7, fractional_tolerance=1e-4,
+def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tolerance=1e-4,
                               conservation_tolerance=1e-5):
     """Report observable issues and optional verified engine SCC diagnostics."""
     result = _as_result(result)
@@ -89,7 +89,7 @@ def assess_descriptor_quality(result, *, occupation_threshold=1e-7, fractional_t
         electron_error = float(sum(occ)-result.number_of_electrons)
         if abs(electron_error) > conservation_tolerance:
             flag('electron_conservation_failed', 'error', 'Occupations do not sum to the reported modeled electron count.')
-    settings = result.metadata.get('calculation_settings')
+    settings = result.metadata.get('CalculationSettings')
     if not settings:
         flag('calculation_settings_unknown', 'warning', 'Result does not record the numerical calculation settings.')
     elif settings['electronic_temperature'] != settings['effective_electronic_temperature']:
@@ -108,7 +108,7 @@ def assess_descriptor_quality(result, *, occupation_threshold=1e-7, fractional_t
             'calculation_status': result.metadata.get('calculation_status', 'unknown')}
 
 
-def descriptor_sensitivity(reference, *, gfn1=None, gfn2=None,
+def DescriptorSensitivity(reference, *, gfn1=None, gfn2=None,
                            temperature_300=None, temperature_1000=None):
     """Compare already-produced reports without invoking an engine.
 
@@ -166,7 +166,7 @@ def _analysis_settings(*, frontier_depth=2, occupation_threshold=1e-7,
                        degeneracy_ev=1e-3, occupation_tolerance=1e-6,
                        include_orbitals=True, fractional_tolerance=1e-4,
                        conservation_tolerance=1e-5):
-    descriptor_columns(frontier_depth)
+    DescriptorColumns(frontier_depth)
     if not isinstance(include_orbitals, bool):
         raise ValueError('include_orbitals must be Boolean')
     values = dict(occupation_threshold=occupation_threshold, degeneracy_ev=degeneracy_ev,
@@ -178,7 +178,7 @@ def _analysis_settings(*, frontier_depth=2, occupation_threshold=1e-7,
                 **{key:float(value) for key,value in values.items()})
 
 
-def calc_descriptor_report(mol, result, *, record_id=None, fragments=None, frontier_depth=2,
+def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontier_depth=2,
                            occupation_threshold=1e-7, degeneracy_ev=1e-3,
                            occupation_tolerance=1e-6, include_orbitals=True,
                            fractional_tolerance=1e-4, conservation_tolerance=1e-5):
@@ -195,27 +195,27 @@ def calc_descriptor_report(mol, result, *, record_id=None, fragments=None, front
         conservation_tolerance=conservation_tolerance)
     result = _as_result(result)
     _validate_mapping(mol, result)
-    report = _base_report(record_id, descriptor_columns(frontier_depth), analysis)
+    report = _base_report(record_id, DescriptorColumns(frontier_depth), analysis)
     report['provenance'] = deepcopy(dict(result.metadata))
-    report['quality'] = assess_descriptor_quality(result, occupation_threshold=occupation_threshold,
+    report['quality'] = AssessDescriptorQuality(result, occupation_threshold=occupation_threshold,
             fractional_tolerance=fractional_tolerance, conservation_tolerance=conservation_tolerance)
-    scalars = calc_xtb_descriptors(result, frontier_depth=frontier_depth, occupation_threshold=occupation_threshold)
+    scalars = CalcXTBDescriptors(result, frontier_depth=frontier_depth, occupation_threshold=occupation_threshold)
     report['values'].update(scalars)
     for key, value in scalars.items():
         if value is None: report['missing'][key] = 'unavailable_from_result_or_orbital_range'
     if len(result.partial_charges):
-        report['atoms'] = calc_xtb_atom_descriptors(result)
+        report['atoms'] = CalcXTBAtomDescriptors(result)
     else: report['missing']['atoms'] = 'charges_not_reported'
     if len(result.wiberg_bond_orders):
-        report['bonds'] = calc_xtb_bond_descriptors(mol, result)
+        report['bonds'] = CalcXTBBondDescriptors(mol, result)
     else: report['missing']['bonds'] = 'bond_orders_not_reported'
     if fragments is not None:
-        report['fragments'] = calc_xtb_fragment_descriptors(result, fragments)
+        report['fragments'] = CalcXTBFragmentDescriptors(result, fragments)
     else: report['missing']['fragments'] = 'not_requested'
     if include_orbitals and len(result.overlap_matrix):
-        report['populations'] = {scheme: calc_orbital_populations(result, scheme=scheme)
+        report['populations'] = {scheme: CalcOrbitalPopulations(result, scheme=scheme)
                                 for scheme in ('lowdin', 'mulliken')}
-        frontier = report['frontier'] = calc_frontier_descriptors(mol, result, fragments=fragments,
+        frontier = report['frontier'] = CalcFrontierDescriptors(mol, result, fragments=fragments,
             occupation_threshold=occupation_threshold, degeneracy_ev=degeneracy_ev,
             occupation_tolerance=occupation_tolerance)
         for label in ('homo', 'lumo'):
@@ -229,11 +229,11 @@ def calc_descriptor_report(mol, result, *, record_id=None, fragments=None, front
         for key in ('homo_lumo_atom_overlap','homo_lumo_atom_centroid_separation_angstrom'):
             report['values']['frontier_' + key] = frontier[key]
         for name, function in (
-            ('density', calc_density_matrix),
-            ('shell_populations', calc_shell_populations),
-            ('mayer_bonds', lambda r: calc_mayer_bond_descriptors(mol, r)),
-            ('frontier_bonds', lambda r: calc_frontier_bond_descriptors(mol, r)),
-            ('pi', lambda r: calc_pi_descriptors(mol, r)),
+            ('density', CalcDensityMatrix),
+            ('shell_populations', CalcShellPopulations),
+            ('mayer_bonds', lambda r: CalcMayerBondDescriptors(mol, r)),
+            ('frontier_bonds', lambda r: CalcFrontierBondDescriptors(mol, r)),
+            ('pi', lambda r: CalcPiDescriptors(mol, r)),
         ):
             try:
                 report[name] = function(result)
@@ -255,26 +255,26 @@ def calc_descriptor_report(mol, result, *, record_id=None, fragments=None, front
     return report
 
 
-def run_descriptor_batch(molecules, *, options=None, cache=None, record_ids=None, fragments=None,
+def RunDescriptorBatch(molecules, *, options=None, cache=None, record_ids=None, fragments=None,
                          max_workers=1, timeout=None, isolate=False, **analysis):
     """Ordered calculation/report rows; failures contain null features and diagnostics."""
-    from .batch import run_xtb_batch
+    from .batch import RunXTBBatch
     from .options import XTBOptions
     mols = list(molecules)
     ids = list(record_ids) if record_ids is not None else list(map(str, range(len(mols))))
     if len(ids) != len(mols) or any(v is not None and not isinstance(v, str) for v in ids):
         raise ValueError('record_ids must match molecules and contain strings or None')
     analysis = _analysis_settings(**analysis)
-    columns = descriptor_columns(analysis['frontier_depth'])
+    columns = DescriptorColumns(analysis['frontier_depth'])
     config = options or XTBOptions(keep_overlap=True)
-    results = run_xtb_batch(mols, options=config,
+    results = RunXTBBatch(mols, options=config,
                             cache=cache, return_exceptions=True,
                             max_workers=max_workers, timeout=timeout, isolate=isolate)
     reports = []
     for mol, result, identifier in zip(mols, results, ids):
         try:
             if isinstance(result, Exception): raise result
-            report = calc_descriptor_report(mol, result, record_id=identifier, fragments=fragments, **analysis)
+            report = CalcDescriptorReport(mol, result, record_id=identifier, fragments=fragments, **analysis)
         except Exception as exc:
             report = _base_report(identifier, columns.copy(), dict(analysis))
             report['quality'] = {'status':'error', 'flags':[{'code':'calculation_or_analysis_failed',
@@ -288,7 +288,7 @@ def run_descriptor_batch(molecules, *, options=None, cache=None, record_ids=None
     return reports
 
 
-def export_descriptor_reports(reports, path, *, format=None):
+def ExportDescriptorReports(reports, path, *, format=None):
     """Write consistent reports to CSV (scalar table) or JSONL (all sections).
 
     CSV includes JSON provenance, settings, flags and missing reasons per row.

@@ -18,7 +18,7 @@ from rdkit.Chem.Scaffolds import MurckoScaffold
 _PROTOCOL_PATHS = (Path(__file__).with_name('protocol.json'), Path(__file__).resolve().parents[2] / 'protocol.json')
 
 
-def load_frozen_protocol():
+def LoadFrozenProtocol():
     """Load the repository's frozen EAS protocol.
 
     The protocol is an input artifact, rather than a second set of Python
@@ -36,9 +36,9 @@ def load_frozen_protocol():
     return payload
 
 
-def frozen_protocol_sha256(protocol=None):
+def FrozenProtocolSHA256(protocol=None):
     """Return the SHA256 of canonical protocol JSON (without filesystem paths)."""
-    payload = load_frozen_protocol() if protocol is None else protocol
+    payload = LoadFrozenProtocol() if protocol is None else protocol
     encoded = json.dumps(payload, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
     return hashlib.sha256(encoded).hexdigest()
 
@@ -84,7 +84,7 @@ def _scaffold(mol):
     return value or 'acyclic:' + _canonical_smiles(Chem.RemoveHs(mol))
 
 
-def normalize_eas_records(rows: Iterable[Mapping], *, source='local'):
+def NormalizeEASRecords(rows: Iterable[Mapping], *, source='local'):
     """Validate and normalize public EAS records.
 
     Accepted label keys are ``reactive_atoms``, ``target_atoms``,
@@ -92,7 +92,7 @@ def normalize_eas_records(rows: Iterable[Mapping], *, source='local'):
     supplied SMILES. Invalid rows are returned in ``excluded`` with a reason;
     no row is silently repaired.
     """
-    protocol = load_frozen_protocol()
+    protocol = LoadFrozenProtocol()
     allowed = {Chem.GetPeriodicTable().GetAtomicNumber(symbol)
                for symbol in protocol['selection']['allowed_elements']}
     records, excluded, seen, seen_ids = [], [], set(), set()
@@ -190,7 +190,7 @@ def _union_find(n):
     return parent, find, union
 
 
-def cluster_keys(records, threshold=0.7, *, radius=2, fp_size=1024, include_chirality=False):
+def ClusterKeys(records, threshold=0.7, *, radius=2, fp_size=1024, include_chirality=False):
     """Return single-linkage Morgan clusters at the frozen Tanimoto threshold."""
     if not 0 < threshold <= 1: raise ValueError('threshold must be in (0, 1]')
     generator = rdFingerprintGenerator.GetMorganGenerator(radius=radius, fpSize=fp_size,
@@ -212,7 +212,7 @@ def cluster_keys(records, threshold=0.7, *, radius=2, fp_size=1024, include_chir
 
 def _leakage_groups(records, *, threshold=0.7, radius=2, fp_size=1024,
                     include_chirality=False):
-    clusters = cluster_keys(records, threshold=threshold, radius=radius,
+    clusters = ClusterKeys(records, threshold=threshold, radius=radius,
                             fp_size=fp_size, include_chirality=include_chirality)
     parent, find, union = _union_find(len(records))
     owners = {}
@@ -229,12 +229,12 @@ def _leakage_groups(records, *, threshold=0.7, radius=2, fp_size=1024,
 
 
 def _frozen_cluster_settings():
-    cluster = load_frozen_protocol()['split']['cluster']
+    cluster = LoadFrozenProtocol()['split']['cluster']
     return dict(threshold=cluster['threshold'], radius=cluster['radius'],
                 fp_size=cluster['fp_size'], include_chirality=cluster['include_chirality'])
 
 
-def assign_eas_splits(records, *, seed=20261106, train_fraction=0.8, valid_fraction=0.1):
+def AssignEASSplits(records, *, seed=20261106, train_fraction=0.8, valid_fraction=0.1):
     """Assign scaffold-plus-cluster groups to train/valid/test deterministically."""
     if not 0 < train_fraction < 1 or not 0 <= valid_fraction < 1 or train_fraction + valid_fraction >= 1:
         raise ValueError('split fractions must leave a positive test fraction')
@@ -252,7 +252,7 @@ def assign_eas_splits(records, *, seed=20261106, train_fraction=0.8, valid_fract
     return result
 
 
-def assign_eas_folds(records, *, seed=20261106, n_splits=5):
+def AssignEASFolds(records, *, seed=20261106, n_splits=5):
     """Assign deterministic leakage-safe grouped folds for model selection."""
     if isinstance(n_splits, bool) or not isinstance(n_splits, int) or n_splits < 2:
         raise ValueError('n_splits must be an integer >= 2')
@@ -269,22 +269,22 @@ def assign_eas_folds(records, *, seed=20261106, n_splits=5):
     return result
 
 
-def prepare_eas_dataset(path, *, source='local', seed=None):
-    protocol = load_frozen_protocol()
+def PrepareEASDataset(path, *, source='local', seed=None):
+    protocol = LoadFrozenProtocol()
     if seed is None:
         seed = protocol['split']['seed']
     elif seed != protocol['split']['seed']:
         raise ValueError(f'seed must equal frozen protocol value {protocol["split"]["seed"]}')
-    rows, excluded = normalize_eas_records(_load_rows(path), source=source)
+    rows, excluded = NormalizeEASRecords(_load_rows(path), source=source)
     fractions = protocol['split']['fractions']
-    splits = assign_eas_splits(rows, seed=seed, train_fraction=fractions['train'],
+    splits = AssignEASSplits(rows, seed=seed, train_fraction=fractions['train'],
                                valid_fraction=fractions['valid']) if rows else {}
-    folds = assign_eas_folds(rows, seed=seed, n_splits=protocol['split']['secondary_folds']) if rows else {}
+    folds = AssignEASFolds(rows, seed=seed, n_splits=protocol['split']['secondary_folds']) if rows else {}
     for row in rows:
         row['split'] = splits[row['id']]
         row['cv_fold'] = folds[row['id']]
     return {'protocol_id': 'eas_regioselectivity_v1', 'source': source,
-            'protocol_sha256': frozen_protocol_sha256(protocol),
+            'protocol_sha256': FrozenProtocolSHA256(protocol),
             'split_seed': seed,
             'input_path': str(Path(path)), 'n_input': len(rows) + len(excluded),
             'n_selected': len(rows), 'n_excluded': len(excluded),

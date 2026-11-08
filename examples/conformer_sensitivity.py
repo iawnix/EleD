@@ -6,7 +6,7 @@ from pathlib import Path
 
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem
-from eled import XTBDiskCache, run_conformer_analysis
+from eled import XTBDiskCache, RunConformerAnalysis
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
         optimized = AllChem.MMFFOptimizeMoleculeConfs(mol, numThreads=1, maxIters=500)
         retained = [i for i, (status, energy) in zip(ids, optimized) if status == 0]
         if not retained: raise RuntimeError(f'no converged MMFF conformers: {name}')
-        report = run_conformer_analysis(mol, conf_ids=retained, record_id=name, cache=cache)
+        report = RunConformerAnalysis(mol, conf_ids=retained, record_id=name, cache=cache)
         report['geometry_preparation'] = {'rdkit': rdBase.rdkitVersion, 'smiles': smiles,
             'embedding': 'ETKDGv3', 'seed': 20261104, 'requested': 12, 'prune_rms_angstrom': .2,
             'optimization': 'MMFF94; maxIters=500; no post-optimization deduplication',

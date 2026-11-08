@@ -10,8 +10,8 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from eled import (XTBOptions, XTBNativeNotFoundError, run_xtb_batch, XTBCache,
-    calc_descriptor_report, run_reactivity, calc_reactivity_descriptors, assess_descriptor_quality)
+from eled import (XTBOptions, XTBNativeNotFoundError, RunXTBBatch, XTBCache,
+    CalcDescriptorReport, RunReactivity, CalcReactivityDescriptors, AssessDescriptorQuality)
 from eled.runtime import _find_xtb_library, _native_basis_build
 
 pytestmark = pytest.mark.integration
@@ -39,8 +39,8 @@ def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temp
     ok,b=mod.RunMol(m,method=method,xtbLibrary=library,accuracy=.1,maxIterations=333,
                    electronicTemperature=temperature,keepOverlap=True)
     assert ok
-    ra,rb=calc_descriptor_report(m,a),calc_descriptor_report(m,b)
-    assert ra['provenance']['calculation_settings']==rb['provenance']['calculation_settings']
+    ra,rb=CalcDescriptorReport(m,a),CalcDescriptorReport(m,b)
+    assert ra['provenance']['CalculationSettings']==rb['provenance']['CalculationSettings']
     assert b.maxIterations==333 and b.accuracy==.1
     assert b.effectiveElectronicTemperature==max(temperature,1e-6)
     np.testing.assert_allclose(a.orbital_energies_ev,b.GetOrbitalEnergies(),atol=1e-9,rtol=0)
@@ -54,10 +54,10 @@ def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temp
 
 def test_cache_distinguishes_each_numerical_setting(library):
     m=molecule(); cache=XTBCache(); opts=XTBOptions(xtb_library=library)
-    base=run_xtb_batch([m],options=opts,cache=cache)[0]
+    base=RunXTBBatch([m],options=opts,cache=cache)[0]
     for change in [{'accuracy':.2},{'max_iterations':300},{'electronic_temperature':1000.}]:
-        result=run_xtb_batch([m],options=replace(opts,**change),cache=cache)[0]
-        assert result.metadata['calculation_settings'] != base.metadata['calculation_settings']
+        result=RunXTBBatch([m],options=replace(opts,**change),cache=cache)[0]
+        assert result.metadata['CalculationSettings'] != base.metadata['CalculationSettings']
     assert len(cache)==4
 
 
@@ -68,8 +68,8 @@ def test_vertical_states_interfaces_and_population_definitions(library,method,sm
     pytest.importorskip('eled.rdXTBTools');m=molecule(smiles);original=m.ToBinary()
     opts=XTBOptions(method=method,xtb_library=library,accuracy=.1,electronic_temperature=300.)
     spins={'ionized_uhf':0,'attached_uhf':0} if smiles=='[CH3]' else {}
-    a=run_reactivity(m,options=opts,population_scheme='mulliken',initialization=initialization,**spins)
-    b=run_reactivity(m,options=opts,population_scheme='charges',interface='compiled',initialization=initialization,**spins)
+    a=RunReactivity(m,options=opts,population_scheme='mulliken',initialization=initialization,**spins)
+    b=RunReactivity(m,options=opts,population_scheme='charges',interface='compiled',initialization=initialization,**spins)
     assert a['values']==pytest.approx(b['values'],abs=1e-8)
     for key in ['f_plus','f_minus','f_radical','dual']:
         np.testing.assert_allclose([v[key] for v in a['atoms']],[v[key] for v in b['atoms']],atol=1e-7,rtol=0)
@@ -132,21 +132,21 @@ def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_o
     from eled import XTBEnvironmentError
     with patch.object(_NativeXTB,'_bind',bind):
         with pytest.raises(XTBEnvironmentError,match='copy'):
-            run_reactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
-    assert run_reactivity(molecule(),options=XTBOptions(xtb_library=library))['error'] is None
+            RunReactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
+    assert RunReactivity(molecule(),options=XTBOptions(xtb_library=library))['error'] is None
 
 
 @pytest.mark.parametrize('interface',['native','compiled'])
 def test_actual_scf_failure_keeps_protocol_and_does_not_poison_next_call(library,interface):
     if interface=='compiled': pytest.importorskip('eled.rdXTBTools')
-    report=run_reactivity(molecule('CCO'), interface=interface, return_errors=True,
+    report=RunReactivity(molecule('CCO'), interface=interface, return_errors=True,
         options=XTBOptions(xtb_library=library,max_iterations=1,electronic_temperature=0.))
     assert report['error']['state']=='reference'
     assert 'converge' in report['error']['message']
     assert all(v is None for v in report['values'].values())
     assert report['states']['ionized']['status']=='not_run'
     assert report['analysis_settings']['requested_options']['max_iterations']==1
-    successful=run_reactivity(molecule(),interface=interface,
+    successful=RunReactivity(molecule(),interface=interface,
         options=XTBOptions(xtb_library=library,electronic_temperature=0.))
     assert successful['error'] is None
     assert successful['values']['vertical_ip_ev'] > 0
@@ -154,7 +154,7 @@ def test_actual_scf_failure_keeps_protocol_and_does_not_poison_next_call(library
 
 def test_lowdin_fukui_and_finite_temperature_label(library):
     m=molecule('CCO')
-    r=run_reactivity(m,options=XTBOptions(xtb_library=library,electronic_temperature=1000.),
+    r=RunReactivity(m,options=XTBOptions(xtb_library=library,electronic_temperature=1000.),
                      population_scheme='lowdin',fragments={'all':list(range(m.GetNumAtoms()))})
     assert r['fragments']['all']['f_plus']==pytest.approx(1.,abs=1e-7)
     assert 'finite_electronic_temperature' in {f['code'] for f in r['quality']['flags']}
@@ -164,6 +164,6 @@ def test_report_does_not_recalculate_and_labels_thermal_occupations(library):
     m=molecule('c1ccccc1')
     result=calculate_xtb(m,xtb_library=library,electronic_temperature=50000.,keep_overlap=True)
     with patch('eled.xtb._run_xtb',side_effect=AssertionError('must not calculate')):
-        report=calc_descriptor_report(m,result)
+        report=CalcDescriptorReport(m,result)
     assert report['quality']['fractional_orbital_indices']
     assert 'fractional_occupations' in {f['code'] for f in report['quality']['flags']}

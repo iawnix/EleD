@@ -12,13 +12,13 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 
 | Function | Output | Supported input |
 | --- | --- | --- |
-| `calc_xtb_descriptors(result, frontier_depth=2, occupation_threshold=1e-7)` | Flat molecular features | Native `XTBResult` or compiled `rdXTBTools.XTBResults` |
-| `calc_xtb_atom_descriptors(result)` | One row per atom | Both result paths |
-| `calc_xtb_bond_descriptors(mol, result)` | One row per existing RDKit bond | Either result type with matching input provenance |
-| `calc_xtb_fragment_descriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
-| `calc_orbital_populations(result, scheme="lowdin", orbital_indices=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
-| `calc_frontier_descriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
-| `calc_density_descriptors(mol, result)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond and π descriptors | Same-calculation C/S/maps; `keep_overlap=True` |
+| `CalcXTBDescriptors(result, frontier_depth=2, occupation_threshold=1e-7)` | Flat molecular features | Native `XTBResult` or compiled `rdXTBTools.XTBResults` |
+| `CalcXTBAtomDescriptors(result)` | One row per atom | Both result paths |
+| `CalcXTBBondDescriptors(mol, result)` | One row per existing RDKit bond | Either result type with matching input provenance |
+| `CalcXTBFragmentDescriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
+| `CalcOrbitalPopulations(result, scheme="lowdin", orbital_indices=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
+| `CalcFrontierDescriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
+| `CalcDensityDescriptors(mol, result)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond and π descriptors | Same-calculation C/S/maps; `keep_overlap=True` |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned
 molecule snapshot. Both Python result types support bond mapping, annotation and
@@ -29,20 +29,20 @@ provenance record; molecule-bound helpers reject missing provenance.
 
 ```python
 from eled import (
-    XTBCalculator, calc_xtb_descriptors, calc_xtb_atom_descriptors,
-    calc_xtb_bond_descriptors, calc_xtb_fragment_descriptors, annotate_mol,
+    XTBCalculator, CalcXTBDescriptors, CalcXTBAtomDescriptors,
+    CalcXTBBondDescriptors, CalcXTBFragmentDescriptors, AnnotateMol,
 )
 
 # mol must already have explicit hydrogen atoms and a 3D conformer.
 result = XTBCalculator(method="GFN2-xTB").calculate(mol)
-scalars = calc_xtb_descriptors(result, frontier_depth=2)
-atoms = calc_xtb_atom_descriptors(result)
-bonds = calc_xtb_bond_descriptors(mol, result)
-fragments = calc_xtb_fragment_descriptors(result, {"first": [0], "second": [1, 2]})
-annotated = annotate_mol(mol, result)
+scalars = CalcXTBDescriptors(result, frontier_depth=2)
+atoms = CalcXTBAtomDescriptors(result)
+bonds = CalcXTBBondDescriptors(mol, result)
+fragments = CalcXTBFragmentDescriptors(result, {"first": [0], "second": [1, 2]})
+annotated = AnnotateMol(mol, result)
 ```
 
-`calc_xtb_descriptors` retains the original method/backend/version, total energy
+`CalcXTBDescriptors` retains the original method/backend/version, total energy
 (Hartree), HOMO/LUMO/gap (eV) and electron/orbital counts. It adds:
 
 - `xtb_homo_index`, `xtb_lumo_index`: zero-based indices; `None` if absent.
@@ -82,7 +82,7 @@ identifies omitted atoms. For a complete partition, fragment charges sum to the
 molecular charge, and internal plus interfragment WBO sums recover the total
 pair sum. No spatial criterion or bond-order cutoff is silently applied.
 
-`annotate_mol` now writes `xtb_wiberg_sum` on atoms, in addition to partial charges,
+`AnnotateMol` now writes `xtb_wiberg_sum` on atoms, in addition to partial charges,
 bond WBOs and molecular scalar descriptors. `atom_wiberg_prop` can override its
 name. Atomic charge and WBO property names must differ. All validation precedes
 in-place writes; geometry/topology changes are rejected.
@@ -97,7 +97,7 @@ print(result.overlap_matrix)  # AO × AO, same basis/order as coefficients
 
 Select the [extended libxtb installation](xtb-patched-build.md) before running
 this example. `keep_overlap` is also supported in `XTBOptions` and
-`run_xtb_batch`, and is part of cache identity. It defaults to false, accepts
+`RunXTBBatch`, and is part of cache identity. It defaults to false, accepts
 only a Boolean and implies retaining coefficients. Extra storage costs O(NAO²).
 
 Compiled callers use `rdXTBTools.RunMol(mol, keepOverlap=True)` and retrieve
@@ -116,11 +116,11 @@ separate alpha/beta densities and spin populations are not supplied.
 ## Löwdin and Mulliken populations
 
 ```python
-from eled import calc_orbital_populations
+from eled import CalcOrbitalPopulations
 
-lowdin = calc_orbital_populations(result)
-mulliken = calc_orbital_populations(result, scheme="mulliken")
-selected = calc_orbital_populations(result, orbital_indices=[3, 4])
+lowdin = CalcOrbitalPopulations(result)
+mulliken = CalcOrbitalPopulations(result, scheme="mulliken")
+selected = CalcOrbitalPopulations(result, orbital_indices=[3, 4])
 ```
 
 For real AO coefficients `C`, overlap `S`, and atom A:
@@ -151,9 +151,9 @@ data raises `ValueError`. Descriptor extraction never invokes another engine.
 ## Frontier subspaces and spatial proxies
 
 ```python
-from eled import calc_frontier_descriptors
+from eled import CalcFrontierDescriptors
 
-frontier = calc_frontier_descriptors(
+frontier = CalcFrontierDescriptors(
     mol, result,
     fragments={"donor": donor_atom_indices, "acceptor": acceptor_atom_indices},
     degeneracy_ev=1e-3,
@@ -206,19 +206,19 @@ failed SCF, Hessian invalidation and recovery. No tblite or ASE is imported.
 ## Shell, Mayer, frontier-bond and π descriptors
 
 ```python
-from eled import calc_density_descriptors
+from eled import CalcDensityDescriptors
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-density = calc_density_descriptors(mol, result)
+density = CalcDensityDescriptors(mol, result)
 ```
 
-`calc_density_matrix` exposes `P`, `trace_PS_e` and the electron-conservation
-error. `calc_shell_populations` reports Mulliken and Löwdin s/p/d electron
-counts, p/s ratios and shell rows. `calc_mayer_bond_descriptors` places Mayer
+`CalcDensityMatrix` exposes `P`, `trace_PS_e` and the electron-conservation
+error. `CalcShellPopulations` reports Mulliken and Löwdin s/p/d electron
+counts, p/s ratios and shell rows. `CalcMayerBondDescriptors` places Mayer
 and Wiberg values beside each RDKit bond; open-shell Mayer entries are `None`
-with an explicit spin-density reason. `calc_frontier_bond_descriptors` uses
+with an explicit spin-density reason. `CalcFrontierBondDescriptors` uses
 near-degenerate HOMO/LUMO projectors and signed Mulliken overlap populations.
-`calc_pi_descriptors` reports p-shell projection for aromatic/sp2 atoms and
+`CalcPiDescriptors` reports p-shell projection for aromatic/sp2 atoms and
 π-bond order where a local plane exists. Units, invariance and missing-value
 semantics are included in each section. See [density-descriptors](density-descriptors.md)
 for definitions and the EAS validation protocol. The scope and literature

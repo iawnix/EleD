@@ -87,12 +87,12 @@ _STATUS = {
 }
 
 
-def descriptor_catalog():
+def DescriptorCatalog():
     """Return a copy of the canonical descriptor definitions."""
     return deepcopy(_CATALOG)
 
 
-def descriptor_status():
+def DescriptorStatus():
     """Return the intended validation maturity of descriptor families."""
     return {name: sorted(values) for name, values in _STATUS.items()}
     return output

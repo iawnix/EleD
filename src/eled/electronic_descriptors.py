@@ -40,7 +40,7 @@ def _as_result(result):
     metadata['scf'] = scf_record(result.method, getattr(result, 'scfIterations', -1),
         [getattr(result, name, -1.) for name in ('scfEnergyChangeHartree', 'scfMixerRMS',
                                                 'scfEnergyThresholdHartree', 'scfMixerThreshold')])
-    metadata.update(calculation_status='success', initialization=result.initialization, calculation_settings={
+    metadata.update(calculation_status='success', initialization=result.initialization, CalculationSettings={
         'max_iterations': result.maxIterations, 'accuracy': result.accuracy,
         'electronic_temperature': result.electronicTemperature,
         'effective_electronic_temperature': result.effectiveElectronicTemperature},
@@ -136,7 +136,7 @@ def _fragments(fragments, natoms):
     return groups
 
 
-def calc_xtb_descriptors(result, *, frontier_depth=2, occupation_threshold=1e-7):
+def CalcXTBDescriptors(result, *, frontier_depth=2, occupation_threshold=1e-7):
     """Return JSON-compatible molecular scalars; unavailable values are None.
 
     frontier_depth=2 adds HOMO-1/-2 and LUMO+1/+2. Charge standard deviation
@@ -184,7 +184,7 @@ def calc_xtb_descriptors(result, *, frontier_depth=2, occupation_threshold=1e-7)
     return output
 
 
-def calc_xtb_atom_descriptors(result):
+def CalcXTBAtomDescriptors(result):
     """Return rows in calculation atom order: partial charge and total WBO.
 
     All off-diagonal pairs contribute to each atom's WBO sum, including pairs
@@ -200,7 +200,7 @@ def calc_xtb_atom_descriptors(result):
             for i, q in enumerate(charges)]
 
 
-def calc_xtb_bond_descriptors(mol, result):
+def CalcXTBBondDescriptors(mol, result):
     """Return existing RDKit bond rows after checking topology/geometry provenance.
 
     Accepts ctypes and compiled Python results carrying input snapshot
@@ -218,7 +218,7 @@ def calc_xtb_bond_descriptors(mol, result):
             for b in mol.GetBonds()]
 
 
-def calc_xtb_fragment_descriptors(result, fragments):
+def CalcXTBFragmentDescriptors(result, fragments):
     """Aggregate disjoint, explicitly indexed fragments; a full partition is optional.
 
     Internal WBO counts each pair once. External WBO includes all atoms outside

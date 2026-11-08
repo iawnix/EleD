@@ -9,11 +9,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 from eled import (XTBOptions, XTBResult, XTBRunError, XTBEnvironmentError,
-                       XTBCacheError, XTBDiskCache, run_conformer_analysis,
-                       conformer_descriptor_columns)
+                       XTBCacheError, XTBDiskCache, RunConformerAnalysis,
+                       ConformerDescriptorColumns)
 from eled import conformers
 from eled.input import _input_metadata, _xyz_from_mol
-from eled.options import calculation_settings
+from eled.options import CalculationSettings
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def synthetic(monkeypatch):
         identifier = kwargs.get('conf_id', self.options.conf_id)
         h = {3: -3., 8: -2., 12: -1.}[identifier]
         metadata = _input_metadata(molecule, identifier, 0, 0, _xyz_from_mol(molecule, identifier))
-        metadata.update(calculation_settings=calculation_settings(), calculation_status='success',
+        metadata.update(CalculationSettings=CalculationSettings(), calculation_status='success',
                         engine={'sha256': 'fixture-engine'}, initialization='independent')
         return XTBResult('GFN2-xTB', None, -1., 3., 3, 4, 0,
             orbital_energies_ev=(-10., h, 1.), orbital_occupations=(2., 2., 0.),
@@ -40,7 +40,7 @@ def synthetic(monkeypatch):
 
 def test_statistics_order_coverage_and_input_unchanged(synthetic):
     mol, _ = synthetic; before = mol.ToBinary()
-    report = run_conformer_analysis(mol, record_id='water')
+    report = RunConformerAnalysis(mol, record_id='water')
     assert report['conformer_ids'] == [3, 8, 12]
     assert report['status'] == 'partial'  # synthetic results lack basis arrays
     stats = report['statistics']['xtb_homo_ev']
@@ -48,11 +48,11 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
                          mean=-2., std=np.std([-3., -2., -1.]), min=-3., max=-1., range=2.)
     missing = report['statistics']['frontier_homo_participation_ratio']
     assert missing['n_missing'] == 3 and missing['mean'] is None and missing['n_failed'] == 0
-    reverse = run_conformer_analysis(mol, conf_ids=[12, 8, 3])
+    reverse = RunConformerAnalysis(mol, conf_ids=[12, 8, 3])
     assert reverse['statistics'] == report['statistics']
     assert mol.ToBinary() == before
     assert json.loads(json.dumps(report, allow_nan=False)) == report
-    single = run_conformer_analysis(mol, conf_ids=[8], columns=['xtb_homo_ev'])
+    single = RunConformerAnalysis(mol, conf_ids=[8], columns=['xtb_homo_ev'])
     assert single['status'] == 'complete' and single['statistics']['xtb_homo_ev']['std'] == 0
 
 
@@ -62,18 +62,18 @@ def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
         if kwargs.get('conf_id', self.options.conf_id) == 8: raise XTBRunError('SCF failed')
         return calculate(self, mol, **kwargs)
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', fail_middle)
-    report = run_conformer_analysis(mol, columns=['xtb_homo_ev'])
+    report = RunConformerAnalysis(mol, columns=['xtb_homo_ev'])
     assert report['n_failed'] == 1 and report['status'] == 'partial'
     assert report['statistics']['xtb_homo_ev']['n_valid'] == 2
     assert report['statistics']['xtb_homo_ev']['n_missing'] == 0
     assert report['reports'][1]['error']['message'] == 'SCF failed'
-    with pytest.raises(XTBRunError): run_conformer_analysis(mol, return_errors=False)
+    with pytest.raises(XTBRunError): RunConformerAnalysis(mol, return_errors=False)
     for error in (XTBEnvironmentError('runtime'), RuntimeError('unexpected'), ValueError('analysis')):
         def fail(*a, **k): raise error
         monkeypatch.setattr(conformers.XTBCalculator, 'calculate', fail)
-        with pytest.raises(type(error)): run_conformer_analysis(mol)
+        with pytest.raises(type(error)): RunConformerAnalysis(mol)
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', lambda *a, **k: (_ for _ in ()).throw(XTBRunError('SCF')))
-    report = run_conformer_analysis(mol)
+    report = RunConformerAnalysis(mol)
     assert report['status'] == 'failed' and report['n_failed'] == 3
     assert all(s['mean'] is None and s['n_failed'] == 3 for s in report['statistics'].values())
 
@@ -86,18 +86,18 @@ def test_invalid_inputs_do_not_calculate(synthetic, monkeypatch, kwargs):
     mol, _ = synthetic
     def unexpected(*a, **k): raise AssertionError('must validate first')
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
-    with pytest.raises(ValueError): run_conformer_analysis(mol, **kwargs)
+    with pytest.raises(ValueError): RunConformerAnalysis(mol, **kwargs)
 
 
 def test_bad_later_geometry_rejected_before_first_calculation(synthetic, monkeypatch):
     mol, _ = synthetic; mol.GetConformer(12).SetAtomPosition(0, (float('nan'), 0, 0))
     def unexpected(*a, **k): raise AssertionError('must validate all first')
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
-    with pytest.raises(ValueError, match='finite'): run_conformer_analysis(mol)
+    with pytest.raises(ValueError, match='finite'): RunConformerAnalysis(mol)
 
 
 @pytest.mark.parametrize('field,value', [('engine', {'sha256': 'other'}), ('charge', 2),
-                                        ('conformer_id', 3), ('calculation_settings', {})])
+                                        ('conformer_id', 3), ('CalculationSettings', {})])
 def test_mixed_or_wrong_provenance_is_rejected(synthetic, monkeypatch, field, value):
     mol, calculate = synthetic
     def mixed(self, mol, **kwargs):
@@ -105,7 +105,7 @@ def test_mixed_or_wrong_provenance_is_rejected(synthetic, monkeypatch, field, va
         identifier = kwargs.get('conf_id', self.options.conf_id)
         return replace(r, metadata={**r.metadata, field: value}) if identifier == 8 else r
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', mixed)
-    with pytest.raises(ValueError, match='provenance|protocol'): run_conformer_analysis(mol)
+    with pytest.raises(ValueError, match='provenance|protocol'): RunConformerAnalysis(mol)
 
 
 def test_cache_errors_are_fatal(synthetic, monkeypatch):
@@ -113,7 +113,7 @@ def test_cache_errors_are_fatal(synthetic, monkeypatch):
     monkeypatch.setattr(conformers, '_key', lambda *a: 'key')
     class Broken:
         def get(self, key): raise XTBCacheError('corrupt')
-    with pytest.raises(XTBCacheError): run_conformer_analysis(mol, cache=Broken())
+    with pytest.raises(XTBCacheError): RunConformerAnalysis(mol, cache=Broken())
 
 
 def test_missing_gfn0_parameters_are_environment_errors(monkeypatch):
@@ -125,9 +125,9 @@ def test_missing_gfn0_parameters_are_environment_errors(monkeypatch):
 
 
 def test_charged_dipoles_and_cartesian_fields_excluded():
-    assert 'xtb_dipole_norm_debye' in conformer_descriptor_columns()
-    assert 'xtb_dipole_norm_debye' not in conformer_descriptor_columns(charge=1)
-    assert not any('_centroid_x_' in k or k.endswith('_index') for k in conformer_descriptor_columns())
+    assert 'xtb_dipole_norm_debye' in ConformerDescriptorColumns()
+    assert 'xtb_dipole_norm_debye' not in ConformerDescriptorColumns(charge=1)
+    assert not any('_centroid_x_' in k or k.endswith('_index') for k in ConformerDescriptorColumns())
 
 
 @pytest.mark.integration
@@ -140,9 +140,9 @@ def test_real_engine_rigid_transform_and_disk_cache(smiles, tmp_path, monkeypatc
     for i, pos in enumerate(transformed): conf.SetAtomPosition(i, pos)
     mol.AddConformer(conf, assignId=False)
     cache = XTBDiskCache(tmp_path/'conformers.sqlite')
-    report = run_conformer_analysis(mol, cache=cache, frontier_depth=0)
+    report = RunConformerAnalysis(mol, cache=cache, frontier_depth=0)
     assert report['status'] == 'complete' and len(cache) == 2
     for key, stats in report['statistics'].items(): assert stats['range'] < 1e-6, key
     def unexpected(*a, **k): raise AssertionError('cache should hit')
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
-    assert run_conformer_analysis(mol, cache=cache, frontier_depth=0) == report
+    assert RunConformerAnalysis(mol, cache=cache, frontier_depth=0) == report

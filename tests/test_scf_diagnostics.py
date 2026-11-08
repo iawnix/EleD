@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from eled import calc_descriptor_report
+from eled import CalcDescriptorReport
 from eled.runtime import _find_xtb_library, _extended_libxtb_build, _SCF_DIAGNOSTICS_PATCH
 from eled.scf import scf_record
 from eled.errors import XTBEnvironmentError, XTBNativeNotFoundError
@@ -48,7 +48,7 @@ def test_success_diagnostics_and_compiled_parity(library, method):
     else:
         assert 1 <= diagnostic['iterations'] <= 250 and diagnostic['criteria_satisfied']
         assert diagnostic['energy_change_hartree'] < diagnostic['energy_threshold_hartree']
-        assert calc_descriptor_report(molecule, result, include_orbitals=False)['quality']['scf_iterations'] == diagnostic['iterations']
+        assert CalcDescriptorReport(molecule, result, include_orbitals=False)['quality']['scf_iterations'] == diagnostic['iterations']
     try: from eled import rdXTBTools
     except ImportError: return  # native coverage still runs without the optional extension
     if not hasattr(rdXTBTools.XTBResults, 'scfIterations'): return

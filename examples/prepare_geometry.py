@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from rdkit import Chem
-from eled import XTBCalculator, prepare_conformers
+from eled import XTBCalculator, PrepareConformers
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
     parser.add_argument('--output', type=Path, default=Path('build/prepared-geometry'))
     parser.add_argument('--xtb', action='store_true')
     args = parser.parse_args(); args.output.mkdir(parents=True, exist_ok=True)
-    prepared = prepare_conformers('C[C@H](O)C(=O)O', num_conformers=4, random_seed=42)
+    prepared = PrepareConformers('C[C@H](O)C(=O)O', num_conformers=4, random_seed=42)
     (args.output/'preparation.json').write_text(json.dumps(prepared.report, indent=2, allow_nan=False)+'\n')
     if not prepared.success: raise RuntimeError(prepared.report['error'])
     with Chem.SDWriter(str(args.output/'conformers.sdf')) as writer:

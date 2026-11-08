@@ -245,7 +245,7 @@
             "charge": 0,
             "uhf": 0,
             "conformer_id": 0,
-            "calculation_settings": {
+            "CalculationSettings": {
               "max_iterations": 250,
               "accuracy": 1.0,
               "electronic_temperature": 300.0,
@@ -439,7 +439,7 @@
                 "charge": 0,
                 "uhf": 0,
                 "conformer_id": 0,
-                "calculation_settings": {
+                "CalculationSettings": {
                   "max_iterations": 250,
                   "accuracy": 1.0,
                   "electronic_temperature": 300.0,
@@ -494,7 +494,7 @@
                 "charge": 1,
                 "uhf": 1,
                 "conformer_id": 0,
-                "calculation_settings": {
+                "CalculationSettings": {
                   "max_iterations": 250,
                   "accuracy": 1.0,
                   "electronic_temperature": 300.0,
@@ -549,7 +549,7 @@
                 "charge": -1,
                 "uhf": 1,
                 "conformer_id": 0,
-                "calculation_settings": {
+                "CalculationSettings": {
                   "max_iterations": 250,
                   "accuracy": 1.0,
                   "electronic_temperature": 300.0,
@@ -607,7 +607,7 @@
                   "charge": 0,
                   "uhf": 0,
                   "conformer_id": 0,
-                  "calculation_settings": {
+                  "CalculationSettings": {
                     "max_iterations": 250,
                     "accuracy": 1.0,
                     "electronic_temperature": 300.0,
@@ -662,7 +662,7 @@
                   "charge": 1,
                   "uhf": 1,
                   "conformer_id": 0,
-                  "calculation_settings": {
+                  "CalculationSettings": {
                     "max_iterations": 250,
                     "accuracy": 1.0,
                     "electronic_temperature": 300.0,
@@ -717,7 +717,7 @@
                   "charge": -1,
                   "uhf": 1,
                   "conformer_id": 0,
-                  "calculation_settings": {
+                  "CalculationSettings": {
                     "max_iterations": 250,
                     "accuracy": 1.0,
                     "electronic_temperature": 300.0,
