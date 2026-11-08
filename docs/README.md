@@ -1,46 +1,46 @@
-# Documentation / 文档
+# EleD documentation / EleD 文档
 
-`EleD` (Electronic Descriptors) is an RDKit extension for electronic-structure
-descriptors. This
-documentation keeps the detailed API references in English and provides Chinese
-translations for the main user workflows. Code names, field names and units are
-kept identical in both languages.
+EleD is an RDKit extension for electronic-structure descriptors backed by xTB.
+The documentation follows the same path as a typical analysis: install the
+runtime, prepare a molecule, calculate descriptors, build a report and inspect
+or export the result.
 
-`EleD` 是面向 RDKit 的电子结构描述符扩展。详细 API 文档以英文为主，
-同时为主要使用流程提供中文页面。
-两种语言中的代码接口、字段名和单位保持一致。
+EleD 是基于 xTB 的 RDKit 电子结构描述符扩展。文档按实际使用流程组织：安装
+运行环境、准备分子、计算描述符、生成报告，最后进行可视化或导出。
 
-## Start here / 从这里开始
+## User guides / 用户指南
 
-| Topic / 主题 | English / 英文 | 中文 / Chinese |
+| Stage / 阶段 | English / 英文 | 中文 / Chinese |
 | --- | --- | --- |
-| Installation / 安装 | [install.md](install.md) | [zh-CN/install.md](zh-CN/install.md) |
-| Descriptors / 描述符 | [descriptors.md](descriptors.md) | [zh-CN/descriptors.md](zh-CN/descriptors.md) |
-| Reports and reactivity / 报告与反应性 | [descriptor-reports.md](descriptor-reports.md) | [zh-CN/descriptor-reports.md](zh-CN/descriptor-reports.md) |
-| Descriptor catalog / 描述符目录 | [descriptor-catalog.md](descriptor-catalog.md) | [zh-CN/descriptor-catalog.md](zh-CN/descriptor-catalog.md) |
-| Density descriptors / 密度描述符 | [density-descriptors.md](density-descriptors.md) | [zh-CN/density-descriptors.md](zh-CN/density-descriptors.md) |
-| Visualization / 可视化 | [visualization.md](visualization.md) | [zh-CN/visualization.md](zh-CN/visualization.md) |
-| YAeHMOP/EHT comparison / YAeHMOP/EHT 对照 | [eht-comparison.md](eht-comparison.md) | [zh-CN/eht-comparison.md](zh-CN/eht-comparison.md) |
-| EAS research plan / EAS 研究方案 | [research-plan-eas-en.md](research-plan-eas-en.md) | [zh-CN/research-plan-eas.md](zh-CN/research-plan-eas.md) |
-| EAS protocol audit / EAS 协议审计 | [protocol-audit.md](protocol-audit.md) | English reference |
-| EAS benchmark layer / EAS benchmark 层 | [../benchmarks/eas/README.md](../benchmarks/eas/README.md) | English reference |
-| Project positioning / 项目定位 | [project-positioning.md](project-positioning.md) | [zh-CN/project-positioning.md](zh-CN/project-positioning.md) |
-| C++ interface / C++ 接口 | [rdxtb-tools.md](rdxtb-tools.md) | English reference |
-| Extended xTB build / 扩展版 xTB 编译 | [xtb-patched-build.md](xtb-patched-build.md) | English reference |
+| Install / 安装 | [Install](install.md) | [安装说明](zh-CN/install.md) |
+| Prepare geometry / 准备构象 | [Geometry preparation](geometry-preparation.md) | [构象准备](zh-CN/geometry-preparation.md) |
+| Calculate descriptors / 计算描述符 | [Descriptors](descriptors.md) | [描述符定义](zh-CN/descriptors.md) |
+| Build reports / 生成报告 | [Reports and reactivity](descriptor-reports.md) | [报告与反应性](zh-CN/descriptor-reports.md) |
+| Explore results / 查看结果 | [Visualization](visualization.md) | [可视化](zh-CN/visualization.md) |
+| Export and scale / 导出与批量计算 | [Persistent batches](persistent-batches.md) · [Isolated batches](isolated-batches.md) | — |
 
 ## Reference / 参考
 
-- [Geometry preparation](geometry-preparation.md) / [构象准备](zh-CN/geometry-preparation.md)
+- [Descriptor catalog](descriptor-catalog.md) · [描述符目录](zh-CN/descriptor-catalog.md)
+- [Density descriptors](density-descriptors.md) · [密度描述符](zh-CN/density-descriptors.md)
+- [C++ interface](rdxtb-tools.md)
+- [Extended xTB build](xtb-patched-build.md)
 - [Runtime bundle](runtime-bundle.md)
-- [Persistent batches](persistent-batches.md)
-- [Isolated batches](isolated-batches.md)
-- [SCF diagnostics](scf-diagnostics.md)
+- [YAeHMOP/EHT comparison](eht-comparison.md) · [YAeHMOP/EHT 对照](zh-CN/eht-comparison.md)
+- [Project positioning](project-positioning.md) · [项目定位](zh-CN/project-positioning.md)
+
+## Research and validation / 研究与验证
+
+The research pages document the EAS feature protocol, benchmark preparation and
+numerical validation of the descriptor layers. They are useful when reproducing
+experiments or extending the feature set.
+
+研究页面记录 EAS 特征协议、数据准备和描述符层的数值验证，适合复现实验或
+扩展描述符功能。
+
+- [EAS research plan](research-plan-eas-en.md) · [EAS 研究方案](zh-CN/research-plan-eas.md)
+- [EAS protocol audit](protocol-audit.md)
+- [EAS benchmark](../benchmarks/eas/README.md)
 - [Validation scope](mainline-validation.md)
+- [SCF diagnostics](scf-diagnostics.md)
 - [Literature and ML positioning](literature-density-ml-audit.md)
-
-Historical validation notes and upstream issue records remain available in the
-repository for reproducibility. The landing pages above describe the supported
-open-source workflow.
-
-历史验证记录和上游问题记录仍保留在仓库中，用于复现。上面的入口页面描述
-当前支持的开源使用流程。
