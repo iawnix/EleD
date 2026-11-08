@@ -94,6 +94,20 @@ from .eas import (normalize_eas_records, cluster_keys, assign_eas_splits,
                   frozen_protocol_sha256)
 from .descriptor_catalog import descriptor_catalog, descriptor_status
 
+from .visualization import (
+    BuildFragmentVisualData, DrawDescriptorMap, PlotFragmentSummary,
+    PlotFragmentInteractions, RenderFragmentAnalysis,
+    build_fragment_visual_data, draw_descriptor_map, plot_fragment_summary,
+    plot_fragment_interactions, render_fragment_analysis,
+)
+
 __all__ += ['normalize_eas_records', 'cluster_keys', 'assign_eas_splits', 'assign_eas_folds',
             'prepare_eas_dataset', 'load_frozen_protocol', 'frozen_protocol_sha256',
             'descriptor_catalog', 'descriptor_status']
+
+__all__ += [
+    'BuildFragmentVisualData', 'DrawDescriptorMap', 'PlotFragmentSummary',
+    'PlotFragmentInteractions', 'RenderFragmentAnalysis',
+    'build_fragment_visual_data', 'draw_descriptor_map', 'plot_fragment_summary',
+    'plot_fragment_interactions', 'render_fragment_analysis',
+]
