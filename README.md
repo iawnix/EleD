@@ -8,8 +8,8 @@ conformers, fragments and annotations stay connected from input to report.
 
 The package provides a Python API, an optional RDKit-style C++ extension
 (`rdXTBTools`), reusable calculation results, descriptor reports and lightweight
-visualization. GFN0-xTB, GFN1-xTB and GFN2-xTB use the same extended `libxtb`
-runtime supplied by the project.
+visualization. GFN0-xTB, GFN1-xTB and GFN2-xTB are exposed through one
+consistent native calculation backend.
 
 [English](#english) · [中文](#中文)
 
@@ -34,8 +34,8 @@ runtime supplied by the project.
 
 ### Install
 
-The standard installer builds a matched RDKit environment, the extended xTB
-runtime and the optional C++ extension:
+The standard installer builds a matched RDKit environment, the xTB calculation
+backend and the optional C++ extension:
 
 ```bash
 git clone https://github.com/iawnix/EleD.git
@@ -173,7 +173,7 @@ field details.
 - [Visualization](docs/visualization.md) · [可视化](docs/zh-CN/visualization.md)
 - [Geometry preparation](docs/geometry-preparation.md) · [构象准备](docs/zh-CN/geometry-preparation.md)
 - [C++ interface](docs/rdxtb-tools.md)
-- [Extended xTB build](docs/xtb-patched-build.md)
+- [Native xTB backend build](docs/xtb-patched-build.md)
 - [Project positioning](docs/project-positioning.md) · [项目定位](docs/zh-CN/project-positioning.md)
 
 ### Development
@@ -197,7 +197,7 @@ patches retain their upstream licenses.
 计算、描述符分析和结果报告中。项目提供 Python 接口、可选的
 RDKit 风格 `rdXTBTools` C++ 扩展、可复用的计算结果、报告和轻量级可视化。
 
-GFN0-xTB、GFN1-xTB 和 GFN2-xTB 统一使用项目提供的扩展版 `libxtb`。
+GFN0-xTB、GFN1-xTB 和 GFN2-xTB 通过统一的原生计算后端执行。
 
 ### 功能
 
@@ -215,7 +215,7 @@ GFN0-xTB、GFN1-xTB 和 GFN2-xTB 统一使用项目提供的扩展版 `libxtb`�
 
 ### 安装
 
-标准安装会构建匹配的 RDKit 环境、扩展版 xTB runtime 和可选 C++ 扩展：
+标准安装会构建匹配的 RDKit 环境、xTB 计算后端和可选 C++ 扩展：
 
 ```bash
 git clone https://github.com/iawnix/EleD.git
@@ -225,7 +225,7 @@ conda activate "$PWD/.eled/runtime"
 python -m eled doctor --check compiled --method GFN2-xTB
 ```
 
-已有兼容的扩展版 `libxtb` 时，可以直接安装 Python 层：
+已有兼容的原生 xTB 后端时，可以直接安装 Python 层：
 
 ```bash
 python -m pip install .

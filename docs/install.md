@@ -1,8 +1,8 @@
 # Installing EleD 0.11
 
-The standard profile uses **one extended libxtb for GFN0/1/2 and all current
-descriptors**, with both ctypes and compiled `rdXTBTools`. It targets Linux
-x86-64 / Python 3.11. Installing upstream RDKit alone does not enable it.
+The standard profile provides one native xTB backend for GFN0/1/2 and the
+descriptor layers, together with the compiled `rdXTBTools` interface. It
+targets Linux x86-64 / Python 3.11.
 
 ## Standard installation
 
@@ -17,8 +17,8 @@ python examples/electronic_descriptors.py --populations
 
 The installer creates two dedicated prefixes from the supplied exact locks:
 
-- `.eled/runtime`: matched RDKit/Boost/Python SDK, the extended shared
-  libxtb and parameters, and the installed `rdXTBTools` wheel.
+- `.eled/runtime`: matched RDKit/Boost/Python SDK, the native xTB library and
+  parameters, and the installed `rdXTBTools` wheel.
 - `.eled/toolchain`: Fortran compiler, mctc-lib and numerical dependencies.
 
 It fetches the pinned xTB revision containing upstream PR #1490, applies

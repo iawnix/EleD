@@ -14,16 +14,16 @@ python -m eled doctor --check compiled --method GFN2-xTB --keep-overlap
 
 安装器会创建两个相互匹配的目录：
 
-- `.eled/runtime`：Python、RDKit、扩展版 `libxtb`、参数文件和
+- `.eled/runtime`：Python、RDKit、原生 xTB 库、参数文件和
   `rdXTBTools`；
 - `.eled/toolchain`：编译器和原生构建依赖。
 
 两个目录需要一起保留在原始路径。安装完成后，`doctor` 会检查 GFN0/1/2、
 overlap/basis 导出、描述符和固定几何反应性流程。
 
-## 已有扩展版 libxtb
+## 已有原生 xTB 后端
 
-如果环境中已经有项目要求的扩展版 `libxtb`，可以只安装 Python 适配层：
+如果环境中已经有项目要求的原生 xTB 后端，可以只安装 Python 适配层：
 
 ```bash
 python -m pip install .
