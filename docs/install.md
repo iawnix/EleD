@@ -1,8 +1,9 @@
 # Installing EleD 0.11
 
-The standard profile provides one native xTB backend for GFN0/1/2 and the
-descriptor layers, together with the compiled `rdXTBTools` interface. It
-targets Linux x86-64 / Python 3.11.
+The installer sets up RDKit, EleD, its project-built xTB calculation library
+(`libxtb`) and the `rdXTBTools` C++ extension. The xTB build includes EleD’s
+basis-export and SCC-diagnostics extensions for GFN0/1/2 descriptor analysis.
+The installation targets Linux x86-64 / Python 3.11.
 
 ## Standard installation
 
@@ -42,8 +43,8 @@ Keep **both** prefixes installed at their original paths: native libraries
 use their RPATHs. This is a reproducible local source installation, not a
 portable binary distribution by itself. The separate [offline bundle](runtime-bundle.md)
 provides relocation and installed-runtime checks. Windows/macOS and public
-package-index delivery are not implemented. A plain `pip install .` still installs only the Python
-adapter; it does not invoke a Fortran build. The conda recipe is packaging
+package-index delivery are not implemented. For Python source edits in the installed
+environment, see the [development guide](development.md). The conda recipe is packaging
 scaffolding only: an unmodified conda-forge xTB library does not satisfy the
 runtime contract and is rejected by the calculation API.
 

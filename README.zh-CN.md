@@ -26,7 +26,8 @@ GFN0-xTB、GFN1-xTB 和 GFN2-xTB 通过统一的原生计算后端执行。
 
 ## 安装
 
-标准安装会构建匹配的 RDKit 环境、xTB 计算后端和可选 C++ 扩展：
+在 Linux x86-64 上准备好 conda，然后执行以下命令。安装器会统一安装
+RDKit、EleD、项目构建的 xTB 计算库（`libxtb`）和 `rdXTBTools` C++ 扩展：
 
 ```bash
 git clone https://github.com/iawnix/EleD.git
@@ -34,13 +35,6 @@ cd EleD
 python tools/install_native.py --jobs 6
 conda activate "$PWD/.eled/runtime"
 python -m eled doctor --check compiled --method GFN2-xTB
-```
-
-已有兼容的原生 xTB 后端时，可以直接安装 Python 层：
-
-```bash
-python -m pip install .
-python -m eled doctor --check native --method GFN2-xTB
 ```
 
 详细步骤见[安装说明](docs/zh-CN/install.md)。
@@ -161,10 +155,6 @@ html_fragment = RenderFragmentAnalysis(mol, report)
 
 ## 开发
 
-```bash
-conda activate "$PWD/.eled/runtime"
-python -m pip install --no-deps --no-build-isolation -e .
-python -m pytest -q
-```
+在完整安装创建的环境中修改 EleD，具体步骤见[开发指南](docs/zh-CN/development.md)。
 
 EleD 采用 BSD 3-Clause 许可证；随项目提供的 xTB 源码和补丁遵循其上游许可证。

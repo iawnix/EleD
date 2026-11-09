@@ -32,8 +32,9 @@ consistent native calculation backend.
 
 ## Install
 
-The standard installer builds a matched RDKit environment, the xTB calculation
-backend and the optional C++ extension:
+On Linux x86-64, install conda and run the commands below. The installer sets up
+RDKit, EleD, its project-built xTB calculation library (`libxtb`) and the
+`rdXTBTools` C++ extension:
 
 ```bash
 git clone https://github.com/iawnix/EleD.git
@@ -41,14 +42,6 @@ cd EleD
 python tools/install_native.py --jobs 6
 conda activate "$PWD/.eled/runtime"
 python -m eled doctor --check compiled --method GFN2-xTB
-```
-
-For an existing EleD-compatible native xTB backend, install the Python layer
-directly:
-
-```bash
-python -m pip install .
-python -m eled doctor --check native --method GFN2-xTB
 ```
 
 See the [installation guide](docs/install.md) for runtime layouts, source
@@ -176,11 +169,8 @@ field details.
 
 ## Development
 
-```bash
-conda activate "$PWD/.eled/runtime"
-python -m pip install --no-deps --no-build-isolation -e .
-python -m pytest -q
-```
+See the [development guide](docs/development.md) for working on EleD in the
+environment created by the installer.
 
 EleD is released under the BSD 3-Clause license. The bundled xTB source and
 patches retain their upstream licenses.
