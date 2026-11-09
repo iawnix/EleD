@@ -1,5 +1,7 @@
 # EleD documentation / EleD 文档
 
+Project overview / 项目首页：[English](../README.md) · [中文](../README.zh-CN.md)
+
 EleD is an RDKit extension for electronic-structure descriptors backed by xTB.
 The documentation follows the same path as a typical analysis: install the
 runtime, prepare a molecule, calculate descriptors, build a report and inspect
