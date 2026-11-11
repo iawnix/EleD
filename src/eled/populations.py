@@ -31,8 +31,7 @@ def CalcOrbitalPopulations(result, *, orb_idx=None, scheme='lowdin',
             or not len(result.ao_atom_indices)):
         raise DescriptorUnavailableError(
             'orbital populations require same-calculation overlap and AO-to-atom mapping; '
-            'use XTBCalculator(...).calculate(..., keep_overlap=True) with the verified native basis extension. '
-            'Official libraries support basic descriptors without this extension.')
+            'use XTBCalculator(...).calculate(..., keep_overlap=True).')
     energies, occupations, _, _ = _orbitals(result)
     n = len(energies)
     coefficients = _finite(result.orbital_coefficients, 'orbital coefficients', 2)
@@ -105,17 +104,8 @@ def CalcFrontierDescriptors(mol, result, *, fragments=None,
     def frontier(indices, last):
         if not len(indices):
             return None
-        anchor = int(indices[-1] if last else indices[0])
-        # Anchor is the occupied group's high-energy edge or virtual low edge.
-        selected = [anchor]
-        candidates = indices[-2::-1] if last else indices[1:]
-        for index in candidates:
-            if (abs(energies[index] - energies[anchor]) > degeneracy_ev
-                    or abs(occupations[index] - occupations[anchor]) > occupation_tolerance
-                    or abs(int(index) - selected[-1]) != 1):
-                break
-            selected.append(int(index))
-        selected.sort()
+        selected = _frontier_group(energies, occupations, occupied, virtual,
+                                   last, degeneracy_ev, occupation_tolerance)
         weights = atom[:, selected].mean(axis=1)
         ipr = float(weights @ weights)
         positive = weights[weights > 0]
@@ -146,3 +136,15 @@ def CalcFrontierDescriptors(mol, result, *, fragments=None,
         'orthonormality_error': populations['orthonormality_error'],
         'interpretation': 'ground-state frontier subspace populations and atom-centroid proxies; not excitation or transition-density descriptors',
     }
+
+
+def _frontier_group(energies, occ, occupied, virtual, last, degeneracy_ev, occupation_tolerance):
+    indices = occupied if last else virtual
+    if not len(indices): return []
+    anchor = int(indices[-1] if last else indices[0]); selected = [anchor]
+    candidates = indices[-2::-1] if last else indices[1:]
+    for i in candidates:
+        if (abs(energies[i] - energies[anchor]) > degeneracy_ev or
+                abs(occ[i] - occ[anchor]) > occupation_tolerance or abs(int(i)-selected[-1]) != 1): break
+        selected.append(int(i))
+    return sorted(selected)

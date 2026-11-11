@@ -161,3 +161,67 @@ def test_real_engine_rigid_transform_and_disk_cache(smiles, tmp_path, monkeypatc
     def unexpected(*a, **k): raise AssertionError('cache should hit')
     monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
     assert RunConformerAnalysis(mol, cache=cache, frontier_depth=0) == report
+
+
+def test_local_statistics_keep_entity_frontier_coverage_and_units(synthetic,monkeypatch):
+    mol,_=synthetic
+    original=conformers.CalcDescriptorReport
+    def report(*args,**kwargs):
+        out=original(*args,**kwargs)
+        i=[3,8,12].index(int(out['record_id']))
+        out['frontier_bonds']={'bonds':[
+            {'bond_index':0,'frontier_group':'homo','orb_idx':[1],'mul_ovlp_e':float(i+1)},
+            {'bond_index':0,'frontier_group':'lumo','orb_idx':[2],'mul_ovlp_e':float(-i-1)}],
+            'units':{'mul_ovlp_e':'e'}}
+        out['pi']={'atoms':[{'atom_index':0,'pi_n_e':float(i+1),'pi_q_e':None,'normal':None}],
+                   'bonds':[{'bond_index':0,'pi_bo':(.2,.4,None)[i]}],
+                   'units':{'pi_n_e':'e','pi_q_e':'e','pi_bo':'dimensionless'}}
+        out['frontier']={'homo':{'orb_idx':[1] if i==0 else [0,1]},'lumo':{'orb_idx':[2]}}
+        return out
+    monkeypatch.setattr(conformers,'CalcDescriptorReport',report)
+    out=RunConformerAnalysis(mol,columns=['xtb_homo_ev'],boltzmann_weighted=True)
+    bonds=out['bond_statistics']['0']; atoms=out['atom_statistics']['0']
+    assert bonds['frontier_bonds.homo.mul_ovlp_e']['mean']==2.
+    assert bonds['frontier_bonds.lumo.mul_ovlp_e']['mean']==-2.
+    assert bonds['frontier_bonds.homo.mul_ovlp_e']['n_valid']==3
+    assert bonds['pi.pi_bo']['n_valid']==2 and bonds['pi.pi_bo']['n_missing']==1
+    assert bonds['pi.pi_bo']['mean']==pytest.approx(.3)
+    assert 'pi.pi_n_e' not in bonds and 'pi.pi_bo' not in atoms
+    assert atoms['pi.pi_q_e']['n_valid']==0 and atoms['pi.pi_q_e']['mean'] is None
+    assert atoms['pi.pi_n_e']['mean']==2.
+    assert out['frontier_group_composition_changed']
+    assert out['atom_units']['pi.pi_n_e']=='e'
+    assert out['bond_units']['frontier_bonds.lumo.mul_ovlp_e']=='e'
+    weights=np.asarray(out['boltzmann']['weights'])
+    assert out['boltzmann']['atom_statistics']['0']['pi.pi_n_e']['mean']==pytest.approx(weights@[1,2,3])
+    weighted=out['boltzmann']['bond_statistics']['0']['pi.pi_bo']
+    assert weighted['weight_sum']==pytest.approx(weights[:2].sum())
+    assert weighted['mean']==pytest.approx(weights[:2]@[.2,.4]/weights[:2].sum())
+    assert weighted['n_missing']==1
+    assert json.loads(json.dumps(out,allow_nan=False))==out
+
+
+def test_weighted_missing_failed_and_underflow_are_distinct():
+    # A finite feature remains observed even when its energy weight underflows.
+    out=conformers._summary([None,2.,None],[False,False,True],
+                           weights=np.array([1.,0.,0.]),energy_valid=np.array([True,True,False]))
+    assert out['n_valid']==1 and out['n_missing']==1 and out['n_failed']==1
+    assert out['weight_sum']==0 and out['mean'] is None
+    assert out['missing_reason']=='no_positive_weight_for_available_values'
+
+
+def test_sensitivity_requires_matched_per_feature_conformer_coverage(synthetic):
+    from copy import deepcopy
+    from eled import DescriptorSensitivity
+    mol,_=synthetic
+    a=RunConformerAnalysis(mol,columns=['xtb_homo_ev'])
+    b=deepcopy(a); b['calculation_provenance']['method']='GFN1-xTB'
+    baseline=DescriptorSensitivity(a,gfn1=b,gfn2=a)
+    assert baseline['values']['xtb_homo_ev']['gfn12_delta']==0.
+    assert baseline['atoms']['0']['atoms.q_e']['gfn12_delta']==0.
+    # Same number of valid points, different geometries: comparing means is invalid.
+    a['reports'][0]['atoms'][0]['q_e']=None
+    b['reports'][1]['atoms'][0]['q_e']=None
+    output=DescriptorSensitivity(a,gfn1=b,gfn2=a)['atoms']['0']['atoms.q_e']
+    assert output['gfn12_delta'] is None
+    assert output['missing_reasons']['gfn1_vs_gfn2']=='unmatched_conformer_coverage'

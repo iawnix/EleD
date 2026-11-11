@@ -25,6 +25,7 @@ EleD 是基于 xTB 的 RDKit 电子结构描述符扩展。文档按实际使用
 
 - [Development](development.md) · [开发指南](zh-CN/development.md)
 - [Descriptor catalog](descriptor-catalog.md) · [描述符目录](zh-CN/descriptor-catalog.md)
+- [Conformer statistics](conformer-sensitivity.md) · [构象统计](zh-CN/conformer-sensitivity.md)
 - [Density descriptors](density-descriptors.md) · [密度描述符](zh-CN/density-descriptors.md)
 - [C++ interface](rdxtb-tools.md)
 - [Native xTB backend](xtb-patched-build.md)

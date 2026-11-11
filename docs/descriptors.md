@@ -1,4 +1,4 @@
-# Electronic descriptors and density analysis (1.2)
+# Electronic descriptors and density analysis (1.3)
 
 For standardized reports, quality flags, CSV/JSONL export and vertical charge-state
 analysis, see [descriptor reports](descriptor-reports.md).
@@ -226,5 +226,5 @@ near-degenerate HOMO/LUMO projectors and signed Mulliken overlap populations.
 `CalcPiDescriptors` reports p-shell projection for aromatic/sp2 atoms and
 π-bond order where a local plane exists. Units, invariance and missing-value
 semantics are included in each section. See [density-descriptors](density-descriptors.md)
-for definitions and the EAS validation protocol. The scope and literature
+for formulas, units and applicability. The scope and literature
 positioning audit is in [literature-density-ml-audit](literature-density-ml-audit.md).

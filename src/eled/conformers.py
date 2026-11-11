@@ -20,6 +20,7 @@ from .input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
 from .options import XTBOptions
 from .reports import DESCRIPTOR_VERSION, _analysis_settings, _base_report, CalcDescriptorReport, DescriptorColumns
 from .calculator import XTBCalculator
+from .density_descriptors import _pi_options
 
 _KB_EH_PER_K = 3.166811563e-6
 
@@ -55,7 +56,7 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
     """
     if not isinstance(return_errors, bool): raise ValueError('return_errors must be Boolean')
     if not isinstance(boltzmann_weighted, bool): raise ValueError('boltzmann_weighted must be Boolean')
-    if not np.isfinite(boltzmann_temperature) or boltzmann_temperature <= 0:
+    if isinstance(boltzmann_temperature, bool) or not np.isfinite(boltzmann_temperature) or boltzmann_temperature <= 0:
         raise ValueError('boltzmann_temperature must be finite and positive')
     if record_id is not None and not isinstance(record_id, str):
         raise ValueError('record_id must be a string or None')
@@ -63,6 +64,8 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
     if config.conf_id != -1: raise ValueError('use conf_ids, not options.conf_id')
     settings = _analysis_settings(**analysis)
     snapshot = Chem.Mol(mol)
+    _pi_options(settings['pi_scheme'], settings['pi_plane_tol_a'],
+                settings['pi_ref'], natoms=snapshot.GetNumAtoms())
     ids = list(conf_ids) if conf_ids is not None else [c.GetId() for c in snapshot.GetConformers()]
     if not ids or any(isinstance(i, bool) or not isinstance(i, Integral) or i < 0 for i in ids):
         raise ValueError('conf_ids must contain nonnegative actual conformer IDs')
@@ -123,46 +126,15 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
             'n_missing': len(ids)-sum(failed)-len(numbers),
             **{key: float(func(numbers)) if len(numbers) else None for key, func in (
                 ('mean', np.mean), ('std', np.std), ('min', np.min), ('max', np.max), ('range', np.ptp))}}
-    # Variable-size sections are summarized by fixed atom/bond indices.  This
-    # is well-defined because RDKit atom and bond indices are preserved across
-    # conformers. Frontier group composition is tracked separately because a
-    # near-degenerate group can change between geometries.
-    def nested_statistics(sections, key_fields):
-        records = {}
-        for report, bad in zip(reports, failed):
-            if bad: continue
-            rows = []
-            for section in sections:
-                value = report.get(section)
-                if isinstance(value, list): rows.extend((section, row) for row in value)
-                elif isinstance(value, dict) and isinstance(value.get('atoms'), list):
-                    rows.extend((section, row) for row in value['atoms'])
-                elif isinstance(value, dict) and isinstance(value.get('bonds'), list):
-                    rows.extend((section, row) for row in value['bonds'])
-            for section, row in rows:
-                identity = row.get('atom_index', row.get('bond_index'))
-                if identity is None: continue
-                for key, value in row.items():
-                    if key in key_fields or not isinstance(value, (int, float)) or isinstance(value, bool): continue
-                    if not np.isfinite(value): continue
-                    records.setdefault((int(identity), f'{section}.{key}'), []).append(float(value))
-        output = {}
-        for (identity, key), values in sorted(records.items()):
-            values = np.asarray(values, dtype=float)
-            output.setdefault(str(identity), {})[key] = {
-                'n_total': len(ids), 'n_valid': int(len(values)), 'n_failed': sum(failed),
-                'n_missing': len(ids) - sum(failed) - len(values),
-                'mean': float(values.mean()), 'std': float(values.std()),
-                'min': float(values.min()), 'max': float(values.max())}
-        return output
-    atom_statistics = nested_statistics(('atoms', 'shell_populations', 'pi'), {'atom_index'})
-    bond_statistics = nested_statistics(('bonds', 'mayer_bonds', 'frontier_bonds', 'pi'),
-                                        {'bond_index', 'begin_atom_index', 'end_atom_index'})
-    frontier_compositions = []
-    for report, bad in zip(reports, failed):
-        if bad or not report.get('frontier_bonds'): continue
-        frontier_compositions.append({row['frontier_group']: tuple(row['orb_idx'])
-                                      for row in report['frontier_bonds'].get('bonds', [])})
+    # Preserve one slot per conformer and identify frontier subspaces explicitly.
+    atom_series = _local_series(reports, failed, 'atoms')
+    bond_series = _local_series(reports, failed, 'bonds')
+    atom_statistics = _local_statistics(atom_series, failed)
+    bond_statistics = _local_statistics(bond_series, failed)
+    frontier_compositions = [
+        {label: (tuple(report['frontier'][label]['orb_idx']) if report['frontier'][label] else None)
+         for label in ('homo', 'lumo')}
+        for report, bad in zip(reports, failed) if not bad and report.get('frontier')]
     composition_changed = bool(frontier_compositions and
                                any(c != frontier_compositions[0] for c in frontier_compositions[1:]))
     weighted_statistics = None
@@ -179,19 +151,10 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
             boltzmann_weights = weights.tolist()
         weighted_statistics = {}
         for name in chosen:
-            vals = np.asarray([r['values'][name] if not bad else np.nan for r, bad in zip(reports, failed)], dtype=float)
-            good = np.isfinite(vals) & (weights > 0)
-            if not good.any():
-                weighted_statistics[name] = {'mean': None, 'std': None, 'n_total': len(ids),
-                                             'n_valid': 0, 'n_missing': len(ids),
-                                             'weighting': 'electronic_energy_not_free_energy'}
-                continue
-            w = weights[good] / weights[good].sum(); x = vals[good]; mean = float(np.sum(w*x))
-            weighted_statistics[name] = {
-                'mean': mean, 'std': float(np.sqrt(np.sum(w*(x-mean)**2))),
-                'n_total': len(ids), 'n_valid': int(good.sum()),
-                'n_missing': int(len(ids) - good.sum()),
-                'weighting': 'electronic_energy_not_free_energy'}
+            vals = [r['values'][name] if not bad else None for r, bad in zip(reports, failed)]
+            weighted_statistics[name] = _summary(vals, failed, weights=weights, energy_valid=valid)
+        weighted_atoms = _local_statistics(atom_series, failed, weights=weights, energy_valid=valid)
+        weighted_bonds = _local_statistics(bond_series, failed, weights=weights, energy_valid=valid)
     complete = all(v['n_valid'] == len(ids) for v in statistics.values())
     report = {'schema_version': 2, 'descriptor_version': DESCRIPTOR_VERSION,
         'report_type': 'conformer_sensitivity', 'record_id': record_id,
@@ -202,6 +165,8 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
         'analysis_settings': settings, 'requested_options': config.to_dict(),
         'calculation_provenance': signature, 'reports': reports,
         'atom_statistics': atom_statistics, 'bond_statistics': bond_statistics,
+        'atom_units': _local_units(reports, atom_series),
+        'bond_units': _local_units(reports, bond_series),
         'frontier_group_composition_changed': composition_changed,
         'sensitivity': {
             'conformer_dispersion': {k: v['std'] for k, v in statistics.items()},
@@ -211,8 +176,75 @@ def RunConformerAnalysis(mol, *, conf_ids=None, options=None, cache=None,
         'boltzmann': ({'enabled': True, 'temperature_K': float(boltzmann_temperature),
                        'energy_definition': 'xTB electronic energy; not a free energy',
                        'weights': boltzmann_weights,
-                       'statistics': weighted_statistics} if boltzmann_weighted else
+                       'statistics': weighted_statistics,
+                       'atom_statistics': weighted_atoms, 'bond_statistics': weighted_bonds} if boltzmann_weighted else
                       {'enabled': False, 'statistics': None}),
         'excluded_columns': [k for k in all_units if k not in chosen]}
     json.dumps(report, allow_nan=False)
     return report
+
+
+def _local_series(reports, failed, entity):
+    sections = ('atoms', 'shell_populations', 'pi') if entity == 'atoms' else ('bonds', 'mayer_bonds', 'frontier_bonds', 'pi')
+    index_key = 'atom_index' if entity == 'atoms' else 'bond_index'
+    excluded = {'atom_index', 'bond_index', 'begin_atom_index', 'end_atom_index'}
+    series = {}
+    for i, (report, bad) in enumerate(zip(reports, failed)):
+        if bad: continue
+        for section in sections:
+            value = report.get(section)
+            rows = value if isinstance(value, list) else value.get(entity, []) if isinstance(value, dict) else []
+            for row in rows:
+                identity = row[index_key]
+                prefix = section + ('.' + row['frontier_group'] if section == 'frontier_bonds' else '')
+                for field, value in row.items():
+                    if field in excluded or (value is not None and (isinstance(value, bool) or not isinstance(value, (int, float)))):
+                        continue
+                    # Metadata fields with null values are not descriptors.
+                    if field in {'normal', 'mayer_missing_reason'}: continue
+                    key = (str(identity), prefix + '.' + field)
+                    series.setdefault(key, [None] * len(reports))[i] = value
+    return series
+
+
+def _local_units(reports, series):
+    units = {'atoms.q_e': 'e', 'atoms.wbo_sum': 'dimensionless', 'bonds.wbo': 'dimensionless'}
+    for report in reports:
+        for section in ('shell_populations', 'mayer_bonds', 'frontier_bonds', 'pi'):
+            data = report.get(section) or {}
+            for field, unit in data.get('units', {}).items():
+                labels = ('frontier_bonds.homo', 'frontier_bonds.lumo') if section == 'frontier_bonds' else (section,)
+                for label in labels:
+                    units[label + '.' + field] = unit
+    return {field: units[field] for field in sorted({key[1] for key in series})}
+
+
+def _summary(values, failed, *, weights=None, energy_valid=None):
+    x = np.asarray(values, dtype=float)
+    present = ~np.asarray(failed) & ~np.isnan(x)
+    if np.any(present & ~np.isfinite(x)):
+        raise ValueError('nonfinite descriptor values')
+    if energy_valid is not None: present &= energy_valid
+    count = int(present.sum())
+    out = {'n_total': len(x), 'n_valid': count, 'n_failed': sum(failed),
+           'n_missing': len(x) - sum(failed) - count}
+    if weights is None:
+        out.update({name: float(func(x[present])) if count else None
+                    for name, func in [('mean', np.mean), ('std', np.std), ('min', np.min), ('max', np.max)]})
+    else:
+        mass = float(weights[present].sum())
+        out.update(weight_sum=mass, weighting='electronic_energy_not_free_energy', mean=None, std=None)
+        if mass > 0:
+            w = weights[present] / mass
+            mean = float(w @ x[present])
+            out.update(mean=mean, std=float(np.sqrt(w @ (x[present] - mean)**2)))
+        else:
+            out['missing_reason'] = 'no_positive_weight_for_available_values'
+    return out
+
+
+def _local_statistics(series, failed, **kwargs):
+    output = {}
+    for (identity, field), values in sorted(series.items()):
+        output.setdefault(identity, {})[field] = _summary(values, failed, **kwargs)
+    return output

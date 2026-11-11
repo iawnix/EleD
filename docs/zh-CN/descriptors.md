@@ -75,7 +75,7 @@ pi = CalcPiDescriptors(mol, result)
 ```
 
 这些接口提供简并轨道组布居、participation ratio、熵、Mayer 键级、带符号
-的 HOMO/LUMO 键重叠、π 电子数和 π 键级。Mayer 需要闭壳层自旋密度；局部
+的 HOMO/LUMO 键重叠、π 电子数和 π 键级。Mayer 使用闭壳层的自旋求和密度；开壳层需要当前未提供的自旋密度。局部
 π 特征需要定义明确的局部平面法向。条件不满足时返回 `None` 和原因。
 
 ## 反应性描述符
@@ -87,16 +87,21 @@ report = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
 ```
 
 固定几何计算 Q、Q+1、Q−1，得到 `ip_v_ev`、`ea_v_ev`、
-`eta_ev`、`s_1ev`、`omega_ev`，以及原子级
-`f_plus`、`f_minus`、`f_radical`、`dual` 和局部软度。该流程支持 GFN1/2，
+`mu_ev`、`chi_ev`、`eta_ev`、`s_1ev`、`omega_ev`，以及原子级
+`f_plus`、`f_minus`、`f_radical`、`dual`，以及 `s_loc_1ev`、
+`omega_loc_ev` 和 `n_loc_1ev`。该流程支持 GFN1/2，
 不自动搜索自旋态，也不进行电荷态几何优化。
 
 ## 缺失值和不变性
 
 `None` 表示不可用或定义域不满足，不能当成零。报告中的 `missing` 字段会
 记录原因，例如 `basis_not_retained` 或
-`spin_density_unavailable_for_open_shell`。标量描述符在刚体平移/旋转下
-保持不变；密度描述符在同时变换 `C`、`S` 和 AO 映射时保持 AO 排列和轨道
+`spin_density_unavailable_for_open_shell`。标量密度描述符在刚体平移/旋转下保持不变；带电分子的偶极模长依赖坐标原点。
+密度描述符在同时变换 `C`、`S`、AO 映射和 p 分量方向时保持 AO 排列和轨道
 相位不变。
 
 完整字段、单位、成熟度和缺失语义见 [descriptor-catalog.md](../descriptor-catalog.md)。
+
+π 布居、π 参考电荷和投影键指标的公式及适用范围见
+[密度描述符](density-descriptors.md)。构象汇总和敏感性比较见
+[构象统计](conformer-sensitivity.md)。

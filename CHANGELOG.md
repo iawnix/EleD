@@ -2,7 +2,23 @@
 
 ## Unreleased — project identity is `EleD`
 
-- Descriptor schema 1.2 uses compact unit-aware feature names such as
+- Propagated π scheme, plane tolerance and explicit reference populations through
+  density/report/batch/conformer APIs, with JSON-stable settings and validation
+  before engine calls. Fixed benchmark bond extraction to read nested sections
+  and keep HOMO/LUMO columns separate while excluding failed conformers.
+- Corrected π projections for nonorthogonal bases and stored p-component
+  directions with AO rows. π charge uses a π reference population; projected
+  bond indices use density products. Undefined planes and inapplicable atoms
+  or bonds retain null fields with specific reasons.
+- Separated HOMO/LUMO bond statistics and atom/bond π statistics. Added weighted
+  local summaries, retained-weight coverage and per-field units. Sensitivity
+  comparisons validate provenance and matching valid-conformer subsets.
+- Unified frontier grouping, validated standalone bond provenance and basis
+  maps, and removed the ambiguous reconstructed-charge alias.
+- Corrected patched-header hashes in the pinned xTB source manifest and rebuilt
+  the runtime. Added analytical invariance and GFN0/1/2 interface-parity tests.
+
+- Descriptor definitions 1.3 (report schema 2) use compact unit-aware feature names such as
   `xtb_energy_ha`, `q_e`, `wbo`, `eta_ev` and `s_1ev`; frontier and shell
   fields follow the same short naming rules.
 - YAeHMOP scalar fields now use the same compact convention (`eht_energy_ev`,

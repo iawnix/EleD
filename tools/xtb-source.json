@@ -8,7 +8,7 @@
     "patch": "diagnostics/xtb_basis_export.patch",
     "patch_sha256": "3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c",
     "patched_files": {
-      "include/xtb.h": "2f7174839f177226223a8b80b38a25ac4af4dbc5bdfab71d3e1c32db317d8eba",
+      "include/xtb.h": "6bd4d659bded3905f3949cdc60cce67a326f0c4af34a9dd81bbe8dc5fcccd3e7",
       "src/api/interface.f90": "79c7ffd35cd2e315eb63f32dcedc851604948f96691c3558d3c995d181beebab",
       "src/api/results.f90": "76a976414a80d2fe673c318834a5e2f1372329a9099e397da42a77312b2a112b",
       "src/peeq_module.f90": "907fdff1a9b37764263cef86496415c345e781b3b7e56935fb1a55602d571157",
@@ -33,7 +33,7 @@
       "src/scf_module.F90": "0167116c278468f3cf8766badf6d04051a04330cffde4978fd4a542824d62110",
       "src/api/results.f90": "bb3093e329ff45a3db1afdc8f0c5f437bbc9925e913cfa441746ddeaf7e6c754",
       "src/api/interface.f90": "bee056aa0f7159b648104ce8f1d6243a3ca6311bee1d05b9e7444074ee603849",
-      "include/xtb.h": "95711834b225f650c24eaf87d746f8f907a018d9a444b529e0bd6f3bfe023708"
+      "include/xtb.h": "a74fba091eeb37739b79b85329753ad366620bca87c4609d59521ce4a4a0cc7e"
     }
   }
 }

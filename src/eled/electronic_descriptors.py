@@ -34,6 +34,10 @@ def _as_result(result):
                      ao_shell_indices=tuple(map(int, result.GetAOShellMap())),
                      shell_atom_indices=tuple(map(int, result.GetShellAtomMap())),
                      shell_angular_momenta=tuple(map(int, result.GetShellAngularMomenta())))
+    if basis:
+        from .basis import NativePDirections
+        basis["ao_p_directions"] = NativePDirections(
+            basis["ao_shell_indices"], basis["shell_angular_momenta"])
     metadata = json.loads(result.inputProvenanceJSON) if result.inputProvenanceJSON else {'atom_count': result.numAtoms}
     metadata = dict(metadata)
     from .scf import scf_record

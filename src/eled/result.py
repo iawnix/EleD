@@ -58,6 +58,8 @@ class XTBResult:
     ao_shell_indices: tuple[int, ...] = ()
     shell_atom_indices: tuple[int, ...] = ()
     shell_angular_momenta: tuple[int, ...] = ()
+    # Cartesian unit directions attached to AO rows; zero for non-p AOs.
+    ao_p_directions: tuple[tuple[float, ...], ...] = ()
 
     @property
     def homo_ev(self) -> float | None:

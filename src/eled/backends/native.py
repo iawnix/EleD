@@ -134,7 +134,9 @@ class _NativeXTB:
         self.get_overlap(environment, results, nao * nao, overlap)
         self.get_basis_map(environment, results, nao, nshell, aa, ash, sa, sl)
         self.check(environment, 'basis extraction')
-        return dict(overlap_matrix=tuple(tuple(overlap[j * nao + i] for j in range(nao)) for i in range(nao)),
+        from ..basis import NativePDirections
+        return dict(ao_p_directions=NativePDirections(tuple(ash), tuple(sl)),
+                    overlap_matrix=tuple(tuple(overlap[j * nao + i] for j in range(nao)) for i in range(nao)),
                     ao_atom_indices=tuple(aa), ao_shell_indices=tuple(ash),
                     shell_atom_indices=tuple(sa), shell_angular_momenta=tuple(sl))
 

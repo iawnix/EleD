@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (1.2)
+# Descriptor reports and vertical reactivity (1.3)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
@@ -42,7 +42,34 @@ degeneracy-aware frontier distributions. `RunDescriptorBatch` retains overlap by
 is used for basic and overlap-aware features; set `keep_overlap=False` only
 when the additional basis snapshot is not needed.
 
-The report schema version is **2** and descriptor-definition version is **1.2**;
+π analysis uses the same settings in `CalcDescriptorReport`, `RunDescriptorBatch`
+and `RunConformerAnalysis`:
+
+| Argument | Default | Meaning |
+| --- | --- | --- |
+| `pi_scheme` | `"lowdin"` | `"lowdin"` or `"mulliken"` population/projection definition |
+| `pi_plane_tol_a` | `0.1` | Maximum distance from the local plane, Å; finite and nonnegative |
+| `pi_ref` | `None` | Original atom index → reference π electrons, between 0 and 2 e |
+
+```python
+pi_settings = dict(pi_scheme="mulliken", pi_plane_tol_a=0.05, pi_ref={0: 1.0})
+report = CalcDescriptorReport(mol, result, **pi_settings)
+reports = RunDescriptorBatch([mol], **pi_settings)
+```
+
+All settings are retained in `analysis_settings`, including failed batch rows.
+`pi_ref` overrides only the listed atoms; unlisted atoms follow the
+[default reference rules](density-descriptors.md#local-π-projections).
+The reference map is copied and stored with decimal string keys so exported
+JSON settings can be reused with `CalcDescriptorReport(..., **settings)`.
+Integer keys and their canonical decimal string forms are accepted on input.
+Batch rows share the same index map; extract separately for molecule-specific
+reference definitions. Invalid settings and out-of-range indices on any valid
+input molecule are rejected before batch/conformer engine calls.
+Changing these analysis settings does not change the underlying xTB cache key.
+Sensitivity comparisons require the same π settings.
+
+The report schema version is **2** and descriptor-definition version is **1.3**;
 neither is the package version. `DescriptorColumns(frontier_depth=2)` returns
 the ordered scalar schema and units. Each report includes:
 
@@ -130,7 +157,7 @@ triplet workflow, including failures. Returned results contain owned arrays.
 0.6 initialization. To reproduce the complete 0.6 default protocol, also set
 `electronic_temperature=0.` explicitly. Reports record `protocol_version="2.0"`
 and requested initialization in `analysis_settings`; successful state provenance
-records the actual initialization. Descriptor version 1.2 and schema 2 identify
+records the actual initialization. Descriptor version 1.3 and schema 2 identify
 the added nested density sections; existing scalar columns remain unchanged.
 
 Reference reuse can improve convergence, but neither initialization guarantees

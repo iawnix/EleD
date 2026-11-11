@@ -30,7 +30,13 @@ _SHELL_FIELDS = (
 )
 _REACTIVITY_FIELDS = ('f_plus', 'f_minus', 'f_radical', 'dual',
                       's_loc_1ev', 'omega_loc_ev', 'n_loc_1ev')
-_BOND_FIELDS = ('wbo', 'mbo', 'mul_ovlp_e', 'pi_bo')
+_BOND_FIELDS = {
+    'wbo': ('bonds', 'wbo', None),
+    'mbo': ('mayer_bonds', 'mbo', None),
+    'homo_mul_ovlp_e': ('frontier_bonds', 'mul_ovlp_e', 'homo'),
+    'lumo_mul_ovlp_e': ('frontier_bonds', 'mul_ovlp_e', 'lumo'),
+    'pi_bo': ('pi', 'pi_bo', None),
+}
 
 
 def _canonical_sha256(payload: Mapping) -> str:
@@ -102,7 +108,11 @@ def _number(value):
 def _atom_stat(analysis, atom_index, section, field, statistic='mean'):
     values = analysis.get('atom_statistics') or {}
     row = values.get(str(atom_index), {})
-    return _number(row.get(f'{section}.{field}.{statistic}'))
+    stats = row.get(f'{section}.{field}') or {}
+    if statistic == 'range':
+        low, high = _number(stats.get('min')), _number(stats.get('max'))
+        return high - low if low is not None and high is not None else None
+    return _number(stats.get(statistic))
 
 
 def _reactivity_stat(record, atom_index, field):
@@ -116,12 +126,20 @@ def _reactivity_stat(record, atom_index, field):
 
 
 def _bond_stat(record, atom_index, field):
+    """Mean over available incident bond/conformer pairs, preserving frontier groups."""
     values = []
+    section, source_field, frontier = _BOND_FIELDS[field]
     analysis = (record.get('analyses') or {}).get('gfn2_300K') or {}
     for report in analysis.get('reports') or []:
-        for row in report.get('bonds') or []:
+        if report.get('error') is not None or (report.get('quality') or {}).get('status') == 'error':
+            continue
+        data = report.get(section)
+        rows = data if isinstance(data, list) else (data or {}).get('bonds', [])
+        for row in rows:
+            if frontier is not None and row.get('frontier_group') != frontier:
+                continue
             if atom_index in (row.get('begin_atom_index'), row.get('end_atom_index')):
-                value = _number(row.get(field))
+                value = _number(row.get(source_field))
                 if value is not None:
                     values.append(float(value))
     return sum(values) / len(values) if values else None

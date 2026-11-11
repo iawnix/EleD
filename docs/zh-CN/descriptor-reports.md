@@ -20,6 +20,31 @@ report = CalcDescriptorReport(mol, result, record_id="molecule-1")
 没有保留 overlap 时，密度相关区段为 `None` 并记录
 `basis_not_retained`。报告不会用零填补缺失值。
 
+## π 分析参数
+
+`CalcDescriptorReport`、`RunDescriptorBatch` 和 `RunConformerAnalysis` 共用：
+
+| 参数 | 默认值 | 含义 |
+| --- | --- | --- |
+| `pi_scheme` | `"lowdin"` | `"lowdin"` 或 `"mulliken"` 布居/投影定义 |
+| `pi_plane_tol_a` | `0.1` | 局部平面最大距离容差，Å；有限且非负 |
+| `pi_ref` | `None` | RDKit 原始原子编号 → 参考 π 电子数，范围 0 至 2 e |
+
+```python
+pi_settings = dict(pi_scheme="mulliken", pi_plane_tol_a=0.05, pi_ref={0: 1.0})
+report = CalcDescriptorReport(mol, result, **pi_settings)
+reports = RunDescriptorBatch([mol], **pi_settings)
+```
+
+这些参数写入 `analysis_settings`，失败的批处理行也保留设置。`pi_ref` 只覆盖
+列出的原子，其他原子遵循[默认参考规则](density-descriptors.md#局部-π-投影)。
+输入支持整数索引和标准十进制字符串索引，报告复制映射并统一保存为字符串键，
+从 JSON 读回后可通过 `CalcDescriptorReport(..., **settings)` 重用。
+
+同一批次共享参考索引映射；不同分子需要不同参考定义时，分别提取报告。
+无效参数和任一有效输入分子的越界索引会在批处理/构象计算前被拒绝。
+这些是分析参数，不改变底层 xTB 计算缓存键；敏感性比较要求 π 参数一致。
+
 ## 批量计算和导出
 
 ```python
@@ -61,7 +86,7 @@ report = RunReactivity(
 
 ## 报告版本
 
-当前单点报告使用 schema 2、descriptor version 1.2。报告字段带有显式单位，
+当前单点报告使用 schema 2、descriptor version 1.3。报告字段带有显式单位，
 原子编号固定遵循输入分子。修改公开字段时需要同步更新目录、测试和版本说明。
 
 英文详细说明见 [descriptor-reports.md](../descriptor-reports.md)。

@@ -1,8 +1,8 @@
-# Conformer sensitivity (1.2)
+# Conformer sensitivity (1.3)
 
 `RunConformerAnalysis` evaluates **explicitly supplied conformers of one RDKit
 molecule** using native libxtb. It does not generate or optimize geometries.
-Use [`OptimizeXTB`](../README.md#xtb-geometry-optimization) before this
+Use [`OptimizeXTB`](geometry-preparation.md) before this
 analysis when relaxed structures are required. The default requests the
 extended library's overlap/basis data, as do descriptor reports.
 
@@ -72,8 +72,9 @@ those depend on the coordinate origin. No alignment is needed for these scalar
 aggregates; rotation/translation invariance is tested on neutral and charged
 molecules. `columns=[...]` may select a nonempty subset of this schema.
 
-Atom/fragment/bond and individual orbital sections remain per-conformer data;
-this API does not average them or equate a specific MO index across geometries.
+Atom and bond scalar fields also receive indexed statistics (see below).
+Fragment and individual orbital sections remain per-conformer data; this API
+does not equate a specific MO index across geometries.
 Near-degenerate frontier groups follow existing report tolerances, and can
 change composition with conformation; inspect counts and quality flags.
 
@@ -105,3 +106,43 @@ The GFN2 HOMO–LUMO gap spans about 0.250 eV for ethylene glycol, 0.333 eV for
 butane and 0.151 eV for phenethylamine. Ethanol and benzene each retain only one
 geometry; their zero spread is uninformative about unsampled conformations.
 These orbital gaps are not vertical optical excitation energies.
+
+π extraction accepts `pi_scheme`, `pi_plane_tol_a` and `pi_ref` as described
+in [report settings](descriptor-reports.md). The settings apply to every supplied
+conformer and are retained in both the ensemble and individual reports.
+Equal-weight and electronic-energy-weighted π statistics use that definition.
+
+## Atom and bond statistics
+
+`atom_statistics[atom_index][field]` and `bond_statistics[bond_index][field]`
+report `mean`, `std`, `min`, `max` and coverage in original RDKit order. JSON
+index keys are strings. `atom_units` and `bond_units` map field names to units.
+Each conformer contributes at most one value per indexed field:
+
+```python
+charge = report["atom_statistics"]["0"]["atoms.q_e"]
+homo = report["bond_statistics"]["0"]["frontier_bonds.homo.mul_ovlp_e"]
+lumo = report["bond_statistics"]["0"]["frontier_bonds.lumo.mul_ovlp_e"]
+pi_bond = report["bond_statistics"]["0"]["pi.pi_bo"]
+```
+
+Unavailable values retain their slots: `n_total = n_valid + n_missing + n_failed`.
+An entirely missing field has null statistics, and one valid observation has
+zero population standard deviation (`ddof=0`). Atom π populations never enter
+bond statistics; HOMO and LUMO overlap populations have separate fields.
+`frontier_group_composition_changed` records changes in the selected orbital
+indices. It does not assert that orbitals with the same indices have been tracked
+between conformers; the per-conformer reports retain each group's definition.
+
+With Boltzmann weighting, `boltzmann.atom_statistics` and
+`boltzmann.bond_statistics` contain weighted means and standard deviations.
+`weight_sum` records the available probability mass before renormalization for
+each field. A finite observation with an underflowed zero weight still counts
+as valid; if all available values have zero mass, the weighted result is null
+with `no_positive_weight_for_available_values`. Weighted and equal-weight local
+statistics use the same unit maps.
+
+`DescriptorSensitivity` compares molecular and local statistics across matched
+method/temperature reports. It checks identical ordered geometries and protocol,
+then requires matching valid-conformer subsets for each compared field.
+See [density descriptors](density-descriptors.md#sensitivity-diagnostics).

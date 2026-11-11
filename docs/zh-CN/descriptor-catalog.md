@@ -1,7 +1,8 @@
 # 描述符目录
 
 项目的机器可读目录由 `eled.DescriptorCatalog()` 提供，成熟度由
-`eled.DescriptorStatus()` 提供。字段统一使用小写 `snake_case`。
+`eled.DescriptorStatus()` 提供。公开描述符函数采用 RDKit 风格的
+`Calc...` / `Run...` 命名；字段和 Python 分析参数使用小写 `snake_case`。
 
 ## 推荐特征
 
@@ -37,9 +38,9 @@ Mayer 键级、带符号的前线键重叠、π 布居、π 键级和局部亲�
 - 原子和键索引：RDKit 原始编号。
 
 `None` 表示不可用或定义域不满足，不能当成零。报告的 `missing` 区段保存
-原因，例如 `basis_not_retained`、`local_plane_normal_undefined` 或
+原因，例如 `basis_not_retained`、`local_plane_nonplanar` 或
 `spin_density_unavailable_for_open_shell`。
 
-密度描述符在同时变换 AO 映射、`C` 和 `S` 时对 AO 排列和轨道相位不变；
+密度描述符在同时变换 AO 映射、p 分量方向、`C` 和 `S` 时对 AO 排列和轨道相位不变；
 标量能量和布居在刚体平移/旋转下不变。完整英文目录见
 [descriptor-catalog.md](../descriptor-catalog.md)。

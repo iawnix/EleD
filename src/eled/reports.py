@@ -10,17 +10,19 @@ from pathlib import Path
 import tempfile
 
 import numpy as np
+from rdkit import Chem
 
 from .electronic_descriptors import (
     _as_result, _orbitals, _nonnegative, CalcXTBDescriptors,
     CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
 )
 from .result import XTBResult
+from .errors import DescriptorUnavailableError
 from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
 from .density_descriptors import (CalcDensityMatrix, CalcShellPopulations,
-    CalcMayerBondDescriptors, CalcFrontierBondDescriptors, CalcPiDescriptors)
+    CalcMayerBondDescriptors, CalcFrontierBondDescriptors, CalcPiDescriptors, _pi_options)
 
-DESCRIPTOR_VERSION = '1.2'
+DESCRIPTOR_VERSION = '1.3'
 SCHEMA_VERSION = 2
 
 
@@ -108,46 +110,124 @@ def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tol
             'calculation_status': result.metadata.get('calculation_status', 'unknown')}
 
 
+def _sensitivity_signature(report):
+    if report.get('report_type') == 'single_point':
+        inputs = [report.get('provenance', {})]
+        provenance = inputs[0]
+        method = report.get('values', {}).get('xtb_method')
+        failed = [report.get('error') is not None or report.get('quality', {}).get('status') == 'error']
+    elif report.get('report_type') == 'conformer_sensitivity':
+        inputs = report['inputs']; provenance = report.get('calculation_provenance') or {}
+        method = provenance.get('method')
+        failed = [r.get('error') is not None or r.get('quality', {}).get('status') == 'error' for r in report['reports']]
+    else:
+        raise ValueError('sensitivity requires single-point or conformer reports with provenance')
+    fields = ('ordered_structure_sha256', 'geometry_sha256', 'charge', 'uhf')
+    if not inputs or any(any(row.get(k) is None for k in fields) for row in inputs):
+        raise ValueError('sensitivity requires indexed molecular geometry, charge and spin provenance')
+    settings = provenance.get('CalculationSettings')
+    engine = provenance.get('engine', {}).get('sha256')
+    if not engine or not settings or not method:
+        raise ValueError('sensitivity requires method, engine identity and calculation settings')
+    common = (report.get('descriptor_version'), report.get('schema_version'), report['report_type'],
+              report.get('analysis_settings'), report.get('units'),
+              [tuple(row[k] for k in fields) for row in inputs], engine,
+              provenance.get('initialization'), failed)
+    return common, method, settings, provenance.get('parameter_file')
+
+
 def DescriptorSensitivity(reference, *, gfn1=None, gfn2=None,
                            temperature_300=None, temperature_1000=None):
-    """Compare already-produced reports without invoking an engine.
+    """Compare matched reports; no engine calls or unpaired geometry comparisons.
 
-    The returned per-column diagnostics deliberately keep the three effects
-    separate: conformer dispersion, GFN1/GFN2 absolute difference, and the
-    300 K/1000 K absolute difference.  ``None`` means the comparison report
-    was not supplied or the value is missing; it is never treated as zero.
+    Reports must share indexed geometries, charge/spin, engine, analysis settings
+    and successful-conformer coverage. GFN1/2 may differ in method/parameters;
+    300/1000 K reports may differ only in electronic temperature. Atom and bond
+    diagnostics are keyed by original indices, including the frontier label.
     """
-    if not isinstance(reference, dict):
-        raise TypeError('reference must be a descriptor report or conformer report')
-    if 'statistics' in reference:
-        base = {k: v.get('std') for k, v in reference['statistics'].items()}
-    else:
-        base = {k: None for k in reference.get('values', {})}
-    def values(report):
+    ref_signature = _sensitivity_signature(reference)
+    signatures = {}
+    for label, report in [('gfn1', gfn1), ('gfn2', gfn2), ('t300', temperature_300), ('t1000', temperature_1000)]:
+        if report is None: continue
+        signature = _sensitivity_signature(report)
+        if signature[0] != ref_signature[0]:
+            raise ValueError('sensitivity reports must share molecule, geometry, protocol and coverage')
+        signatures[label] = signature
+    for label, method in [('gfn1', 'GFN1-xTB'), ('gfn2', 'GFN2-xTB')]:
+        if label in signatures and (signatures[label][1] != method or signatures[label][2] != ref_signature[2]):
+            raise ValueError('GFN1/2 comparison requires the named methods and identical calculation settings')
+    for label, temp in [('t300', 300.), ('t1000', 1000.)]:
+        if label not in signatures: continue
+        _, method, settings, parameters = signatures[label]
+        ref_settings = ref_signature[2]
+        temperature_keys = {'electronic_temperature', 'effective_electronic_temperature'}
+        if (method != ref_signature[1] or parameters != ref_signature[3]
+                or any(settings.get(k) != temp for k in temperature_keys)
+                or {k:v for k,v in settings.items() if k not in temperature_keys} !=
+                   {k:v for k,v in ref_settings.items() if k not in temperature_keys}):
+            raise ValueError('temperature comparison requires the named temperatures and matched method/settings')
+    def scalar_values(report):
         if report is None: return {}
-        return report.get('values', {}) if 'values' in report else {k: v.get('mean') for k, v in report.get('statistics', {}).items()}
-    ref_values = values(reference)
-    g1, g2 = values(gfn1), values(gfn2)
-    t3, t10 = values(temperature_300), values(temperature_1000)
-    keys = list(ref_values) if ref_values else list(base)
-    output = {}
-    for key in keys:
-        def delta(a, b):
-            try:
-                return abs(float(a) - float(b)) if a is not None and b is not None else None
-            except (TypeError, ValueError): return None
-        output[key] = {
-            'conformer_dispersion': base.get(key),
-            'gfn12_delta': delta(g1.get(key), g2.get(key)),
-            'et300_1000_delta': delta(t3.get(key), t10.get(key)),
-            'missing': {
-                'gfn1_vs_gfn2': gfn1 is None or g2.get(key) is None or g1.get(key) is None,
-                'electronic_temperature': temperature_300 is None or temperature_1000 is None or t3.get(key) is None or t10.get(key) is None,
-            },
-        }
-    return {'descriptor_version': DESCRIPTOR_VERSION,
-            'definition': 'absolute differences; conformer dispersion is population std',
-            'values': output}
+        if 'statistics' in report: return {k:v.get('mean') for k,v in report['statistics'].items()}
+        from .conformers import ConformerDescriptorColumns
+        allowed = ConformerDescriptorColumns(charge=report['provenance']['charge'],
+                    frontier_depth=report['analysis_settings']['frontier_depth'])
+        bad = report.get('error') is not None or report.get('quality', {}).get('status') == 'error'
+        return {k:None if bad else v for k,v in report.get('values', {}).items() if k in allowed}
+    def local_values(report, entity):
+        if report is None: return {}, {}
+        section = 'atom_statistics' if entity == 'atoms' else 'bond_statistics'
+        if section in report:
+            flat = {(i,k): stats for i, row in report[section].items() for k,stats in row.items()}
+            return {k:v['mean'] for k,v in flat.items()}, {k:v['std'] for k,v in flat.items()}
+        from .conformers import _local_series
+        bad = report.get('error') is not None or report.get('quality', {}).get('status') == 'error'
+        series = _local_series([report], [bad], entity)
+        return {k:v[0] for k,v in series.items()}, {}
+    def coverage(report, entity):
+        if report is None or report['report_type'] != 'conformer_sensitivity': return {}
+        rows = report['reports']
+        failed = [r.get('error') is not None or r.get('quality', {}).get('status') == 'error' for r in rows]
+        if entity == 'values':
+            return {key: tuple(not bad and row['values'].get(key) is not None for row,bad in zip(rows,failed))
+                    for key in report['statistics']}
+        from .conformers import _local_series
+        return {key: tuple(v is not None for v in values)
+                for key,values in _local_series(rows,failed,entity).items()}
+    def compare(ref, dispersion, a, b, c, d, *, entity):
+        masks = [coverage(r,entity) for r in (reference,*others)]
+        output = {}
+        for key in ref:
+            def delta(left, right, i, j):
+                x,y = left.get(key),right.get(key)
+                if x is None or y is None: return None, 'comparison_value_unavailable'
+                if masks[i].get(key) != masks[j].get(key) or masks[i].get(key) != masks[0].get(key):
+                    return None, 'unmatched_conformer_coverage'
+                if not np.isfinite(x) or not np.isfinite(y): raise ValueError('nonfinite sensitivity values')
+                return abs(float(x)-float(y)), None
+            method_delta, method_reason = delta(a,b,1,2)
+            temp_delta, temp_reason = delta(c,d,3,4)
+            output[key] = {'conformer_dispersion': dispersion.get(key),
+                'gfn12_delta': method_delta, 'et300_1000_delta': temp_delta,
+                'missing': {'gfn1_vs_gfn2': method_delta is None, 'electronic_temperature': temp_delta is None},
+                'missing_reasons': {k:v for k,v in [('gfn1_vs_gfn2',method_reason),
+                                    ('electronic_temperature',temp_reason)] if v is not None}}
+        return output
+    others = (gfn1,gfn2,temperature_300,temperature_1000)
+    dispersion = {k:v.get('std') for k,v in reference.get('statistics', {}).items()}
+    out = {'descriptor_version': DESCRIPTOR_VERSION,
+           'definition': 'absolute differences; conformer dispersion is population std',
+           'values': compare(scalar_values(reference), dispersion, *(scalar_values(r) for r in others), entity='values')}
+    out['units'] = {k: reference['units'][k] for k in out['values']}
+    for entity in ('atoms', 'bonds'):
+        values, spread = local_values(reference,entity)
+        flat = compare(values,spread,*(local_values(r,entity)[0] for r in others), entity=entity)
+        from .conformers import _local_units
+        out['atom_units' if entity == 'atoms' else 'bond_units'] = _local_units(
+            reference.get('reports', [reference]), values)
+        out[entity] = {}
+        for (index, field), value in flat.items(): out[entity].setdefault(index,{})[field] = value
+    return out
 
 
 def _base_report(record_id, columns, analysis):
@@ -165,7 +245,8 @@ def _base_report(record_id, columns, analysis):
 def _analysis_settings(*, frontier_depth=2, occupation_threshold=1e-7,
                        degeneracy_ev=1e-3, occupation_tolerance=1e-6,
                        include_orbitals=True, fractional_tolerance=1e-4,
-                       conservation_tolerance=1e-5):
+                       conservation_tolerance=1e-5, pi_scheme='lowdin',
+                       pi_plane_tol_a=0.1, pi_ref=None):
     DescriptorColumns(frontier_depth)
     if not isinstance(include_orbitals, bool):
         raise ValueError('include_orbitals must be Boolean')
@@ -174,14 +255,17 @@ def _analysis_settings(*, frontier_depth=2, occupation_threshold=1e-7,
                   conservation_tolerance=conservation_tolerance)
     for key, value in values.items():
         _nonnegative(value, key)
+    pi = _pi_options(pi_scheme, pi_plane_tol_a, pi_ref)
     return dict(frontier_depth=int(frontier_depth), include_orbitals=include_orbitals,
+                pi_scheme=pi['scheme'], pi_plane_tol_a=pi['plane_tol_a'], pi_ref=pi['pi_ref'],
                 **{key:float(value) for key,value in values.items()})
 
 
 def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontier_depth=2,
                            occupation_threshold=1e-7, degeneracy_ev=1e-3,
                            occupation_tolerance=1e-6, include_orbitals=True,
-                           fractional_tolerance=1e-4, conservation_tolerance=1e-5):
+                           fractional_tolerance=1e-4, conservation_tolerance=1e-5,
+                           pi_scheme='lowdin', pi_plane_tol_a=0.1, pi_ref=None):
     """Extract all descriptor sections without running an engine.
 
     Missing retained basis gives explicit nulls/reasons; inconsistent arrays or
@@ -192,7 +276,9 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
     analysis = _analysis_settings(frontier_depth=frontier_depth, occupation_threshold=occupation_threshold,
         degeneracy_ev=degeneracy_ev, occupation_tolerance=occupation_tolerance,
         include_orbitals=include_orbitals, fractional_tolerance=fractional_tolerance,
-        conservation_tolerance=conservation_tolerance)
+        conservation_tolerance=conservation_tolerance, pi_scheme=pi_scheme,
+        pi_plane_tol_a=pi_plane_tol_a, pi_ref=pi_ref)
+    pi_options = _pi_options(pi_scheme, pi_plane_tol_a, analysis['pi_ref'], natoms=mol.GetNumAtoms())
     result = _as_result(result)
     _validate_mapping(mol, result)
     report = _base_report(record_id, DescriptorColumns(frontier_depth), analysis)
@@ -232,12 +318,14 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
             ('density', CalcDensityMatrix),
             ('shell_populations', CalcShellPopulations),
             ('mayer_bonds', lambda r: CalcMayerBondDescriptors(mol, r)),
-            ('frontier_bonds', lambda r: CalcFrontierBondDescriptors(mol, r)),
-            ('pi', lambda r: CalcPiDescriptors(mol, r)),
+            ('frontier_bonds', lambda r: CalcFrontierBondDescriptors(mol, r,
+                degeneracy_ev=degeneracy_ev, occupation_threshold=occupation_threshold,
+                occupation_tolerance=occupation_tolerance)),
+            ('pi', lambda r: CalcPiDescriptors(mol, r, **pi_options)),
         ):
             try:
                 report[name] = function(result)
-            except Exception as exc:
+            except DescriptorUnavailableError as exc:
                 report['missing'][name] = f'{type(exc).__name__}: {exc}'
                 report['quality']['flags'].append({'code': f'{name}_unavailable',
                     'severity': 'warning', 'detail': str(exc)})
@@ -268,6 +356,10 @@ def RunDescriptorBatch(molecules, *, options=None, cache=None, record_ids=None, 
     if len(ids) != len(mols) or any(v is not None and not isinstance(v, str) for v in ids):
         raise ValueError('record_ids must match molecules and contain strings or None')
     analysis = _analysis_settings(**analysis)
+    for mol in mols:
+        if isinstance(mol, Chem.Mol):
+            _pi_options(analysis['pi_scheme'], analysis['pi_plane_tol_a'],
+                        analysis['pi_ref'], natoms=mol.GetNumAtoms())
     columns = DescriptorColumns(analysis['frontier_depth'])
     config = options or XTBOptions(keep_overlap=True)
     results = RunXTBBatch(mols, options=config,
@@ -279,7 +371,7 @@ def RunDescriptorBatch(molecules, *, options=None, cache=None, record_ids=None, 
             if isinstance(result, Exception): raise result
             report = CalcDescriptorReport(mol, result, record_id=identifier, fragments=fragments, **analysis)
         except Exception as exc:
-            report = _base_report(identifier, columns.copy(), dict(analysis))
+            report = _base_report(identifier, columns.copy(), deepcopy(analysis))
             report['quality'] = {'status':'error', 'flags':[{'code':'calculation_or_analysis_failed',
                                    'severity':'error', 'detail': str(exc)}]}
             report['error'] = {'type':type(exc).__name__, 'message':str(exc)}
