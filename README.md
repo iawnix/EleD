@@ -82,8 +82,10 @@ The following images were generated from an EleD GFN2-xTB single point on an emb
 </p>
 
 <p align="center">
-  <img alt="Ethanol fragment charge summary" src="docs/assets/eled-ethanol-fragments.svg" width="49%">
-  <img alt="Ethanol fragment interaction network" src="docs/assets/eled-ethanol-network.svg" width="49%">
+  <img alt="Ethanol fragment charge summary" src="docs/assets/eled-ethanol-fragments.svg" width="620">
+</p>
+<p align="center">
+  <img alt="Ethanol fragment interaction network" src="docs/assets/eled-ethanol-network.svg" width="620">
 </p>
 
 A report keeps the numerical data behind those views:

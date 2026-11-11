@@ -46,6 +46,23 @@ def test_rdkit_map_and_svg_views_are_self_contained():
     assert '<section>' in html and '<svg' in html
 
 
+def test_explicit_hydrogens_are_hidden_from_map_by_default():
+    mol = Chem.AddHs(Chem.MolFromSmiles('CCO'))
+    report = {
+        'atoms': [{'atom_index': index, 'q_e': 0.01 * index}
+                  for index in range(mol.GetNumAtoms())],
+        'fragments': {
+            'fragments': {'all': {'atom_indices': list(range(mol.GetNumAtoms()))}},
+            'pairs': [],
+        },
+    }
+    compact = DrawDescriptorMap(mol, report, atom_field='q_e')
+    complete = DrawDescriptorMap(mol, report, atom_field='q_e',
+                                 include_hydrogens=True)
+    assert "class='atom-8'" not in compact
+    assert "class='atom-8'" in complete
+
+
 def test_visual_data_rejects_overlapping_fragments():
     mol, report = _report()
     report['fragments']['fragments']['phenoxy']['atom_indices'] = [2, 3, 4, 5, 6, 7, 8, 9]

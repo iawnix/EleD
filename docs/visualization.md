@@ -25,8 +25,12 @@ html_fragment = RenderFragmentAnalysis(mol, report)
 ```
 
 `DrawDescriptorMap` uses RDKit's `rdMolDraw2D` and keeps the original RDKit atom
-indices. `PlotFragmentSummary` renders signed fragment values such as charge,
-Fukui indices or local softness. `PlotFragmentInteractions` uses the explicit
+indices. Explicit hydrogens are omitted from the map by default so their labels
+do not crowd the heavy-atom values; the report still contains their descriptors.
+Use `include_hydrogens=True` for a hydrogen-level map. Set
+`add_atom_indices=True` to include the original index in each value label.
+`PlotFragmentSummary` renders signed fragment values such as charge, Fukui
+indices or local softness. `PlotFragmentInteractions` uses the explicit
 fragment-pair Wiberg values from `report["fragments"]["pairs"]`; it does not add
 the two directional external sums a second time.
 

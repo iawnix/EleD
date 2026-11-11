@@ -36,6 +36,9 @@ def _svg_color(rgb):
     return '#{:02x}{:02x}{:02x}'.format(*(round(255 * value) for value in rgb))
 
 
+_SVG_SERIES = tuple(_svg_color(rgb) for rgb in _COLORS[:3])
+
+
 def _unit(field):
     if field.endswith('_1ev'):
         return '1/eV'
@@ -160,28 +163,61 @@ def _strip_xml_header(svg):
 
 
 def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=320,
-                     add_atom_indices=True):
-    """Return an SVG RDKit drawing with fragments and atom values highlighted."""
+                     add_atom_indices=False, include_hydrogens=False):
+    """Return an SVG RDKit drawing with fragments and atom values highlighted.
+
+    Explicit hydrogens are hidden by default so their labels cannot crowd the
+    heavy-atom descriptor labels.  The report still contains every atom; pass
+    ``include_hydrogens=True`` when a hydrogen-level map is required.  When
+    ``add_atom_indices`` is true, the RDKit index is included in the value
+    label (for example ``2:-0.44``) rather than drawn a second time by RDKit.
+    """
     from rdkit.Chem.Draw import rdMolDraw2D
+    from rdkit import Chem
 
     data = BuildFragmentVisualData(mol, report, atom_field=atom_field)
     records = data['fragments']
     assignments = {row['atom_index']: row['fragment'] for row in data['atoms']}
+    if include_hydrogens:
+        draw_mol = mol
+        draw_indices = list(range(int(mol.GetNumAtoms())))
+    else:
+        draw_indices = [atom.GetIdx() for atom in mol.GetAtoms()
+                        if atom.GetAtomicNum() != 1]
+        draw_mol = Chem.RemoveHs(mol) if len(draw_indices) != mol.GetNumAtoms() else mol
+    original_to_draw = {original: index for index, original in enumerate(draw_indices)}
     colors = {record['name']: _COLORS[index % len(_COLORS)]
               for index, record in enumerate(records)}
-    highlight_atoms = [index for index, name in assignments.items() if name is not None]
-    highlight_colors = {index: colors[name] for index, name in assignments.items() if name is not None}
+    highlight_atoms = [original_to_draw[index] for index, name in assignments.items()
+                       if name is not None and index in original_to_draw]
+    highlight_colors = {original_to_draw[index]: colors[name]
+                        for index, name in assignments.items()
+                        if name is not None and index in original_to_draw}
     drawer = rdMolDraw2D.MolDraw2DSVG(int(width), int(height))
     options = drawer.drawOptions()
-    options.addAtomIndices = bool(add_atom_indices)
+    # A fixed, moderate annotation size is more predictable than RDKit's
+    # automatic maximum for small molecules.  In particular, it prevents a
+    # nine-atom explicit-H molecule from receiving 40 px labels.
+    font_size = max(8, min(18, int(min(width, height) / 24)))
+    options.fixedFontSize = font_size
+    options.minFontSize = max(6, font_size - 3)
+    options.maxFontSize = font_size
+    options.padding = 0.12
+    options.additionalAtomLabelPadding = 0.04
+    options.atomHighlightsAreCircles = True
+    # Indices are part of our custom label when requested.  Enabling RDKit's
+    # own index annotation as well would draw two labels at every atom.
+    options.addAtomIndices = False
     if data['atom_field']:
         for row in data['atoms']:
-            if row['value'] is not None:
-                options.atomLabels[int(row['atom_index'])] = (
-                    f"{row['atom_index']}:{row['value']:+.2f}"
-                    if not add_atom_indices else f"{row['value']:+.2f}"
+            original_index = int(row['atom_index'])
+            draw_index = original_to_draw.get(original_index)
+            if draw_index is not None and row['value'] is not None:
+                options.atomLabels[draw_index] = (
+                    f"{original_index}:{row['value']:+.2f}"
+                    if add_atom_indices else f"{row['value']:+.2f}"
                 )
-    drawer.DrawMolecule(mol, highlightAtoms=highlight_atoms,
+    drawer.DrawMolecule(draw_mol, highlightAtoms=highlight_atoms,
                         highlightAtomColors=highlight_colors)
     drawer.FinishDrawing()
     return _strip_xml_header(drawer.GetDrawingText())
@@ -209,7 +245,7 @@ def PlotFragmentSummary(report, *, field='q_e', width=620, row_height=38):
         if value is not None:
             span = abs(value) / maximum * chart_width / 2
             x = center if value >= 0 else center - span
-            fill = 'var(--viz-series-1)' if value >= 0 else 'var(--viz-series-2)'
+            fill = _SVG_SERIES[0] if value >= 0 else _SVG_SERIES[1]
             body.append(f'<rect x="{x:.1f}" y="{y - 8}" width="{span:.1f}" height="16" fill="{fill}" rx="3"/>')
             body.append(f'<text x="{width - 12}" y="{y + 5}" text-anchor="end" fill="currentColor">{value:+.3f}</text>')
         else:
@@ -242,7 +278,7 @@ def PlotFragmentInteractions(report, *, width=620, height=280):
         x1, y1 = positions[pair['fragment_a']]
         x2, y2 = positions[pair['fragment_b']]
         stroke_width = 2 + 10 * abs(pair['value']) / maximum
-        body.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="var(--viz-series-3)" stroke-width="{stroke_width:.1f}" stroke-linecap="round" opacity=".75"/>')
+        body.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{_SVG_SERIES[2]}" stroke-width="{stroke_width:.1f}" stroke-linecap="round" opacity=".75"/>')
         body.append(f'<text x="{(x1+x2)/2:.1f}" y="{(y1+y2)/2-10:.1f}" text-anchor="middle" fill="currentColor" font-size="12">{pair["value"]:.2f}</text>')
     for index, name in enumerate(names):
         x, y = positions[name]

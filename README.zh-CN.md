@@ -82,8 +82,10 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 </p>
 
 <p align="center">
-  <img alt="乙醇片段电荷汇总" src="docs/assets/eled-ethanol-fragments.svg" width="49%">
-  <img alt="乙醇片段相互作用网络" src="docs/assets/eled-ethanol-network.svg" width="49%">
+  <img alt="乙醇片段电荷汇总" src="docs/assets/eled-ethanol-fragments.svg" width="620">
+</p>
+<p align="center">
+  <img alt="乙醇片段相互作用网络" src="docs/assets/eled-ethanol-network.svg" width="620">
 </p>
 
 这些视图背后仍然是结构化报告：
