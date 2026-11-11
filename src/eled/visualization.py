@@ -37,6 +37,16 @@ def _svg_color(rgb):
 
 
 _SVG_SERIES = tuple(_svg_color(rgb) for rgb in _COLORS[:3])
+_SVG_STYLE = '''<style>
+.eled-viz-bg { fill: #fbfcfe; }
+.eled-viz-text { fill: #172033; }
+.eled-viz-muted { stroke: #718096; }
+@media (prefers-color-scheme: dark) {
+  .eled-viz-bg { fill: #111827; }
+  .eled-viz-text { fill: #f8fafc; }
+  .eled-viz-muted { stroke: #94a3b8; }
+}
+</style>'''
 
 
 def _unit(field):
@@ -162,7 +172,7 @@ def _strip_xml_header(svg):
     return svg
 
 
-def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=320,
+def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=240,
                      add_atom_indices=False, include_hydrogens=False):
     """Return an SVG RDKit drawing with fragments and atom values highlighted.
 
@@ -198,7 +208,7 @@ def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=320,
     # A fixed, moderate annotation size is more predictable than RDKit's
     # automatic maximum for small molecules.  In particular, it prevents a
     # nine-atom explicit-H molecule from receiving 40 px labels.
-    font_size = max(8, min(18, int(min(width, height) / 24)))
+    font_size = max(10, min(18, int(min(width, height) / 18)))
     options.fixedFontSize = font_size
     options.minFontSize = max(6, font_size - 3)
     options.maxFontSize = font_size
@@ -233,26 +243,30 @@ def PlotFragmentSummary(report, *, field='q_e', width=620, row_height=38):
     title = escape(f"{_field_label(field)} ({_unit(field)})")
     if not finite:
         return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-                f'role="img" aria-label="No {title} values available"><title>No {title} values available</title>'
-                f'<text x="20" y="48" fill="currentColor">No values available</text></svg>')
+                f'role="img" aria-label="No {title} values available">{_SVG_STYLE}'
+                f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+                f'<title>No {title} values available</title>'
+                f'<text class="eled-viz-text" x="20" y="48">No values available</text></svg>')
     maximum = max(abs(value) for value in finite) or 1.0
     left, chart_width, center = 160, width - 210, 160 + (width - 210) / 2
-    body = [f'<line x1="{center:.1f}" y1="55" x2="{center:.1f}" y2="{height - 18}" stroke="currentColor" opacity=".35"/>']
+    body = [f'<line class="eled-viz-muted" x1="{center:.1f}" y1="55" x2="{center:.1f}" y2="{height - 18}" opacity=".55"/>']
     for index, (record, value) in enumerate(zip(records, values)):
         y = 72 + index * row_height
         name = escape(str(record['name']))
-        body.append(f'<text x="12" y="{y + 5}" fill="currentColor">{name}</text>')
+        body.append(f'<text class="eled-viz-text" x="12" y="{y + 5}" font-size="14">{name}</text>')
         if value is not None:
             span = abs(value) / maximum * chart_width / 2
             x = center if value >= 0 else center - span
             fill = _SVG_SERIES[0] if value >= 0 else _SVG_SERIES[1]
             body.append(f'<rect x="{x:.1f}" y="{y - 8}" width="{span:.1f}" height="16" fill="{fill}" rx="3"/>')
-            body.append(f'<text x="{width - 12}" y="{y + 5}" text-anchor="end" fill="currentColor">{value:+.3f}</text>')
+            body.append(f'<text class="eled-viz-text" x="{width - 12}" y="{y + 5}" text-anchor="end" font-size="14">{value:+.3f}</text>')
         else:
-            body.append(f'<text x="{width - 12}" y="{y + 5}" text-anchor="end" fill="currentColor">missing</text>')
+            body.append(f'<text class="eled-viz-text" x="{width - 12}" y="{y + 5}" text-anchor="end" font-size="14">missing</text>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-            f'role="img" aria-label="Fragment {title} summary"><title>Fragment {title} summary</title>'
-            f'<text x="12" y="25" fill="currentColor" font-size="16">{title}</text>{"".join(body)}</svg>')
+            f'role="img" aria-label="Fragment {title} summary">{_SVG_STYLE}'
+            f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+            f'<title>Fragment {title} summary</title>'
+            f'<text class="eled-viz-text" x="12" y="25" font-size="16">{title}</text>{"".join(body)}</svg>')
 
 
 def PlotFragmentInteractions(report, *, width=620, height=280):
@@ -261,7 +275,9 @@ def PlotFragmentInteractions(report, *, width=620, height=280):
     records, pairs = data['fragments'], data['pairs']
     names = [record['name'] for record in records]
     if not names:
-        return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img"><text x="20" y="40" fill="currentColor">No fragments available</text></svg>'
+        return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
+                f'{_SVG_STYLE}<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+                f'<text class="eled-viz-text" x="20" y="40">No fragments available</text></svg>')
     positions = {}
     if len(names) == 1:
         positions[names[0]] = (width / 2, height / 2)
@@ -279,14 +295,16 @@ def PlotFragmentInteractions(report, *, width=620, height=280):
         x2, y2 = positions[pair['fragment_b']]
         stroke_width = 2 + 10 * abs(pair['value']) / maximum
         body.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{_SVG_SERIES[2]}" stroke-width="{stroke_width:.1f}" stroke-linecap="round" opacity=".75"/>')
-        body.append(f'<text x="{(x1+x2)/2:.1f}" y="{(y1+y2)/2-10:.1f}" text-anchor="middle" fill="currentColor" font-size="12">{pair["value"]:.2f}</text>')
+        body.append(f'<text class="eled-viz-text" x="{(x1+x2)/2:.1f}" y="{(y1+y2)/2-10:.1f}" text-anchor="middle" font-size="14">{pair["value"]:.2f}</text>')
     for index, name in enumerate(names):
         x, y = positions[name]
         fill = _svg_color(_COLORS[index % len(_COLORS)])
         body.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="38" fill="{fill}" opacity=".88"/>')
-        body.append(f'<text x="{x:.1f}" y="{y+5:.1f}" text-anchor="middle" fill="white" font-size="13">{escape(name)}</text>')
+        body.append(f'<text x="{x:.1f}" y="{y+5:.1f}" text-anchor="middle" fill="#ffffff" font-size="14">{escape(name)}</text>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-            f'role="img" aria-label="Fragment interaction network"><title>Fragment interaction network</title>'
+            f'role="img" aria-label="Fragment interaction network">{_SVG_STYLE}'
+            f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+            f'<title>Fragment interaction network</title>'
             f'{"".join(body)}</svg>')
 
 
@@ -307,7 +325,7 @@ def RenderFragmentAnalysis(mol, report, *, atom_field=None, width=620):
     """Return a self-contained HTML fragment with the three EleD views."""
     data = BuildFragmentVisualData(mol, report, atom_field=atom_field)
     title = escape(_field_label(data['atom_field'] or 'descriptor'))
-    molecule = DrawDescriptorMap(mol, report, atom_field=atom_field, width=width, height=320)
+    molecule = DrawDescriptorMap(mol, report, atom_field=atom_field, width=width, height=240)
     summary = PlotFragmentSummary(report, field='q_e', width=width)
     interactions = PlotFragmentInteractions(report, width=width)
     return f'''<div class="eled-fragment-analysis">

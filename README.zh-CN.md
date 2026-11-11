@@ -75,20 +75,13 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 
 ## 看一个实际输出
 
-下面的图片由 EleD 对一个嵌入后的乙醇构象进行 GFN2-xTB 单点计算生成。分子图使用 RDKit 的 `rdMolDraw2D`，片段图表使用 EleD 返回的无额外依赖 SVG。
+下面的报告只来自一个嵌入后的乙醇构象和一次 EleD GFN2-xTB 单点计算。所有面板都使用同一个 `XTBResult`：分子图由 RDKit 绘制，片段电荷和相互作用视图由 EleD 生成。
 
 <p align="center">
-  <img alt="带原子电荷和片段颜色的乙醇分子图" src="docs/assets/eled-ethanol-map.svg" width="520">
+  <img alt="同一个 EleD 乙醇报告中的分子、片段和相互作用视图" src="docs/assets/eled-ethanol-report.svg" width="900">
 </p>
 
-<p align="center">
-  <img alt="乙醇片段电荷汇总" src="docs/assets/eled-ethanol-fragments.svg" width="620">
-</p>
-<p align="center">
-  <img alt="乙醇片段相互作用网络" src="docs/assets/eled-ethanol-network.svg" width="620">
-</p>
-
-这些视图背后仍然是结构化报告：
+这张组合图背后仍然是结构化报告：
 
 ```python
 from eled import (

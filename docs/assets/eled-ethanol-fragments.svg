@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 146" role="img" aria-label="Fragment charge (e) summary"><title>Fragment charge (e) summary</title><text x="12" y="25" fill="currentColor" font-size="16">charge (e)</text><line x1="365.0" y1="55" x2="365.0" y2="128" stroke="currentColor" opacity=".35"/><text x="12" y="77" fill="currentColor">ethyl</text><rect x="365.0" y="64" width="205.0" height="16" fill="#337ac9" rx="3"/><text x="608" y="77" text-anchor="end" fill="currentColor">+0.154</text><text x="12" y="115" fill="currentColor">hydroxyl</text><rect x="160.0" y="102" width="205.0" height="16" fill="#d66326" rx="3"/><text x="608" y="115" text-anchor="end" fill="currentColor">-0.154</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 146" role="img" aria-label="Fragment charge (e) summary"><style>
+.eled-viz-bg { fill: #fbfcfe; }
+.eled-viz-text { fill: #172033; }
+.eled-viz-muted { stroke: #718096; }
+@media (prefers-color-scheme: dark) {
+  .eled-viz-bg { fill: #111827; }
+  .eled-viz-text { fill: #f8fafc; }
+  .eled-viz-muted { stroke: #94a3b8; }
+}
+</style><rect class="eled-viz-bg" width="620" height="146"/><title>Fragment charge (e) summary</title><text class="eled-viz-text" x="12" y="25" font-size="16">charge (e)</text><line class="eled-viz-muted" x1="365.0" y1="55" x2="365.0" y2="128" opacity=".55"/><text class="eled-viz-text" x="12" y="77" font-size="14">ethyl</text><rect x="365.0" y="64" width="205.0" height="16" fill="#337ac9" rx="3"/><text class="eled-viz-text" x="608" y="77" text-anchor="end" font-size="14">+0.154</text><text class="eled-viz-text" x="12" y="115" font-size="14">hydroxyl</text><rect x="160.0" y="102" width="205.0" height="16" fill="#d66326" rx="3"/><text class="eled-viz-text" x="608" y="115" text-anchor="end" font-size="14">-0.154</text></svg>

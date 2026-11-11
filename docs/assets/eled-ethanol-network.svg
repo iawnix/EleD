@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 280" role="img" aria-label="Fragment interaction network"><title>Fragment interaction network</title><line x1="530.0" y1="140.0" x2="90.0" y2="140.0" stroke="#479466" stroke-width="12.0" stroke-linecap="round" opacity=".75"/><text x="310.0" y="130.0" text-anchor="middle" fill="currentColor" font-size="12">1.09</text><circle cx="530.0" cy="140.0" r="38" fill="#337ac9" opacity=".88"/><text x="530.0" y="145.0" text-anchor="middle" fill="white" font-size="13">ethyl</text><circle cx="90.0" cy="140.0" r="38" fill="#d66326" opacity=".88"/><text x="90.0" y="145.0" text-anchor="middle" fill="white" font-size="13">hydroxyl</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 280" role="img" aria-label="Fragment interaction network"><style>
+.eled-viz-bg { fill: #fbfcfe; }
+.eled-viz-text { fill: #172033; }
+.eled-viz-muted { stroke: #718096; }
+@media (prefers-color-scheme: dark) {
+  .eled-viz-bg { fill: #111827; }
+  .eled-viz-text { fill: #f8fafc; }
+  .eled-viz-muted { stroke: #94a3b8; }
+}
+</style><rect class="eled-viz-bg" width="620" height="280"/><title>Fragment interaction network</title><line x1="530.0" y1="140.0" x2="90.0" y2="140.0" stroke="#479466" stroke-width="12.0" stroke-linecap="round" opacity=".75"/><text class="eled-viz-text" x="310.0" y="130.0" text-anchor="middle" font-size="14">1.09</text><circle cx="530.0" cy="140.0" r="38" fill="#337ac9" opacity=".88"/><text x="530.0" y="145.0" text-anchor="middle" fill="#ffffff" font-size="14">ethyl</text><circle cx="90.0" cy="140.0" r="38" fill="#d66326" opacity=".88"/><text x="90.0" y="145.0" text-anchor="middle" fill="#ffffff" font-size="14">hydroxyl</text></svg>

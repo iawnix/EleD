@@ -43,6 +43,8 @@ def test_rdkit_map_and_svg_views_are_self_contained():
     assert '<svg' in molecule and '<?xml' not in molecule
     assert 'acetyl' in summary and 'phenoxy' in summary
     assert '1.20' in network and 'Fragment interaction network' in network
+    assert 'eled-viz-bg' in summary and 'currentColor' not in summary
+    assert 'eled-viz-bg' in network and 'currentColor' not in network
     assert '<section>' in html and '<svg' in html
 
 

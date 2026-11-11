@@ -75,20 +75,13 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 
 ## See an actual output
 
-The following images were generated from an EleD GFN2-xTB single point on an embedded ethanol conformer. The molecular map is drawn with RDKit's `rdMolDraw2D`; the fragment charts are dependency-free SVG returned by EleD.
+The report below comes from one EleD GFN2-xTB single point on one embedded ethanol conformer. Every panel uses that same `XTBResult`: RDKit draws the molecular map, while EleD provides the fragment charge and interaction views.
 
 <p align="center">
-  <img alt="Ethanol with atom charges and fragment coloring" src="docs/assets/eled-ethanol-map.svg" width="520">
+  <img alt="A single EleD ethanol report with molecular, fragment and interaction views" src="docs/assets/eled-ethanol-report.svg" width="900">
 </p>
 
-<p align="center">
-  <img alt="Ethanol fragment charge summary" src="docs/assets/eled-ethanol-fragments.svg" width="620">
-</p>
-<p align="center">
-  <img alt="Ethanol fragment interaction network" src="docs/assets/eled-ethanol-network.svg" width="620">
-</p>
-
-A report keeps the numerical data behind those views:
+The report keeps the numerical data behind the combined view:
 
 ```python
 from eled import (
