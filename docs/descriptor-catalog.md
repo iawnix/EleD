@@ -7,7 +7,8 @@ layers are appropriate for validation.
 Public descriptor functions follow RDKit's `Calc...` / `Run...` naming.
 Report fields and Python analysis arguments use `snake_case`. Unit suffixes are lower-case and explicit, for example
 `xtb_gap_ev`, `xtb_energy_ha`, `xtb_dip_ebohr` and
-`s_1ev`. There is one public spelling for each field.
+`s_1ev`. There is one public spelling for each field. `DescriptorCatalog()` expands grouped
+definitions into exact fields such as `mul_s_e`, `low_d_e` and `low_qrec_e`.
 
 The naming rules keep feature columns short while retaining their meaning:
 

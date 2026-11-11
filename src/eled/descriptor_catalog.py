@@ -96,9 +96,25 @@ _STATUS = {
 }
 
 
+def _exact_catalog():
+    """Expand grouped definitions into the concrete public field names."""
+    catalog = deepcopy(_CATALOG)
+    atom = catalog['atom']
+    for prefix in ('mul', 'low'):
+        grouped = atom[f'{prefix}_*_e']
+        for channel in ('s', 'p', 'd'):
+            atom[f'{prefix}_{channel}_e'] = deepcopy(grouped)
+        atom[f'{prefix}_qrec_e'] = deepcopy(atom['mul_qrec_e / low_qrec_e'])
+    density = catalog['density']
+    density['density_matrix']['unit'] = 'basis-dependent matrix; trace with S is e'
+    # Keep wildcard entries as compact documentation, but make exact lookups
+    # deterministic for feature-table builders and schema validators.
+    return catalog
+
+
 def DescriptorCatalog():
     """Return a copy of the canonical descriptor definitions."""
-    return deepcopy(_CATALOG)
+    return _exact_catalog()
 
 
 def DescriptorStatus():

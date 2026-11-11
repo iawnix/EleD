@@ -50,8 +50,7 @@ def _unit(field):
 
 def _field_label(field):
     return {
-        'q_e': 'partial charge',
-        'q_e': 'fragment charge',
+        'q_e': 'charge',
         'f_plus': 'Fukui f+',
         'f_minus': 'Fukui f−',
         's_loc_1ev': 'local softness',

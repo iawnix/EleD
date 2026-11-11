@@ -2,6 +2,8 @@
 
 ## Unreleased — project identity is `EleD`
 
+- Expanded the machine-readable catalog to exact shell and reconstructed-charge
+  field names and corrected the visualization charge label.
 - Propagated π scheme, plane tolerance and explicit reference populations through
   density/report/batch/conformer APIs, with JSON-stable settings and validation
   before engine calls. Fixed benchmark bond extraction to read nested sections

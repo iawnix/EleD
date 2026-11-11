@@ -116,6 +116,9 @@ def test_descriptor_catalog_and_scalar_units_are_explicit():
     assert {'molecular', 'atom', 'bond', 'density', 'reactivity', 'diagnostic'} <= set(catalog)
     assert catalog['bond']['mbo']['unit'] == 'dimensionless'
     assert catalog['atom']['pi_n_e']['unit'] == 'e'
+    assert catalog['atom']['mul_s_e']['unit'] == 'e'
+    assert catalog['atom']['low_qrec_e']['unit'] == 'e'
+    assert catalog['density']['n_e']['unit'] == 'e'
     assert catalog['reactivity']['ip_v_ev']['unit'] == 'eV'
     assert catalog['molecular']['xtb_dip_*_ebohr']['unit'] == 'e*Bohr'
     assert DescriptorColumns()['xtb_occ_cut'] == 'dimensionless'
