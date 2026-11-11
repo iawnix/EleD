@@ -38,11 +38,11 @@
     <text x="695" y="275" text-anchor="middle" font-size="13" fill="#526174">the project’s native calculation layer</text>
 
     <text x="1003" y="127" text-anchor="middle" font-size="18" font-weight="700">Descriptor products</text>
-    <text x="895" y="166" font-size="13">Molecular: energy · gap · dipole</text>
-    <text x="895" y="194" font-size="13">Atomic / bond: charges · Wiberg · Mayer</text>
-    <text x="895" y="222" font-size="13">Density / orbital: shell · π · frontier</text>
-    <text x="895" y="250" font-size="13">Reactivity: ΔSCF · Fukui · softness</text>
-    <text x="895" y="278" font-size="13">Reports / views: JSONL · CSV · SVG</text>
+    <text x="895" y="166" font-size="12">Molecular</text><text x="1000" y="166" font-size="12">energy · gap · dipole</text>
+    <text x="895" y="194" font-size="12">Atomic / bond</text><text x="1000" y="194" font-size="12">charge · WBO · Mayer</text>
+    <text x="895" y="222" font-size="12">Density / orb.</text><text x="1000" y="222" font-size="12">shell · π · frontier</text>
+    <text x="895" y="250" font-size="12">Reactivity</text><text x="1000" y="250" font-size="12">ΔSCF · Fukui · softness</text>
+    <text x="895" y="278" font-size="12">Reports</text><text x="1000" y="278" font-size="12">JSONL · CSV · SVG</text>
   </g>
 
   <path d="M266 210 H310" stroke="#718096" stroke-width="3" marker-end="url(#arrow)"/>
