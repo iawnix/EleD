@@ -53,7 +53,7 @@ jobs:
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python -m pip install --no-deps --require-hashes -r locks/linux-64/release-tools-py311.txt
       - name: Verify Python interfaces
         run: |
-          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python -m pytest -q
+          conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python -m pytest -q -m 'not benchmark'
           conda run --no-capture-output -p "$PWD/.rdxtb-build-env" python examples/rdxtb_tools.py
       - name: Verify standalone C++ interface
         run: |

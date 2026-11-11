@@ -23,7 +23,7 @@ jobs:
           conda run --no-capture-output -p "$PWD/.runtime-env" python -m pip install --no-deps --require-hashes -r locks/linux-64/release-tools-py311.txt
       - name: Test Python layer without an engine
         run: |
-          conda run --no-capture-output -p "$PWD/.runtime-env" python -m pytest -q -m 'not integration'
+          conda run --no-capture-output -p "$PWD/.runtime-env" python -m pytest -q -m 'not integration and not benchmark'
       - name: Build source archive and pure wheel
         run: conda run --no-capture-output -p "$PWD/.runtime-env" python tools/build_release.py --output dist/0.11.0
       - name: Verify optional benchmark data joins and group splits in a separate environment
@@ -31,6 +31,7 @@ jobs:
           conda run --no-capture-output -p "$PWD/.runtime-env" python -m venv --system-site-packages build/benchmark-env
           build/benchmark-env/bin/python -m pip install -r tools/benchmark-requirements.txt
           build/benchmark-env/bin/python -m pytest -q tests/test_qm8_protocol.py tests/test_qm8_geometry.py
+          build/benchmark-env/bin/python -m pytest -q -m benchmark tests/test_eas_benchmark_modeling.py
       - name: Verify installed wheel outside checkout
         run: |
           conda run --no-capture-output -p "$PWD/.runtime-env" python tools/check_wheel.py dist/0.11.0/pure/*.whl --kind pure --output dist/0.11.0/installed-pure.json

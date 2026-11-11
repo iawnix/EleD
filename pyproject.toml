@@ -40,4 +40,7 @@ eled = ["*.so"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-markers = ["integration: requires an installed xTB engine"]
+markers = [
+    "integration: requires an installed xTB engine",
+    "benchmark: requires optional model-training dependencies",
+]

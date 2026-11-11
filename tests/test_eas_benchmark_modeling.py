@@ -9,6 +9,9 @@ from benchmarks.eas.modeling import (aggregate_molecule_metrics, molecule_metric
 from benchmarks.eas.train import fit_and_evaluate
 
 
+pytestmark = pytest.mark.benchmark
+
+
 def _rows_and_scores():
     rows = [
         {'record_id': 'a', 'target': 1}, {'record_id': 'a', 'target': 0},
