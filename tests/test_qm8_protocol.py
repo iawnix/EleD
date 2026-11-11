@@ -11,6 +11,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 
+pytestmark = pytest.mark.benchmark
+
+
 @pytest.fixture
 def benchmark():
     spec = importlib.util.spec_from_file_location('benchmark_qm8', Path(__file__).resolve().parents[1]/'tools/benchmark_qm8.py')

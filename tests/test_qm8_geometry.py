@@ -8,6 +8,9 @@ import numpy as np
 import pytest
 
 
+pytestmark = pytest.mark.benchmark
+
+
 @pytest.fixture
 def study():
     spec = importlib.util.spec_from_file_location('qm8_geometry', Path(__file__).resolve().parents[1]/'tools/benchmark_qm8_geometry.py')

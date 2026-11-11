@@ -3,10 +3,15 @@ from pathlib import Path
 import hashlib
 import sys
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from benchmarks.eas.pipeline import (atom_rows, feature_matrix,
                                      validate_feature_archive)
+
+
+pytestmark = pytest.mark.benchmark
 
 
 def _protocol_hash():

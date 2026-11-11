@@ -4,6 +4,8 @@
 
 - Expanded the machine-readable catalog to exact shell and reconstructed-charge
   field names and corrected the visualization charge label.
+- Kept benchmark protocol and model-training tests out of automatic core CI;
+  they now run only through the manually triggered benchmark workflow.
 - Propagated π scheme, plane tolerance and explicit reference populations through
   density/report/batch/conformer APIs, with JSON-stable settings and validation
   before engine calls. Fixed benchmark bond extraction to read nested sections

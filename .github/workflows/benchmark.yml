@@ -1,0 +1,27 @@
+name: optional benchmark protocols and models
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ''
+          auto-activate-base: true
+      - name: Create benchmark environment
+        run: |
+          conda create --yes --prefix "$PWD/.benchmark-env" --file locks/linux-64/runtime.txt
+          conda run --no-capture-output -p "$PWD/.benchmark-env" python -m pip install --no-deps --no-build-isolation -e .
+          conda run --no-capture-output -p "$PWD/.benchmark-env" python -m pip install -r tools/benchmark-requirements.txt
+      - name: Run benchmark and dataset contract tests
+        run: conda run --no-capture-output -p "$PWD/.benchmark-env" python -m pytest -q -m benchmark
