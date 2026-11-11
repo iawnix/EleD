@@ -1,53 +1,46 @@
 # EleD
 
-**English** | [中文](README.zh-CN.md)
+<p align="center">
+  <strong>Electronic-structure descriptors for RDKit molecules</strong><br>
+  <em>From an RDKit graph and one 3D conformer to reusable xTB descriptors, reports and visual maps.</em>
+</p>
 
-**Electronic descriptors for RDKit molecules.**
+<p align="center">
+  <a href="README.zh-CN.md">中文</a> ·
+  <a href="docs/README.md">Documentation</a> ·
+  <a href="https://github.com/iawnix/EleD/issues">Issues</a>
+</p>
 
-EleD extends the RDKit molecular model with electronic-structure descriptors
-from xTB. An RDKit molecule remains the central object: atom and bond indices,
-conformers, fragments and annotations stay connected from input to report.
+<p align="center">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white">
+  <img alt="RDKit" src="https://img.shields.io/badge/RDKit-2024.03%2B-2E8B57">
+  <img alt="xTB" src="https://img.shields.io/badge/xTB-GFN0%20%7C%20GFN1%20%7C%20GFN2-6B4FBB">
+  <img alt="License BSD-3-Clause" src="https://img.shields.io/badge/license-BSD--3--Clause-64748B">
+</p>
 
-The package provides a Python API, an optional RDKit-style C++ extension
-(`rdXTBTools`), reusable calculation results, descriptor reports and lightweight
-visualization. GFN0-xTB, GFN1-xTB and GFN2-xTB are exposed through one
-consistent native calculation backend.
+EleD is an RDKit extension for electronic-structure descriptors. The RDKit molecule stays at the center: atom and bond indices, conformers, fragments and annotations remain connected while EleD runs the project's extended `libxtb` backend and turns one calculation into several analysis views.
 
-## What it provides
+![EleD workflow: RDKit molecule to descriptors and reports](docs/assets/eled-workflow.svg)
 
-- Molecular descriptors: total energy, orbital energies, HOMO/LUMO gap,
-  dipole, partial charges and Wiberg bond orders.
-- Atomic, bond and fragment descriptors with stable RDKit atom indexing.
-- Density analysis from retained xTB data: Mulliken and Löwdin populations,
-  shell populations, Mayer bonds, frontier-bond decomposition and π descriptors.
-- Fixed-geometry ΔSCF reactivity: ionization and attachment energies, global
-  hardness and softness, Fukui functions and local conceptual-DFT indices.
-- Conformer preparation with RDKit embedding and force-field refinement, plus
-  optional xTB gradient optimization.
-- Versioned reports, ordered batch calculation, persistent caching and JSONL or
-  CSV export.
-- RDKit molecular maps and dependency-free SVG/HTML views for fragments and
-  fragment interactions.
-- A separate YAeHMOP/EHT adapter for comparing electronic-structure methods.
+## Why EleD?
 
-## Install
+RDKit is excellent at representing molecular structure. xTB is excellent at producing fast approximate electronic structure. EleD joins those two layers in a reusable API so that a calculation can be inspected at molecular, atomic, bond, fragment, density and reactivity levels without losing the original RDKit indexing.
 
-On Linux x86-64, install conda and run the commands below. The installer sets up
-RDKit, EleD, its project-built xTB calculation library (`libxtb`) and the
-`rdXTBTools` C++ extension:
+The core flow is simple:
 
-```bash
-git clone https://github.com/iawnix/EleD.git
-cd EleD
-python tools/install_native.py --jobs 6
-conda activate "$PWD/.eled/runtime"
-python -m eled doctor --check compiled --method GFN2-xTB
+```text
+RDKit Mol + 3D conformer
+        │
+        ▼
+  XTBCalculator  ──►  extended libxtb (GFN0 / GFN1 / GFN2)
+        │
+        ├── molecular, atomic and bond descriptors
+        ├── density and frontier-orbital analysis
+        ├── fixed-geometry ΔSCF reactivity
+        └── versioned reports, CSV/JSONL and SVG views
 ```
 
-See the [installation guide](docs/install.md) for runtime layouts, source
-builds and the compiled interface.
-
-## First calculation
+## A five-minute calculation
 
 ```python
 from rdkit import Chem
@@ -60,117 +53,135 @@ if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
 AllChem.MMFFOptimizeMolecule(mol)
 
 result = XTBCalculator(method="GFN2-xTB").calculate(mol)
-descriptors = CalcXTBDescriptors(result)
-print(descriptors["xtb_energy_ha"])
-print(descriptors["xtb_homo_ev"], descriptors["xtb_lumo_ev"])
+values = CalcXTBDescriptors(result)
+
+print(values["xtb_energy_ha"])
+print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBCalculator` accepts an RDKit molecule with a finite 3D conformer. The
-returned `XTBResult` can be reused by every descriptor layer, so a report can
-combine molecular, atomic, bond, fragment and orbital features from one
-single-point calculation.
+`XTBResult` is reusable. The same result can feed descriptor tables, fragment summaries, density analysis and a report, so repeated analysis does not silently repeat the engine call.
 
-## Density and orbital descriptors
+## What you get
 
-Retain the overlap matrix and basis maps when density-derived features are
-needed:
+| Layer | Examples | Main entry points |
+| --- | --- | --- |
+| Molecular | energy, HOMO/LUMO, gap, dipole, charge statistics | `CalcXTBDescriptors` |
+| Atomic | xTB charge, Wiberg sum, Fukui and local reactivity | `CalcXTBAtomDescriptors`, `RunReactivity` |
+| Bond | Wiberg and Mayer bond orders, frontier-bond contributions | `CalcXTBBondDescriptors`, `CalcMayerBondDescriptors`, `CalcFrontierBondDescriptors` |
+| Density | Mulliken/Löwdin shell populations, density matrix, π population and π bond order | `CalcDensityMatrix`, `CalcShellPopulations`, `CalcPiDescriptors` |
+| Frontier orbitals | degenerate HOMO/LUMO groups, participation, centroids and bond decomposition | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors` |
+| Conformers | mean, standard deviation, range and optional electronic-energy weighting | `RunConformerAnalysis` |
+| Reports | provenance, units, quality flags, missing-value reasons and JSONL/CSV export | `CalcDescriptorReport`, `ExportDescriptorReports` |
 
-```python
-from eled import (
-    XTBCalculator, CalcXTBAtomDescriptors, CalcXTBBondDescriptors,
-    CalcShellPopulations, CalcDensityMatrix, CalcXTBFragmentDescriptors,
-)
+## See an actual output
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-atoms = CalcXTBAtomDescriptors(result)
-bonds = CalcXTBBondDescriptors(mol, result)
-shells = CalcShellPopulations(result)
-density = CalcDensityMatrix(result)
-fragments = CalcXTBFragmentDescriptors(result, {
-    "ethyl": [0, 1],
-    "oxygen": [2],
-})
-```
+The following images were generated from an EleD GFN2-xTB single point on an embedded ethanol conformer. The molecular map is drawn with RDKit's `rdMolDraw2D`; the fragment charts are dependency-free SVG returned by EleD.
 
-`keep_overlap=True` makes the same calculation's coefficient, overlap, AO and
-shell data available to `CalcOrbitalPopulations`, `CalcFrontierDescriptors` and
-`CalcDensityDescriptors`.
+<p align="center">
+  <img alt="Ethanol with atom charges and fragment coloring" src="docs/assets/eled-ethanol-map.svg" width="520">
+</p>
 
-## Reactivity
+<p align="center">
+  <img alt="Ethanol fragment charge summary" src="docs/assets/eled-ethanol-fragments.svg" width="49%">
+  <img alt="Ethanol fragment interaction network" src="docs/assets/eled-ethanol-network.svg" width="49%">
+</p>
 
-```python
-from eled import RunReactivity, XTBOptions
-
-report = RunReactivity(
-    mol,
-    options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
-    population_scheme="lowdin",
-)
-print(report["values"]["ip_v_ev"])
-print(report["atoms"][0]["f_plus"])
-```
-
-The reactivity workflow evaluates matched charge states at the input geometry
-and returns molecular and atom-level Fukui data in a versioned report.
-
-## Reports, batches and geometry
-
-```python
-from eled import PrepareConformers, RunDescriptorBatch, ExportDescriptorReports
-
-prepared = PrepareConformers("CCO", num_conformers=3, optimize="MMFF94")
-reports = RunDescriptorBatch(
-    [prepared.molecule], record_ids=["ethanol"], max_workers=1,
-)
-ExportDescriptorReports(reports, "features.jsonl")
-```
-
-Use `OptimizeXTB` when the descriptor protocol calls for xTB-consistent
-coordinates. `RunConformerAnalysis` summarizes descriptor variation across a
-conformer pool.
-
-## Visualization
-
-EleD uses RDKit's `rdMolDraw2D` for molecular maps. Fragment summaries and
-interaction networks are returned as SVG, and `RenderFragmentAnalysis` combines
-them into an embeddable HTML fragment:
+A report keeps the numerical data behind those views:
 
 ```python
 from eled import (
     CalcDescriptorReport, DrawDescriptorMap, PlotFragmentSummary,
-    PlotFragmentInteractions, RenderFragmentAnalysis,
+    PlotFragmentInteractions,
 )
 
-report = CalcDescriptorReport(mol, result, fragments={
-    "ethyl": [0, 1],
-    "oxygen": [2],
-})
+report = CalcDescriptorReport(
+    mol,
+    result,
+    record_id="ethanol",
+    fragments={"ethyl": [0, 1, 3, 4, 5, 6, 7], "hydroxyl": [2, 8]},
+)
+
 molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
-summary_svg = PlotFragmentSummary(report, field="q_e")
+fragment_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
-html_fragment = RenderFragmentAnalysis(mol, report)
 ```
 
-See the [visualization guide](docs/visualization.md) for rendering and report
-field details.
+## Density and orbital analysis
+
+Retain the overlap and basis mapping when the calculation needs density-derived features:
+
+```python
+from eled import (
+    XTBCalculator, CalcOrbitalPopulations, CalcDensityMatrix,
+    CalcShellPopulations, CalcMayerBondDescriptors,
+    CalcFrontierBondDescriptors, CalcPiDescriptors,
+)
+
+result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
+
+mulliken = CalcOrbitalPopulations(result, scheme="mulliken")
+lowdin = CalcOrbitalPopulations(result, scheme="lowdin")
+density = CalcDensityMatrix(result)
+shells = CalcShellPopulations(result)
+mayer = CalcMayerBondDescriptors(mol, result)
+frontier_bonds = CalcFrontierBondDescriptors(mol, result)
+pi = CalcPiDescriptors(mol, result)
+```
+
+The density layer consumes the retained result; it does not start another xTB calculation. Units, invariance conventions and missing-value semantics are documented in the [descriptor catalog](docs/descriptor-catalog.md) and [density descriptor guide](docs/density-descriptors.md).
+
+## Reactivity and geometry
+
+`RunReactivity` evaluates matched charge states at the supplied geometry and returns ΔSCF ionization/attachment energies, global hardness and softness, Fukui functions and local conceptual-DFT indices. `PrepareConformers` provides RDKit embedding and force-field refinement; `OptimizeXTB` can then refine a geometry with the same native backend used for descriptors.
+
+```python
+from eled import RunReactivity, XTBOptions
+
+reactivity = RunReactivity(
+    mol,
+    options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
+    population_scheme="lowdin",
+)
+print(reactivity["values"]["ip_v_ev"])
+print(reactivity["atoms"][0]["f_plus"])
+```
+
+## Install
+
+The supported Linux x86-64 profile installs RDKit, EleD, the project-built extended `libxtb` and the optional `rdXTBTools` extension as one matched runtime:
+
+```bash
+git clone https://github.com/iawnix/EleD.git
+cd EleD
+python tools/install_native.py --jobs 6
+conda activate "$PWD/.eled/runtime"
+python -m eled doctor --check compiled --method GFN2-xTB
+```
+
+`--jobs` controls parallel build jobs; it does not change the numerical calculation. See the [installation guide](docs/install.md) for source builds and runtime layout.
 
 ## Documentation
 
-- [Documentation index](docs/README.md)
-- [Installation](docs/install.md)
-- [Descriptor definitions](docs/descriptors.md)
+- [Start here: documentation index](docs/README.md)
+- [Descriptor definitions and units](docs/descriptors.md)
 - [Descriptor catalog](docs/descriptor-catalog.md)
-- [Reports and reactivity](docs/descriptor-reports.md)
+- [Reports, quality and exports](docs/descriptor-reports.md)
 - [Visualization](docs/visualization.md)
 - [Geometry preparation](docs/geometry-preparation.md)
+- [xTB geometry optimization](docs/geometry-preparation.md)
 - [C++ interface](docs/rdxtb-tools.md)
-- [Native xTB backend build](docs/xtb-patched-build.md)
-- [Project positioning](docs/project-positioning.md)
+- [Native backend build](docs/xtb-patched-build.md)
 
-## Development
+Model training and benchmark datasets live in a separate `benchmarks/` layer. They are not required to calculate descriptors or to run the core test suite.
 
-See the [development guide](docs/development.md) for working on EleD in the
-environment created by the installer.
+## Scope
 
-EleD is released under the BSD 3-Clause license. The bundled xTB source and
-patches retain their upstream licenses.
+EleD provides ground-state, gas-phase electronic descriptors and fixed-geometry ΔSCF reactivity built around RDKit molecules. It does not present frontier-orbital proxies as excited-state observables, and it does not include a solvent model or an excited-state solver.
+
+The YAeHMOP/EHT adapter remains available as an independent RDKit comparison path. It is not the xTB backend used by EleD's descriptor protocol.
+
+## Contributing and license
+
+Development setup and test commands are in the [development guide](docs/development.md). Contributions that improve descriptor definitions, native reproducibility, RDKit integration or documentation are welcome.
+
+EleD is released under the BSD 3-Clause license. The bundled xTB source and patches retain their upstream licenses.
