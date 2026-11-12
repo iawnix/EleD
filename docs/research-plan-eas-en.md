@@ -1,78 +1,79 @@
-# Research plan: RDKit-native xTB density descriptors for EAS selectivity
+# EAS case study protocol
 
-## Scientific question
+This page is the EAS application of the broader [EleD research and case-study
+plan](research-plan-eled.md). EAS is a useful atom-labelled demonstration of
+EleD; it does not define the core package and it is not a claim that EleD is an
+EAS predictor.
 
-On an atom-labelled electrophilic aromatic substitution (EAS) task with strict
-scaffold and similarity-cluster separation, do shell-resolved density features
-from one xTB calculation add stable site-ranking information beyond RDKit
-structure features and a GFN1 partial-charge baseline?
+## Question
 
-The project does not claim to invent Mulliken, Löwdin or Fukui definitions. Its
-contribution is a reproducible RDKit/libxtb interface, an atom-level benchmark,
-and a reliability analysis that separates chemical signal from conformer and
-numerical sensitivity.
+Can a researcher use one indexed EleD feature archive to train a small atom-level
+classifier/ranker or graph model for electrophilic aromatic substitution (EAS)
+site labels?
 
-## Pre-registered feature groups
+The case measures interface usefulness, descriptor coverage and reproducibility.
+It does not require a GFN1-versus-EleD superiority result. A structure-only
+feature group (A) may be reported as a sanity control; GFN1 and other published
+feature recipes are optional ablations.
 
-- **A:** RDKit atom, bond and local-topology features;
-- **B:** A plus GFN1 charge, shell and Wiberg features;
-- **C:** corresponding GFN2 features;
-- **D:** C plus Mulliken/Löwdin s/p/d populations and p/s ratios;
-- **E:** D plus Mayer, frontier-bond and π features;
-- **F:** D plus Fukui, local softness and local electrophilicity;
-- **G:** D/F plus conformer mean, standard deviation, minimum and maximum.
+## Data
 
-A--D define the main conclusion. E--G are exploratory extensions and are reported
-separately. Missing values remain explicit masks with reasons; they are never
-replaced by zero.
+Use a versioned public RegioML/RegioSQM-style EAS export only after its source,
+license, atom mapping and release identity have been recorded. `protocol.json`
+freezes the allowed elements, event declaration, label indexing, deduplication and
+leakage rules. The source adapter must reject unmapped or ambiguous labels and
+must preserve every excluded row with a reason.
 
-## Frozen calculation protocol
+If the selected records are too few for an independent scaffold test set, label
+the case as a pilot. Do not turn a pilot into a generalization claim.
 
-Use the public RegioML/RegioSQM EAS atom labels and the selection rules in
-`protocol.json`. RDKit generates and checks at most ten conformers with ETKDGv3;
-other embedding presets are not used as silent fallbacks. GFN2 supplies the
-predeclared geometry, while GFN1 and GFN2 single points use identical coordinates.
-Every manifest carries the protocol SHA256 and a leakage-safe five-fold
-`cv_fold` in addition to the primary scaffold split.
-The extended `libxtb` build retains `C`, `S` and AO/shell maps for density analysis.
+## Electronic protocol
 
-The primary electronic temperature is 300 K. Feature generation also records a
-same-geometry GFN1/300 K comparison and a GFN2/1000 K calculation. The latter is
-a deliberately amplified occupation-sensitivity diagnostic; it is not a nuclear
-temperature, thermal conformer ensemble or excited-state calculation.
+- Prepare at most ten ETKDGv3 conformers using the frozen seed and retry policy.
+- Optimize the primary coordinates with extended-libxtb GFN2-xTB.
+- Run GFN2/300 K as the primary feature calculation.
+- Run GFN1/300 K on the identical coordinates as an optional method diagnostic.
+- Run GFN2/1000 K as an electronic-occupation sensitivity diagnostic.
+- Set `keep_overlap=True` for density, shell, frontier and π features.
+- Keep engine/parameter hashes, coordinate hashes, coverage and failure rows.
+- Never convert a failed or undefined descriptor into zero during feature export.
 
-## Models and evaluation
+## Feature groups
 
-This section is a benchmark specification, not part of the descriptor API. Its
-machine-readable contract is [`benchmarks/eas/model_protocol.json`](../benchmarks/eas/model_protocol.json);
-the feature protocol remains [`protocol.json`](../protocol.json).
+| Group | Contents | Role |
+| --- | --- | --- |
+| A | RDKit atom, bond and local-topology features | sanity control |
+| B | GFN1 charge and basic electronic features | optional method ablation |
+| C | GFN2 charge and basic electronic features | optional method ablation |
+| D | GFN2 plus Mulliken/Löwdin shell and density features | primary EleD case |
+| E | D plus Mayer, frontier-bond and π features | exploratory extension |
+| F | D plus Fukui and local conceptual-DFT features | exploratory extension |
+| G | D plus conformer statistics and reliability fields | robustness extension |
 
-Use regularized logistic regression and gradient-boosted trees. Keep molecules
-sharing a Bemis--Murcko scaffold or Morgan Tanimoto cluster in the same partition.
-Fit scaling, feature selection and imputation inside training folds only. The
-untouched test set is evaluated with molecule-weighted macro ROC-AUC, mean
-reciprocal rank, top-1 and top-2 accuracy, with PR-AUC and calibration as
-secondary measures.
+Groups are reported separately. A single best concatenated score is not the case
+conclusion.
 
-For every candidate minus GFN1 baseline comparison, use 2,000 molecule-level
-bootstrap replicates and report the difference with a 95% confidence interval.
-A positive result requires at least one primary metric whose interval is entirely
-above zero without significant deterioration in the other primary metrics. If
-this condition is not met, report no stable incremental benefit.
+## External model study
 
-## Required technical evidence
+The EleD repository does not contain model training code, hyperparameter files,
+datasets, trained weights or statistical results. An external research workspace
+consumes the frozen feature archive and owns model selection, preprocessing,
+calibration and uncertainty estimation. It must freeze molecule-level splits,
+keep atom and bond indices, record its environment and report held-out metrics
+without using test labels for decisions.
 
-Before model fitting, archive AO permutation, orbital-phase, degenerate-rotation
-and rigid-motion invariance tests; `trace(P S)` and shell-to-atom conservation;
-ctypes/compiled parity for GFN0/1/2; coverage and failure reasons; engine and
-parameter hashes; and conformer-level atom/bond index checks.
+The public EAS protocol evaluates the archive contract: descriptor coverage,
+missingness, provenance, runtime and reuse by downstream tabular or graph code.
+Feature groups and any model families are declared before the external study;
+EleD itself does not select a winning model or claim predictive superiority.
 
-The final package contains the frozen protocol and hash, selected-record manifest,
-feature files, failure manifest, training scripts, locked environment, test logs,
-models and bootstrap results. A negative result is retained as a valid outcome.
+## Artifacts
 
-The model command is isolated under `benchmarks/eas/` and
-`tools/run_eas_benchmark.py`. It consumes a validated feature archive, performs
-training-fold tuning, evaluates the untouched test partition, and reports paired
-molecule bootstrap intervals. It is an optional benchmark dependency and is not
-imported by the `eled` runtime package.
+The public archive consists of the frozen input manifest, protocol hash, feature
+JSON/JSONL archive, failure report and reproduction log. External model outputs,
+source exports and trained models are kept in a separate research workspace with
+checksums; they are not EleD release artifacts.
+
+`tools/prepare_eas_dataset.py` and `tools/run_eas_features.py` implement the
+public preparation and feature stages. Model stages are external. No real
+RegioML/RegioSQM archive is currently stored in this repository.

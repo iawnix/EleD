@@ -166,8 +166,10 @@ python -m eled doctor --check compiled --method GFN2-xTB
 - [xTB 几何优化](docs/geometry-preparation.md)
 - [C++ 接口](docs/rdxtb-tools.md)
 - [原生后端构建](docs/xtb-patched-build.md)
+- [研究与案例方案](docs/zh-CN/research-plan-eled.md)
 
-模型训练和基准数据集位于独立的 `benchmarks/` 层，不是计算描述符或运行核心测试所必需的依赖。
+应用模型训练、数据集和训练产物放在 EleD 仓库之外维护。公开包提供描述符报告
+和特征归档，外部研究工程可以直接消费这些产物。
 
 ## 项目边界
 

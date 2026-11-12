@@ -14,3 +14,6 @@ src/eled/rdXTBTools*.so
 .xtb-native/
 .eled/
 .xtb-native-0.5/
+
+# Local application studies; model training and datasets are not EleD sources.
+research/

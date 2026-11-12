@@ -35,16 +35,16 @@ EleD 是基于 xTB 的 RDKit 电子结构描述符扩展。文档按实际使用
 
 ## Research and validation / 研究与验证
 
-The research pages document the EAS feature protocol, benchmark preparation and
-numerical validation of the descriptor layers. They are useful when reproducing
-experiments or extending the feature set.
+The research pages separate EleD's software validation from optional application
+cases. They are useful when reproducing experiments or extending the feature
+set.
 
-研究页面记录 EAS 特征协议、数据准备和描述符层的数值验证，适合复现实验或
+研究页面把 EleD 软件验证、特征归档和可选应用案例分开记录，适合复现实验或
 扩展描述符功能。
 
+- [EleD research and case-study plan](research-plan-eled.md) · [EleD 研究与案例方案](zh-CN/research-plan-eled.md)
 - [EAS research plan](research-plan-eas-en.md) · [EAS 研究方案](zh-CN/research-plan-eas.md)
 - [EAS protocol audit](protocol-audit.md)
-- [EAS benchmark](../benchmarks/eas/README.md)
 - [Validation scope](mainline-validation.md)
 - [SCF diagnostics](scf-diagnostics.md)
 - [Literature and ML positioning](literature-density-ml-audit.md)

@@ -16,7 +16,7 @@ from eled.eas import FrozenProtocolSHA256, LoadFrozenProtocol
 
 
 def _atom_features(smiles):
-    """Serialize only stable RDKit graph features for the benchmark layer."""
+    """Serialize stable RDKit graph features for an external study archive."""
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         raise ValueError('SMILES could not be parsed for atom feature export')

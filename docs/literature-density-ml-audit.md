@@ -11,12 +11,15 @@ check, not a claim that the descriptors are experimentally unique observables.
 | Atomic conformer dispersion | Ensemble and conformer sensitivity statistics are common in cheminformatics | Usually reported as a workflow diagnostic rather than an xTB-specific learned feature | **reliability diagnostic**, with equal-weight and optional electronic-energy weighting |
 | Fukui / local conceptual-DFT indices | Condensed Fukui indices and global softness/electrophilicity are established | GFN1/GFN2 ΔSCF and charge/shell baselines are used for reactivity ML; GFN0 EEQ charges are not equivalent to density populations | **analysis of existing ΔSCF results**, with units and state-failure semantics |
 
-The primary validation target is atom-level EAS regioselectivity using the
-public RegioML/RegioSQM records. This target can test whether shell and
-frontier features add information beyond a GFN1 xTB partial-charge/shell baseline. QM8
-E1 is retained as a molecular smoke test only: it cannot establish utility for
-an atom-labelled target. CYP site-of-metabolism is the fallback target if the
-EAS atom mapping cannot be made reproducible.
+The primary application case is atom-level EAS regioselectivity using a
+versioned public RegioML/RegioSQM-style export. This target tests whether an
+RDKit-indexed EleD feature archive can be consumed by downstream atom-level
+models. The model study and its data remain outside the EleD repository. A
+structure-only feature group is a sanity control; GFN1 comparisons are optional
+ablations rather than the acceptance condition. QM8 E1 is retained as a
+molecular smoke test only: it cannot establish utility for an atom-labelled
+target. CYP site-of-metabolism is a fallback case if the EAS atom mapping cannot
+be made reproducible.
 
 The implementation follows the definitions in Mulliken, *J. Chem. Phys.* 23,
 1833 (1955); Löwdin, *J. Chem. Phys.* 18, 365 (1950); Mayer, *Chem. Phys.

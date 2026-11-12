@@ -1,6 +1,6 @@
 {
   "protocol_id": "eas_regioselectivity_v1",
-  "purpose": "Evaluate atom-level xTB density descriptors for electrophilic aromatic substitution regioselectivity.",
+  "purpose": "Freeze the feature archive contract for an optional EleD atom-level EAS case study.",
   "status": "frozen_before_feature_calculation",
   "target": {
     "primary": "RegioML/RegioSQM EAS regioselectivity labels",

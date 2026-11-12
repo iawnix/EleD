@@ -1,52 +1,68 @@
-# EAS 区域选择性研究方案
+# EAS 案例协议
 
-## 科学问题
+本页是 [EleD 总体研究与案例方案](research-plan-eled.md) 的 EAS 应用案例。
+EAS 适合作为原子标签示例，但不定义核心包，也不意味着 EleD 是专门的 EAS
+预测器。
 
-在严格按分子骨架和相似性聚类划分的原子级 EAS 任务中，来自同一次 xTB
-计算的 shell-resolved density 特征，是否能在 RDKit 结构特征和 GFN1
-partial-charge baseline 之外提供稳定的位点排序信息？
+## 研究问题
 
-这个问题比 QM8 的分子级激发能回归更适合检验原子描述符，因为标签直接对应
-反应原子。项目不声称发明 Mulliken、Löwdin 或 Fukui 定义，贡献集中在：
+研究者能否使用同一个带 RDKit 原子/键索引的 EleD 特征归档，训练一个小型
+EAS 原子分类/排序模型或图模型？
 
-1. RDKit 原子编号与扩展版 `libxtb` 的 `P`、`S`、AO/shell map 的一致接口；
-2. 原子级 EAS 任务上的严格特征消融和跨骨架测试；
-3. 构象、方法和电子温度三种可靠性诊断。
+本案例考察接口易用性、描述符覆盖率和可复现性，不要求得到“GFN1 被 EleD
+超过”的结论。结构-only 特征组 A 可以作为最小 sanity control；GFN1 和已发表
+特征方案只是可选消融。
+
+## 数据
+
+只有在记录数据源、许可证、原子映射和版本身份后，才使用有版本的公开
+RegioML/RegioSQM 风格 EAS 导出。`protocol.json` 冻结元素范围、事件声明、
+标签编号、去重和防泄漏规则。数据源适配器必须排除无法映射或标签有歧义的
+记录，并为每条排除记录保存原因。
+
+如果筛选后记录太少，无法形成独立 scaffold 测试集，案例必须标记为 pilot，
+不能写成一般化结论。
+
+## 电子计算协议
+
+- 使用冻结种子和重试策略，最多准备十个 ETKDGv3 构象；
+- 使用扩展版 libxtb GFN2-xTB 优化主坐标；
+- 主特征计算使用 GFN2/300 K；
+- GFN1/300 K 在完全相同坐标上运行，只作为可选方法诊断；
+- GFN2/1000 K 只作为电子占据敏感性诊断；
+- 密度、shell、前线和 π 特征使用 `keep_overlap=True`；
+- 保存引擎/参数哈希、坐标哈希、覆盖率和失败行；
+- 特征导出阶段不能把失败或未定义描述符改成零。
 
 ## 特征组
 
-- A：RDKit 原子、键和局部拓扑；
-- B：A + GFN1 电荷、shell 和 Wiberg 特征；
-- C：GFN2 的对应特征；
-- D：C + Mulliken/Löwdin s/p/d 和 p/s 特征；
-- E：D + Mayer、前线键和 π 特征；
-- F：D + Fukui、局部软度和局部亲电性；
-- G：D/F + 多构象 mean/std/min/max。
+| 组别 | 内容 | 作用 |
+| --- | --- | --- |
+| A | RDKit 原子、键和局部拓扑特征 | 最小控制 |
+| B | GFN1 电荷和基础电子特征 | 可选方法消融 |
+| C | GFN2 电荷和基础电子特征 | 可选方法消融 |
+| D | GFN2 加 Mulliken/Löwdin shell 和密度特征 | EleD 主案例 |
+| E | D 加 Mayer、前线键和 π 特征 | 探索性扩展 |
+| F | D 加 Fukui 和局部概念 DFT 特征 | 探索性扩展 |
+| G | D 加构象统计和可靠性字段 | 稳健性扩展 |
 
-A--D 是主要结论，E--G 单独作为探索性扩展。缺失值保留 mask 和原因，
-不能把缺失填成零。
+各组分开报告，不能只报告一个拼接后最高分作为案例结论。
 
-## 计算和评估
+## 外部模型研究
 
-这里的模型和评估属于独立的 benchmark 层，不是描述符 API 的一部分。
-机器可读的模型协议见
-[`benchmarks/eas/model_protocol.json`](../../benchmarks/eas/model_protocol.json)，
-`protocol.json` 只负责特征生成和数据清单。
+EleD 仓库不包含模型训练代码、超参数文件、数据集、训练权重或统计结果。独立研究
+工作区消费冻结的特征归档，并负责模型选择、预处理、校准和不确定性估计。研究工程
+必须冻结分子级划分，保留原子/键编号，记录环境，并保证测试标签不参与决策。
 
-使用公开 RegioML/RegioSQM EAS 原子标签，沿用 `protocol.json` 的筛选、
-严格 ETKDGv3（不启用其它 preset 的静默回退）、GFN2 几何和扩展版 `libxtb`。
-GFN1 与 GFN2 在同一坐标上做单点。主分析为 300 K；同时记录 GFN2/1000 K
-电子占据敏感性诊断，不代表热构象或激发态。输入清单保存协议 SHA256 和
-泄漏安全的五折 `cv_fold`。
+公开 EAS 协议用于检验归档合约：描述符覆盖率、缺失值、来源信息、运行时间，以及
+下游表格或图代码的复用能力。特征组和模型族在外部研究前声明；EleD 本身不挑选
+最佳模型，也不声称预测性能优越。
 
-模型使用正则化 logistic regression 和梯度提升树。测试集按 scaffold 加
-Morgan cluster 隔离，所有标准化、特征选择和缺失处理只在训练折拟合。
-主要指标为分子等权的 macro ROC-AUC、MRR、top-1 和 top-2，使用分子级
-2,000 次 bootstrap 计算候选组相对 GFN1 baseline 的差值和 95% CI。
+## 交付物
 
-如果没有稳定增益，负结果仍然保留，并明确描述适用边界。完整预注册方案见
-[English research plan](../research-plan-eas-en.md)。
+案例归档包括冻结输入 manifest、协议哈希、特征 JSON/JSONL、失败报告和复现日志。
 
-模型命令位于独立的 `benchmarks/eas/` 和 `tools/run_eas_benchmark.py`，只消费
-已经生成的特征归档，完成训练折调参、固定测试集评估和分子级 paired
-bootstrap。它是可选 benchmark 依赖，不会被 `eled` 运行时导入。
+外部模型输出放在带校验和的独立研究工作区，不作为 EleD 发布产物。
+
+`tools/prepare_eas_dataset.py` 和 `tools/run_eas_features.py` 实现公开的准备和
+特征阶段，模型阶段放在外部。当前仓库没有存放真实 RegioML/RegioSQM 特征归档。

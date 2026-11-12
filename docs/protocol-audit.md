@@ -1,9 +1,9 @@
 # EAS protocol audit
 
-This note records the executable boundary of `protocol.json`.  It is kept next
-to the protocol so a feature archive cannot be mistaken for a completed model
-benchmark. Model choices and acceptance rules live separately in
-[`benchmarks/eas/model_protocol.json`](../benchmarks/eas/model_protocol.json).
+This note records the executable boundary of `protocol.json`. It is kept next
+to the protocol so a feature archive cannot be mistaken for a completed case
+study. Model choices, training code and application data live in a separate
+research workspace and are not part of the EleD source tree.
 
 ## Checks now enforced
 
@@ -24,12 +24,12 @@ benchmark. Model choices and acceptance rules live separately in
 
 ## Items deliberately outside the feature runner
 
-The repository now ships the separate `tools/run_eas_benchmark.py` command and
-the A–G matrix exporter. It still does not contain a downloaded RegioML or
-RegioSQM dataset or a completed benchmark result. Nested hyperparameter selection,
-molecule-level bootstrap confidence intervals, calibration, and the A–G
-ablation tables still require a separate benchmark stage.  Until that stage is
-archived, no predictive gain or failure should be inferred from a feature file.
+The EleD repository ships the feature archive contract and feature-generation
+tooling. Model training, train-fold hyperparameter selection, validation
+checking, train+validation refitting, bootstrap reporting and calibration are
+performed by a separate research workspace. No RegioML/RegioSQM dataset,
+training code or trained model is part of this repository. No predictive result
+can be inferred from a feature file alone.
 
 The source adapter also cannot infer an EAS event from an arbitrary SMILES-only
 row.  Rows without `event_type`/`reaction_class` are accepted only because the

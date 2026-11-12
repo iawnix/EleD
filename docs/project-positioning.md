@@ -94,5 +94,6 @@ optimization remains an optional coordinate-preparation tool. New descriptors
 must answer a defined RDKit analysis need and pass unit, invariance, conservation
 and ctypes/compiled parity checks before entering the recommended catalog.
 
-The EAS benchmark is a validation application of this extension layer. It is
-kept in research tooling and does not define the package's core API.
+The EAS study is an external validation application of this extension layer. Its
+model code, data and results remain outside the EleD repository and do not define
+the package's core API.

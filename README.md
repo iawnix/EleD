@@ -166,8 +166,11 @@ python -m eled doctor --check compiled --method GFN2-xTB
 - [xTB geometry optimization](docs/geometry-preparation.md)
 - [C++ interface](docs/rdxtb-tools.md)
 - [Native backend build](docs/xtb-patched-build.md)
+- [Research and case-study plan](docs/research-plan-eled.md)
 
-Model training and benchmark datasets live in a separate `benchmarks/` layer. They are not required to calculate descriptors or to run the core test suite.
+Application model training, datasets and trained artifacts are maintained outside
+the EleD repository. The public package supplies descriptor reports and feature
+archives that an external study can consume.
 
 ## Scope
 
