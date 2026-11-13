@@ -44,6 +44,7 @@ set.
 
 - [EleD research and case-study plan](research-plan-eled.md) · [EleD 研究与案例方案](zh-CN/research-plan-eled.md)
 - [EAS research plan](research-plan-eas-en.md) · [EAS 研究方案](zh-CN/research-plan-eas.md)
+- [Application case research](research-application-cases.md) · [应用案例调研](zh-CN/research-application-cases.md)
 - [EAS protocol audit](protocol-audit.md)
 - [Validation scope](mainline-validation.md)
 - [SCF diagnostics](scf-diagnostics.md)
