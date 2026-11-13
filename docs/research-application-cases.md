@@ -20,11 +20,81 @@ The result is a demonstration of a usable electronic-descriptor interface. It
 does not make EleD a reaction predictor and does not require an EleD feature
 group to outperform a published model.
 
+## Why the optical database is a strong EleD case
+
+The optical database is a better molecular-level companion to the atom-level
+EAS case. The paper by Joung *et al.* describes 20,236 literature data points,
+7,016 chromophores and measurements in solvents or solid state. The current
+version-3 Figshare file is the source to freeze for a new study:
+`10.6084/m9.figshare.12045567.v3`, licensed CC BY 4.0. Its metadata and file
+row count have changed between releases, so the study must record the exact
+download URL, file SHA256 and row count rather than relying on the rounded
+numbers in a paper or on the copy shipped by DeepMPP.
+
+The DeepMPP repository is a model-training package, not an independent
+database authority. Its `_Data/optical.csv` is convenient for a software
+example, but the external study should cite and freeze the Figshare record and
+keep the training implementation outside EleD. The package itself was marked
+deprecated in July 2026 in favour of D4CMPP2; that software status does not
+invalidate the underlying optical data paper.
+
+The targets should be named precisely:
+
+| Target | Definition | Unit | Interpretation |
+| --- | --- | --- | --- |
+| `lambda_abs_nm` | first reported absorption maximum | nm | experimental optical transition; solvent/solid-state dependent |
+| `lambda_em_nm` | reported emission maximum | nm | experimental fluorescence/emission observable; solvent and environment dependent |
+| `e_abs_ev` | `1239.841984 / lambda_abs_nm` | eV | photon energy corresponding to the absorption maximum |
+| `e_em_ev` | `1239.841984 / lambda_em_nm` | eV | photon energy corresponding to the emission maximum |
+| `stokes_ev` | `e_abs_ev - e_em_ev` when both exist | eV | derived Stokes shift in energy |
+| `xtb_gap_ev` | EleD `LUMO - HOMO` | eV | ground-state xTB orbital gap, an input descriptor rather than the experimental optical gap |
+
+`e_abs_ev` must not be labelled as a HOMO–LUMO gap. The first allowed optical
+transition can differ from the orbital gap because of orbital relaxation,
+exciton binding, selection rules, vibronic structure and the environment.
+Likewise, EleD currently does not solve an excited state or a solvent-shifted
+emission state. The scientifically useful claim is therefore that EleD makes
+ground-state electronic features easy to calculate and archive for downstream
+prediction of experimental optical properties.
+
+The current Figshare v3 CSV contains 20,836 rows in the downloaded file, with
+17,703 absorption values, 18,851 emission values and 16,422 rows containing
+both. It contains repeated chromophore/solvent records from different papers;
+61 chromophore/solvent groups have conflicting absorption values and 77 have
+conflicting emission values. These are literature measurement records, not
+duplicates that may be silently averaged. The external study must retain the
+reference DOI, define a duplicate policy before splitting, and report the
+number of excluded or aggregated records.
+
+The same chromophore appears in multiple solvents, which is scientifically
+valuable and statistically dangerous. A random row split leaks a molecule's
+structure into the test set. The primary evaluation should split by canonical
+chromophore or scaffold. A secondary solvent-transfer experiment can hold out
+solvent conditions for chromophores that remain in training, but it must be
+reported as a different task. Solvent structure and environment features must
+be included explicitly when that task is studied.
+
+The optical case should compare three feature groups in the external research
+workspace:
+
+1. RDKit structure and solvent features;
+2. the same features plus EleD core descriptors such as `xtb_homo_ev`,
+   `xtb_lumo_ev`, `xtb_gap_ev`, dipole and charge summaries; and
+3. the full retained electronic feature archive, with shell, frontier and
+   π/reaction descriptors added only when their coverage is sufficient.
+
+The report should use molecule/scaffold-held-out MAE and RMSE in nm and eV,
+calibration or interval coverage where uncertainty is available, coverage and
+runtime. Emission and absorption should be evaluated separately. The optical
+database is therefore a strong first molecular case, while RegioSQM20 remains
+the complementary atom-level case.
+
 ## Candidates reviewed on 2026-11-13
 
 | Case | Labels and scale | Source and rights | EleD fit | Decision |
 | --- | --- | --- | --- | --- |
-| **RegioSQM20** | EAS reaction-site labels; 535 molecules and 604 raw labelled atom entries in the supplied `compounds.smiles` export | Code and supplied repository carry an MIT license; the article is CC BY 4.0. The rights of the exported reaction data still need to be recorded before redistribution. | Excellent: atom labels match charges, Fukui, shell, π and frontier descriptors; the input preserves RDKit atom order | **Primary case** |
+| **Experimental chromophore optics (Deep4Chem/Joung DB)** | Experimental absorption and emission maxima, lifetime, quantum yield and bandwidths; the current Figshare v3 file contains 20,836 rows with 16,422 rows having both absorption and emission maxima | Original database article and the Figshare record are CC BY 4.0; the DeepMPP copy is a software-distributed mirror and must not replace the frozen source record | Excellent for molecular electronic descriptors, solvent-aware features and a direct usability case; optical properties remain experimental excited-state targets | **Primary molecular-property case** |
+| **RegioSQM20** | EAS reaction-site labels; 535 molecules and 604 raw labelled atom entries in the supplied `compounds.smiles` export | Code and supplied repository carry an MIT license; the article is CC BY 4.0. The rights of the exported reaction data still need to be recorded before redistribution. | Excellent: atom labels match charges, Fukui, shell, π and frontier descriptors; the input preserves RDKit atom order | **Primary atom-level case** |
 | **RegioML** | EAS atom scores; published model and descriptor code, with the full training export hosted in ERDA | GitHub code is MIT; the ERDA data package and its redistribution terms must be checked separately | Very good for a related-work and interoperability check; weak as the first independent dataset because the data archive is external | **Reference / optional replication** |
 | **GNN-SOM** | Atom-SOM and bond-SOM labels from KEGG RPAIR; 21,023 molecules in the paper | KEGG RPAIR was downloaded under an academic license; the GitHub repository contains inference code and weights, not the curated training data | Good for testing EleD node and edge archives, but the license and reaction-centre reconstruction add risk | **Second-stage case** |
 | **ESNUEL / ESNUEL-ML** | QM-derived methyl cation and methyl anion affinities for 47,921 and 47,440 molecules, respectively; atom-level regression targets | MIT code; data and raw QM archives are distributed through ERDA and must be checked before use | Strong for a large numerical regression and archive-throughput study; expensive and less directly tied to experimental selectivity | **Optional scale case** |
