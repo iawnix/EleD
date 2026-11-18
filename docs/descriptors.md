@@ -64,8 +64,8 @@ origin. Total energies have method-specific references.
 
 Atom rows contain `atom_index`, `q_e` and `wbo_sum`; `q_e` is the engine charge
 set and its exact `charge_model` is recorded in report provenance. For GFN1/2,
-`cm5_q_e` is available as a separate, explicitly derived CM5 value. The latter
-is the sum of all off-diagonal WBOs involving that atom, not formal valence.
+`cm5_q_e` is the separately derived CM5 value. `wbo_sum` is the sum of all
+off-diagonal WBOs involving that atom and represents a bond-order aggregate.
 Bond rows contain `bond_index`, `begin_atom_index`, `end_atom_index` and
 `wbo`. They do not create bonds or change RDKit bond orders.
 

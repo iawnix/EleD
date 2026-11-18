@@ -86,9 +86,9 @@ report = RunReactivity(
 
 `population_scheme="xtb_scc"` 使用 GFN1/2 收敛后的 SCC Mulliken 电荷差分；
 `population_scheme="cm5"` 使用显式推导的 CM5 电荷差分。旧名称
-`"charges"` 仍可用，但已弃用并映射到 `"xtb_scc"`。报告会同时记录
+为兼容已有程序，`"charges"` 映射到 `"xtb_scc"`。报告会同时记录
 population scheme 和 charge model；`"mulliken"`、`"lowdin"` 指轨道人口分析，
-不是 `GetAtomicCharges()` 返回的原子电荷。
+对应轨道布居定义。
 
 ## 报告版本
 

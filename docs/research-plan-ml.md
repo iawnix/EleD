@@ -9,10 +9,11 @@ feature archive contract and descriptor-level validation.
 
 Can one RDKit-indexed EleD archive be consumed by conventional tabular models,
 GCN, GAT, GIN and Chemprop for molecular-property regression and atom-level
-reactivity prediction without recalculating electronic structure?
+reactivity prediction from one reusable electronic-structure archive?
 
-The study is an interface and capability evaluation. It is not a claim that a
-particular descriptor family or neural architecture is state of the art.
+The study evaluates interface capability and practical model use. It reports
+how each descriptor family and architecture performs under the declared data
+and compute protocols.
 
 Many existing studies already add tight-binding electronic features to machine
 learning. EleD's contribution is the software handoff: stable RDKit atom/bond
@@ -27,14 +28,15 @@ low-data usefulness and large-data operational scaling.
 | Reactivity | atom | RegioSQM20 public export plus ESNUEL/ESNUEL-ML ERDA archive after rights review | EAS reactive atom set; MCA and MAA | first atom case, covering small and large data |
 | Optical spectroscopy | molecule | Joung *et al.*, Scientific Data 2020; Figshare v3 `10.6084/m9.figshare.12045567.v3` | absorption and emission maxima | first molecular case |
 
-GNN-SOM, SET-LSF and other reaction-condition datasets are deferred until these
-two cases have stable archive and model contracts. They are extensions, not
-requirements for the first results.
+GNN-SOM, SET-LSF and other reaction-condition datasets follow after these two
+cases establish stable archive and model contracts. They form the extension set
+for later experiments.
 
 Every source receives a manifest containing source URL, commit or release,
 license, file SHA256, row count, structure parse status, target coverage and
-the exact filtering and duplicate policy. A mirror distributed with a model
-package is never treated as the authoritative data source.
+the exact filtering and duplicate policy. Freeze the cited source record as the
+data authority and retain model-package mirrors as separately identified
+convenience copies.
 
 ## Frozen feature groups
 
@@ -55,9 +57,9 @@ inside the training fold.
   and failure indicators.
 
 Null values remain null with an explicit missing reason during export. A model
-adapter may impute and add a missingness indicator, but only from its fitting
-partition. Zero is a valid physical value and must not be used as a missing
-sentinel.
+adapter may impute and add a missingness indicator using its fitting partition.
+Zero remains a valid physical value, while missingness is represented by the
+explicit reason field.
 
 ## Graph representation
 
@@ -65,12 +67,13 @@ The graph adapter preserves RDKit atom indices. Nodes contain structure and
 EleD atom features; edges contain RDKit bond features and incident EleD bond
 descriptors. Molecular quantities are carried as a global feature vector.
 Solvent and reaction-condition features are separate global inputs so that a
-model can be evaluated with or without environmental information.
+model can be evaluated with environmental information enabled or omitted.
 
 For atom-level tasks, the graph produces one score or regression value per
 node. For molecular optics, node embeddings are pooled with mean, sum or
 attention pooling and concatenated with the global vector. The graph adapter
-is external and must not add a dependency to the EleD runtime package.
+lives in the external research workspace; the EleD runtime package stays
+focused on descriptor generation and archive export.
 
 ## Model matrix
 
@@ -110,13 +113,15 @@ node-embedding head and a molecule-preserving ranking loss.
 
 For absorption and emission, train separate heads or a shared backbone with
 two masked regression heads. Report MAE and RMSE in nm and eV, Spearman
-correlation, calibration coverage and runtime. `e_abs_ev` is photon energy,
-not an experimental HOMO–LUMO gap.
+correlation, calibration coverage and runtime. `e_abs_ev` is the photon energy
+corresponding to the absorption maximum; `xtb_gap_ev` is the ground-state xTB
+orbital gap used as an input descriptor.
 
 For EAS and SOM, retain multiple positive atoms. Train weighted BCE or focal
 loss (`gamma=2`) and optionally a listwise ranking loss. Report molecule-level
-top-1/top-3/top-5 hit rate, MRR, nDCG, PR-AUC and ROC-AUC. Global atom accuracy
-is only a secondary diagnostic because molecule sizes and positive rates vary.
+top-1/top-3/top-5 hit rate, MRR, nDCG, PR-AUC and ROC-AUC. Use global atom
+accuracy as a secondary diagnostic and molecule-level metrics as the primary
+comparison across varying molecule sizes and positive rates.
 
 For MCA/MAA and other local reactivity targets, report atom-level and
 molecule-level MAE, RMSE, (R^2), Spearman correlation and errors stratified
@@ -141,28 +146,29 @@ Hyperparameters, imputation, scaling and feature selection are chosen inside
 the training partition using deterministic grouped folds. The validation set
 is reported as a development check; the final model is refit on train plus
 validation and evaluates the test set once. Report every declared seed, mean,
-standard deviation and molecule-bootstrap 95% interval. Calibration is
-descriptive and is never selected on the test labels.
+standard deviation and molecule-bootstrap 95% interval. Use validation data for
+model selection and report test-set calibration as a descriptive result.
 
 ## Small- and large-sample evidence
 
-The independent unit is always the molecule or reaction record. Counting every
-atom as an independent sample would overstate evidence for atom-level tasks.
+Use the molecule or reaction record as the independent unit for all estimates;
+atom-level predictions remain grouped within that unit during splitting and
+uncertainty analysis.
 
 The low-data study subsamples the same frozen source at 50, 100, 250 and 500
 molecules (or the largest available balanced subsets for atom labels). It uses
 repeated scaffold splits and reports the learning curve, mean and standard
 deviation across seeds, and the number of examples needed to reach a fixed
 error or ranking target. Ridge/ElasticNet, a shallow tree model and a small GIN
-or Chemprop model are sufficient for this study; large neural models are not
-automatically preferred when they overfit.
+or Chemprop model cover the low-data study. Select larger neural models only
+when the validation results support their use.
 
 The large-data study uses the complete optical archive and an ESNUEL-scale or
 other openly licensed reaction archive. It measures throughput, peak memory,
 parallel scaling, feature coverage, archive size, cache reuse and model fit
-time. The expensive xTB stage is run once and its cost is amortized across all
-tabular and graph models. A successful result shows that adding models does not
-silently trigger new electronic-structure calculations.
+time. Run the expensive xTB stage once and amortize its cost across all
+tabular and graph models. Record archive reuse and engine-call counts to
+quantify this workflow.
 
 The primary software comparisons are RDKit-only features, a direct one-off
 xTB script or published descriptor export when reproducible, and the EleD
@@ -173,8 +179,8 @@ failures, reproducibility and archive reuse are equally important results.
 
 Every run also records descriptor coverage, missing reasons, conformer and SCF
 failure rates, xTB engine calls, wall time, archive size, cache hits and native/
-compiled numerical parity. A successful case must show that the same archive
-feeds every declared model without an additional electronic-structure call.
+compiled numerical parity. Each case records how the same archive feeds every
+declared model, together with the associated electronic-structure call count.
 
 ## Execution milestones
 

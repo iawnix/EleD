@@ -24,7 +24,7 @@ EleD is an RDKit extension for electronic-structure descriptors. The RDKit molec
 
 ## Why EleD?
 
-RDKit is excellent at representing molecular structure. xTB is excellent at producing fast approximate electronic structure. EleD joins those two layers in a reusable API so that a calculation can be inspected at molecular, atomic, bond, fragment, density and reactivity levels without losing the original RDKit indexing.
+RDKit is excellent at representing molecular structure. xTB is excellent at producing fast approximate electronic structure. EleD joins those two layers in a reusable API so that one calculation can be inspected at molecular, atomic, bond, fragment, density and reactivity levels while preserving the original RDKit indexing.
 
 The core flow is simple:
 
@@ -59,7 +59,7 @@ print(values["xtb_energy_ha"])
 print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBResult` is reusable. The same result can feed descriptor tables, fragment summaries, density analysis and a report, so repeated analysis does not silently repeat the engine call.
+`XTBResult` is reusable. The same result feeds descriptor tables, fragment summaries, density analysis and a report, with one recorded engine call.
 
 ## What you get
 
@@ -123,7 +123,7 @@ frontier_bonds = CalcFrontierBondDescriptors(mol, result)
 pi = CalcPiDescriptors(mol, result)
 ```
 
-The density layer consumes the retained result; it does not start another xTB calculation. Units, invariance conventions and missing-value semantics are documented in the [descriptor catalog](docs/descriptor-catalog.md) and [density descriptor guide](docs/density-descriptors.md).
+The density layer consumes the retained result and records the same xTB calculation. Units, invariance conventions and missing-value semantics are documented in the [descriptor catalog](docs/descriptor-catalog.md) and [density descriptor guide](docs/density-descriptors.md).
 
 ## Reactivity and geometry
 
@@ -153,7 +153,7 @@ conda activate "$PWD/.eled/runtime"
 python -m eled doctor --check compiled --method GFN2-xTB
 ```
 
-`--jobs` controls parallel build jobs; it does not change the numerical calculation. See the [installation guide](docs/install.md) for source builds and runtime layout.
+`--jobs` controls parallel build jobs; the numerical calculation follows the selected method and options. See the [installation guide](docs/install.md) for source builds and runtime layout.
 
 ## Documentation
 
@@ -175,9 +175,9 @@ archives that an external study can consume.
 
 ## Scope
 
-EleD provides ground-state, gas-phase electronic descriptors and fixed-geometry ΔSCF reactivity built around RDKit molecules. It does not present frontier-orbital proxies as excited-state observables, and it does not include a solvent model or an excited-state solver.
+EleD provides ground-state, gas-phase electronic descriptors and fixed-geometry ΔSCF reactivity built around RDKit molecules. Frontier-orbital descriptors describe the ground-state calculation. Solvent models and excited-state solvers belong to downstream extensions.
 
-The YAeHMOP/EHT adapter remains available as an independent RDKit comparison path. It is not the xTB backend used by EleD's descriptor protocol.
+The YAeHMOP/EHT adapter remains available as an independent RDKit comparison path. EleD's descriptor protocol uses the extended xTB backend.
 
 ## Contributing and license
 

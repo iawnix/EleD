@@ -59,7 +59,7 @@ print(values["xtb_energy_ha"])
 print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBResult` 可以重复使用。同一个结果可以继续生成描述符表、片段汇总、密度分析和报告，后续分析不会悄悄重复调用引擎。
+`XTBResult` 可以重复使用。同一个结果可以继续生成描述符表、片段汇总、密度分析和报告，所有视图共享同一次已记录的引擎计算。
 
 ## 可以得到什么？
 
@@ -123,7 +123,7 @@ frontier_bonds = CalcFrontierBondDescriptors(mol, result)
 pi = CalcPiDescriptors(mol, result)
 ```
 
-密度层直接消费已经保留的数据，不会再次启动 xTB。单位、不变性约定和缺失值语义见[描述符目录](docs/zh-CN/descriptor-catalog.md)和[密度描述符说明](docs/density-descriptors.md)。
+密度层直接消费已经保留的数据并沿用同一次 xTB 计算。单位、不变性约定和缺失值语义见[描述符目录](docs/zh-CN/descriptor-catalog.md)和[密度描述符说明](docs/density-descriptors.md)。
 
 ## 反应性和几何
 
@@ -174,9 +174,9 @@ python -m eled doctor --check compiled --method GFN2-xTB
 
 ## 项目边界
 
-EleD 提供围绕 RDKit 分子的基态、气相电子描述符和固定几何 ΔSCF 反应性分析。前线轨道代理量不会被表述为激发态观测量，项目也不包含溶剂模型或激发态求解器。
+EleD 提供围绕 RDKit 分子的基态、气相电子描述符和固定几何 ΔSCF 反应性分析。前线轨道描述符对应基态计算；溶剂模型和激发态求解器属于下游扩展。
 
-YAeHMOP/EHT 适配器作为独立的 RDKit 对照路径保留，不是 EleD 描述符协议使用的 xTB 后端。
+YAeHMOP/EHT 适配器作为独立的 RDKit 对照路径保留；EleD 描述符协议使用扩展版 xTB 后端。
 
 ## 贡献和许可证
 

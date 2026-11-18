@@ -186,8 +186,8 @@ GFN descriptors, **not calibrated experimental IP/EA or optical excitations**.
 For atomic electron populations nA, f+ = nA(N+1)−nA(N), f− = nA(N)−nA(N−1),
 f0 = (f++f−)/2, dual = f+−f−. `population_scheme="xtb_scc"` uses differences
 of the converged GFN1/2 SCC Mulliken charges; `population_scheme="cm5"` uses
-the explicitly derived xTB CM5 charges. The legacy name `"charges"` is accepted
-as a deprecated alias for `"xtb_scc"`. `"mulliken"` and `"lowdin"` refer to
+the explicitly derived xTB CM5 charges. For compatibility, `"charges"` maps to
+`"xtb_scc"`. `"mulliken"` and `"lowdin"` refer to
 occupation-weighted orbital populations and require the extended basis API.
 The report records both the population scheme and charge model; signed values
 are preserved and sums are checked against 1, 1 and 0. Explicit disjoint
