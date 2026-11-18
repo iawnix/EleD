@@ -10,7 +10,7 @@
 
 - `xtb_energy_ha`、`xtb_homo_ev`、`xtb_lumo_ev`、`xtb_gap_ev`；
 - 偶极分量和模长；
-- 原子 `q_e`、`wbo_sum`；
+- 原子 `q_e`、`cm5_q_e`、`wbo_sum`；`q_e` 的确切模型写入 `charge_model`，`cm5_q_e` 单独表示 CM5；
 - RDKit 键的 `wbo`；
 - Mulliken/Löwdin s/p/d 布居和 p/s 比；
 - GFN1/2 固定几何 ΔSCF 的 IP、EA、硬度、软度和 Fukui 指数。

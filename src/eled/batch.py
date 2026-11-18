@@ -16,6 +16,7 @@ from .result import XTBResult
 from .runtime import _engine_identity, _parameter_context, _parameter_file
 from .xtb import _resolve_options, _run_xtb
 from .errors import XTBCacheError, XTBEnvironmentError, XTBNativeNotFoundError
+from .charges import charge_model_for_method
 
 
 def _prepare(mol: Any, options: XTBOptions) -> tuple[XTBOptions, dict]:
@@ -38,6 +39,7 @@ def _key(options: XTBOptions, metadata: dict) -> str:
     payload = {'schema': 5, 'input': metadata, 'options': values,
                'implementation': _implementation_identity(),
                'engine': engine,
+               'charge_model': charge_model_for_method(options.method),
                'parameters': _parameter_context(),
                'parameter_file': _parameter_file(options.method, path)}
     return hashlib.sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()

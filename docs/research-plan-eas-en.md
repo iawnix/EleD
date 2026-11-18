@@ -47,8 +47,9 @@ the case as a pilot. Do not turn a pilot into a generalization claim.
 | C | GFN2 charge and basic electronic features | optional method ablation |
 | D | GFN2 plus Mulliken/Löwdin shell and density features | primary EleD case |
 | E | D plus Mayer, frontier-bond and π features | exploratory extension |
-| F | D plus Fukui and local conceptual-DFT features | exploratory extension |
+| F | E plus Fukui and local conceptual-DFT features | cumulative reactivity extension |
 | G | D plus conformer statistics and reliability fields | robustness extension |
+| R | Fukui and local conceptual-DFT features only | isolated local-reactivity ablation |
 
 Groups are reported separately. A single best concatenated score is not the case
 conclusion.

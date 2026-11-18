@@ -37,6 +37,11 @@ struct XTBResults {
   int numTotalElectrons = 0;  // sum of nuclear charges minus molecular charge
   int numUnpairedElectrons = 0;
   int charge = 0;
+  // Exact semantics of atomicCharges: GFN1/2 are SCC Mulliken charges;
+  // GFN0 is the PEEQ/EEQ charge model. They are not CM5 charges.
+  std::string chargeModel;
+  std::vector<int> atomicNumbers;
+  std::vector<double> coordinatesAngstrom; // row-major [atom][xyz]
   int apiVersion = 0;
   int maxIterations = 250;
   double accuracy = 1.0;

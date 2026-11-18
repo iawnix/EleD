@@ -72,7 +72,7 @@ MAE、RMSE；如果有不确定性，再报告校准或区间覆盖率，同时�
 
 | 案例 | 标签和规模 | 数据源与权利 | 与 EleD 的匹配度 | 决定 |
 | --- | --- | --- | --- | --- |
-| **实验发色团光学性质（Deep4Chem/Joung 数据库）** | 实验吸收峰、发射峰、寿命、量子产率和带宽；当前 Figshare v3 文件有 20,836 行，其中 16,422 行同时有吸收和发射峰 | 原始数据库论文和 Figshare 记录为 CC BY 4.0；DeepMPP 副本只是随软件分发的镜像，不能替代冻结的数据源记录 | 适合分子电子描述符、溶剂感知特征和接口可用性案例；光学性质仍是实验激发态目标 | **第一分子性质案例** |
+| **实验发色团光学性质（Joung 发色团数据库）** | 实验吸收峰、发射峰、寿命、量子产率和带宽；当前 Figshare v3 文件有 20,836 行，其中 16,422 行同时有吸收和发射峰 | 数据源是数据库论文和 Figshare 记录；Deep4Chem/DeepMPP 副本只是随软件分发的镜像，不能替代冻结的数据源记录 | 适合分子电子描述符、溶剂感知特征和接口可用性案例；光学性质仍是实验激发态目标 | **第一分子性质案例** |
 | **RegioSQM20** | EAS 反应位点标签；随附 `compounds.smiles` 有 535 个分子、604 个原始标注原子条目 | 代码和随附仓库带 MIT 许可证；论文为 CC BY 4.0。导出反应数据的再分发权仍需单独记录 | 很高：标签粒度与电荷、Fukui、shell、π 和前线描述符一致；输入保留 RDKit 原子顺序 | **第一原子级案例** |
 | **RegioML** | EAS 原子分数；公开模型和描述符代码，完整训练导出在 ERDA | GitHub 代码为 MIT；ERDA 数据包及再分发条件需单独核对 | 很高，适合作为相关工作和互操作性检查；外部数据不适合做第一个独立数据源 | **参考 / 可选复核** |
 | **GNN-SOM** | KEGG RPAIR 的原子 SOM 和键 SOM 标签；论文报告 21,023 个分子 | RPAIR 按 KEGG 学术许可下载；GitHub 仓库没有整理后的训练数据 | 可检验 EleD 的节点和边归档，但许可和反应中心重建增加风险 | **第二阶段** |
@@ -86,9 +86,10 @@ RegioSQM20 论文描述了 535 个文献 EAS 溴化反应，并给出实验观�
 `jensengroup/SI_RegioSQM20@6f9539594b9a07babd76db347ca6d2f550c3ad97`。
 其中 `RegioSQM20/compounds.smiles` 每行是
 `record_id SMILES site_indices`；逗号分隔的编号表示多个观察位点。使用
-RDKit 2026.09.1 解析得到 535 条有效记录、604 个原始正标签原子，没有越界
-编号。随附 SDF 是二维结构文件，不包含这些反应标签，因此适配器必须把
-SMILES 文件和行身份一起保留。
+RDKit 2026.09.1 解析得到 535 条源记录和 604 个原始正标签原子。按 EleD
+当前冻结的元素筛选规则，选中 533 条记录和 602 个正标签；排除的两条记录含有
+Ge 和 Se。源导出没有越界编号。随附 SDF 是二维结构文件，不包含这些反应标签，
+因此适配器必须把 SMILES 文件和行身份一起保留。
 
 这个案例适合 EleD，因为目标和报告特征处于同一原子粒度。特征行可以同时
 保留原始 RDKit 原子编号、标签、缺失原因和计算来源；同一份冻结归档随后可
@@ -153,6 +154,11 @@ notebook、模型状态和配置，没有整理后的训练集。KEGG 的学术�
 作为背景或消融，不能成为 EleD 的验收条件。
 
 ## 来源记录
+
+- 光学数据库论文：[Joung 等，Scientific Data (2020)](https://doi.org/10.1038/s41597-020-00634-8)，《Experimental database of optical properties of organic compounds》。
+- 光学数据库记录：[DB for chromophore，Figshare v3](https://doi.org/10.6084/m9.figshare.12045567.v3)，CC BY 4.0。
+- JACS Au 应用论文：[Joung 等，JACS Au (2021)](https://doi.org/10.1021/jacsau.1c00035)，《Deep Learning Optical Spectroscopy Based on Experimental Database: Potential Applications to Molecular Design》。
+- Deep4Chem/DeepMPP 软件：[ACCA-KU/DeepMPP](https://github.com/ACCA-KU/DeepMPP)。其中随软件提供的 optical CSV 是便利镜像，不是权威数据记录。
 
 - RegioSQM20 论文：[Ree, Göller and Jensen (2021)](https://doi.org/10.1186/s13321-021-00490-7)，文章为 CC BY 4.0。
 - RegioSQM20 代码：[jensengroup/RegioSQM20](https://github.com/jensengroup/RegioSQM20)。

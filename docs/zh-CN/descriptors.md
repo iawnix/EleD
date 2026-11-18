@@ -22,7 +22,8 @@ bonds = CalcXTBBondDescriptors(mol, result)
 - `xtb_energy_ha`：总电子能，Hartree；
 - `xtb_homo_ev`、`xtb_lumo_ev`、`xtb_gap_ev`：eV；
 - `xtb_dip_*_ebohr`、`xtb_dip_debye`：偶极分量和模长；
-- `xtb_q_*_e`：原子部分电荷统计；
+- `xtb_q_*_e`：xTB 原子电荷统计；GFN1/2 是 SCC Mulliken，GFN0 是 PEEQ/EEQ，准确模型写入 provenance；
+- `xtb_cm5_q_*_e`、原子 `cm5_q_e`：由 GFN1/2 SCC Mulliken 电荷和计算几何显式推导的 CM5 电荷；
 - `q_e`、`wbo_sum`：原子级特征；
 - `wbo`：对应 RDKit 键的 Wiberg 键级。
 

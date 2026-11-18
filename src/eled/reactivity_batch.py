@@ -11,12 +11,13 @@ from .input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
 from .options import XTBOptions
 from .persistence import (XTBDiskCache, ReactivityCheckpoint, _digest,
                           _implementation_identity)
-from .reactivity import (RunReactivity, _empty_report, _scheme, REACTIVITY_UNITS,
+from .reactivity import (RunReactivity, _empty_report, _scheme, _population_model, REACTIVITY_UNITS,
                          REACTIVITY_PROTOCOL_VERSION)
 from .reports import DESCRIPTOR_VERSION, SCHEMA_VERSION
 from .runtime import _engine_identity, _parameter_context, _parameter_file
 from .xtb import _resolve_options
 from .electronic_descriptors import _fragments
+from .charges import CHARGE_MODEL_CM5, CHARGE_MODEL_SCC
 
 
 @dataclass(frozen=True)
@@ -37,7 +38,7 @@ class ReactivityJob:
 
 def _prepare_jobs(jobs, options, population_scheme, interface, initialization):
     from rdkit import Chem
-    _scheme(population_scheme)
+    population_scheme = _scheme(population_scheme)
     if interface not in ('native', 'compiled'):
         raise ValueError('interface must be native or compiled')
     if initialization not in ('reference', 'independent'):
@@ -66,7 +67,7 @@ def _prepare_jobs(jobs, options, population_scheme, interface, initialization):
             if spin is not None and (isinstance(spin, bool) or not isinstance(spin, Integral) or not 0 <= spin <= 2147483647):
                 raise ValueError('adjacent spins must be nonnegative integers')
         # Fail on installation/capability errors even if a stored row exists.
-        config = _resolve_options(replace(config, keep_overlap=config.keep_overlap or population_scheme != 'charges'))
+        config = _resolve_options(replace(config, keep_overlap=config.keep_overlap or population_scheme in ('mulliken', 'lowdin')))
         engine = _engine_identity('native', config.xtb_library)
         if not engine['sha256']:
             raise ValueError('persistent protocols require a fingerprintable libxtb file')
@@ -104,6 +105,8 @@ def _prepare_jobs(jobs, options, population_scheme, interface, initialization):
             'options': config.to_dict(), 'engine': engine, 'parameter_file': parameters,
             'parameter_context': _parameter_context(), 'interface': interface,
             'initialization': initialization, 'population_scheme': population_scheme,
+            'charge_model': CHARGE_MODEL_CM5 if population_scheme == 'cm5' else CHARGE_MODEL_SCC,
+            'population_model': _population_model(population_scheme),
             'ionized_uhf': None if job.ionized_uhf is None else int(job.ionized_uhf),
             'attached_uhf': None if job.attached_uhf is None else int(job.attached_uhf),
             'fragments': groups}
@@ -111,7 +114,7 @@ def _prepare_jobs(jobs, options, population_scheme, interface, initialization):
     return prepared
 
 
-def RunReactivityBatch(jobs, *, options=None, population_scheme='charges', interface='native',
+def RunReactivityBatch(jobs, *, options=None, population_scheme='xtb_scc', interface='native',
                          initialization='reference', cache=None, checkpoint=None, retry_failed=False,
                          max_workers=1, timeout=None, isolate=False):
     """Run ordered ReactivityJob records with molecule-level checkpoint commits.
@@ -130,6 +133,7 @@ def RunReactivityBatch(jobs, *, options=None, population_scheme='charges', inter
         raise ValueError('retry_failed must be Boolean')
     if cache is not None and not isinstance(cache, XTBDiskCache):
         raise TypeError('cache must be XTBDiskCache')
+    population_scheme = _scheme(population_scheme)
     prepared = _prepare_jobs(jobs, options, population_scheme, interface, initialization)
     if checkpoint is not None and not isinstance(checkpoint, ReactivityCheckpoint):
         checkpoint = ReactivityCheckpoint(checkpoint)

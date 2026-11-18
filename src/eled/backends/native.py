@@ -13,6 +13,7 @@ from ..options import CalculationSettings
 from ..result import XTBResult, _frontier_energies
 from ..input import _xyz_from_mol, _method_flag, _effective_charge_uhf, _input_metadata
 from ..runtime import _find_xtb_library, _engine_identity, _parameter_file, _require_extended_libxtb
+from ..charges import charge_model_for_method, calc_cm5_charges, CHARGE_MODEL_CM5
 
 HARTREE_TO_EV = 27.211386245988
 ANGSTROM_TO_BOHR = 1.8897261254578281
@@ -339,6 +340,13 @@ def _run_xtb_native(
             orbital_energies_ev=energies_ev,
             orbital_occupations=occupation_values,
             partial_charges=tuple(float(value) for value in charges),
+            charge_model=charge_model_for_method(method_name),
+            cm5_charges=(calc_cm5_charges(
+                [atom.GetAtomicNum() for atom in mol.GetAtoms()],
+                [[conf.GetAtomPosition(i).x, conf.GetAtomPosition(i).y, conf.GetAtomPosition(i).z]
+                 for i in range(natoms)],
+                tuple(float(value) for value in charges)
+            ) if method_name in ('GFN1-xTB', 'GFN2-xTB') else ()),
             dipole_e_bohr=tuple(float(value) for value in dipole),
             wiberg_bond_orders=tuple(
                 tuple(float(bond_orders[row * natoms + column]) for column in range(natoms))
@@ -363,6 +371,8 @@ def _run_xtb_native(
                 'native_api_version': int(library.get_api_version()),
                 'elapsed_seconds': time.perf_counter() - started,
                 'coefficient_axes': ['AO', 'MO'],
+                'charge_model': charge_model_for_method(method_name),
+                'cm5_model': CHARGE_MODEL_CM5 if method_name in ('GFN1-xTB', 'GFN2-xTB') else None,
                 'overlap_source': 'same libxtb calculation' if keep_overlap else None,
                 **({'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
                    if gradient is not None else {}),

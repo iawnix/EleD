@@ -12,6 +12,7 @@ from numbers import Integral
 import numpy as np
 
 from .result import XTBResult
+from .charges import charge_model_for_method, calc_cm5_charges
 
 AU_DIPOLE_TO_DEBYE = 2.541746473
 
@@ -40,6 +41,8 @@ def _as_result(result):
             basis["ao_shell_indices"], basis["shell_angular_momenta"])
     metadata = json.loads(result.inputProvenanceJSON) if result.inputProvenanceJSON else {'atom_count': result.numAtoms}
     metadata = dict(metadata)
+    charge_model = getattr(result, 'chargeModel', None) or metadata.get(
+        'charge_model', charge_model_for_method(result.method))
     from .scf import scf_record
     metadata['scf'] = scf_record(result.method, getattr(result, 'scfIterations', -1),
         [getattr(result, name, -1.) for name in ('scfEnergyChangeHartree', 'scfMixerRMS',
@@ -51,8 +54,16 @@ def _as_result(result):
         engine={'backend': 'compiled', 'path': result.libraryPath, 'sha256': result.librarySHA256,
                 'source_commit': result.sourceCommit, 'api_version': result.apiVersion},
         parameter_file={'path': result.parameterFile, 'sha256': result.parameterSHA256} if result.parameterFile else None)
+    metadata['charge_model'] = charge_model
     if hasattr(result, 'GetGradient'):
         metadata['gradient_hartree_per_bohr'] = tuple(float(value) for value in np.asarray(result.GetGradient()).ravel())
+    partial_charges = tuple(result.GetAtomicCharges())
+    cm5_charges = ()
+    if charge_model == 'xtb_scc_mulliken' and hasattr(result, 'GetCM5Charges'):
+        cm5_charges = tuple(result.GetCM5Charges())
+    elif charge_model == 'xtb_scc_mulliken' and metadata.get('coordinates_angstrom') is not None:
+        cm5_charges = calc_cm5_charges(metadata.get('atomic_numbers', ()),
+                                        metadata['coordinates_angstrom'], partial_charges)
     return XTBResult(
         **basis,
         method=result.method, version=None, total_energy_hartree=result.totalEnergyHartree,
@@ -61,7 +72,8 @@ def _as_result(result):
         number_of_unpaired_electrons=result.numUnpairedElectrons,
         orbital_energies_ev=tuple(result.GetOrbitalEnergies()),
         orbital_occupations=tuple(result.GetOrbitalOccupancies()),
-        partial_charges=tuple(result.GetAtomicCharges()), dipole_e_bohr=tuple(result.GetDipole()),
+        partial_charges=partial_charges, charge_model=charge_model, cm5_charges=cm5_charges,
+        dipole_e_bohr=tuple(result.GetDipole()),
         wiberg_bond_orders=tuple(map(tuple, result.GetWibergBondOrders())),
         backend='compiled', metadata=metadata,
     )
@@ -103,6 +115,22 @@ def _charges(result):
     if expected is not None and len(charges) not in (0, expected):
         raise ValueError('partial charges do not match atom count')
     return charges
+
+
+def CalcCM5Charges(result):
+    """Return derived CM5 charges and reject results where CM5 is undefined.
+
+    ``result.partial_charges`` remains the engine charge set.  Callers that
+    need CM5 must use this explicitly named accessor rather than interpreting
+    ``q_e`` or ``GetAtomicCharges`` as CM5.
+    """
+    result = _as_result(result)
+    if not len(result.cm5_charges):
+        raise ValueError('CM5 charges are unavailable for this result; GFN1/2 SCC charges and geometry are required')
+    values = _finite(result.cm5_charges, 'CM5 charges', 1)
+    if result.metadata.get('atom_count') not in (None, len(values)):
+        raise ValueError('CM5 charges do not match atom count')
+    return tuple(float(value) for value in values)
 
 
 def _wbo(result, natoms):
@@ -183,6 +211,11 @@ def CalcXTBDescriptors(result, *, frontier_depth=2, occupation_threshold=1e-7):
     for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
                         ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
         output[f'xtb_q_{label}_e'] = float(func(charges)) if len(charges) else None
+    cm5 = _finite(result.cm5_charges, 'CM5 charges', 1) if len(result.cm5_charges) else np.array(())
+    if len(cm5):
+        for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
+                            ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
+            output[f'xtb_cm5_q_{label}_e'] = float(func(cm5))
     wbo = _wbo(result, len(charges))
     output['xtb_wbo_sum'] = float(np.triu(wbo, 1).sum()) if wbo is not None else None
     return output
@@ -199,9 +232,16 @@ def CalcXTBAtomDescriptors(result):
     if not len(charges):
         raise ValueError('atomic descriptors require partial charges')
     wbo = _wbo(result, len(charges))
-    return [{'atom_index': i, 'q_e': float(q),
-             'wbo_sum': float(wbo[i].sum()) if wbo is not None else None}
-            for i, q in enumerate(charges)]
+    cm5 = _finite(result.cm5_charges, 'CM5 charges', 1) if len(result.cm5_charges) else None
+    if cm5 is not None and len(cm5) != len(charges):
+        raise ValueError('CM5 charges do not match atom count')
+    rows = []
+    for i, q in enumerate(charges):
+        row = {'atom_index': i, 'q_e': float(q),
+               'wbo_sum': float(wbo[i].sum()) if wbo is not None else None}
+        if cm5 is not None: row['cm5_q_e'] = float(cm5[i])
+        rows.append(row)
+    return rows
 
 
 def CalcXTBBondDescriptors(mol, result):
@@ -236,6 +276,9 @@ def CalcXTBFragmentDescriptors(result, fragments):
     groups = _fragments(fragments, len(charges))
     wbo = _wbo(result, len(charges))
     records, pairs = {}, []
+    cm5 = _finite(result.cm5_charges, 'CM5 charges', 1) if len(result.cm5_charges) else None
+    if cm5 is not None and len(cm5) != len(charges):
+        raise ValueError('CM5 charges do not match atom count')
     for name, indices in groups.items():
         outside = np.setdiff1d(np.arange(len(charges)), indices)
         records[name] = {
@@ -247,6 +290,11 @@ def CalcXTBFragmentDescriptors(result, fragments):
             'wbo_intra': float(np.triu(wbo[np.ix_(indices, indices)], 1).sum()) if wbo is not None else None,
             'wbo_inter': float(wbo[np.ix_(indices, outside)].sum()) if wbo is not None else None,
         }
+        if cm5 is not None:
+            records[name].update(cm5_q_e=float(cm5[indices].sum()),
+                                 cm5_q_min_e=float(cm5[indices].min()),
+                                 cm5_q_max_e=float(cm5[indices].max()),
+                                 cm5_q_sd_e=float(cm5[indices].std()))
     names = list(groups)
     for i, first in enumerate(names):
         for second in names[i+1:]:

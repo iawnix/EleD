@@ -20,6 +20,7 @@ from .calculator import XTBCalculator
 
 from .electronic_descriptors import (
     CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
+    CalcCM5Charges,
 )
 from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
 from .density_descriptors import (
@@ -43,6 +44,7 @@ __all__ = [
     "CalcXTBAtomDescriptors",
     "CalcXTBBondDescriptors",
     "CalcXTBFragmentDescriptors",
+    "CalcCM5Charges",
     "CalcOrbitalPopulations",
     "CalcFrontierDescriptors",
     "CalcDensityMatrix",

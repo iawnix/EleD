@@ -111,7 +111,7 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
         from .reactivity import RunReactivity
         reactivity_report = RunReactivity(mol, interface=backend,
             options=XTBOptions(method=method, xtb_library=library),
-            population_scheme='lowdin' if keep_overlap else 'charges')
+            population_scheme='lowdin' if keep_overlap else 'xtb_scc')
     return {"backend": backend, "method": method, "molecule": "water",
             "total_energy_hartree": energy, "n_orb": nao,
             "charge_sum_e": float(sum(charges)), "engine": engine,

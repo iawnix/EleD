@@ -167,6 +167,7 @@ python -m eled doctor --check compiled --method GFN2-xTB
 - [C++ 接口](docs/rdxtb-tools.md)
 - [原生后端构建](docs/xtb-patched-build.md)
 - [研究与案例方案](docs/zh-CN/research-plan-eled.md)
+- [多模型应用方案](docs/zh-CN/research-plan-ml.md)
 
 应用模型训练、数据集和训练产物放在 EleD 仓库之外维护。公开包提供描述符报告
 和特征归档，外部研究工程可以直接消费这些产物。

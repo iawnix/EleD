@@ -62,7 +62,9 @@ excitation energy; the input unpaired-electron count is not a predicted spin sta
 For charged molecules, the dipole and its norm depend on the supplied coordinate
 origin. Total energies have method-specific references.
 
-Atom rows contain `atom_index`, `q_e` and `wbo_sum`. The latter
+Atom rows contain `atom_index`, `q_e` and `wbo_sum`; `q_e` is the engine charge
+set and its exact `charge_model` is recorded in report provenance. For GFN1/2,
+`cm5_q_e` is available as a separate, explicitly derived CM5 value. The latter
 is the sum of all off-diagonal WBOs involving that atom, not formal valence.
 Bond rows contain `bond_index`, `begin_atom_index`, `end_atom_index` and
 `wbo`. They do not create bonds or change RDKit bond orders.
@@ -74,6 +76,7 @@ Duplicate, negative, Boolean, out-of-range or overlapping indices are rejected.
 Each named fragment reports:
 
 - `q_e`, `q_min_e`, `q_max_e`, `q_sd_e`, `num_atoms`;
+- `cm5_q_e` and CM5 summary statistics when GFN1/2 CM5 charges are available;
 - `wbo_intra`: each pair inside the fragment counted once;
 - `wbo_inter`: all pairs to atoms outside, including unassigned atoms.
 

@@ -50,6 +50,8 @@ def DescriptorColumns(frontier_depth=2):
             units[f'{label}_{field}'] = unit
     units['hl_ovlp'] = 'dimensionless'
     units['hl_dist_a'] = 'angstrom'
+    for label in ('sum', 'min', 'max', 'mean', 'sd', 'abs'):
+        units[f'xtb_cm5_q_{label}_e'] = 'e'
     return units
 
 
@@ -84,6 +86,12 @@ def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tol
         if not np.isfinite(q_error): raise ValueError('charges must be finite')
         if abs(q_error) > conservation_tolerance:
             flag('charge_conservation_failed', 'error', 'Atomic charges do not sum to the requested molecular charge.')
+    if len(result.cm5_charges):
+        cm5 = np.asarray(result.cm5_charges, dtype=float)
+        if cm5.ndim != 1 or not np.isfinite(cm5).all():
+            raise ValueError('CM5 charges must be finite')
+        if expected_charge is not None and len(cm5) and abs(float(cm5.sum()) - expected_charge) > conservation_tolerance:
+            flag('cm5_charge_conservation_failed', 'error', 'CM5 charges do not sum to the requested molecular charge.')
     if expected_charge:
         flag('charged_dipole_origin_dependent', 'info', 'Dipole components and norm depend on the coordinate origin.')
     electron_error = None
@@ -283,6 +291,8 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
     _validate_mapping(mol, result)
     report = _base_report(record_id, DescriptorColumns(frontier_depth), analysis)
     report['provenance'] = deepcopy(dict(result.metadata))
+    report['provenance']['charge_model'] = result.charge_model
+    report['provenance']['cm5_available'] = bool(result.cm5_charges)
     report['quality'] = AssessDescriptorQuality(result, occupation_threshold=occupation_threshold,
             fractional_tolerance=fractional_tolerance, conservation_tolerance=conservation_tolerance)
     scalars = CalcXTBDescriptors(result, frontier_depth=frontier_depth, occupation_threshold=occupation_threshold)

@@ -43,8 +43,9 @@ RegioML/RegioSQM 风格 EAS 导出。`protocol.json` 冻结元素范围、事件
 | C | GFN2 电荷和基础电子特征 | 可选方法消融 |
 | D | GFN2 加 Mulliken/Löwdin shell 和密度特征 | EleD 主案例 |
 | E | D 加 Mayer、前线键和 π 特征 | 探索性扩展 |
-| F | D 加 Fukui 和局部概念 DFT 特征 | 探索性扩展 |
+| F | E 加 Fukui 和局部概念 DFT 特征 | 累积反应性扩展 |
 | G | D 加构象统计和可靠性字段 | 稳健性扩展 |
+| R | 仅 Fukui 和局部概念 DFT 特征 | 局部反应性消融 |
 
 各组分开报告，不能只报告一个拼接后最高分作为案例结论。
 

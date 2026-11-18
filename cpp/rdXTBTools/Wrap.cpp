@@ -29,6 +29,21 @@ py::object array(const std::vector<double> &values, std::vector<npy_intp> shape)
 py::object charges(const XTBResults &r) {
   requireSuccess(r); return array(r.atomicCharges, {r.numAtoms});
 }
+py::object cm5Charges(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.chargeModel != "xtb_scc_mulliken")
+    throw std::invalid_argument("CM5 charges require GFN1/2 SCC Mulliken charges; GFN0 exposes PEEQ/EEQ");
+  py::list numbers, coordinates, base;
+  for (int value : r.atomicNumbers) numbers.append(value);
+  for (unsigned int i = 0; i < r.numAtoms; ++i) {
+    py::list row;
+    for (unsigned int axis = 0; axis < 3; ++axis)
+      row.append(r.coordinatesAngstrom[3 * i + axis]);
+    coordinates.append(row);
+  }
+  for (double value : r.atomicCharges) base.append(value);
+  return py::import("eled.charges").attr("calc_cm5_charges")(numbers, coordinates, base);
+}
 py::object energies(const XTBResults &r) {
   requireSuccess(r); return array(r.orbitalEnergiesEV, {r.numOrbitals});
 }
@@ -230,6 +245,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def_readonly("numTotalElectrons", &XTBResults::numTotalElectrons)
       .def_readonly("numUnpairedElectrons", &XTBResults::numUnpairedElectrons)
       .def_readonly("charge", &XTBResults::charge)
+      .def_readonly("chargeModel", &XTBResults::chargeModel)
       .def_readonly("apiVersion", &XTBResults::apiVersion)
       .def_readonly("maxIterations", &XTBResults::maxIterations)
       .def_readonly("accuracy", &XTBResults::accuracy)
@@ -256,7 +272,12 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def_readonly("parameterSHA256", &XTBResults::parameterSHA256)
       .def_readonly("sourceCommit", &XTBResults::sourceCommit)
       .add_property("totalEnergyHartree", totalEnergy, "xTB total energy in Hartree; not EHT totalEnergy in eV.")
-      .def("GetAtomicCharges", charges, "Copy of atomic partial charges in elementary-charge units, [atom].")
+      .def("GetAtomicCharges", charges,
+           "Copy of xTB atomic charges in elementary-charge units, [atom]. "
+           "GFN1/2: converged SCC Mulliken charges; GFN0: PEEQ/EEQ charges; never CM5.")
+      .def("GetCM5Charges", cm5Charges,
+           "Return xTB CM5 charges in elementary-charge units, [atom]. "
+           "Only defined for GFN1/2 SCC Mulliken charges; GFN0 has no CM5 result.")
       .def("GetOrbitalEnergies", energies, "Copy of molecular orbital energies in eV, [MO].")
       .def("GetOrbitalOccupancies", occupancies, "Copy of orbital occupancies in electrons, [MO].")
       .def("GetDipole", dipole, "Copy of dipole in e*Bohr, [x,y,z].")

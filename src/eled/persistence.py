@@ -117,7 +117,7 @@ def _decode_result(value):
             def tuples(v):
                 return tuple(tuples(x) for x in v) if isinstance(v, list) else v
             for field in fields(XTBResult):
-                if isinstance(field.default, tuple):
+                if field.name in data and isinstance(field.default, tuple):
                     data[field.name] = tuples(data[field.name])
             result = XTBResult(**data)
         elif value['kind'] == 'vertical_reactivity':

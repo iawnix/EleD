@@ -82,9 +82,18 @@ def _effective_charge_uhf(mol: Any, charge: int | None, uhf: int | None) -> tupl
 
 
 def _input_metadata(mol: Any, conf_id: int, charge: int, uhf: int, xyz: str) -> dict:
+    conf = mol.GetConformer(conf_id)
     return {
         'atom_count': mol.GetNumAtoms(),
         'atomic_numbers': [a.GetAtomicNum() for a in mol.GetAtoms()],
+        # Retain the exact coordinates used by the engine so derived models
+        # (notably CM5) can be reproduced from a compiled result/cache without
+        # borrowing geometry from a caller's mutable molecule.
+        'coordinates_angstrom': [
+            [float(conf.GetAtomPosition(i).x), float(conf.GetAtomPosition(i).y),
+             float(conf.GetAtomPosition(i).z)]
+            for i in range(mol.GetNumAtoms())
+        ],
         'ordered_structure_sha256': _ordered_structure_hash(mol),
         'geometry_sha256': _geometry_hash(xyz),
         'charge': charge,

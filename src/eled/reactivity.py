@@ -10,6 +10,7 @@ from copy import deepcopy
 from contextlib import closing
 from dataclasses import replace
 import json
+import warnings
 
 import numpy as np
 
@@ -23,11 +24,14 @@ from .populations import CalcOrbitalPopulations
 from .reports import SCHEMA_VERSION, DESCRIPTOR_VERSION, AssessDescriptorQuality
 from .calculator import XTBCalculator
 from .xtb import _resolve_options
+from .charges import CHARGE_MODEL_CM5, CHARGE_MODEL_SCC, charge_model_for_method
 
 REACTIVITY_UNITS = {'ip_v_ev':'eV', 'ea_v_ev':'eV',
                     'mu_ev':'eV', 'chi_ev':'eV',
                     'eta_ev':'eV', 's_1ev':'1/eV', 'omega_ev':'eV'}
 
+# Keep the wire protocol version stable for existing checkpoint readers; the
+# explicit charge-model field is additive and participates in the manifest.
 REACTIVITY_PROTOCOL_VERSION = '2.0'
 
 
@@ -43,15 +47,23 @@ def _summary(result):
     return {'status':'success', 'method':result.method, 'charge':result.metadata['charge'],
             'uhf':result.metadata['uhf'], 'energy_hartree':result.total_energy_hartree,
             'num_electrons':result.number_of_electrons,
-            'partial_charges_e':list(result.partial_charges), 'provenance':deepcopy(dict(result.metadata))}
+            'partial_charges_e':list(result.partial_charges),
+            'charge_model': result.charge_model,
+            'cm5_charges_e': list(result.cm5_charges),
+            'provenance':deepcopy(dict(result.metadata))}
 
 
 def _empty_report(record_id, scheme, states):
     if record_id is not None and not isinstance(record_id, str): raise ValueError('record_id must be a string or None')
+    scheme = _canonical_scheme(scheme, warn=False)
+    charge_model = CHARGE_MODEL_CM5 if scheme == 'cm5' else CHARGE_MODEL_SCC
+    population_model = _population_model(scheme)
     return {'schema_version':SCHEMA_VERSION, 'descriptor_version':DESCRIPTOR_VERSION,
             'report_type':'vertical_reactivity', 'record_id':record_id,
             'values':dict.fromkeys(REACTIVITY_UNITS), 'units':dict(REACTIVITY_UNITS),
             'analysis_settings':{'geometry':'fixed_reference_geometry', 'population_scheme':scheme,
+                'charge_model': charge_model,
+                'population_model': population_model,
                 'energy_definition':'libxtb_total_energy', 'hardness':'(IP-EA)/2',
                 'softness':'1/(IP-EA)', 'electrophilicity':'mu^2/(2*hardness)',
                 'f_plus':'population(N+1)-population(N)',
@@ -67,21 +79,49 @@ def _empty_report(record_id, scheme, states):
             'atom_missing_semantics': 'None means the required global softness/electrophilicity is undefined or the state failed; never zero-filled'}
 
 
+def _canonical_scheme(scheme, *, warn=True):
+    if scheme == 'charges':
+        if warn:
+            warnings.warn("population_scheme='charges' is deprecated; use 'xtb_scc' for explicit SCC Mulliken charges",
+                          DeprecationWarning, stacklevel=3)
+        return 'xtb_scc'
+    if scheme not in ('xtb_scc', 'cm5', 'mulliken', 'lowdin'):
+        raise ValueError("population_scheme must be 'xtb_scc', 'cm5', 'mulliken' or 'lowdin' (legacy 'charges' is accepted)")
+    return scheme
+
+
 def _scheme(scheme):
-    if scheme not in ('charges','mulliken','lowdin'):
-        raise ValueError("population_scheme must be 'charges', 'mulliken' or 'lowdin'")
+    return _canonical_scheme(scheme)
+
+
+def _population_model(scheme):
+    return {
+        'xtb_scc': 'atomic_charge_difference',
+        'cm5': 'cm5_atomic_charge_difference',
+        'mulliken': 'mulliken_orbital_population',
+        'lowdin': 'lowdin_orbital_population',
+    }[scheme]
+
+
+def _result_charge_model(result):
+    model = getattr(result, 'charge_model', None)
+    if model and model != 'unknown':
+        return model
+    return charge_model_for_method(result.method)
 
 
 def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=None,
-                                population_scheme='charges', record_id=None):
+                                population_scheme='xtb_scc', record_id=None):
     """Analyze three compatible successful results, without further engine calls.
 
     ionized has Q+1 / N-1; attached has Q-1 / N+1. All use the exact same
     indexed input geometry, method, library, parameters and numerical settings.
-    'charges' takes differences of the method's engine partial charges. Orbital
-    schemes use occupation-weighted populations, not normalized frontier MOs.
+    'xtb_scc' takes differences of the converged SCC Mulliken charges. 'cm5'
+    uses the explicit CM5 correction. Orbital schemes use occupation-weighted
+    populations, not normalized frontier MOs. Legacy 'charges' is accepted as
+    an alias for 'xtb_scc'.
     """
-    _scheme(population_scheme)
+    population_scheme = _scheme(population_scheme)
     results = {k:_as_result(v) for k,v in [('reference',reference),('ionized',ionized),('attached',attached)]}
     ref = results['reference']
     if ref.method not in ('GFN1-xTB','GFN2-xTB'): raise ValueError('vertical Delta-SCF requires self-consistent GFN1/2, not GFN0')
@@ -114,6 +154,8 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
         energy = result.total_energy_hartree
         if energy is None or not np.isfinite(energy): raise ValueError('all three energies must be finite')
         charges = _finite(result.partial_charges,'charges',1)
+        if _result_charge_model(result) != CHARGE_MODEL_SCC:
+            raise ValueError('vertical GFN1/2 charge states must expose SCC Mulliken charges')
         if len(charges) != mol.GetNumAtoms(): raise ValueError('charges must match the indexed atoms')
         quality = AssessDescriptorQuality(result)
         if quality['status'] == 'error': raise ValueError(f'{label} failed charge/electron conservation checks')
@@ -141,8 +183,13 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
     if base['CalculationSettings']['effective_electronic_temperature'] > 1e-6:
         flags.append({'code':'finite_electronic_temperature','severity':'warning',
                       'detail':'Energy differences use the configured finite-temperature libxtb energies.'})
-    if population_scheme == 'charges':
+    if population_scheme == 'xtb_scc':
         q0, qp, qm = [np.asarray(results[k].partial_charges) for k in ('reference','ionized','attached')]
+        plus, minus = q0-qm, qp-q0
+    elif population_scheme == 'cm5':
+        if any(not len(results[k].cm5_charges) for k in ('reference', 'ionized', 'attached')):
+            raise ValueError('population_scheme="cm5" requires CM5 charges from all three GFN1/2 states')
+        q0, qp, qm = [np.asarray(results[k].cm5_charges) for k in ('reference','ionized','attached')]
         plus, minus = q0-qm, qp-q0
     else:
         n0, np_, nm = [np.asarray(CalcOrbitalPopulations(results[k],scheme=population_scheme)['mo_n_e'])
@@ -182,7 +229,7 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
 
 
 def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
-                   fragments=None, population_scheme='charges', interface='native',
+                   fragments=None, population_scheme='xtb_scc', interface='native',
                    record_id=None, return_errors=False, initialization='reference'):
     """Calculate fixed-geometry Q, Q+1, Q-1 states with explicit spin policy.
 
@@ -194,7 +241,7 @@ def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
     return an error report with all derived values null when return_errors=True.
     """
     from rdkit import Chem
-    _scheme(population_scheme)
+    population_scheme = _scheme(population_scheme)
     if interface not in ('native','compiled'): raise ValueError('interface must be native or compiled')
     if initialization not in ('reference','independent'):
         raise ValueError('initialization must be reference or independent')
@@ -214,10 +261,12 @@ def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
         _, spins[label] = _effective_charge_uhf(snapshot,charges[label],spins[label])
     if fragments is not None: _fragments(fragments,snapshot.GetNumAtoms())
     config = _resolve_options(replace(config,charge=charge,uhf=uhf,
-        keep_overlap=config.keep_overlap or population_scheme != 'charges'))
+        keep_overlap=config.keep_overlap or population_scheme in ('mulliken', 'lowdin')))
     protocol = {'requested_options': config.to_dict(), 'interface': interface,
                 'protocol_version': REACTIVITY_PROTOCOL_VERSION,
                 'initialization': initialization,
+                'charge_model': CHARGE_MODEL_CM5 if population_scheme == 'cm5' else CHARGE_MODEL_SCC,
+                'population_model': _population_model(population_scheme),
                 'charge_states': charges, 'unpaired_electrons': spins,
                 'spin_selection': 'closed_shell_doublet_defaults'
                     if not uhf and ionized_uhf is None and attached_uhf is None

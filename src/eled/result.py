@@ -33,6 +33,10 @@ class XTBResult:
     supplies the same-calculation overlap and zero-based AO/shell/atom maps.
     ``version`` is the engine/package version when known, never the C ABI
     version (which is recorded separately in metadata).
+
+    ``partial_charges`` are engine charges, whose exact model is given by
+    ``charge_model`` (GFN1/2 SCC Mulliken or GFN0 PEEQ/EEQ). They are never
+    CM5. ``cm5_charges`` is an explicitly derived CM5 set when available.
     """
 
     method: str
@@ -45,6 +49,13 @@ class XTBResult:
     orbital_energies_ev: tuple[float, ...] = ()
     orbital_occupations: tuple[float, ...] = ()
     partial_charges: tuple[float, ...] = ()
+    # Exact semantics of ``partial_charges``.  GFN1/2 use the converged SCC
+    # Mulliken charge; GFN0 uses PEEQ/EEQ.  This must never be inferred from
+    # the generic field name alone.
+    charge_model: str = "unknown"
+    # CM5 is a derived charge set and is empty when the geometry or a Mulliken
+    # base charge was unavailable (for example GFN0/EEQ).
+    cm5_charges: tuple[float, ...] = ()
     dipole_e_bohr: tuple[float, ...] = ()
     wiberg_bond_orders: tuple[tuple[float, ...], ...] = ()
     raw_json: Mapping[str, Any] = field(default_factory=dict, repr=False)
@@ -60,6 +71,17 @@ class XTBResult:
     shell_angular_momenta: tuple[int, ...] = ()
     # Cartesian unit directions attached to AO rows; zero for non-p AOs.
     ao_p_directions: tuple[tuple[float, ...], ...] = ()
+
+    def __post_init__(self) -> None:
+        # Results serialized before charge-model provenance was introduced can
+        # still be read safely: infer only the unambiguous method-level model.
+        # GFN-FF and unknown methods intentionally remain ``unknown``.
+        if self.charge_model == "unknown":
+            model = {"GFN0-xTB": "gfn0_eeq",
+                     "GFN1-xTB": "xtb_scc_mulliken",
+                     "GFN2-xTB": "xtb_scc_mulliken"}.get(self.method)
+            if model is not None:
+                object.__setattr__(self, "charge_model", model)
 
     @property
     def homo_ev(self) -> float | None:

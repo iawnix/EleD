@@ -184,12 +184,15 @@ bound anion. These values use the libxtb total-energy API and are approximate
 GFN descriptors, **not calibrated experimental IP/EA or optical excitations**.
 
 For atomic electron populations nA, f+ = nA(N+1)−nA(N), f− = nA(N)−nA(N−1),
-f0 = (f++f−)/2, dual = f+−f−. `population_scheme="charges"` uses equivalent
-differences of engine charges: f+ = qA(N)−qA(N+1), f− = qA(N−1)−qA(N).
-`"mulliken"` and `"lowdin"` require the extended library and retain basis data
-automatically. Signed values are preserved; sums are checked against 1, 1 and
-0. Explicit disjoint `fragments` aggregate these quantities. These finite
-charge differences are distinct from frontier-MO population approximations.
+f0 = (f++f−)/2, dual = f+−f−. `population_scheme="xtb_scc"` uses differences
+of the converged GFN1/2 SCC Mulliken charges; `population_scheme="cm5"` uses
+the explicitly derived xTB CM5 charges. The legacy name `"charges"` is accepted
+as a deprecated alias for `"xtb_scc"`. `"mulliken"` and `"lowdin"` refer to
+occupation-weighted orbital populations and require the extended basis API.
+The report records both the population scheme and charge model; signed values
+are preserved and sums are checked against 1, 1 and 0. Explicit disjoint
+`fragments` aggregate these quantities. These finite charge differences are
+distinct from frontier-MO population approximations.
 
 Any charge-state calculation failure stops subsequent states. Runtime/setup,
 allocation/extraction and unexpected errors propagate even with `return_errors=True`

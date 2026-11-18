@@ -19,7 +19,9 @@ The naming rules keep feature columns short while retaining their meaning:
 - `idx`, `n`, `sd`, `ipr`, `pr` and `ent` mean index, count, standard deviation,
   inverse participation ratio, participation ratio and entropy;
 - `xtb_` marks molecular fields directly reported by xTB. Atom and bond rows
-  use their shorter local names (`q_e`, `wbo`, `mul_p_e`, `low_ps`).
+  use their shorter local names (`q_e`, `cm5_q_e`, `wbo`, `mul_p_e`, `low_ps`).
+  `q_e` is the engine charge set and its exact model is recorded in
+  `charge_model`; `cm5_q_e` is a separate derived field.
 
 | Layer | Main API | What it means | Engine calls during extraction |
 | --- | --- | --- | --- |

@@ -316,8 +316,13 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
   result.effectiveElectronicTemperature = std::max(options.electronicTemperature, 1e-6);
   result.initialization = restart ? "reference" : "independent";
   result.method = "GFN" + std::to_string(method) + "-xTB";
+  result.chargeModel = method == 0 ? "gfn0_eeq" : "xtb_scc_mulliken";
   result.numAtoms = n;
   result.conformerId = conf->getId();
+  result.atomicNumbers = numbers;
+  result.coordinatesAngstrom.resize(xyz.size());
+  std::transform(xyz.begin(), xyz.end(), result.coordinatesAngstrom.begin(),
+                 [](double value) { return value / angstromToBohr; });
   auto &api = loadAPI(options.libraryPath);
   result.libraryPath = api.path;
   result.librarySHA256 = api.hash;

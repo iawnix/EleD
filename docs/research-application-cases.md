@@ -93,7 +93,7 @@ the complementary atom-level case.
 
 | Case | Labels and scale | Source and rights | EleD fit | Decision |
 | --- | --- | --- | --- | --- |
-| **Experimental chromophore optics (Deep4Chem/Joung DB)** | Experimental absorption and emission maxima, lifetime, quantum yield and bandwidths; the current Figshare v3 file contains 20,836 rows with 16,422 rows having both absorption and emission maxima | Original database article and the Figshare record are CC BY 4.0; the DeepMPP copy is a software-distributed mirror and must not replace the frozen source record | Excellent for molecular electronic descriptors, solvent-aware features and a direct usability case; optical properties remain experimental excited-state targets | **Primary molecular-property case** |
+| **Experimental chromophore optics (Joung DB for chromophore)** | Experimental absorption and emission maxima, lifetime, quantum yield and bandwidths; the current Figshare v3 file contains 20,836 rows with 16,422 rows having both absorption and emission maxima | The database paper and Figshare record are the data sources; the Deep4Chem/DeepMPP copy is a software-distributed mirror and must not replace the frozen source record | Excellent for molecular electronic descriptors, solvent-aware features and a direct usability case; optical properties remain experimental excited-state targets | **Primary molecular-property case** |
 | **RegioSQM20** | EAS reaction-site labels; 535 molecules and 604 raw labelled atom entries in the supplied `compounds.smiles` export | Code and supplied repository carry an MIT license; the article is CC BY 4.0. The rights of the exported reaction data still need to be recorded before redistribution. | Excellent: atom labels match charges, Fukui, shell, π and frontier descriptors; the input preserves RDKit atom order | **Primary atom-level case** |
 | **RegioML** | EAS atom scores; published model and descriptor code, with the full training export hosted in ERDA | GitHub code is MIT; the ERDA data package and its redistribution terms must be checked separately | Very good for a related-work and interoperability check; weak as the first independent dataset because the data archive is external | **Reference / optional replication** |
 | **GNN-SOM** | Atom-SOM and bond-SOM labels from KEGG RPAIR; 21,023 molecules in the paper | KEGG RPAIR was downloaded under an academic license; the GitHub repository contains inference code and weights, not the curated training data | Good for testing EleD node and edge archives, but the license and reaction-centre reconstruction add risk | **Second-stage case** |
@@ -108,10 +108,13 @@ supporting repository snapshot reviewed here is
 `jensengroup/SI_RegioSQM20@6f9539594b9a07babd76db347ca6d2f550c3ad97`.
 Its `RegioSQM20/compounds.smiles` file has one record per molecule in the form
 `record_id SMILES site_indices`; comma-separated indices represent multiple
-observed sites. Parsing with RDKit 2026.09.1 gives 535 valid records, 604 raw
-positive atom indices, and no out-of-range labels. The associated SDF is a 2-D
-structure file and does not contain the reaction labels, so the adapter must
-keep the SMILES export and its row identity together.
+observed sites. Parsing the source snapshot with RDKit 2026.09.1 gives 535
+source records and 604 raw positive atom indices. Under EleD's current frozen
+allowed-element filter, 533 records and 602 positive labels are selected; the
+two excluded records contain Ge and Se. There are no out-of-range labels in the
+source export. The associated SDF is a 2-D structure file and does not contain
+the reaction labels, so the adapter must keep the SMILES export and its row
+identity together.
 
 This is a useful test for EleD because the target has the same granularity as
 the feature report. A feature row can retain the original RDKit atom index,
@@ -197,6 +200,11 @@ negative results, and should treat any comparison to GFN1/RegioML/RegioSQM20 as
 context or ablation rather than an acceptance criterion for EleD.
 
 ## Source records
+
+- Optical database paper: [Joung *et al.*, Scientific Data (2020)](https://doi.org/10.1038/s41597-020-00634-8), “Experimental database of optical properties of organic compounds”.
+- Optical database record: [DB for chromophore, Figshare v3](https://doi.org/10.6084/m9.figshare.12045567.v3), CC BY 4.0.
+- JACS Au application paper: [Joung *et al.*, JACS Au (2021)](https://doi.org/10.1021/jacsau.1c00035), “Deep Learning Optical Spectroscopy Based on Experimental Database: Potential Applications to Molecular Design”.
+- Deep4Chem/DeepMPP software: [ACCA-KU/DeepMPP](https://github.com/ACCA-KU/DeepMPP). Its bundled optical CSV is a convenience mirror, not the authoritative data record.
 
 - RegioSQM20 paper: [Ree, Göller and Jensen (2021)](https://doi.org/10.1186/s13321-021-00490-7); article text is CC BY 4.0.
 - RegioSQM20 code: [jensengroup/RegioSQM20](https://github.com/jensengroup/RegioSQM20).

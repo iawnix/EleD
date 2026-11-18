@@ -69,7 +69,7 @@ from eled import RunReactivity, XTBOptions
 report = RunReactivity(
     mol,
     options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
-    population_scheme="charges",
+    population_scheme="xtb_scc",
     return_errors=True,
 )
 ```
@@ -83,6 +83,12 @@ report = RunReactivity(
 
 三种电荷态使用相同几何、方法、参数、电子温度和引擎。300 K 是电子占据
 平滑的计算设置，不是分子热力学温度。GFN0 不参与 ΔSCF 反应性分析。
+
+`population_scheme="xtb_scc"` 使用 GFN1/2 收敛后的 SCC Mulliken 电荷差分；
+`population_scheme="cm5"` 使用显式推导的 CM5 电荷差分。旧名称
+`"charges"` 仍可用，但已弃用并映射到 `"xtb_scc"`。报告会同时记录
+population scheme 和 charge model；`"mulliken"`、`"lowdin"` 指轨道人口分析，
+不是 `GetAtomicCharges()` 返回的原子电荷。
 
 ## 报告版本
 
