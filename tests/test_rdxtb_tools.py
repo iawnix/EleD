@@ -111,6 +111,22 @@ def test_eht_coexistence_and_result_ownership(library):
     assert np.isfinite(retained).all()
 
 
+@pytest.mark.parametrize('method', ['GFN1-xTB', 'GFN2-xTB'])
+def test_cm5_agrees_across_backends_and_atom_permutations(library, method):
+    mol = molecule('CCl')
+    order = list(reversed(range(mol.GetNumAtoms())))
+    permuted = Chem.RenumberAtoms(mol, order)
+    charges = []
+    for candidate in (mol, permuted):
+        ok, compiled = rdXTBTools.RunMol(candidate, method=method, xtbLibrary=library)
+        assert ok
+        native = calculate_xtb(candidate, method=method, backend='native', xtb_library=library)
+        np.testing.assert_allclose(compiled.GetCM5Charges(), native.cm5_charges, atol=2e-5, rtol=0)
+        assert sum(native.cm5_charges) == pytest.approx(0., abs=1e-7)
+        charges.append(np.asarray(native.cm5_charges))
+    np.testing.assert_allclose(charges[0][order], charges[1], atol=2e-5, rtol=0)
+
+
 @pytest.mark.parametrize('change, options, message', [
     ('empty', {}, 'contain atoms'),
     ('no-conformer', {}, '3D conformer'),

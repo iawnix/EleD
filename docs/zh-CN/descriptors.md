@@ -27,6 +27,13 @@ bonds = CalcXTBBondDescriptors(mol, result)
 - `q_e`、`wbo_sum`：原子级特征；
 - `wbo`：对应 RDKit 键的 Wiberg 键级。
 
+CM5 在 SCC Mulliken 电荷上加入与距离有关的反对称原子对校正，单位为元电荷。
+H/C/N/O 元素对使用 xTB 的特定参数，其他元素对使用按原子顺序计算的原子参数差。
+校正保持总电荷守恒；原子重新编号后，各原子的电荷随映射保持一致。坐标重合时
+抛出 `ValueError`。本次修复纠正了非特定元素对的额外符号反转；涉及这些元素对的
+历史 CM5 归档应使用保存的几何和 SCC 电荷重新生成。SCC 电荷和 Wiberg 键级
+不受此校正影响。
+
 YAeHMOP 适配器也使用同一套短字段规则，字段为
 `eht_homo_ev`、`eht_lumo_ev`、`eht_gap_ev`、`eht_fermi_ev`、
 `eht_energy_ev`、`eht_n_orb` 和 `eht_n_e`。`eht_` 前缀表示这是 RDKit

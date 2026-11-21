@@ -69,3 +69,15 @@ def test_reactivity_cm5_scheme_is_explicit_and_conserves_fukui_sums():
     assert sum(atom['f_plus'] for atom in report['atoms']) == pytest.approx(1.)
     assert sum(atom['f_minus'] for atom in report['atoms']) == pytest.approx(1.)
 
+
+@pytest.mark.parametrize('numbers', [(5, 14), (6, 17), (1, 9), (6, 8), (7, 8)])
+def test_cm5_element_order_invariance(numbers):
+    q_ab = calc_cm5_charges(numbers, ((0.0, 0.0, 0.0), (2.0, 0.0, 0.0)), (0.2, -0.2))
+    q_ba = calc_cm5_charges(numbers[::-1], ((2.0, 0.0, 0.0), (0.0, 0.0, 0.0)), (-0.2, 0.2))
+    np.testing.assert_allclose(q_ab, (q_ba[1], q_ba[0]))
+    assert sum(q_ab) == pytest.approx(0.0)
+
+
+def test_cm5_same_element_zero_distance_raises_value_error():
+    with pytest.raises(ValueError, match='distinct atom coordinates'):
+        calc_cm5_charges((6, 6), ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0)), (0.0, 0.0))

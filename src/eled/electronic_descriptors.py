@@ -61,9 +61,11 @@ def _as_result(result):
     cm5_charges = ()
     if charge_model == 'xtb_scc_mulliken' and hasattr(result, 'GetCM5Charges'):
         cm5_charges = tuple(result.GetCM5Charges())
-    elif charge_model == 'xtb_scc_mulliken' and metadata.get('coordinates_angstrom') is not None:
-        cm5_charges = calc_cm5_charges(metadata.get('atomic_numbers', ()),
-                                        metadata['coordinates_angstrom'], partial_charges)
+    elif charge_model == 'xtb_scc_mulliken':
+        coordinates = metadata.get('coordinates_angstrom')
+        atomic_numbers = metadata.get('atomic_numbers', ())
+        if coordinates is not None and atomic_numbers is not None and len(atomic_numbers):
+            cm5_charges = calc_cm5_charges(atomic_numbers, coordinates, partial_charges)
     return XTBResult(
         **basis,
         method=result.method, version=None, total_energy_hartree=result.totalEnergyHartree,

@@ -126,6 +126,9 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
     ref = results['reference']
     if ref.method not in ('GFN1-xTB','GFN2-xTB'): raise ValueError('vertical Delta-SCF requires self-consistent GFN1/2, not GFN0')
     base = ref.metadata
+    for label, result in results.items():
+        if any(result.metadata.get(key) is None for key in ('charge', 'uhf')):
+            raise ValueError(f'{label} lacks charge/spin provenance')
     if not base.get('engine',{}).get('sha256') or not base.get('CalculationSettings'):
         raise ValueError('charge-state analysis requires engine identity and calculation settings')
     def identity(result):
@@ -144,7 +147,7 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
         if result.number_of_molecular_orbitals != ref.number_of_molecular_orbitals:
             raise ValueError('charge states must use the same orbital basis size')
         delta = {'reference':0,'ionized':1,'attached':-1}[label]
-        if result.metadata.get('charge') != base['charge'] + delta:
+        if result.metadata['charge'] != base['charge'] + delta:
             raise ValueError(f'{label} has the wrong molecular charge')
         if result.number_of_electrons != ref.number_of_electrons - delta:
             raise ValueError(f'{label} has the wrong modeled electron count')

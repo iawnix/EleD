@@ -21,8 +21,10 @@ void requireSuccess(const XTBResults &result) {
 py::object array(const std::vector<double> &values, std::vector<npy_intp> shape) {
   PyObject *object = PyArray_SimpleNew(shape.size(), shape.data(), NPY_DOUBLE);
   if (!object) py::throw_error_already_set();
-  std::memcpy(PyArray_DATA(reinterpret_cast<PyArrayObject *>(object)), values.data(),
-              values.size() * sizeof(double));
+  if (!values.empty()) {
+    std::memcpy(PyArray_DATA(reinterpret_cast<PyArrayObject *>(object)), values.data(),
+                values.size() * sizeof(double));
+  }
   return py::object(py::handle<>(object));
 }
 
