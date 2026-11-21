@@ -276,7 +276,7 @@ def CalcPiDescriptors(mol, result, *, scheme='lowdin', plane_tol_a=0.1, pi_ref=N
                     raise ValueError('p component directions must be orthonormal')
             elif np.any(directions[indices]):
                 raise ValueError('non-p AO directions must be zero')
-    conf_id = result.metadata['conformer_id']
+    conf_id = result.metadata.get('conformer_id', -1)
     vectors, atoms, bonds = {}, [], []
     missing = {'atoms': {}, 'bonds': {}}
     population_metric = (ps + ps.T) / 2 if scheme == 'mulliken' else lowdin
