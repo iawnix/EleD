@@ -69,6 +69,16 @@ off-diagonal WBOs involving that atom and represents a bond-order aggregate.
 Bond rows contain `bond_index`, `begin_atom_index`, `end_atom_index` and
 `wbo`. They do not create bonds or change RDKit bond orders.
 
+CM5 adds an antisymmetric, distance-dependent pair correction to SCC Mulliken
+charges, in elementary-charge units. H/C/N/O pairs use the xTB pair parameters;
+other element pairs use the ordered difference of their atomic parameters.
+The correction conserves total charge and follows the original atom order under
+renumbering. Coincident atom coordinates raise `ValueError`. The corrected
+implementation fixes an extra sign reversal for non-tabulated element pairs;
+previously archived CM5 values involving such pairs should be regenerated from
+their stored geometry and SCC charges. SCC charges and Wiberg bond orders are
+unaffected by this correction.
+
 Fragment groups are nonempty **disjoint** collections of unique integer indices
 into the calculation's original atom order. Indices include hydrogen atoms;
 hydrogens are not added to a fragment implicitly. A complete partition is optional.

@@ -57,6 +57,13 @@ uses `optimization_iterations` for the geometry-step limit and keeps the other
 optimizer controls at their documented defaults. Unexpected exceptions
 propagate; they are not hidden as ordinary embedding failures.
 
+During the optimizer's line search, an `XTBRunError` at a trial geometry triggers
+another trial with half the displacement. If all 14 trial calculations fail,
+the last engine error is raised. If at least one trial is evaluated but none
+lowers the energy, the optimizer returns `reason="line_search_failed"` with the
+last accepted geometry and result. Failure of the initial calculation propagates
+directly.
+
 Stop at the **first strategy with any accepted conformers**. Return only its
 accepted pool, with status `complete` or `partial`. A partial pool does not
 trigger attempts to pad it with duplicates. There is no cross-attempt pooling

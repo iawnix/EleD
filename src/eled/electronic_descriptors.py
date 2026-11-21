@@ -64,7 +64,7 @@ def _as_result(result):
     elif charge_model == 'xtb_scc_mulliken':
         coordinates = metadata.get('coordinates_angstrom')
         atomic_numbers = metadata.get('atomic_numbers', ())
-        if coordinates is not None and atomic_numbers is not None and len(atomic_numbers) > 0 and len(atomic_numbers) == len(coordinates):
+        if coordinates is not None and atomic_numbers is not None and len(atomic_numbers):
             cm5_charges = calc_cm5_charges(atomic_numbers, coordinates, partial_charges)
     return XTBResult(
         **basis,

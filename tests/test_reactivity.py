@@ -69,6 +69,21 @@ def test_mixed_or_invalid_charge_states_are_rejected(damage):
     with pytest.raises(ValueError):CalcReactivityDescriptors(mol,*r)
 
 
+@pytest.mark.parametrize('state', [0, 1, 2])
+@pytest.mark.parametrize('field', ['charge', 'uhf'])
+@pytest.mark.parametrize('missing', [True, False])
+def test_charge_states_require_explicit_charge_and_spin(state, field, missing):
+    mol, results = states()
+    metadata = dict(results[state].metadata)
+    if missing:
+        del metadata[field]
+    else:
+        metadata[field] = None
+    results[state] = replace(results[state], metadata=metadata)
+    with pytest.raises(ValueError, match='charge/spin provenance'):
+        CalcReactivityDescriptors(mol, *results)
+
+
 def test_failed_required_state_never_yields_partial_reactivity():
     mol,r=states()
     with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \

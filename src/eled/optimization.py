@@ -167,6 +167,7 @@ def OptimizeXTB(
         accepted = None
         accepted_delta = None
         last_error: XTBRunError | None = None
+        evaluated_trial = False
         accepted_step = None
         for backtrack in range(14):
             displacement_bohr = direction * (scale * (0.5 ** backtrack))
@@ -182,14 +183,14 @@ def OptimizeXTB(
             except XTBRunError as exc:
                 last_error = exc
                 continue
-            last_error = None
+            evaluated_trial = True
             delta_energy = float(current.total_energy_hartree - trial_result.total_energy_hartree)
             if delta_energy > 0.0:
                 accepted, accepted_delta, accepted_step = trial, delta_energy, displacement_angstrom
                 current = trial_result
                 break
         if accepted is None:
-            if last_error is not None:
+            if not evaluated_trial and last_error is not None:
                 raise last_error
             reason = "line_search_failed"
             break
