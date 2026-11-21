@@ -122,6 +122,27 @@ class _NativeXTB:
         self.get_basis_map = self._bind('xtb_rdkit_getBasisMap', None,
             [h, h, i, i, ctypes.POINTER(i), ctypes.POINTER(i), ctypes.POINTER(i), ctypes.POINTER(i)])
 
+    def bind_esp_api(self):
+        from ..runtime import _native_esp_build
+        if not _native_esp_build(self.library):
+            raise DescriptorUnavailableError('ESP requires the verified ESP extension; rebuild libxtb')
+        h, i, d = self._handle, ctypes.c_int, ctypes.c_double
+        if self._bind('xtb_rdkit_getESPAPIVersion', i, [])() != 1:
+            raise DescriptorUnavailableError('unsupported native ESP API')
+        self.set_keep_esp = self._bind('xtb_rdkit_setKeepESP', None, [h, h, ctypes.c_bool])
+        self.get_esp = self._bind('xtb_rdkit_getESP', i,
+                                [h, h, i, ctypes.POINTER(d), i, ctypes.POINTER(d)])
+
+    def esp_data(self, environment, results, points):
+        count = len(points)
+        xyz = (ctypes.c_double * (3 * count))(*(v * ANGSTROM_TO_BOHR for row in points for v in row))
+        values = (ctypes.c_double * count)()
+        ok = self.get_esp(environment, results, count, xyz, count, values)
+        self.check(environment, 'ESP evaluation')
+        if not ok:
+            raise XTBEnvironmentError('native ESP evaluation failed without a diagnostic')
+        return dict(esp_points_angstrom=points, esp_values_au=tuple(values))
+
     def basis_data(self, environment, results, natoms, nao):
         sizes = (ctypes.c_int * 3)()
         self.get_basis_size(environment, results, sizes)
@@ -183,6 +204,7 @@ def _run_xtb_native(
     uhf: int | None = None,
     xtb_library: str | os.PathLike[str] | None = None,
     keep_overlap: bool = False,
+    esp_points_angstrom=(),
     max_iterations: int = 250,
     accuracy: float = 1.0,
     electronic_temperature: float = 300.0,
@@ -198,6 +220,8 @@ def _run_xtb_native(
     """
 
     from rdkit import Chem
+    from ..esp_input import ESPPoints
+    esp_points_angstrom = ESPPoints(esp_points_angstrom)
     settings = CalculationSettings(max_iterations, accuracy, electronic_temperature)
     mol = Chem.Mol(mol)  # Own the exact geometry/topology while ctypes releases the GIL.
     if not isinstance(keep_overlap, bool):
@@ -210,6 +234,8 @@ def _run_xtb_native(
     library = _NativeXTB(_find_xtb_library(xtb_library))
     _require_extended_libxtb(library.library)
     engine = _engine_identity('native', library.library)
+    if esp_points_angstrom:
+        library.bind_esp_api()
     if keep_overlap:
         if not engine['orbital_basis']:
             raise DescriptorUnavailableError('keep_overlap requires a verified native basis extension; rebuild with tools/build_patched_xtb.py')
@@ -282,6 +308,9 @@ def _run_xtb_native(
         if keep_overlap:
             library.set_keep_overlap(environment, results, True)
             library.check(environment, "basis retention setup")
+        if esp_points_angstrom:
+            library.set_keep_esp(environment, results, True)
+            library.check(environment, "ESP retention setup")
         library.singlepoint(environment, molecule, calculator, results)
         library.check(environment, "single point")
 
@@ -311,6 +340,7 @@ def _run_xtb_native(
         energies_ev = tuple(value * HARTREE_TO_EV for value in orbital_energies)
         occupation_values = tuple(float(value) for value in occupations)
         homo, lumo = _frontier_energies(energies_ev, occupation_values)
+        esp = library.esp_data(environment, results, esp_points_angstrom) if esp_points_angstrom else {}
         basis = library.basis_data(environment, results, natoms, nao.value) if keep_overlap else {}
         from ..runtime import _native_diagnostics_build
         from ..scf import scf_record
@@ -329,6 +359,7 @@ def _run_xtb_native(
                 raise XTBEnvironmentError('native xTB could not copy the reference wavefunction')
             _save_restart.append((library, saved))
         return XTBResult(
+            **esp,
             **basis,
             method=method_name,
             version=engine["version"],
@@ -373,6 +404,8 @@ def _run_xtb_native(
                 'coefficient_axes': ['AO', 'MO'],
                 'charge_model': charge_model_for_method(method_name),
                 'cm5_model': CHARGE_MODEL_CM5 if method_name in ('GFN1-xTB', 'GFN2-xTB') else None,
+                **({'esp': {'api_version': 1, 'potential_unit': 'hartree/e',
+                            'coordinate_unit': 'angstrom', 'source': 'native_density'}} if esp else {}),
                 'overlap_source': 'same libxtb calculation' if keep_overlap else None,
                 **({'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
                    if gradient is not None else {}),
@@ -386,11 +419,11 @@ def _run_xtb_native(
 
 
 def run_xtb_native(mol, *, conf_id=-1, method='GFN2-xTB', charge=None, uhf=None,
-                   xtb_library=None, keep_overlap=False, max_iterations=250,
+                   xtb_library=None, keep_overlap=False, esp_points_angstrom=(), max_iterations=250,
                    accuracy=1.0, electronic_temperature=300.0):
     """Run an independently initialized gas-phase libxtb single point."""
     return _run_xtb_native(mol, conf_id=conf_id, method=method, charge=charge, uhf=uhf,
-        xtb_library=xtb_library, keep_overlap=keep_overlap, max_iterations=max_iterations,
+        xtb_library=xtb_library, keep_overlap=keep_overlap, esp_points_angstrom=esp_points_angstrom, max_iterations=max_iterations,
         accuracy=accuracy, electronic_temperature=electronic_temperature)
 
 

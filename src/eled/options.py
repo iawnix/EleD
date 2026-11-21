@@ -37,8 +37,11 @@ class XTBOptions:
     max_iterations: int = 250
     accuracy: float = 1.0
     electronic_temperature: float = 300.0
+    esp_points_angstrom: tuple[tuple[float, float, float], ...] = ()
 
     def __post_init__(self):
+        from .esp_input import ESPPoints
+        object.__setattr__(self, "esp_points_angstrom", ESPPoints(self.esp_points_angstrom))
         settings = CalculationSettings(self.max_iterations, self.accuracy, self.electronic_temperature)
         for key in ("max_iterations", "accuracy", "electronic_temperature"):
             object.__setattr__(self, key, settings[key])
@@ -55,4 +58,6 @@ class XTBOptions:
 
     def to_dict(self) -> dict:
         """Return JSON-compatible options for ``XTBCalculator`` and batches."""
-        return asdict(self)
+        values = asdict(self)
+        values['esp_points_angstrom'] = [list(row) for row in self.esp_points_angstrom]
+        return values

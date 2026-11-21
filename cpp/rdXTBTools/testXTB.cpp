@@ -76,6 +76,16 @@ int main() {
       catch (const std::invalid_argument &) { rejected = true; }
       require(rejected, "Unverified basis export was not rejected");
     }
+    options.espPointsAngstrom = {2., 3., 4., -3., 2., 4.};
+    require(RDKit::XTBTools::runMol(mol, intermediate, options), "ESP sampling failed");
+    require(intermediate.espValuesAU.size() == 2 && intermediate.espPointsAngstrom == options.espPointsAngstrom,
+            "ESP point/value dimensions changed");
+    require(std::abs(intermediate.espValuesAU[0]-intermediate.espValuesAU[1]) > 1e-6,
+            "ESP did not depend on sample coordinates");
+    auto sampled = intermediate;
+    options.espPointsAngstrom.clear();
+    require(RDKit::XTBTools::runMol(mol, intermediate, options), "Calculation after ESP failed");
+    require(intermediate.espValuesAU.empty() && sampled.espValuesAU.size() == 2, "ESP result ownership failed");
     options.keepOverlap = false;
     options.maxIterations = 1;
     require(!RDKit::XTBTools::runMol(mol, intermediate, options), "Expected SCF failure");

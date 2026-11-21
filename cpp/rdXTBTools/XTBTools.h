@@ -15,6 +15,7 @@ struct XTBOptions {
   std::optional<int> numUnpairedElectrons;
   bool keepOrbitalCoefficients = false;
   bool keepOverlap = false;
+  std::vector<double> espPointsAngstrom; // row-major [point][xyz]; empty disables sampling
   std::string libraryPath;
   std::string parameterDirectory;
   int maxIterations = 250;
@@ -57,6 +58,8 @@ struct XTBResults {
   std::string parameterFile;
   std::string parameterSHA256;
   std::string sourceCommit;
+  std::vector<double> espPointsAngstrom; // row-major [point][xyz]
+  std::vector<double> espValuesAU; // Hartree/e, point order; empty when not requested
   std::vector<double> gradientHartreePerBohr; // row-major [atom][xyz]
   std::vector<double> orbitalEnergiesEV;
   std::vector<double> orbitalOccupancies;

@@ -3,7 +3,7 @@
 The standard installation is `python tools/install_native.py`; see
 [install.md](install.md). This lower-level builder also supports a separate
 engine prefix for development. It uses upstream's GFN0 state repair and applies
-our project-local basis-export and SCC-diagnostics patches. GFN0/1/2 and population analysis
+our project-local basis-export, SCC-diagnostics and ESP patches. GFN0/1/2 and population analysis
 use this single extended library; no CLI or tblite backend is involved.
 
 ## Reproduce the build
@@ -28,7 +28,7 @@ does not launch it.
 
 The [source lock](../tools/xtb-source.json) pins commit
 `33fe381adde775c4992610c0f90d8914b7572bb5`, the upstream-repaired D4 source,
-the basis/diagnostics patches and all modified source files by SHA256. This upstream main commit reports
+the basis/diagnostics/ESP patches and all modified source files by SHA256. This upstream main commit reports
 6.7.1 but differs from the release tag; see [earlier verification](gfn0-reverification.md).
 The builder accepts a clean pinned checkout or an exactly matching patched
 checkout. It refuses unrelated or mismatched edits and never resets them.
@@ -37,7 +37,8 @@ selects an existing checkout. Use a new prefix when changing the source lock
 to preserve prior verified engines.
 
 The build runs all upstream tests, 12 installed-library D4 method-switch
-checks, the native basis/lifecycle C diagnostic and the SCC diagnostic lifecycle check before writing capability
+checks, the native basis/lifecycle C diagnostic, the SCC diagnostic lifecycle check,
+and ESP C ABI/CLI comparisons before writing capability
 metadata. There is no skip-tests option. The installation includes:
 
 ```text
@@ -95,6 +96,15 @@ upstream-fix commit/source identity and `capabilities.native_gfn0: true`.
 Historical 0.4 manifests with the reviewed local D4 patch are also accepted. An engine version string cannot
 establish either capability. The public adapter requires the complete extended
 profile for every GFN0/1/2 calculation.
+
+## ESP extension ABI v1
+
+The library can retain a singlepoint ESP snapshot and evaluate supplied spatial
+points in memory through `xtb_rdkit_setKeepESP` and `xtb_rdkit_getESP`.
+See the [ESP C API](esp-api.md) ([中文](zh-CN/esp-api.md)) for units, ownership,
+error handling, examples and validation. The extension is recorded as
+`capabilities.esp_api = 1`. Both Python interfaces support sampled ESP; shared
+ESP/RESP fitting functions operate on either result type.
 
 ## Validation and scope
 

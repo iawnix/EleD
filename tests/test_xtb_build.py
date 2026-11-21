@@ -124,3 +124,36 @@ def test_upstream_capability_constants_match_source_lock():
     assert lock['gfn0_fix']['file_sha256'] == _UPSTREAM_D4_SHA256
     code = (root / 'cpp/rdXTBTools/XTBTools.cpp').read_text()
     assert _UPSTREAM_GFN0_COMMIT in code and _UPSTREAM_D4_SHA256 in code
+
+
+def test_esp_patch_layers_over_basis_and_rejects_drift(source_case, tmp_path):
+    source, lock, base_patch = source_case
+    basis = tmp_path/'basis.patch'
+    basis.write_text('--- a/model.txt\n+++ b/model.txt\n@@ -1 +1 @@\n-local references\n+basis\n')
+    esp = tmp_path/'esp.patch'
+    esp.write_text('--- a/model.txt\n+++ b/model.txt\n@@ -1 +1 @@\n-basis\n+esp\n')
+    lock['basis_extension'] = {'patch': str(basis), 'patch_sha256': builder.digest(basis),
+                              'patched_files': {'model.txt': hashlib.sha256(b'basis\n').hexdigest()}}
+    lock['esp_extension'] = {'patch': str(esp), 'patch_sha256': builder.digest(esp),
+                            'patched_files': {'model.txt': hashlib.sha256(b'esp\n').hexdigest()}}
+    # The upstream repair file is distinct from extension files in real builds.
+    builder.run(['git', '-C', source, 'apply', base_patch])
+    lock.pop('patched_file'); lock.pop('patched_file_sha256')
+    (source/'upstream.txt').write_text('fixed\n')
+    builder.run(['git', '-C', source, 'add', '.'])
+    builder.run(['git', '-C', source, '-c', 'user.name=Build test',
+                 '-c', 'user.email=build-test@example.invalid', '-c', 'commit.gpgsign=false',
+                 'commit', '-qm', 'upstream fix'])
+    lock['commit'] = builder.git_output(source, 'rev-parse', 'HEAD')
+    lock['gfn0_fix'] = {'kind': 'upstream', 'commit': lock['commit'],
+                       'file': 'upstream.txt', 'file_sha256': builder.digest(source/'upstream.txt')}
+    for _ in range(2):
+        assert builder.source_tree(tmp_path, source, lock) == source
+        assert (source/'model.txt').read_text() == 'esp\n'
+    (source/'model.txt').write_text('unreviewed\n')
+    with pytest.raises(ValueError, match='reviewed basis extension'):
+        builder.source_tree(tmp_path, source, lock)
+    assert (source/'model.txt').read_text() == 'unreviewed\n'
+    esp.write_text('tampered\n')
+    with pytest.raises(ValueError, match='ESP patch hash differs'):
+        builder.source_tree(tmp_path, source, lock)

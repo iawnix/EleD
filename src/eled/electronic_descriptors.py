@@ -66,7 +66,14 @@ def _as_result(result):
         atomic_numbers = metadata.get('atomic_numbers', ())
         if coordinates is not None and atomic_numbers is not None and len(atomic_numbers):
             cm5_charges = calc_cm5_charges(atomic_numbers, coordinates, partial_charges)
+    esp = {}
+    if getattr(result, 'espSampled', False):
+        esp = dict(esp_points_angstrom=tuple(map(tuple, result.GetESPPoints())),
+                   esp_values_au=tuple(result.GetESPValues()))
+        metadata['esp'] = {'api_version': 1, 'potential_unit': 'hartree/e',
+                           'coordinate_unit': 'angstrom', 'source': 'native_density'}
     return XTBResult(
+        **esp,
         **basis,
         method=result.method, version=None, total_energy_hartree=result.totalEnergyHartree,
         homo_lumo_gap_ev=None, number_of_molecular_orbitals=result.numOrbitals,

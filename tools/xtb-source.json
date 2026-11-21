@@ -2,7 +2,7 @@
   "repository": "https://github.com/grimme-lab/xtb.git",
   "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
   "upstream_version": "6.7.1",
-  "description": "Pinned upstream GFN0 repair with opt-in basis export and successful-SCC diagnostics",
+  "description": "Pinned upstream GFN0 repair with basis export, SCC diagnostics and in-memory ESP evaluation",
   "basis_extension": {
     "api_version": 1,
     "patch": "diagnostics/xtb_basis_export.patch",
@@ -34,6 +34,17 @@
       "src/api/results.f90": "bb3093e329ff45a3db1afdc8f0c5f437bbc9925e913cfa441746ddeaf7e6c754",
       "src/api/interface.f90": "bee056aa0f7159b648104ce8f1d6243a3ca6311bee1d05b9e7444074ee603849",
       "include/xtb.h": "a74fba091eeb37739b79b85329753ad366620bca87c4609d59521ce4a4a0cc7e"
+    }
+  },
+  "esp_extension": {
+    "api_version": 1,
+    "patch": "diagnostics/xtb_esp_export.patch",
+    "patch_sha256": "aca69861eaf5e25b5437553c1a7f3c6117091c7abc3e6b3ab900109f50b70cd0",
+    "patched_files": {
+      "include/xtb.h": "e35247b02e317ad9404c0c7b0b49e0bb9246fc14898fa7c2eb4b786a38ad219e",
+      "src/api/results.f90": "0c801ccd71333ff52af3df9a7622f6685e0f80d800f5a025c3343e1f7134e43d",
+      "src/api/interface.f90": "111424e78b7a02fcc7b1799dd0250c0ccfeba5ec48182773cd7d659245dbbd82",
+      "src/esp.f": "4be46cc9dbe154f6a475fc1d3984e28002917d7c44330cafa7a516d56e317e71"
     }
   }
 }

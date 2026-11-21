@@ -67,6 +67,7 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | --- | --- | --- |
 | 分子级 | 能量、HOMO/LUMO、能隙、偶极矩、电荷统计 | `CalcXTBDescriptors` |
 | 原子级 | xTB 电荷、Wiberg 总和、Fukui 函数和局部反应性 | `CalcXTBAtomDescriptors`、`RunReactivity` |
+| [静电势与拟合电荷](docs/zh-CN/esp-api.md) | 静电势采样、带约束的 ESP 和单阶段 RESP 电荷 | `GenerateESPGrid`、`CalcESP`、`FitESPCharges`、`FitRESPCharges` |
 | 键级 | Wiberg/Mayer 键级、前线轨道键贡献 | `CalcXTBBondDescriptors`、`CalcMayerBondDescriptors`、`CalcFrontierBondDescriptors` |
 | 密度 | Mulliken/Löwdin shell 布居、密度矩阵、π 布居和 π 键级 | `CalcDensityMatrix`、`CalcShellPopulations`、`CalcPiDescriptors` |
 | 前线轨道 | 简并 HOMO/LUMO 组、参与度、质心和键分解 | `CalcFrontierDescriptors`、`CalcFrontierBondDescriptors` |

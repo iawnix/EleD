@@ -52,8 +52,9 @@ class XTBCalculator:
         """Run one single point for an RDKit molecule.
 
         ``overrides`` accepts only ``XTBOptions`` fields, for example
-        ``conf_id=2`` or ``keep_overlap=True``.  The input molecule is not
-        modified.
+        ``conf_id=2``, ``keep_overlap=True`` or ``esp_points_angstrom=points``.
+        ESP points are sampled during this singlepoint and returned as owned
+        arrays. The input molecule is not modified.
         """
 
         unknown = sorted(set(overrides) - _OPTION_NAMES)

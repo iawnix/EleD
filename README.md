@@ -67,6 +67,7 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | --- | --- | --- |
 | Molecular | energy, HOMO/LUMO, gap, dipole, charge statistics | `CalcXTBDescriptors` |
 | Atomic | xTB charge, Wiberg sum, Fukui and local reactivity | `CalcXTBAtomDescriptors`, `RunReactivity` |
+| [ESP and fitted charges](docs/esp-api.md) | sampled electrostatic potential, constrained ESP and single-stage RESP charges | `GenerateESPGrid`, `CalcESP`, `FitESPCharges`, `FitRESPCharges` |
 | Bond | Wiberg and Mayer bond orders, frontier-bond contributions | `CalcXTBBondDescriptors`, `CalcMayerBondDescriptors`, `CalcFrontierBondDescriptors` |
 | Density | Mulliken/Löwdin shell populations, density matrix, π population and π bond order | `CalcDensityMatrix`, `CalcShellPopulations`, `CalcPiDescriptors` |
 | Frontier orbitals | degenerate HOMO/LUMO groups, participation, centroids and bond decomposition | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors` |

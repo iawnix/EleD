@@ -96,6 +96,7 @@ if eht_ok:
 | Occupations | `GetOrbitalOccupancies()`, electrons, `[MO]` | xTB occupations can be fractional at finite electronic temperature |
 | Atomic charges | `GetAtomicCharges()`, elementary charge, `[atom]` | **GFN1/2:** converged SCC Mulliken charge (`chargeModel == "xtb_scc_mulliken"`); **GFN0:** PEEQ/EEQ (`"gfn0_eeq"`) |
 | CM5 charges | `GetCM5Charges()`, elementary charge, `[atom]` | Geometry-dependent correction to GFN1/2 SCC Mulliken charges; requires GFN1/2 SCC charges and calculation geometry |
+| Sampled ESP | `GetESPPoints()` (Angstrom `[point,xyz]`), `GetESPValues()` (Hartree/e `[point]`) | Pass `espPointsAngstrom` to `RunMol`; `espSampled` reports availability. Shared [ESP/RESP fits](esp-api.md) accept this result |
 | Dipole | `GetDipole()`, e·Bohr, `[x,y,z]` | Origin-dependent for charged molecules; uses supplied coordinates |
 | Nuclear gradient | `GetGradient()`, Hartree/Bohr, `[atom,xyz]` | Used by `OptimizeXTB`; it is not an excited-state gradient |
 | Bond orders | `GetWibergBondOrders()`, dimensionless, `[atom,atom]` | Not the EHT overlap population matrix |

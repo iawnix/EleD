@@ -37,6 +37,9 @@ class XTBResult:
     ``partial_charges`` are engine charges, whose exact model is given by
     ``charge_model`` (GFN1/2 SCC Mulliken or GFN0 PEEQ/EEQ). They are never
     CM5. ``cm5_charges`` is an explicitly derived CM5 set when available.
+    ``esp_points_angstrom`` and ``esp_values_au`` hold optional sampled ESP
+    from this singlepoint, in Angstrom and Hartree/e. Empty tuples mean not
+    sampled. They contain owned data, never a native result handle.
     """
 
     method: str
@@ -71,6 +74,10 @@ class XTBResult:
     shell_angular_momenta: tuple[int, ...] = ()
     # Cartesian unit directions attached to AO rows; zero for non-p AOs.
     ao_p_directions: tuple[tuple[float, ...], ...] = ()
+
+    # Sampled ESP only; no native pointers. Empty tuples mean not requested.
+    esp_points_angstrom: tuple[tuple[float, ...], ...] = ()
+    esp_values_au: tuple[float, ...] = ()  # Hartree/e, in point order
 
     def __post_init__(self) -> None:
         # Results serialized before charge-model provenance was introduced can

@@ -48,8 +48,10 @@ def source_tree(prefix, supplied, lock, patch=None):
     untracked = git_output(source, 'ls-files', '--others', '--exclude-standard')
     extension = lock.get('basis_extension')
     diagnostics = lock.get('diagnostics_extension')
+    esp = lock.get('esp_extension')
     allowed = ({lock['patched_file']} if patch else set()) | (set(extension['patched_files']) if extension else set())
     if diagnostics: allowed |= set(diagnostics['patched_files'])
+    if esp: allowed |= set(esp['patched_files'])
     if set(changes) - allowed or untracked:
         raise ValueError('Source contains unrelated changes; use a separate checkout. '
                          'The builder never resets or discards source changes.')
@@ -84,6 +86,15 @@ def source_tree(prefix, supplied, lock, patch=None):
             if check.returncode == 0:
                 run(['git', '-C', source, 'apply', diagnostic_patch])
             expected_files.update(diagnostics['patched_files'])
+        if esp:
+            esp_patch = (TOOLS / esp['patch']).resolve()
+            if digest(esp_patch) != esp['patch_sha256']:
+                raise ValueError('ESP patch hash differs from source lock')
+            check = subprocess.run(['git', '-C', str(source), 'apply', '--check', str(esp_patch)],
+                                   capture_output=True, text=True)
+            if check.returncode == 0:
+                run(['git', '-C', source, 'apply', esp_patch])
+            expected_files.update(esp['patched_files'])
         for filename, expected in expected_files.items():
             if digest(source / filename) != expected:
                 raise ValueError('Source does not match reviewed basis extension: ' + filename)
@@ -220,6 +231,11 @@ def main():
                       env=env, capture_output=True, text=True, timeout=60)
         scf_checks = json.loads(checked.stdout)
     version = run([executable, '--version'], env=env, capture_output=True, text=True).stdout
+    esp_checks = None
+    if lock.get('esp_extension'):
+        checked = run([sys.executable, TOOLS / 'diagnostics/verify_esp.py', prefix],
+                      env=env, capture_output=True, text=True, timeout=120)
+        esp_checks = json.loads(checked.stdout)
     record_dir = parameters / 'eled'
     record_dir.mkdir(exist_ok=True)
     for filename in ('COPYING', 'COPYING.LESSER'):
@@ -231,6 +247,9 @@ def main():
     if lock.get('diagnostics_extension'):
         diagnostic_patch = TOOLS / lock['diagnostics_extension']['patch']
         shutil.copy2(diagnostic_patch, record_dir / diagnostic_patch.name)
+    if lock.get('esp_extension'):
+        esp_patch = TOOLS / lock['esp_extension']['patch']
+        shutil.copy2(esp_patch, record_dir / esp_patch.name)
     source_diff = git_output(source, 'diff', 'HEAD', '--binary') + '\n'
     (record_dir / 'source.diff').write_text(source_diff)
     (record_dir / 'ctest.log').write_text(ctest.stdout + ctest.stderr)
@@ -244,9 +263,12 @@ def main():
                     cli_version_output=version.strip(),
                     files={str(p.relative_to(prefix)): digest(p) for p in
                            (library, executable, *(parameters / f'param_gfn{i}-xtb.txt' for i in range(3)))},
-                    state_checks=checks, basis_checks=basis_checks, scf_checks=scf_checks)
+                    state_checks=checks, basis_checks=basis_checks, scf_checks=scf_checks,
+                    esp_checks=esp_checks)
     if lock.get('diagnostics_extension'):
         manifest['capabilities']['scf_diagnostics_api'] = 1
+    if lock.get('esp_extension'):
+        manifest['capabilities']['esp_api'] = 1
     (record_dir / 'build.json').write_text(json.dumps(manifest, indent=2) + '\n')
     activation = '# Source this file to select this local xTB installation.\n'
     for key, value in [('XTB_LIBRARY', library), ('XTBPATH', parameters)]:

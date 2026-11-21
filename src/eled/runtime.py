@@ -77,6 +77,23 @@ def _native_diagnostics_build(path):
         return False
 
 
+_ESP_EXPORT_PATCH = 'aca69861eaf5e25b5437553c1a7f3c6117091c7abc3e6b3ab900109f50b70cd0'
+
+
+def _native_esp_build(path):
+    """Verify ESP source identity and the selected binary, without an engine call."""
+    try:
+        if not _native_gfn0_build(path):
+            return False
+        record = Path(path).resolve().parent.parent/'share/xtb/eled/build.json'
+        data = json.loads(record.read_text())
+        extension = data['source']['esp_extension']
+        return (data['capabilities']['esp_api'] == extension['api_version'] == 1
+                and extension['patch_sha256'] == _ESP_EXPORT_PATCH)
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
 def _extended_libxtb_build(path: str) -> dict | None:
     """Return the reviewed project engine identity when every extension is present."""
     gfn0 = _native_gfn0_build(path)

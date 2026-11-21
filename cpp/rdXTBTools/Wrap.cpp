@@ -31,6 +31,24 @@ py::object array(const std::vector<double> &values, std::vector<npy_intp> shape)
 py::object charges(const XTBResults &r) {
   requireSuccess(r); return array(r.atomicCharges, {r.numAtoms});
 }
+py::object espPoints(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.espValuesAU.empty()) throw std::invalid_argument("ESP was not sampled; pass espPointsAngstrom");
+  return array(r.espPointsAngstrom, {static_cast<npy_intp>(r.espValuesAU.size()), 3});
+}
+py::object espValues(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.espValuesAU.empty()) throw std::invalid_argument("ESP was not sampled; pass espPointsAngstrom");
+  return array(r.espValuesAU, {static_cast<npy_intp>(r.espValuesAU.size())});
+}
+std::vector<double> readESPPoints(const py::object &value) {
+  py::object points = py::import("eled.esp_input").attr("ESPPoints")(value);
+  std::vector<double> output;
+  for (Py_ssize_t i = 0; i < py::len(points); ++i)
+    for (int j = 0; j < 3; ++j) output.push_back(py::extract<double>(points[i][j]));
+  return output;
+}
+bool hasESP(const XTBResults &r) { return r.success && !r.espValuesAU.empty(); }
 py::object cm5Charges(const XTBResults &r) {
   requireSuccess(r);
   if (r.chargeModel != "xtb_scc_mulliken")
@@ -118,7 +136,7 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
               const py::object &charge, const py::object &unpaired, bool keepCoefficients,
               const std::string &library, const std::string &parameterDirectory,
               const py::object &maxIterations, const py::object &accuracy,
-              const py::object &electronicTemperature, bool keepOverlap) {
+              const py::object &electronicTemperature, bool keepOverlap, const py::object &espPointsAngstrom) {
   XTBOptions options;
   options.confId = confId;
   options.method = method;
@@ -126,6 +144,7 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.numUnpairedElectrons = optionalInteger(unpaired, "numUnpairedElectrons");
   options.keepOrbitalCoefficients = keepCoefficients;
   options.keepOverlap = keepOverlap;
+  options.espPointsAngstrom = readESPPoints(espPointsAngstrom);
   // Use the active Python runtime, including relocated distributions. An explicit
   // path remains authoritative; the standalone C++ default is unchanged.
   options.libraryPath = library.empty() ? py::extract<std::string>(
@@ -178,6 +197,7 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   options.numUnpairedElectrons = optionalInteger(config.attr("uhf"), "uhf");
   options.libraryPath = py::extract<std::string>(config.attr("xtb_library"));
   options.keepOverlap = py::extract<bool>(config.attr("keep_overlap"));
+  options.espPointsAngstrom = readESPPoints(config.attr("esp_points_angstrom"));
   py::object settings = py::import("eled.options").attr("CalculationSettings")(
       py::object(config.attr("max_iterations")), py::object(config.attr("accuracy")),
       py::object(config.attr("electronic_temperature")));
@@ -274,6 +294,9 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def_readonly("parameterSHA256", &XTBResults::parameterSHA256)
       .def_readonly("sourceCommit", &XTBResults::sourceCommit)
       .add_property("totalEnergyHartree", totalEnergy, "xTB total energy in Hartree; not EHT totalEnergy in eV.")
+      .add_property("espSampled", hasESP)
+      .def("GetESPPoints", espPoints, "Copy of ESP points in Angstrom, [point,xyz].")
+      .def("GetESPValues", espValues, "Copy of ESP in Hartree/e, [point].")
       .def("GetAtomicCharges", charges,
            "Copy of xTB atomic charges in elementary-charge units, [atom]. "
            "GFN1/2: converged SCC Mulliken charges; GFN0: PEEQ/EEQ charges; never CM5.")
@@ -293,7 +316,8 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
            py::arg("charge") = py::object(), py::arg("numUnpairedElectrons") = py::object(),
            py::arg("keepOrbitalCoefficients") = false, py::arg("xtbLibrary") = "",
            py::arg("parameterDirectory") = "", py::arg("maxIterations") = 250,
-           py::arg("accuracy") = 1.0, py::arg("electronicTemperature") = 300.0, py::arg("keepOverlap") = false),
+           py::arg("accuracy") = 1.0, py::arg("electronicTemperature") = 300.0, py::arg("keepOverlap") = false,
+           py::arg("espPointsAngstrom") = py::object()),
           "Run a gas-phase xTB single point on an explicit-H 3D RDKit molecule. "
           "Returns (success, XTBResults). xTB failures return False and errorMessage; "
           "numerical getters then raise RuntimeError. Invalid input raises ValueError; "

@@ -32,6 +32,7 @@ def _run_xtb(
     xtb_library: str | os.PathLike[str] | None = None,
     backend: str = "native",
     keep_overlap: bool = False,
+    esp_points_angstrom=(),
     max_iterations: int = 250,
     accuracy: float = 1.0,
     electronic_temperature: float = 300.0,
@@ -43,14 +44,14 @@ def _run_xtb(
     """
 
     opts = XTBOptions(conf_id=conf_id, method=method, charge=charge, uhf=uhf,
-                      xtb_library=xtb_library, backend=backend, keep_overlap=keep_overlap,
+                      xtb_library=xtb_library, backend=backend, keep_overlap=keep_overlap, esp_points_angstrom=esp_points_angstrom,
                       max_iterations=max_iterations, accuracy=accuracy, electronic_temperature=electronic_temperature)
     _xyz_from_mol(mol, conf_id)
     charge, uhf = _effective_charge_uhf(mol, charge, uhf)
     opts = _resolve_options(replace(opts, charge=charge, uhf=uhf))
     return run_xtb_native(mol, conf_id=opts.conf_id, method=opts.method,
                           charge=opts.charge, uhf=opts.uhf, xtb_library=opts.xtb_library,
-                          keep_overlap=opts.keep_overlap, max_iterations=opts.max_iterations,
+                          keep_overlap=opts.keep_overlap, esp_points_angstrom=opts.esp_points_angstrom, max_iterations=opts.max_iterations,
                           accuracy=opts.accuracy, electronic_temperature=opts.electronic_temperature)
 
 
