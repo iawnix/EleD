@@ -13,7 +13,7 @@ import numpy as np
 from rdkit import Chem
 
 from .electronic_descriptors import (
-    _as_result, _orbitals, _nonnegative, CalcXTBDescriptors,
+    CalcCM5Charges, _as_result, _orbitals, _nonnegative, CalcXTBDescriptors,
     CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
 )
 from .result import XTBResult
@@ -87,9 +87,7 @@ def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tol
         if abs(q_error) > conservation_tolerance:
             flag('charge_conservation_failed', 'error', 'Atomic charges do not sum to the requested molecular charge.')
     if len(result.cm5_charges):
-        cm5 = np.asarray(result.cm5_charges, dtype=float)
-        if cm5.ndim != 1 or not np.isfinite(cm5).all():
-            raise ValueError('CM5 charges must be finite')
+        cm5 = np.asarray(CalcCM5Charges(result))
         if expected_charge is not None and len(cm5) and abs(float(cm5.sum()) - expected_charge) > conservation_tolerance:
             flag('cm5_charge_conservation_failed', 'error', 'CM5 charges do not sum to the requested molecular charge.')
     if expected_charge:
@@ -308,7 +306,7 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
     if fragments is not None:
         report['fragments'] = CalcXTBFragmentDescriptors(result, fragments)
     else: report['missing']['fragments'] = 'not_requested'
-    if include_orbitals and len(result.overlap_matrix):
+    if include_orbitals and result.overlap_matrix is not None and len(result.overlap_matrix):
         report['populations'] = {scheme: CalcOrbitalPopulations(result, scheme=scheme)
                                 for scheme in ('lowdin', 'mulliken')}
         frontier = report['frontier'] = CalcFrontierDescriptors(mol, result, fragments=fragments,
@@ -347,6 +345,9 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
                                  frontier_bonds=reason, pi=reason)
         if include_orbitals and report['quality']['status'] == 'ok': report['quality']['status'] = 'partial'
     for key, value in report['values'].items():
+        if key.startswith('xtb_cm5_q_') and value is None:
+            report['missing'][key] = ('cm5_not_reported' if result.method in ('GFN1-xTB', 'GFN2-xTB')
+                                      else 'cm5_unsupported_method')
         if key in ('homo_n_orb','homo_emin_ev','homo_emax_ev','homo_ipr','homo_pr','homo_ent_nat',
                    'homo_cx_a','homo_cy_a','homo_cz_a','lumo_n_orb','lumo_emin_ev','lumo_emax_ev',
                    'lumo_ipr','lumo_pr','lumo_ent_nat','lumo_cx_a','lumo_cy_a','lumo_cz_a',

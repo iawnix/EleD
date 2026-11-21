@@ -15,7 +15,7 @@ import warnings
 import numpy as np
 
 from .backends.native import HARTREE_TO_EV, _native_charge_states
-from .electronic_descriptors import _as_result, _finite, _fragments
+from .electronic_descriptors import CalcCM5Charges, _as_result, _finite, _fragments
 from .errors import XTBRunError, XTBEnvironmentError
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .mapping import _validate_mapping
@@ -192,7 +192,7 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
     elif population_scheme == 'cm5':
         if any(not len(results[k].cm5_charges) for k in ('reference', 'ionized', 'attached')):
             raise ValueError('population_scheme="cm5" requires CM5 charges from all three GFN1/2 states')
-        q0, qp, qm = [np.asarray(results[k].cm5_charges) for k in ('reference','ionized','attached')]
+        q0, qp, qm = [np.asarray(CalcCM5Charges(results[k])) for k in ('reference','ionized','attached')]
         plus, minus = q0-qm, qp-q0
     else:
         n0, np_, nm = [np.asarray(CalcOrbitalPopulations(results[k],scheme=population_scheme)['mo_n_e'])

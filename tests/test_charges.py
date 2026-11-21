@@ -81,3 +81,35 @@ def test_cm5_element_order_invariance(numbers):
 def test_cm5_same_element_zero_distance_raises_value_error():
     with pytest.raises(ValueError, match='distinct atom coordinates'):
         calc_cm5_charges((6, 6), ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0)), (0.0, 0.0))
+
+
+@pytest.mark.parametrize('method', ['GFN1-xTB', 'GFN2-xTB'])
+def test_cm5_fukui_requires_one_charge_per_atom(method):
+    from test_reactivity import states
+    mol, results = states()
+    results = [replace(r, method=method, cm5_charges=(r.metadata['charge'],)) for r in results]
+    with pytest.raises(ValueError, match='atom count'):
+        CalcReactivityDescriptors(mol, *results, population_scheme='cm5')
+
+
+@pytest.mark.parametrize('method', ['GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'])
+def test_report_with_missing_overlap_and_cm5(method):
+    from eled import CalcDescriptorReport
+    from test_reactivity import states
+    mol, results = states()
+    result = replace(results[0], method=method, charge_model=charge_model_for_method(method),
+                     overlap_matrix=None)
+    report = CalcDescriptorReport(mol, result)
+    assert report['values']['xtb_energy_ha'] == result.total_energy_hartree
+    assert report['missing']['populations'] == 'basis_not_retained'
+    for suffix in ('sum', 'min', 'max', 'mean', 'sd', 'abs'):
+        key = f'xtb_cm5_q_{suffix}_e'
+        assert report['values'][key] is None
+        assert report['missing'][key] == ('cm5_unsupported_method' if method == 'GFN0-xTB'
+                                          else 'cm5_not_reported')
+    if method == 'GFN0-xTB':
+        invalid = replace(result, cm5_charges=result.partial_charges)
+        with pytest.raises(ValueError, match='unavailable'):
+            CalcCM5Charges(invalid)
+        with pytest.raises(ValueError, match='unavailable'):
+            CalcDescriptorReport(mol, invalid)

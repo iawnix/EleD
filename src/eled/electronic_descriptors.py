@@ -12,7 +12,7 @@ from numbers import Integral
 import numpy as np
 
 from .result import XTBResult
-from .charges import charge_model_for_method, calc_cm5_charges
+from .charges import CHARGE_MODEL_SCC, charge_model_for_method, calc_cm5_charges
 
 AU_DIPOLE_TO_DEBYE = 2.541746473
 
@@ -127,10 +127,12 @@ def CalcCM5Charges(result):
     ``q_e`` or ``GetAtomicCharges`` as CM5.
     """
     result = _as_result(result)
-    if not len(result.cm5_charges):
+    if (result.method not in ("GFN1-xTB", "GFN2-xTB")
+            or result.charge_model != CHARGE_MODEL_SCC or not len(result.cm5_charges)):
         raise ValueError('CM5 charges are unavailable for this result; GFN1/2 SCC charges and geometry are required')
     values = _finite(result.cm5_charges, 'CM5 charges', 1)
-    if result.metadata.get('atom_count') not in (None, len(values)):
+    if (result.metadata.get('atom_count') not in (None, len(values))
+            or len(result.partial_charges) not in (0, len(values))):
         raise ValueError('CM5 charges do not match atom count')
     return tuple(float(value) for value in values)
 
@@ -213,7 +215,7 @@ def CalcXTBDescriptors(result, *, frontier_depth=2, occupation_threshold=1e-7):
     for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
                         ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
         output[f'xtb_q_{label}_e'] = float(func(charges)) if len(charges) else None
-    cm5 = _finite(result.cm5_charges, 'CM5 charges', 1) if len(result.cm5_charges) else np.array(())
+    cm5 = np.asarray(CalcCM5Charges(result)) if len(result.cm5_charges) else np.array(())
     if len(cm5):
         for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
                             ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
@@ -234,7 +236,7 @@ def CalcXTBAtomDescriptors(result):
     if not len(charges):
         raise ValueError('atomic descriptors require partial charges')
     wbo = _wbo(result, len(charges))
-    cm5 = _finite(result.cm5_charges, 'CM5 charges', 1) if len(result.cm5_charges) else None
+    cm5 = np.asarray(CalcCM5Charges(result)) if len(result.cm5_charges) else None
     if cm5 is not None and len(cm5) != len(charges):
         raise ValueError('CM5 charges do not match atom count')
     rows = []
@@ -278,7 +280,7 @@ def CalcXTBFragmentDescriptors(result, fragments):
     groups = _fragments(fragments, len(charges))
     wbo = _wbo(result, len(charges))
     records, pairs = {}, []
-    cm5 = _finite(result.cm5_charges, 'CM5 charges', 1) if len(result.cm5_charges) else None
+    cm5 = np.asarray(CalcCM5Charges(result)) if len(result.cm5_charges) else None
     if cm5 is not None and len(cm5) != len(charges):
         raise ValueError('CM5 charges do not match atom count')
     for name, indices in groups.items():

@@ -34,6 +34,9 @@ H/C/N/O 元素对使用 xTB 的特定参数，其他元素对使用按原子顺�
 历史 CM5 归档应使用保存的几何和 SCC 电荷重新生成。SCC 电荷和 Wiberg 键级
 不受此校正影响。
 
+CM5 缺失时，报告为 GFN0 记录 `cm5_unsupported_method`，为 GFN1/2 记录
+`cm5_not_reported`。每组已提供的 CM5 电荷必须与原子逐一对应。
+
 YAeHMOP 适配器也使用同一套短字段规则，字段为
 `eht_homo_ev`、`eht_lumo_ev`、`eht_gap_ev`、`eht_fermi_ev`、
 `eht_energy_ev`、`eht_n_orb` 和 `eht_n_e`。`eht_` 前缀表示这是 RDKit

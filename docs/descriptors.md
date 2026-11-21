@@ -79,6 +79,9 @@ previously archived CM5 values involving such pairs should be regenerated from
 their stored geometry and SCC charges. SCC charges and Wiberg bond orders are
 unaffected by this correction.
 
+For absent CM5 fields, reports record `cm5_unsupported_method` for GFN0 and
+`cm5_not_reported` for GFN1/2. Each populated CM5 array must contain one charge per atom.
+
 Fragment groups are nonempty **disjoint** collections of unique integer indices
 into the calculation's original atom order. Indices include hydrogen atoms;
 hydrogens are not added to a fragment implicitly. A complete partition is optional.
