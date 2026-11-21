@@ -44,8 +44,8 @@ class ChargeStateCalculationError(XTBRunError):
 
 
 def _summary(result):
-    return {'status':'success', 'method':result.method, 'charge':result.metadata['charge'],
-            'uhf':result.metadata['uhf'], 'energy_hartree':result.total_energy_hartree,
+    return {'status':'success', 'method':result.method, 'charge':result.metadata.get('charge'),
+            'uhf':result.metadata.get('uhf'), 'energy_hartree':result.total_energy_hartree,
             'num_electrons':result.number_of_electrons,
             'partial_charges_e':list(result.partial_charges),
             'charge_model': result.charge_model,
@@ -135,7 +135,7 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
     states = {}; flags = []
     for label, result in results.items():
         _validate_mapping(mol, result)
-        if result.metadata['geometry_sha256'] != base['geometry_sha256']:
+        if result.metadata.get('geometry_sha256') != base.get('geometry_sha256'):
             raise ValueError('charge states must use the same fixed geometry')
         if result.metadata.get('calculation_status') != 'success':
             raise ValueError('charge states must record successful calculations')
@@ -148,8 +148,8 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
             raise ValueError(f'{label} has the wrong molecular charge')
         if result.number_of_electrons != ref.number_of_electrons - delta:
             raise ValueError(f'{label} has the wrong modeled electron count')
-        _effective_charge_uhf(mol, result.metadata['charge'], result.metadata['uhf'])
-        if result.number_of_unpaired_electrons != result.metadata['uhf']:
+        _effective_charge_uhf(mol, result.metadata.get('charge'), result.metadata.get('uhf'))
+        if result.number_of_unpaired_electrons != result.metadata.get('uhf'):
             raise ValueError('charge-state spin count disagrees with its provenance')
         energy = result.total_energy_hartree
         if energy is None or not np.isfinite(energy): raise ValueError('all three energies must be finite')
