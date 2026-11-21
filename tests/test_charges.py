@@ -69,3 +69,81 @@ def test_reactivity_cm5_scheme_is_explicit_and_conserves_fukui_sums():
     assert sum(atom['f_plus'] for atom in report['atoms']) == pytest.approx(1.)
     assert sum(atom['f_minus'] for atom in report['atoms']) == pytest.approx(1.)
 
+
+def test_cm5_non_pair_element_order_invariance():
+  from eled.charges import _PAIR
+
+  assert (5, 14) not in _PAIR
+  q_ab = calc_cm5_charges((5, 14), ((0.0, 0.0, 0.0), (2.0, 0.0, 0.0)), (0.2, -0.2))
+  q_ba = calc_cm5_charges((14, 5), ((2.0, 0.0, 0.0), (0.0, 0.0, 0.0)), (-0.2, 0.2))
+  np.testing.assert_allclose(q_ab, (q_ba[1], q_ba[0]))
+  assert sum(q_ab) == pytest.approx(0.0)
+
+
+def test_cm5_same_element_zero_distance_raises_value_error():
+  with pytest.raises(ValueError, match='distinct atom coordinates'):
+    calc_cm5_charges((6, 6), ((0.0, 0.0, 0.0), (0.0, 0.0, 0.0)), (0.0, 0.0))
+
+
+def test_calc_orbital_populations_empty_values_raise_descriptor_unavailable():
+  from eled.errors import DescriptorUnavailableError
+  from eled.populations import CalcOrbitalPopulations
+
+  result = XTBResult(
+      'GFN2-xTB',
+      None,
+      -1.0,
+      None,
+      2,
+      2,
+      0,
+      overlap_matrix=(),
+      ao_atom_indices=(),
+  )
+  with pytest.raises(DescriptorUnavailableError):
+    CalcOrbitalPopulations(result)
+
+
+def test_optimize_xtb_line_search_recovers_from_xtb_run_error(monkeypatch):
+  from eled import optimization
+  from eled.errors import XTBRunError
+
+  mol = Chem.MolFromSmiles('[H][H]')
+  conf = Chem.Conformer(2)
+  conf.Set3D(True)
+  conf.SetAtomPosition(0, (0.0, 0.0, 0.0))
+  conf.SetAtomPosition(1, (0.0, 0.0, 1.0))
+  mol.AddConformer(conf)
+
+  calls = {'n': 0}
+
+  def fake_run_xtb_native(working, max_iterations=None, **options):
+    calls['n'] += 1
+    if calls['n'] == 1:
+      return XTBResult(
+          'GFN2-xTB',
+          None,
+          -1.0,
+          None,
+          2,
+          2,
+          0,
+          metadata={'gradient_hartree_per_bohr': (0.0, 0.0, 0.0, 0.0, 0.0, 0.2)},
+      )
+    if calls['n'] == 2:
+      raise XTBRunError('scf failed on large step')
+    return XTBResult(
+        'GFN2-xTB',
+        None,
+        -1.1,
+        None,
+        2,
+        2,
+        0,
+        metadata={'gradient_hartree_per_bohr': (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)},
+    )
+
+  monkeypatch.setattr(optimization, '_run_xtb_native', fake_run_xtb_native)
+  opt_result = optimization.OptimizeXTB(mol)
+  assert opt_result.converged
+  assert calls['n'] == 3
