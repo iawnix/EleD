@@ -27,8 +27,8 @@ def CalcOrbitalPopulations(result, *, orb_idx=None, scheme='lowdin',
     if scheme not in {'lowdin', 'mulliken'}:
         raise ValueError("scheme must be 'lowdin' or 'mulliken'")
     _nonnegative(orthonormality_tolerance, 'orthonormality_tolerance')
-    if (not isinstance(result, XTBResult) or not len(result.overlap_matrix)
-            or not len(result.ao_atom_indices)):
+    if (not isinstance(result, XTBResult) or result.overlap_matrix is None or not len(result.overlap_matrix)
+            or result.ao_atom_indices is None or not len(result.ao_atom_indices)):
         raise DescriptorUnavailableError(
             'orbital populations require same-calculation overlap and AO-to-atom mapping; '
             'use XTBCalculator(...).calculate(..., keep_overlap=True).')
