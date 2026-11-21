@@ -91,17 +91,20 @@ def calc_cm5_charges(atomic_numbers: Sequence[int], coordinates_angstrom: Sequen
         zi = numbers[i]
         for j in range(i):
             zj = numbers[j]
-            if zi == zj:
-                continue
-            key = (min(zi, zj), max(zi, zj))
-            base = _PAIR.get(key, _A0[zi - 1] - _A0[zj - 1])
-            pij = base if zi < zj else -base
-            dx = coords[i][0] - coords[j][0]
-            dy = coords[i][1] - coords[j][1]
-            dz = coords[i][2] - coords[j][2]
-            distance = math.sqrt(dx * dx + dy * dy + dz * dz)
-            if distance == 0.0:
-                raise ValueError("CM5 requires distinct atom coordinates")
+                dx = coords[i][0] - coords[j][0]
+                dy = coords[i][1] - coords[j][1]
+                dz = coords[i][2] - coords[j][2]
+                distance = math.sqrt(dx * dx + dy * dy + dz * dz)
+                if distance == 0.0:
+                    raise ValueError("CM5 requires distinct atom coordinates")
+                if zi == zj:
+                    continue
+                key = (min(zi, zj), max(zi, zj))
+                if key in _PAIR:
+                    base = _PAIR[key]
+                    pij = base if zi < zj else -base
+                else:
+                    pij = _A0[zi - 1] - _A0[zj - 1]
             weight = math.exp(-2.4740 * (distance - _RADII_A[zi - 1] - _RADII_A[zj - 1]))
             correction[i] += weight * pij
             correction[j] -= weight * pij
