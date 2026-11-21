@@ -10,6 +10,7 @@ from typing import Any, Iterable
 import numpy as np
 
 from .backends.native import ANGSTROM_TO_BOHR, _run_xtb_native
+from .errors import XTBRunError
 from .result import XTBResult
 
 HARTREE_TO_KCAL_MOL = 627.5094740631
@@ -165,6 +166,7 @@ def OptimizeXTB(
         old_gradient = final_gradient.copy()
         accepted = None
         accepted_delta = None
+        last_error: XTBRunError | None = None
         accepted_step = None
         for backtrack in range(14):
             displacement_bohr = direction * (scale * (0.5 ** backtrack))
@@ -175,13 +177,20 @@ def OptimizeXTB(
                 if movable[atom_index]:
                     point = coordinates[atom_index] + delta
                     trial_conf.SetAtomPosition(atom_index, point)
-            trial_result = _run_xtb_native(trial, max_iterations=scf_iterations, **options)
+            try:
+                trial_result = _run_xtb_native(trial, max_iterations=scf_iterations, **options)
+            except XTBRunError as exc:
+                last_error = exc
+                continue
+            last_error = None
             delta_energy = float(current.total_energy_hartree - trial_result.total_energy_hartree)
             if delta_energy > 0.0:
                 accepted, accepted_delta, accepted_step = trial, delta_energy, displacement_angstrom
                 current = trial_result
                 break
         if accepted is None:
+            if last_error is not None:
+                raise last_error
             reason = "line_search_failed"
             break
         working = accepted
