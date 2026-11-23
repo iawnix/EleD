@@ -174,3 +174,21 @@ def test_esp_capability_rejects_unverified_extension(monkeypatch):
     dummy = object.__new__(_NativeXTB); dummy.library = '/no-library'
     with pytest.raises(DescriptorUnavailableError, match='verified ESP'):
         dummy.bind_esp_api()
+
+@pytest.mark.parametrize('read', [CalcESP, FitESPCharges, FitRESPCharges])
+def test_sample_readers_distinguish_missing_and_malformed_data(read):
+    result = synthetic()[0]
+    with pytest.raises(DescriptorUnavailableError):
+        read(replace(result, esp_points_angstrom=None, esp_values_au=None))
+    for points, values in [((), 1.), ((), (1.,)), (((2., 0., 0.),), None)]:
+        with pytest.raises(ValueError) as error:
+            read(replace(result, esp_points_angstrom=points, esp_values_au=values))
+        assert not isinstance(error.value, DescriptorUnavailableError)
+
+
+@pytest.mark.parametrize('fit', [FitESPCharges, FitRESPCharges])
+def test_fit_requires_consistent_source_atoms(fit):
+    result = synthetic()[0]
+    for fields in ({'atom_count': 2}, {'atomic_numbers': None}):
+        with pytest.raises(ValueError, match='atom'):
+            fit(replace(result, metadata={**result.metadata, **fields}))

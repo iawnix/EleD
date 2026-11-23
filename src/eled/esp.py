@@ -44,12 +44,19 @@ def CalcESP(result):
     """
     from .electronic_descriptors import _as_result
     result = _as_result(result)
+    _, values = _esp_samples(result)
+    return tuple(map(float, values))
+
+
+def _esp_samples(result):
     points = ESPPoints(result.esp_points_angstrom)
-    if not points and len(result.esp_values_au) == 0:
-        raise DescriptorUnavailableError('ESP was not sampled; pass esp_points_angstrom when calculating')
+    stored = result.esp_values_au
+    if stored is None:
+        stored = ()
+    values = _vector(stored, 'ESP values', len(points))
     if not points:
-        raise ValueError('ESP values have no sampling coordinates')
-    return tuple(map(float, _vector(result.esp_values_au, 'ESP values', len(points))))
+        raise DescriptorUnavailableError('ESP was not sampled; pass esp_points_angstrom when calculating')
+    return np.asarray(points), values
 
 
 def GenerateESPGrid(mol, *, conf_id=-1, scales=(1.4, 1.6, 1.8, 2.0), points_per_atom=100):
@@ -148,13 +155,14 @@ def _fit(result, *, restraint_strength, restraint_width, restrain_hydrogens,
          weights, equivalence_groups, fixed_charges, max_iterations, tolerance, rcond):
     from .electronic_descriptors import _as_result
     result = _as_result(result)
-    values = np.asarray(CalcESP(result))
-    points = np.asarray(ESPPoints(result.esp_points_angstrom))
+    points, values = _esp_samples(result)
     coords = np.asarray(ESPPoints(result.metadata.get('coordinates_angstrom')))
     numbers = result.metadata.get('atomic_numbers', ())
     n = len(coords)
-    if not n or len(numbers) != n:
+    if not n or numbers is None or np.ndim(numbers) != 1 or len(numbers) != n:
         raise ValueError('charge fitting requires source geometry and atomic numbers')
+    if result.metadata.get('atom_count', n) != n:
+        raise ValueError('source atom count does not match fitting coordinates')
     if any(isinstance(z, (bool, np.bool_)) or not isinstance(z, Integral) or not 1 <= z <= 118 for z in numbers):
         raise ValueError('atomic numbers must be integers in [1, 118]')
     charge = _real(result.metadata.get('charge'), 'source total charge')

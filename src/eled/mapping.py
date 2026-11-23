@@ -14,6 +14,12 @@ def _validate_mapping(mol: Any, result: XTBResult) -> None:
     metadata = result.metadata
     if not metadata.get('ordered_structure_sha256') or not metadata.get('geometry_sha256'):
         raise ValueError('result lacks input provenance; recalculate with XTBCalculator before mapping')
+    if metadata.get('atom_count', mol.GetNumAtoms()) != mol.GetNumAtoms():
+        raise ValueError('result atom count disagrees with the indexed molecule')
+    if len(result.partial_charges) not in (0, mol.GetNumAtoms()):
+        raise ValueError('partial charges do not match the indexed molecule atom count')
+    if result.cm5_charges is not None and len(result.cm5_charges) not in (0, mol.GetNumAtoms()):
+        raise ValueError(f'CM5 charges do not match atom count: expected {mol.GetNumAtoms()}, got {len(result.cm5_charges)}')
     if metadata['ordered_structure_sha256'] != _ordered_structure_hash(mol):
         raise ValueError('molecule structure or atom order does not match the xTB input')
     try:

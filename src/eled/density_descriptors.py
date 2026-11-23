@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import numpy as np
 
-from .electronic_descriptors import _as_result, _finite, _orbitals, _nonnegative
+from .electronic_descriptors import _orbital_basis_arrays, _has_population_basis, _as_result, _finite, _orbitals, _nonnegative
 from .errors import DescriptorUnavailableError
 from .mapping import _validate_mapping
 from .populations import _frontier_group
@@ -21,36 +21,27 @@ _VALENCE = {1: 1, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 14: 4, 15: 5,
 
 def _basis(result):
     result = _as_result(result)
-    fields = (result.overlap_matrix, result.orbital_coefficients,
-              result.ao_atom_indices, result.ao_shell_indices,
+    fields = (result.ao_shell_indices,
               result.shell_atom_indices, result.shell_angular_momenta)
-    if not all(len(v) for v in fields):
+    if not _has_population_basis(result) or not all(v is not None and len(v) for v in fields):
         raise DescriptorUnavailableError(
             "density descriptors require same-calculation overlap, coefficients and shell maps; "
             "use XTBCalculator(...).calculate(..., keep_overlap=True)")
-    c = _finite(result.orbital_coefficients, 'orbital coefficients', 2)
-    s = _finite(result.overlap_matrix, 'overlap', 2)
-    if c.shape != s.shape or s.shape[0] != len(result.ao_atom_indices):
-        raise ValueError('density basis arrays have inconsistent dimensions')
-    if not np.allclose(s, s.T, atol=1e-10, rtol=0):
-        raise ValueError('overlap must be symmetric')
+    energies, occ, _, _ = _orbitals(result)
+    natoms = result.metadata.get('atom_count', len(result.partial_charges))
+    c, s, atom = _orbital_basis_arrays(result, len(energies), natoms)
     eig, u = np.linalg.eigh(s)
     if eig.min() <= max(1., eig.max()) * 1e-10:
         raise ValueError('overlap must be positive definite')
-    energies, occ, _, _ = _orbitals(result)
-    if c.shape != (len(energies), len(energies)):
-        raise ValueError('coefficient matrix does not match orbital arrays')
     metric = c.T @ s @ c
     err = float(np.max(np.abs(metric - np.eye(len(energies)))))
     if err > 1e-5:
         raise ValueError(f'coefficients are not S-orthonormal: error={err:g}')
-    natoms = result.metadata.get('atom_count', len(result.partial_charges))
     def integer_map(values, name):
         array = np.asarray(values)
         if array.ndim != 1 or array.dtype.kind not in 'iu':
             raise ValueError(f'{name} must contain integer indices')
         return array.astype(int)
-    atom = integer_map(result.ao_atom_indices, 'AO atom map')
     shell = integer_map(result.ao_shell_indices, 'AO shell map')
     shell_atom = integer_map(result.shell_atom_indices, 'shell atom map')
     shell_l = integer_map(result.shell_angular_momenta, 'shell angular momentum map')

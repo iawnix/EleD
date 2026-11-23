@@ -1,5 +1,7 @@
 # In-memory xTB electrostatic potential (ESP)
 
+The two fitting functions validate the same sampled points and potentials as `CalcESP`. Fitting also checks the indexed source geometry against the atomic numbers and the recorded atom count when available.
+
 The extended `libxtb` exports an ESP C ABI for nonperiodic GFN0-, GFN1- and
 GFN2-xTB single points. Upstream already compiles the ESP integral routines
 into the shared library, but exposes no corresponding public C API. Its

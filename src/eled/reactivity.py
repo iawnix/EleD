@@ -49,7 +49,7 @@ def _summary(result):
             'num_electrons':result.number_of_electrons,
             'partial_charges_e':list(result.partial_charges),
             'charge_model': result.charge_model,
-            'cm5_charges_e': list(result.cm5_charges),
+            'cm5_charges_e': list(result.cm5_charges) if result.cm5_charges is not None else [],
             'provenance':deepcopy(dict(result.metadata))}
 
 
@@ -190,8 +190,6 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
         q0, qp, qm = [np.asarray(results[k].partial_charges) for k in ('reference','ionized','attached')]
         plus, minus = q0-qm, qp-q0
     elif population_scheme == 'cm5':
-        if any(not len(results[k].cm5_charges) for k in ('reference', 'ionized', 'attached')):
-            raise ValueError('population_scheme="cm5" requires CM5 charges from all three GFN1/2 states')
         q0, qp, qm = [np.asarray(CalcCM5Charges(results[k])) for k in ('reference','ionized','attached')]
         plus, minus = q0-qm, qp-q0
     else:

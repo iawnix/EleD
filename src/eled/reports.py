@@ -13,7 +13,7 @@ import numpy as np
 from rdkit import Chem
 
 from .electronic_descriptors import (
-    CalcCM5Charges, _as_result, _orbitals, _nonnegative, CalcXTBDescriptors,
+    _charges, _cm5_charges, _has_population_basis, _as_result, _orbitals, _nonnegative, CalcXTBDescriptors,
     CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
 )
 from .result import XTBResult
@@ -81,13 +81,14 @@ def AssessDescriptorQuality(result, *, occupation_threshold=1e-7, fractional_tol
         flag('open_shell_spin_summed', 'info', 'No separate alpha/beta population analysis or spin-state search.')
     expected_charge = result.metadata.get('charge')
     q_error = None
-    if len(result.partial_charges) and expected_charge is not None:
-        q_error = float(sum(result.partial_charges) - expected_charge)
+    charges = _charges(result)
+    if len(charges) and expected_charge is not None:
+        q_error = float(sum(charges) - expected_charge)
         if not np.isfinite(q_error): raise ValueError('charges must be finite')
         if abs(q_error) > conservation_tolerance:
             flag('charge_conservation_failed', 'error', 'Atomic charges do not sum to the requested molecular charge.')
-    if len(result.cm5_charges):
-        cm5 = np.asarray(CalcCM5Charges(result))
+    cm5 = _cm5_charges(result)
+    if len(cm5):
         if expected_charge is not None and len(cm5) and abs(float(cm5.sum()) - expected_charge) > conservation_tolerance:
             flag('cm5_charge_conservation_failed', 'error', 'CM5 charges do not sum to the requested molecular charge.')
     if expected_charge:
@@ -290,7 +291,7 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
     report = _base_report(record_id, DescriptorColumns(frontier_depth), analysis)
     report['provenance'] = deepcopy(dict(result.metadata))
     report['provenance']['charge_model'] = result.charge_model
-    report['provenance']['cm5_available'] = bool(result.cm5_charges)
+    report['provenance']['cm5_available'] = bool(len(_cm5_charges(result)))
     report['quality'] = AssessDescriptorQuality(result, occupation_threshold=occupation_threshold,
             fractional_tolerance=fractional_tolerance, conservation_tolerance=conservation_tolerance)
     scalars = CalcXTBDescriptors(result, frontier_depth=frontier_depth, occupation_threshold=occupation_threshold)
@@ -306,7 +307,7 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
     if fragments is not None:
         report['fragments'] = CalcXTBFragmentDescriptors(result, fragments)
     else: report['missing']['fragments'] = 'not_requested'
-    if include_orbitals and result.overlap_matrix is not None and len(result.overlap_matrix):
+    if include_orbitals and _has_population_basis(result):
         report['populations'] = {scheme: CalcOrbitalPopulations(result, scheme=scheme)
                                 for scheme in ('lowdin', 'mulliken')}
         frontier = report['frontier'] = CalcFrontierDescriptors(mol, result, fragments=fragments,

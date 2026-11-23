@@ -7,9 +7,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from .electronic_descriptors import _as_result, _finite, _fragments, _indices, _nonnegative, _orbitals
+from .electronic_descriptors import _orbital_basis_arrays, _has_population_basis, _charges, _as_result, _fragments, _indices, _nonnegative, _orbitals
 from .errors import DescriptorUnavailableError
-from .result import XTBResult
 
 
 def CalcOrbitalPopulations(result, *, orb_idx=None, scheme='lowdin',
@@ -27,29 +26,14 @@ def CalcOrbitalPopulations(result, *, orb_idx=None, scheme='lowdin',
     if scheme not in {'lowdin', 'mulliken'}:
         raise ValueError("scheme must be 'lowdin' or 'mulliken'")
     _nonnegative(orthonormality_tolerance, 'orthonormality_tolerance')
-    if (not isinstance(result, XTBResult)
-            or result.overlap_matrix is None or not len(result.overlap_matrix)
-            or result.ao_atom_indices is None or not len(result.ao_atom_indices)):
+    if not _has_population_basis(result):
         raise DescriptorUnavailableError(
             'orbital populations require same-calculation overlap and AO-to-atom mapping; '
             'use XTBCalculator(...).calculate(..., keep_overlap=True).')
     energies, occupations, _, _ = _orbitals(result)
     n = len(energies)
-    coefficients = _finite(result.orbital_coefficients, 'orbital coefficients', 2)
-    overlap = _finite(result.overlap_matrix, 'overlap', 2)
-    charges = _finite(result.partial_charges, 'partial charges', 1)
-    natoms = len(charges)
-    if result.metadata.get('atom_count', natoms) != natoms:
-        raise ValueError('partial charges do not match atom count')
-    if not n or not natoms or coefficients.shape != (n, n) or overlap.shape != (n, n):
-        raise ValueError('coefficients and overlap must match the full square AO/MO basis')
-    mapping = np.asarray(result.ao_atom_indices)
-    if (mapping.shape != (n,) or mapping.dtype.kind not in 'iu'
-            or np.any(mapping < 0) or np.any(mapping >= natoms)
-            or not np.array_equal(np.unique(mapping), np.arange(natoms))):
-        raise ValueError('AO-to-atom mapping must cover every atom with valid integer indices')
-    if not np.allclose(overlap, overlap.T, atol=1e-10, rtol=0):
-        raise ValueError('overlap must be symmetric')
+    natoms = len(_charges(result))
+    coefficients, overlap, mapping = _orbital_basis_arrays(result, n, natoms)
     eigenvalues, eigenvectors = np.linalg.eigh(overlap)
     if eigenvalues.min() <= max(1., eigenvalues.max()) * 1e-10:
         raise ValueError('overlap must be positive definite and well conditioned')

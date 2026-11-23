@@ -37,6 +37,8 @@ H/C/N/O 元素对使用 xTB 的特定参数，其他元素对使用按原子顺�
 CM5 缺失时，报告为 GFN0 记录 `cm5_unsupported_method`，为 GFN1/2 记录
 `cm5_not_reported`。每组已提供的 CM5 电荷必须与原子逐一对应。
 
+电荷数组沿用计算时的原子顺序。直接提取、Fukui 分析和报告都会检查电荷模型及原子数。缺少重叠矩阵、轨道系数或 AO 到原子的映射时，报告保留标量结果并记录轨道部分缺失。已提供的矩阵维度或原子索引有误时，接口报告输入错误。
+
 YAeHMOP 适配器也使用同一套短字段规则，字段为
 `eht_homo_ev`、`eht_lumo_ev`、`eht_gap_ev`、`eht_fermi_ev`、
 `eht_energy_ev`、`eht_n_orb` 和 `eht_n_e`。`eht_` 前缀表示这是 RDKit

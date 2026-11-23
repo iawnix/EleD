@@ -123,3 +123,27 @@ def test_descriptor_catalog_and_scalar_units_are_explicit():
     assert catalog['molecular']['xtb_dip_*_ebohr']['unit'] == 'e*Bohr'
     assert DescriptorColumns()['xtb_occ_cut'] == 'dimensionless'
     assert all(item['missing'] for group in catalog.values() for item in group.values())
+
+
+@pytest.mark.parametrize('field', ['overlap_matrix', 'orbital_coefficients', 'ao_atom_indices'])
+@pytest.mark.parametrize('missing', [None, ()])
+def test_optional_basis_absence_across_interfaces(field, missing):
+    from eled import CalcDescriptorReport, CalcOrbitalPopulations, DescriptorUnavailableError
+    r = replace(result(), **{field: missing})
+    for read in (CalcDensityMatrix, CalcOrbitalPopulations):
+        with pytest.raises(DescriptorUnavailableError):
+            read(r)
+    report = CalcDescriptorReport(molecule(), r)
+    assert report['missing']['populations'] == 'basis_not_retained'
+    assert report['values']['xtb_energy_ha'] == r.total_energy_hartree
+
+
+@pytest.mark.parametrize('damage', [{'ao_atom_indices': (0,) * 8},
+                                    {'overlap_matrix': ((1.,),)}])
+def test_corrupt_retained_basis_across_interfaces(damage):
+    from eled import CalcDescriptorReport, CalcOrbitalPopulations
+    r = replace(result(), **damage)
+    for read in (CalcDensityMatrix, CalcOrbitalPopulations,
+                 lambda data: CalcDescriptorReport(molecule(), data)):
+        with pytest.raises(ValueError, match='mapping|square'):
+            read(r)

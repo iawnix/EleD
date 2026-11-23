@@ -12,6 +12,7 @@ from numbers import Integral
 import numpy as np
 
 from .result import XTBResult
+from .errors import DescriptorUnavailableError
 from .charges import CHARGE_MODEL_SCC, charge_model_for_method, calc_cm5_charges
 
 AU_DIPOLE_TO_DEBYE = 2.541746473
@@ -121,27 +122,54 @@ def _orbitals(result, occupation_threshold=1e-7):
 def _charges(result):
     charges = _finite(result.partial_charges, 'partial charges', 1)
     expected = result.metadata.get('atom_count')
-    if expected is not None and len(charges) not in (0, expected):
-        raise ValueError('partial charges do not match atom count')
+    if len(charges):
+        if expected is not None and len(charges) != expected:
+            raise ValueError(f'partial charges do not match atom count: expected {expected}, got {len(charges)}')
+        if result.method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
+            if result.charge_model != charge_model_for_method(result.method):
+                raise ValueError(f'{result.charge_model} is inconsistent with {result.method}')
     return charges
 
 
-def CalcCM5Charges(result):
-    """Return derived CM5 charges and reject results where CM5 is undefined.
-
-    ``result.partial_charges`` remains the engine charge set.  Callers that
-    need CM5 must use this explicitly named accessor rather than interpreting
-    ``q_e`` or ``GetAtomicCharges`` as CM5.
-    """
-    result = _as_result(result)
-    if (result.method not in ("GFN1-xTB", "GFN2-xTB")
-            or result.charge_model != CHARGE_MODEL_SCC or not len(result.cm5_charges)):
-        raise ValueError('CM5 charges are unavailable for this result; GFN1/2 SCC charges and geometry are required')
+def _cm5_charges(result):
+    if result.cm5_charges is None:
+        return np.empty(0)
     values = _finite(result.cm5_charges, 'CM5 charges', 1)
-    if (result.metadata.get('atom_count') not in (None, len(values))
-            or len(result.partial_charges) not in (0, len(values))):
-        raise ValueError('CM5 charges do not match atom count')
-    return tuple(float(value) for value in values)
+    if len(values):
+        if result.method not in ('GFN1-xTB', 'GFN2-xTB') or result.charge_model != CHARGE_MODEL_SCC:
+            raise ValueError(f'CM5 charges are unavailable for {result.method} with {result.charge_model}')
+        for expected in (result.metadata.get('atom_count'), len(result.partial_charges) or None):
+            if expected is not None and len(values) != expected:
+                raise ValueError(f'CM5 charges do not match atom count: expected {expected}, got {len(values)}')
+    return values
+
+
+def CalcCM5Charges(result):
+    """Return one derived CM5 charge per atom in elementary-charge units."""
+    values = _cm5_charges(_as_result(result))
+    if not len(values):
+        raise DescriptorUnavailableError('CM5 charges are unavailable; GFN1/2 SCC charges and geometry are required')
+    return tuple(map(float, values))
+
+
+def _has_population_basis(result):
+    fields = (result.overlap_matrix, result.orbital_coefficients, result.ao_atom_indices)
+    return all(value is not None and len(value) > 0 for value in fields)
+
+
+def _orbital_basis_arrays(result, n_orbitals, n_atoms):
+    coefficients = _finite(result.orbital_coefficients, 'orbital coefficients', 2)
+    overlap = _finite(result.overlap_matrix, 'overlap', 2)
+    shape = (n_orbitals, n_orbitals)
+    if not n_orbitals or coefficients.shape != shape or overlap.shape != shape:
+        raise ValueError('coefficients and overlap must match the full square AO/MO basis')
+    if not np.allclose(overlap, overlap.T, atol=1e-10, rtol=0):
+        raise ValueError('overlap must be symmetric')
+    mapping = np.asarray(result.ao_atom_indices)
+    if (mapping.shape != (n_orbitals,) or mapping.dtype.kind not in 'iu'
+            or not np.array_equal(np.unique(mapping), np.arange(n_atoms))):
+        raise ValueError('AO-to-atom mapping must cover every atom with valid integer indices')
+    return coefficients, overlap, mapping
 
 
 def _wbo(result, natoms):
@@ -222,7 +250,7 @@ def CalcXTBDescriptors(result, *, frontier_depth=2, occupation_threshold=1e-7):
     for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
                         ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
         output[f'xtb_q_{label}_e'] = float(func(charges)) if len(charges) else None
-    cm5 = np.asarray(CalcCM5Charges(result)) if len(result.cm5_charges) else np.array(())
+    cm5 = _cm5_charges(result)
     if len(cm5):
         for label, func in [('sum', np.sum), ('min', np.min), ('max', np.max),
                             ('mean', np.mean), ('sd', np.std), ('abs', lambda q: np.abs(q).sum())]:
@@ -243,14 +271,12 @@ def CalcXTBAtomDescriptors(result):
     if not len(charges):
         raise ValueError('atomic descriptors require partial charges')
     wbo = _wbo(result, len(charges))
-    cm5 = np.asarray(CalcCM5Charges(result)) if len(result.cm5_charges) else None
-    if cm5 is not None and len(cm5) != len(charges):
-        raise ValueError('CM5 charges do not match atom count')
+    cm5 = _cm5_charges(result)
     rows = []
     for i, q in enumerate(charges):
         row = {'atom_index': i, 'q_e': float(q),
                'wbo_sum': float(wbo[i].sum()) if wbo is not None else None}
-        if cm5 is not None: row['cm5_q_e'] = float(cm5[i])
+        if len(cm5): row['cm5_q_e'] = float(cm5[i])
         rows.append(row)
     return rows
 
@@ -287,9 +313,7 @@ def CalcXTBFragmentDescriptors(result, fragments):
     groups = _fragments(fragments, len(charges))
     wbo = _wbo(result, len(charges))
     records, pairs = {}, []
-    cm5 = np.asarray(CalcCM5Charges(result)) if len(result.cm5_charges) else None
-    if cm5 is not None and len(cm5) != len(charges):
-        raise ValueError('CM5 charges do not match atom count')
+    cm5 = _cm5_charges(result)
     for name, indices in groups.items():
         outside = np.setdiff1d(np.arange(len(charges)), indices)
         records[name] = {
@@ -301,7 +325,7 @@ def CalcXTBFragmentDescriptors(result, fragments):
             'wbo_intra': float(np.triu(wbo[np.ix_(indices, indices)], 1).sum()) if wbo is not None else None,
             'wbo_inter': float(wbo[np.ix_(indices, outside)].sum()) if wbo is not None else None,
         }
-        if cm5 is not None:
+        if len(cm5):
             records[name].update(cm5_q_e=float(cm5[indices].sum()),
                                  cm5_q_min_e=float(cm5[indices].min()),
                                  cm5_q_max_e=float(cm5[indices].max()),

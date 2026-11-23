@@ -113,3 +113,40 @@ def test_report_with_missing_overlap_and_cm5(method):
             CalcCM5Charges(invalid)
         with pytest.raises(ValueError, match='unavailable'):
             CalcDescriptorReport(mol, invalid)
+
+
+@pytest.mark.parametrize('elements,radii,pair_parameter', [
+    ((1, 8), (0.32, 0.64), 0.1671),
+    ((5, 14), (0.84, 1.14), -0.1030 - (-0.0790)),
+])
+def test_cm5_reference_pair_values(elements, radii, pair_parameter):
+    from math import exp
+    distance = 1.7
+    coords = ((0., 0., 0.), (distance, 0., 0.))
+    correction = pair_parameter * exp(-2.474 * (distance - sum(radii)))
+    expected = (0.2 + correction, -0.2 - correction)
+    for order in (slice(None), slice(None, None, -1)):
+        q = calc_cm5_charges(elements[order], coords[order], (0.2, -0.2)[order])
+        assert q == pytest.approx(expected[order], abs=1e-12)
+        assert sum(q) == pytest.approx(0., abs=1e-12)
+
+
+@pytest.mark.parametrize('values,message', [((0., 0.), 'expected 3, got 2'),
+                                           ((float('nan'), 0., 0.), 'finite')])
+def test_corrupt_cm5_rejected_across_interfaces(monkeypatch, values, message):
+    from eled import (AssessDescriptorQuality, CalcDescriptorReport, CalcXTBDescriptors,
+                      CalcXTBAtomDescriptors, CalcXTBFragmentDescriptors, RunDescriptorBatch)
+    from test_reactivity import states
+    mol, rows = states()
+    rows = [replace(r, cm5_charges=r.partial_charges) for r in rows]
+    bad = replace(rows[0], cm5_charges=values)
+    for read in (CalcCM5Charges, CalcXTBDescriptors, CalcXTBAtomDescriptors,
+                 AssessDescriptorQuality, lambda r: CalcXTBFragmentDescriptors(r, {'O': [0]}),
+                 lambda r: CalcDescriptorReport(mol, r),
+                 lambda r: CalcReactivityDescriptors(mol, r, *rows[1:], population_scheme='cm5')):
+        with pytest.raises(ValueError, match=message):
+            read(bad)
+    monkeypatch.setattr('eled.batch.RunXTBBatch', lambda *a, **kw: [bad, rows[0]])
+    failed, valid = RunDescriptorBatch([mol, mol])
+    assert message in failed['error']['message']
+    assert valid['error'] is None
