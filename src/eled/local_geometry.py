@@ -13,6 +13,7 @@ from rdkit import Chem, rdBase
 
 from .electronic_descriptors import _indices
 from .input import _input_metadata, _xyz_from_mol
+from .reports import DESCRIPTOR_VERSION, SCHEMA_VERSION
 from .selections import NormalizeSelections
 
 
@@ -43,7 +44,8 @@ def _geometry(mol, conf_id):
 
 
 def _report(kind, metadata, selection, settings, values, units, missing=None):
-    return dict(schema_version=1, report_type=kind, protocol_version='1.0', selection=selection,
+    return dict(schema_version=SCHEMA_VERSION, descriptor_version=DESCRIPTOR_VERSION,
+                report_type=kind, protocol_version='1.0', selection=selection,
                 provenance=metadata, analysis_settings=settings, values=values,
                 units=units, missing=missing or {})
 
@@ -58,7 +60,8 @@ def AnalyzeLocalGeometry(mol, *, selections=None, conf_id=-1, sterimol=None,
     ``selections['rings']``. Each result retains the same geometry provenance.
     """
     normalized = NormalizeSelections(mol, selections)
-    out = {'schema_version': 1, 'report_type': 'local_geometry', 'protocol_version': '1.0',
+    out = {'schema_version': SCHEMA_VERSION, 'descriptor_version': DESCRIPTOR_VERSION,
+           'report_type': 'local_geometry', 'protocol_version': '1.0',
            'selections': normalized.to_dict(), 'reports': {}, 'errors': {}}
 
     def run(name, function, *args, **kwargs):
@@ -118,7 +121,8 @@ def RunLocalGeometryBatch(molecules, selections, *, conf_ids=None, return_errors
         except Exception as exc:
             if not return_errors:
                 raise
-            rows.append({'schema_version': 1, 'report_type': 'local_geometry',
+            rows.append({'schema_version': SCHEMA_VERSION, 'descriptor_version': DESCRIPTOR_VERSION,
+                         'report_type': 'local_geometry',
                          'protocol_version': '1.0', 'selections': None, 'reports': {},
                          'errors': {'molecule': {'type': type(exc).__name__, 'message': str(exc)}}})
     return rows

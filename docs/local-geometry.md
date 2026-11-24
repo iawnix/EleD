@@ -46,9 +46,10 @@ first. The first atom appears once. The caller chooses which cycles to analyze.
 
 ## Outputs and provenance
 
-Outputs use `schema_version=1`, a descriptor-specific `report_type` and
-`protocol_version='1.0'`. They contain `values`, `units`, `missing`, `selection`,
-`analysis_settings`, and `provenance`. Provenance includes the conformer ID,
+Outputs use the common `schema_version=2`, a descriptor-specific `report_type`,
+the common `descriptor_version`, and `protocol_version='1.0'`. They contain
+`values`, `units`, `missing`, `selection`, `analysis_settings`, and `provenance`.
+Provenance includes the conformer ID,
 indexed structure and coordinate hashes, atomic numbers and coordinates.
 Undefined quantities are `None` with a reason. Invalid input raises `ValueError`.
 Reports can be serialized with `json.dumps(report, allow_nan=False)`.

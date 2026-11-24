@@ -171,10 +171,13 @@ def test_canonical_selection_schema_and_local_geometry_batch():
     assert normalized.to_dict() == canonical
     report = AnalyzeLocalGeometry(mol, selections=selection,
         homa={'benzene': {}}, planes={'ring': {'other_atom_selection': 'site'}})
+    assert report['schema_version'] == 2
+    assert report['descriptor_version']
     assert report['reports']['homa:benzene']['values']['homa'] == pytest.approx(1.)
     assert 'plane:ring' in report['errors']
     rows = RunLocalGeometryBatch([mol, mol], selection, homa={'benzene': {}})
-    assert len(rows) == 2 and all('homa:benzene' in row['reports'] for row in rows)
+    assert len(rows) == 2 and all(row['schema_version'] == 2 for row in rows)
+    assert all('homa:benzene' in row['reports'] for row in rows)
     with pytest.raises(ValueError):
         NormalizeSelections(mol, {'rings': {'bad': [0, 2, 1, 3, 4, 5]}})
 

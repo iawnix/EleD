@@ -52,8 +52,9 @@ many = RunLocalGeometryBatch([mol], selections,
 | `CalcRingPuckering(mol, ring_atom_indices)` | 至少四元的有序环 | `q_total_a`、偶数环 `q_alternating_a`，Å；六元环 `theta_deg`；各模式的 `q_a` 和 `phi_deg` |
 | `CalcMCI(mol, result, ring_atom_indices)` | 有序环和保留的密度数据 | 无量纲 `mci`、原子块矩阵和定义 |
 
-报告使用 `schema_version=1`、对应的 `report_type` 和 `protocol_version='1.0'`，
-包含 `values`、`units`、`missing`、`selection`、`analysis_settings`、`provenance`。
+报告使用统一的 `schema_version=2`、`descriptor_version`、对应的 `report_type` 和
+`protocol_version='1.0'`，包含 `values`、`units`、`missing`、`selection`、
+`analysis_settings`、`provenance`。
 来源信息记录实际构象 ID、原子顺序与坐标哈希、原子序数和坐标。
 未定义值为 `None` 并附原因，输入错误抛出 `ValueError`。
 用 `json.dumps(report, allow_nan=False)` 保存 JSON 或 JSONL。
