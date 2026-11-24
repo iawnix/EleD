@@ -17,6 +17,29 @@ reports = [CalcHOMA(mol, ring) for ring in rings]
 print([r['values']['homa'] for r in reports])
 ```
 
+Multiple local descriptors can use one canonical selection mapping.
+
+```python
+from eled import AnalyzeLocalGeometry, RunLocalGeometryBatch
+
+selections = {
+    'atoms': {'substituent': [0, 1, 2], 'ring_atoms': [3, 4, 5, 6, 7, 8]},
+    'reaction_sites': {'electrophilic_carbon': [3]},
+    'bonds': {'attachment': [(2, 3)]},
+    'rings': {'aromatic_ring': [3, 4, 5, 6, 7, 8]},
+}
+one = AnalyzeLocalGeometry(mol, selections=selections,
+    sterimol={'substituent': {'axis': (3, 2)}},
+    homa={'aromatic_ring': {}})
+many = RunLocalGeometryBatch([mol], selections,
+    homa={'aromatic_ring': {}})
+```
+
+The same selection schema is available through `NormalizeSelections` and uses
+original atom indices. Reaction-site selections are named atom sets that can be
+passed alongside electronic Fukui results. A local batch row retains all
+successful reports and records an individual descriptor error in `errors`.
+
 Separate calls can analyze overlapping fused rings. A ring selection is a closed
 bonded path of distinct atoms, listed consecutively, with the last bonded to the
 first. The first atom appears once. The caller chooses which cycles to analyze.
@@ -39,6 +62,7 @@ geometry reports as JSON or JSONL directly.
 | `CalcPlaneDescriptors(mol, atom_indices, other_atom_indices=None)` | One or two atom sets, at least three atoms each | `plane_rms_a`, `plane_max_a`, optional `centroid_distance_a`, Angstrom; `plane_angle_deg`, degree |
 | `CalcHOMA(mol, ring_atom_indices)` | Ordered ring | `homa`, dimensionless; individual `bonds` with `length_a` |
 | `CalcRingPuckering(mol, ring_atom_indices)` | Ordered ring of at least four atoms | `q_total_a`, optional `q_alternating_a`, Angstrom; six-membered `theta_deg`; per-mode `q_a` and `phi_deg` |
+| `CalcMCI(mol, result, ring_atom_indices)` | Ordered ring and retained density | `mci`, dimensionless; atom-block matrix and definition |
 
 Selections explicitly include the hydrogen atoms to be counted. Steric functions
 use RDKit van der Waals radii with `radius_scale=1.0`. Pass `radii_angstrom` as a
@@ -103,18 +127,32 @@ have undefined theta. Degenerate normals give explicit missing values.
 ## HOMA
 
 `HOMA = 1 - mean(alpha_AB * (R_AB - Ropt_AB)**2)`.
-The built-in C–C parameters are Ropt=1.388 Angstrom and alpha=257.7 Angstrom^-2
+The built-in table contains C–C `(1.388, 257.7)`, C–N `(1.334, 93.52)`,
+C–O `(1.265, 157.38)` and C–S `(1.677, 94.09)` in Angstrom and Angstrom^-2,
 from Krygowski, J. Chem. Inf. Comput. Sci. 1993, 33, 70–78.
 Negative results are retained. Every ring edge contributes, including the
 closing edge. Aromaticity labels are not needed to evaluate the geometric index.
 
-For heteroatom rings, supply a complete parameter table such as
-`parameters={(6, 6): (Ropt_CC, alpha_CC), (6, 7): (Ropt_CN, alpha_CN)}` together
-with a nonempty `parameter_source`. Custom tables replace the default table.
+The built-in table includes C-C `(1.388, 257.7)`, C-N `(1.334, 93.52)`,
+C-O `(1.265, 157.38)` and C-S `(1.677, 94.09)` in Angstrom and Angstrom^-2.
+These values follow the Krygowski 1993 parameter set. For another parameter set,
+supply a complete table such as `parameters={(6, 6): (Ropt_CC, alpha_CC),
+(6, 7): (Ropt_CN, alpha_CN)}` together with a nonempty `parameter_source`.
+Custom tables replace the default table.
 An unsupported pair makes the whole HOMA value missing with reason
 `unsupported_element_pair`; all measured bond lengths remain in the report.
 HOMA depends on the geometry preparation and parameter set. It provides a
 geometric measure of aromaticity, to be interpreted with the chemical system.
+
+`CalcMCI` uses the retained density and overlap data. It first builds an atom
+pair matrix from the symmetric average of the two directed atom-block sums of
+`P*S` for the Mulliken scheme, or the orthogonal density for the Löwdin scheme.
+For an n-member ring it reports `2^(n-2)` times the sum of products around all
+cyclic permutations with the first atom fixed. The ordered ring, scheme and
+pair convention are part of the result, so MCI values should be compared with
+the same convention and electronic method.
+The local `pi_bo` values describe individual bonds and are not averaged to make
+an MCI.
 
 ## Multiple conformers
 

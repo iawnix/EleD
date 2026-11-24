@@ -20,7 +20,8 @@ from .result import XTBResult
 from .errors import DescriptorUnavailableError
 from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
 from .density_descriptors import (CalcDensityMatrix, CalcShellPopulations,
-    CalcMayerBondDescriptors, CalcFrontierBondDescriptors, CalcPiDescriptors, _pi_options)
+    CalcMayerBondDescriptors, CalcFrontierBondDescriptors, CalcPiDescriptors,
+    CalcMCIDescriptors, _pi_options)
 
 DESCRIPTOR_VERSION = '1.3'
 SCHEMA_VERSION = 2
@@ -246,7 +247,7 @@ def _base_report(record_id, columns, analysis):
             'provenance': {}, 'quality': {}, 'missing': {}, 'error': None,
             'atoms': None, 'bonds': None, 'fragments': None, 'populations': None, 'frontier': None,
             'density': None, 'shell_populations': None, 'mayer_bonds': None,
-            'frontier_bonds': None, 'pi': None}
+            'frontier_bonds': None, 'pi': None, 'mci': None}
 
 
 def _analysis_settings(*, frontier_depth=2, occupation_threshold=1e-7,
@@ -272,7 +273,8 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
                            occupation_threshold=1e-7, degeneracy_ev=1e-3,
                            occupation_tolerance=1e-6, include_orbitals=True,
                            fractional_tolerance=1e-4, conservation_tolerance=1e-5,
-                           pi_scheme='lowdin', pi_plane_tol_a=0.1, pi_ref=None):
+                           pi_scheme='lowdin', pi_plane_tol_a=0.1, pi_ref=None,
+                           mci_rings=None, mci_scheme='mulliken'):
     """Extract all descriptor sections without running an engine.
 
     Missing retained basis gives explicit nulls/reasons; inconsistent arrays or
@@ -285,6 +287,12 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
         include_orbitals=include_orbitals, fractional_tolerance=fractional_tolerance,
         conservation_tolerance=conservation_tolerance, pi_scheme=pi_scheme,
         pi_plane_tol_a=pi_plane_tol_a, pi_ref=pi_ref)
+    if mci_scheme not in {'mulliken', 'lowdin'}:
+        raise ValueError("mci_scheme must be 'mulliken' or 'lowdin'")
+    if mci_rings is not None:
+        mci_rings = mci_rings.rings if hasattr(mci_rings, 'rings') else mci_rings
+        analysis['mci_scheme'] = mci_scheme
+        analysis['mci_rings'] = {str(name): list(indices) for name, indices in mci_rings.items()}
     pi_options = _pi_options(pi_scheme, pi_plane_tol_a, analysis['pi_ref'], natoms=mol.GetNumAtoms())
     result = _as_result(result)
     _validate_mapping(mol, result)
@@ -339,11 +347,15 @@ def CalcDescriptorReport(mol, result, *, record_id=None, fragments=None, frontie
                 report['quality']['flags'].append({'code': f'{name}_unavailable',
                     'severity': 'warning', 'detail': str(exc)})
                 if report['quality']['status'] == 'ok': report['quality']['status'] = 'partial'
+        if mci_rings is not None:
+            report['mci'] = CalcMCIDescriptors(mol, result, mci_rings, scheme=mci_scheme)
     else:
         reason = 'basis_not_retained' if include_orbitals else 'not_requested'
         report['missing'].update(populations=reason, frontier=reason, density=reason,
                                  shell_populations=reason, mayer_bonds=reason,
                                  frontier_bonds=reason, pi=reason)
+        if mci_rings is not None:
+            report['missing']['mci'] = reason
         if include_orbitals and report['quality']['status'] == 'ok': report['quality']['status'] = 'partial'
     for key, value in report['values'].items():
         if key.startswith('xtb_cm5_q_') and value is None:

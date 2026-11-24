@@ -13,6 +13,16 @@ from rdkit import Chem, rdBase
 
 from .electronic_descriptors import _indices
 from .input import _input_metadata, _xyz_from_mol
+from .selections import NormalizeSelections
+
+
+HOMA_PARAMETERS = {
+    (6, 6): (1.388, 257.7),
+    (6, 7): (1.334, 93.52),
+    (6, 8): (1.265, 157.38),
+    (6, 16): (1.677, 94.09),
+}
+HOMA_PARAMETER_SOURCE = 'Krygowski 1993, J. Chem. Inf. Comput. Sci. 33, 70-78'
 
 
 def _positive(value, name, *, integer=False):
@@ -36,6 +46,82 @@ def _report(kind, metadata, selection, settings, values, units, missing=None):
     return dict(schema_version=1, report_type=kind, protocol_version='1.0', selection=selection,
                 provenance=metadata, analysis_settings=settings, values=values,
                 units=units, missing=missing or {})
+
+
+def AnalyzeLocalGeometry(mol, *, selections=None, conf_id=-1, sterimol=None,
+                         buried_volume=None, planes=None, homa=None, puckering=None):
+    """Run selected local geometry descriptors using one canonical selection set.
+
+    Descriptor requests are mappings from a selection name to keyword options.
+    For example, ``sterimol={'substituent': {'axis': (2, 1)}}`` uses
+    ``selections['atoms']['substituent']``. Ring requests use names from
+    ``selections['rings']``. Each result retains the same geometry provenance.
+    """
+    normalized = NormalizeSelections(mol, selections)
+    out = {'schema_version': 1, 'report_type': 'local_geometry', 'protocol_version': '1.0',
+           'selections': normalized.to_dict(), 'reports': {}, 'errors': {}}
+
+    def run(name, function, *args, **kwargs):
+        try:
+            out['reports'][name] = function(mol, *args, conf_id=conf_id, **kwargs)
+        except Exception as exc:
+            out['errors'][name] = {'type': type(exc).__name__, 'message': str(exc)}
+
+    for name, options in (sterimol or {}).items():
+        if name not in normalized.atoms:
+            raise ValueError(f'sterimol request {name!r} has no atom selection')
+        options = dict(options)
+        axis = options.pop('axis')
+        run(f'sterimol:{name}', CalcSterimol, normalized.atoms[name], axis=axis, **options)
+    for name, options in (buried_volume or {}).items():
+        if name not in normalized.atoms:
+            raise ValueError(f'buried-volume request {name!r} has no atom selection')
+        options = dict(options)
+        center = options.pop('center')
+        run(f'buried_volume:{name}', CalcBuriedVolume, normalized.atoms[name], center=center, **options)
+    for name, options in (planes or {}).items():
+        if name not in normalized.atoms:
+            raise ValueError(f'plane request {name!r} has no atom selection')
+        options = dict(options)
+        other_name = options.pop('other_atom_selection', None)
+        other = None if other_name is None else normalized.atoms[other_name]
+        run(f'plane:{name}', CalcPlaneDescriptors, normalized.atoms[name],
+            other_atom_indices=other, **options)
+    for name, options in (homa or {}).items():
+        if name not in normalized.rings:
+            raise ValueError(f'HOMA request {name!r} has no ring selection')
+        run(f'homa:{name}', CalcHOMA, normalized.rings[name], **dict(options))
+    for name, options in (puckering or {}).items():
+        if name not in normalized.rings:
+            raise ValueError(f'puckering request {name!r} has no ring selection')
+        run(f'puckering:{name}', CalcRingPuckering, normalized.rings[name], **dict(options))
+    return out
+
+
+def RunLocalGeometryBatch(molecules, selections, *, conf_ids=None, return_errors=True,
+                          sterimol=None, buried_volume=None, planes=None, homa=None,
+                          puckering=None):
+    """Run ``AnalyzeLocalGeometry`` over molecules with stable ordered rows."""
+    molecules = list(molecules)
+    if conf_ids is None:
+        conf_ids = [-1] * len(molecules)
+    else:
+        conf_ids = list(conf_ids)
+    if len(conf_ids) != len(molecules):
+        raise ValueError('conf_ids must match molecules')
+    rows = []
+    for mol, conf_id in zip(molecules, conf_ids):
+        try:
+            rows.append(AnalyzeLocalGeometry(mol, selections=selections, conf_id=conf_id,
+                sterimol=sterimol, buried_volume=buried_volume, planes=planes,
+                homa=homa, puckering=puckering))
+        except Exception as exc:
+            if not return_errors:
+                raise
+            rows.append({'schema_version': 1, 'report_type': 'local_geometry',
+                         'protocol_version': '1.0', 'selections': None, 'reports': {},
+                         'errors': {'molecule': {'type': type(exc).__name__, 'message': str(exc)}}})
+    return rows
 
 
 def _radii(mol, radii, scale):
@@ -223,8 +309,8 @@ def CalcHOMA(mol, ring_atom_indices, *, conf_id=-1, parameters=None, parameter_s
     coordinates, metadata = _geometry(mol, conf_id)
     indices = _ring(mol, ring_atom_indices)
     if parameters is None:
-        parameters = {(6, 6): (1.388, 257.7)}
-        parameter_source = 'Krygowski 1993, J. Chem. Inf. Comput. Sci. 33, 70-78; C-C'
+        parameters = HOMA_PARAMETERS
+        parameter_source = HOMA_PARAMETER_SOURCE
     elif not isinstance(parameter_source, str) or not parameter_source.strip():
         raise ValueError('custom HOMA parameters require parameter_source')
     if not isinstance(parameters, Mapping):

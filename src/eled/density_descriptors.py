@@ -8,12 +8,15 @@ in a defined non-orthogonal basis.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from itertools import permutations
 import numpy as np
 
-from .electronic_descriptors import _orbital_basis_arrays, _has_population_basis, _as_result, _finite, _orbitals, _nonnegative
+from .electronic_descriptors import (_orbital_basis_arrays, _has_population_basis, _as_result,
+    _finite, _orbitals, _nonnegative, _indices)
 from .errors import DescriptorUnavailableError
 from .mapping import _validate_mapping
 from .populations import _frontier_group
+from .selections import NormalizeSelections
 
 _VALENCE = {1: 1, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 14: 4, 15: 5,
             16: 6, 17: 7, 32: 4, 33: 5, 34: 6, 35: 7, 53: 7}
@@ -323,13 +326,75 @@ def CalcPiDescriptors(mol, result, *, scheme='lowdin', plane_tol_a=0.1, pi_ref=N
             'invariance': 'AO permutation/sign changes with component directions; rigid motion; local normal sign'}
 
 
+def CalcMCI(mol, result, ring_atom_indices, *, scheme='mulliken'):
+    """Calculate a density-based multicenter index for one ordered ring.
+
+    The atom-pair matrix is formed from atom-block sums of the Mulliken
+    ``P*S`` matrix or the Löwdin orthogonal-density matrix. For an ordered ring
+    with ``n`` atoms, the reported index is
+    ``2**(n-2) * sum_perm(prod(B[p_i,p_(i+1)]))`` over permutations with the
+    first atom fixed. Both cyclic directions and all remaining atom orderings
+    are included. This explicit convention is reported with the result and
+    differs from an average of local pi bond indices.
+    """
+    if scheme not in {'mulliken', 'lowdin'}:
+        raise ValueError("scheme must be 'mulliken' or 'lowdin'")
+    result = _as_result(result)
+    _validate_mapping(mol, result)
+    result, _, _, _, ps, lowdin, atom, _, _, _, _ = _basis(result)
+    natoms = result.metadata.get('atom_count', len(result.partial_charges))
+    indices = _indices(ring_atom_indices, natoms, 'ring_atom_indices')
+    if len(indices) < 3:
+        raise ValueError('ring_atom_indices must contain at least three unique atom indices')
+    for first, second in zip(indices, np.roll(indices, -1)):
+        if mol.GetBondBetweenAtoms(int(first), int(second)) is None:
+            raise ValueError('ring_atom_indices must form an ordered bonded closed path')
+    metric = ps if scheme == 'mulliken' else lowdin
+    pair = np.zeros((natoms, natoms), dtype=float)
+    for first in range(natoms):
+        first_rows = np.flatnonzero(atom == first)
+        for second in range(natoms):
+            second_rows = np.flatnonzero(atom == second)
+            pair[first, second] = float(metric[np.ix_(first_rows, second_rows)].sum())
+    pair = (pair + pair.T) / 2
+    ring = tuple(map(int, indices))
+    value = 0.0
+    for tail in permutations(ring[1:]):
+        order = (ring[0],) + tail
+        product = 1.0
+        for first, second in zip(order, order[1:] + order[:1]):
+            product *= pair[first, second]
+        value += product
+    value *= 2 ** (len(ring) - 2)
+    return {'ring_atom_indices': list(ring), 'mci': float(value),
+            'atom_pair_matrix': pair[np.ix_(ring, ring)].tolist(),
+            'scheme': scheme, 'units': {'mci': 'dimensionless', 'atom_pair_matrix': 'dimensionless'},
+            'definition': '2^(n-2) times all fixed-first cyclic density products; atom-pair blocks are symmetrized',
+            'pair_convention': 'B_AB=(sum((P*S)_AB)+sum((P*S)_BA))/2; Löwdin uses the same symmetric block sum',
+            'missing': {}}
+
+
+def CalcMCIDescriptors(mol, result, rings, *, scheme='mulliken'):
+    """Calculate MCI for a named mapping of ordered ring selections."""
+    if hasattr(rings, 'rings'):
+        rings = NormalizeSelections(mol, rings).rings
+    else:
+        rings = NormalizeSelections(mol, {'rings': rings}).rings
+    if not rings:
+        raise ValueError('rings must be a nonempty mapping of names to ordered atom indices')
+    return {name: CalcMCI(mol, result, indices, scheme=scheme) for name, indices in rings.items()}
+
+
 def CalcDensityDescriptors(mol, result, *, include_frontier_bonds=True, include_pi=True,
-                           pi_scheme='lowdin', pi_plane_tol_a=0.1, pi_ref=None):
+                           pi_scheme='lowdin', pi_plane_tol_a=0.1, pi_ref=None,
+                           mci_rings=None, mci_scheme='mulliken'):
     """Aggregate all zero-cost descriptors available from one retained result."""
     pi_options = _pi_options(pi_scheme, pi_plane_tol_a, pi_ref, natoms=mol.GetNumAtoms())
     out = {'density': CalcDensityMatrix(result), 'shell_populations': CalcShellPopulations(result),
            'mayer_bonds': CalcMayerBondDescriptors(mol, result)}
     if include_frontier_bonds: out['frontier_bonds'] = CalcFrontierBondDescriptors(mol, result)
     if include_pi: out['pi'] = CalcPiDescriptors(mol, result, **pi_options)
+    if mci_rings is not None:
+        out['mci'] = CalcMCIDescriptors(mol, result, mci_rings, scheme=mci_scheme)
     return out
 

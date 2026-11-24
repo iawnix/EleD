@@ -5,7 +5,9 @@ import numpy as np
 import pytest
 from rdkit import Chem
 
-from eled import CalcBuriedVolume, CalcHOMA, CalcPlaneDescriptors, CalcRingPuckering, CalcSterimol
+from eled import (AnalyzeLocalGeometry, CalcBuriedVolume, CalcHOMA,
+                  CalcPlaneDescriptors, CalcRingPuckering, CalcSterimol,
+                  NormalizeSelections, RunLocalGeometryBatch)
 
 
 def molecule(smiles, coordinates):
@@ -58,8 +60,9 @@ def test_homa_heteroatom_parameters_and_ring_validation():
     mol = ring()
     mol.GetAtomWithIdx(0).SetAtomicNum(7)
     report = CalcHOMA(mol, range(6))
-    assert report['values']['homa'] is None
-    assert report['missing']['homa'] == 'unsupported_element_pair'
+    expected = 1 - (2 * 93.52 * (1.388 - 1.334)**2
+                    + 4 * 257.7 * (1.388 - 1.388)**2) / 6
+    assert report['values']['homa'] == pytest.approx(expected)
     params = {(6, 6): (1.388, 257.7), (6, 7): (1.388, 100.)}
     assert CalcHOMA(mol, range(6), parameters=params, parameter_source='analytic test')['values']['homa'] == pytest.approx(1.)
     with pytest.raises(ValueError, match='source'):
@@ -155,6 +158,25 @@ def test_conformer_selection_input_validation_and_json():
     bad.GetConformer().SetAtomPosition(0, (float('nan'), 0., 0.))
     with pytest.raises(ValueError, match='finite'):
         CalcHOMA(bad, range(6))
+
+
+def test_canonical_selection_schema_and_local_geometry_batch():
+    mol = ring()
+    selection = {'atoms': {'ring': list(range(6)), 'site': [0, 1]},
+                 'reaction_sites': {'electrophilic': [0]},
+                 'bonds': {'edge': [(0, 1)]},
+                 'rings': {'benzene': list(range(6))}}
+    normalized = NormalizeSelections(mol, selection)
+    canonical = dict(selection, bonds={'edge': [[0, 1]]})
+    assert normalized.to_dict() == canonical
+    report = AnalyzeLocalGeometry(mol, selections=selection,
+        homa={'benzene': {}}, planes={'ring': {'other_atom_selection': 'site'}})
+    assert report['reports']['homa:benzene']['values']['homa'] == pytest.approx(1.)
+    assert 'plane:ring' in report['errors']
+    rows = RunLocalGeometryBatch([mol, mol], selection, homa={'benzene': {}})
+    assert len(rows) == 2 and all('homa:benzene' in row['reports'] for row in rows)
+    with pytest.raises(ValueError):
+        NormalizeSelections(mol, {'rings': {'bad': [0, 2, 1, 3, 4, 5]}})
 
 
 def test_fused_rings_conformer_ids_and_missing_puckering_schema():

@@ -7,11 +7,12 @@ from rdkit import Chem
 from eled import (
     XTBResult, CalcDensityMatrix, CalcShellPopulations,
     CalcMayerBondDescriptors, CalcFrontierBondDescriptors,
-    CalcPiDescriptors,
+    CalcPiDescriptors, CalcMCI, CalcMCIDescriptors,
 )
 from eled.input import _input_metadata, _xyz_from_mol
 from eled.reports import DescriptorSensitivity
 from eled import DescriptorCatalog, DescriptorColumns
+from eled import CalcDescriptorReport
 
 
 def result():
@@ -52,6 +53,54 @@ def test_density_and_shell_conservation():
                for x in shells['atoms']) == pytest.approx(8.)
     assert shells['atoms'][0]['low_ps'] == pytest.approx(3.)
     assert shells['atoms'][0]['low_qrec_e'] == pytest.approx(-4.)
+
+
+def test_mci_uses_explicit_multicenter_density_definition():
+    r = result()
+    mol = molecule()
+    # Identity basis gives P*S diagonal only, so every cyclic multicenter
+    # product vanishes. The result still exposes the selected atom matrix and
+    # the convention used for the index.
+    with pytest.raises(ValueError):
+        CalcMCI(mol, r, [0, 1, 0])
+    # A two-atom synthetic molecule is not a ring. Use a four-atom ring and
+    # retain the same identity density for a zero multicenter product.
+    four = Chem.MolFromSmiles('[CH0]1[CH0][CH0][CH0]1')
+    conf = Chem.Conformer(4); conf.Set3D(True)
+    for i, xy in enumerate(((0., 0.), (1., 0.), (1., 1.), (0., 1.))):
+        conf.SetAtomPosition(i, (xy[0], xy[1], 0.))
+    four.AddConformer(conf)
+    expanded = replace(r, partial_charges=(0.,) * 4,
+                       metadata=_input_metadata(four, -1, 0, 0, _xyz_from_mol(four, -1)),
+                       ao_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
+                       ao_shell_indices=tuple(range(8)),
+                       shell_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
+                       shell_angular_momenta=(0,) * 8)
+    report = CalcMCI(four, expanded, [0, 1, 2, 3])
+    assert report['mci'] == pytest.approx(0.)
+    assert report['definition'].startswith('2^(n-2)')
+    assert CalcMCIDescriptors(four, expanded, {'ring': [0, 1, 2, 3]})['ring'] == report
+
+
+def test_descriptor_report_includes_mci_when_basis_is_retained():
+    r = result()
+    four = Chem.MolFromSmiles('[CH0]1[CH0][CH0][CH0]1')
+    conf = Chem.Conformer(4); conf.Set3D(True)
+    for i, xy in enumerate(((0., 0.), (1., 0.), (1., 1.), (0., 1.))):
+        conf.SetAtomPosition(i, (xy[0], xy[1], 0.))
+    four.AddConformer(conf)
+    expanded = replace(r, partial_charges=(0.,) * 4,
+                       metadata=_input_metadata(four, -1, 0, 0, _xyz_from_mol(four, -1)),
+                       ao_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
+                       ao_shell_indices=tuple(range(8)),
+                       shell_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
+                       shell_angular_momenta=(0,) * 8,
+                       wiberg_bond_orders=tuple(tuple(1. if i != j else 0.
+                                                       for j in range(4)) for i in range(4)))
+    report = CalcDescriptorReport(four, expanded, mci_rings={'ring': [0, 1, 2, 3]})
+    assert report['mci']['ring']['mci'] == pytest.approx(0.)
+    assert report['missing'].get('mci') is None
+    assert report['analysis_settings']['mci_scheme'] == 'mulliken'
 
 
 def test_mayer_and_frontier_bonds_and_open_shell_missing_reason():

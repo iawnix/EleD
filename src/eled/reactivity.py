@@ -25,6 +25,7 @@ from .reports import SCHEMA_VERSION, DESCRIPTOR_VERSION, AssessDescriptorQuality
 from .calculator import XTBCalculator
 from .xtb import _resolve_options
 from .charges import CHARGE_MODEL_CM5, CHARGE_MODEL_SCC, charge_model_for_method
+from .selections import NormalizeSelections
 
 REACTIVITY_UNITS = {'ip_v_ev':'eV', 'ea_v_ev':'eV',
                     'mu_ev':'eV', 'chi_ev':'eV',
@@ -111,7 +112,7 @@ def _result_charge_model(result):
 
 
 def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=None,
-                                population_scheme='xtb_scc', record_id=None):
+                                reaction_sites=None, population_scheme='xtb_scc', record_id=None):
     """Analyze three compatible successful results, without further engine calls.
 
     ionized has Q+1 / N-1; attached has Q-1 / N+1. All use the exact same
@@ -165,6 +166,12 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
         flags.extend(dict(flag, state=label) for flag in quality['flags'])
         states[label] = _summary(result)
     groups = _fragments(fragments,mol.GetNumAtoms()) if fragments is not None else {}
+    if reaction_sites is None:
+        sites = {}
+    elif hasattr(reaction_sites, 'reaction_sites'):
+        sites = NormalizeSelections(mol, reaction_sites).reaction_sites
+    else:
+        sites = NormalizeSelections(mol, {'reaction_sites': reaction_sites}).reaction_sites
     report = _empty_report(record_id,population_scheme,states)
     ip = (results['ionized'].total_energy_hartree-ref.total_energy_hartree)*HARTREE_TO_EV
     ea = (ref.total_energy_hartree-results['attached'].total_energy_hartree)*HARTREE_TO_EV
@@ -221,6 +228,16 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
         'omega_loc_ev': float(electrophilicity * plus[indices].sum()) if electrophilicity is not None else None,
         'n_loc_1ev': float(softness * minus[indices].sum()) if softness is not None else None}
         for name, indices in groups.items()}
+    report['reaction_sites'] = {name: {
+        'atom_indices': list(indices),
+        'f_plus': float(plus[list(indices)].sum()),
+        'f_minus': float(minus[list(indices)].sum()),
+        'f_radical': float(radical[list(indices)].sum()),
+        'dual': float(dual[list(indices)].sum()),
+        's_loc_1ev': float(softness * plus[list(indices)].sum()) if softness is not None else None,
+        'omega_loc_ev': float(electrophilicity * plus[list(indices)].sum()) if electrophilicity is not None else None,
+        'n_loc_1ev': float(softness * minus[list(indices)].sum()) if softness is not None else None,
+    } for name, indices in sites.items()}
     report['unassigned_atom_indices'] = sorted(set(range(len(plus)))-set(i for group in groups.values() for i in group))
     report['quality'] = {'status':'warning' if any(f['severity']=='warning' for f in flags) else 'ok',
                           'flags':flags, 'fukui_sum_errors':errors,
@@ -230,7 +247,7 @@ def CalcReactivityDescriptors(mol, reference, ionized, attached, *, fragments=No
 
 
 def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
-                   fragments=None, population_scheme='xtb_scc', interface='native',
+                   fragments=None, reaction_sites=None, population_scheme='xtb_scc', interface='native',
                    record_id=None, return_errors=False, initialization='reference'):
     """Calculate fixed-geometry Q, Q+1, Q-1 states with explicit spin policy.
 
@@ -261,6 +278,11 @@ def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
     for label in spins:
         _, spins[label] = _effective_charge_uhf(snapshot,charges[label],spins[label])
     if fragments is not None: _fragments(fragments,snapshot.GetNumAtoms())
+    if reaction_sites is not None:
+        if hasattr(reaction_sites, 'reaction_sites'):
+            NormalizeSelections(snapshot, reaction_sites)
+        else:
+            NormalizeSelections(snapshot, {'reaction_sites': reaction_sites})
     config = _resolve_options(replace(config,charge=charge,uhf=uhf,
         keep_overlap=config.keep_overlap or population_scheme in ('mulliken', 'lowdin')))
     protocol = {'requested_options': config.to_dict(), 'interface': interface,
@@ -297,6 +319,7 @@ def RunReactivity(mol, *, options=None, ionized_uhf=None, attached_uhf=None,
                 report['missing'] = dict.fromkeys(REACTIVITY_UNITS,'required_charge_state_failed')
                 return report
     report = CalcReactivityDescriptors(snapshot,**results,fragments=fragments,
+              reaction_sites=reaction_sites,
               population_scheme=population_scheme,record_id=record_id)
     report['analysis_settings'].update(protocol)
     return report

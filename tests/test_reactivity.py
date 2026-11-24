@@ -44,6 +44,15 @@ def test_vertical_formulas_fukui_signs_and_fragment_conservation():
     assert report['quality']['spin_states_verified_as_ground_states'] is False
 
 
+def test_named_reaction_sites_share_the_atom_selection_schema():
+    mol, results = states()
+    report = CalcReactivityDescriptors(
+        mol, *results, reaction_sites={'carbon_site': [0], 'hydrogen_sites': [1, 2]})
+    assert report['reaction_sites']['carbon_site']['atom_indices'] == [0]
+    assert report['reaction_sites']['hydrogen_sites']['f_plus'] == pytest.approx(.8)
+    assert report['reaction_sites']['hydrogen_sites']['dual'] == pytest.approx(.1)
+
+
 def test_negative_ea_is_retained_and_nonpositive_hardness_not_divided():
     mol,r=states(ea=-2.);report=CalcReactivityDescriptors(mol,*r)
     assert report['values']['ea_v_ev']==pytest.approx(-2.)

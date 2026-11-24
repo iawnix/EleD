@@ -1,7 +1,7 @@
 # 局部位阻与环几何描述符
 
 EleD 分析具有显式氢和三维构象的 RDKit 分子。所有索引沿用原始原子编号。
-五个接口都接受 `conf_id=-1`，表示使用 RDKit 默认构象，并记录实际构象 ID。
+局部几何接口都接受 `conf_id=-1`，表示使用 RDKit 默认构象，并记录实际构象 ID。
 计算只需要 RDKit 和 NumPy，使用已有坐标。
 
 ```python
@@ -16,6 +16,28 @@ reports = [CalcHOMA(mol, ring) for ring in rings]
 print([r['values']['homa'] for r in reports])
 ```
 
+多个局部描述符可以使用同一套选择对象。
+
+```python
+from eled import AnalyzeLocalGeometry, RunLocalGeometryBatch
+
+selections = {
+    'atoms': {'substituent': [0, 1, 2], 'ring_atoms': [3, 4, 5, 6, 7, 8]},
+    'reaction_sites': {'electrophilic_carbon': [3]},
+    'bonds': {'attachment': [(2, 3)]},
+    'rings': {'aromatic_ring': [3, 4, 5, 6, 7, 8]},
+}
+one = AnalyzeLocalGeometry(mol, selections=selections,
+    sterimol={'substituent': {'axis': (3, 2)}},
+    homa={'aromatic_ring': {}})
+many = RunLocalGeometryBatch([mol], selections,
+    homa={'aromatic_ring': {}})
+```
+
+同一选择格式也可通过 `NormalizeSelections` 使用，索引沿用原始原子编号。
+反应位点是命名的原子集合，可以和 Fukui 描述符一起保存。批量结果保留成功的
+描述符，并在 `errors` 中记录单个描述符的错误。
+
 稠环可在不同调用中共享原子和键。环输入是按相邻键依次排列的、原子各出现一次的
 闭合路径，末原子必须与首原子成键。由调用者选择分析哪些环。
 
@@ -28,6 +50,7 @@ print([r['values']['homa'] for r in reports])
 | `CalcPlaneDescriptors(mol, atom_indices, other_atom_indices=None)` | 一个或两个至少含三个原子的集合 | `plane_rms_a`、`plane_max_a`，可选 `centroid_distance_a`，Å；`plane_angle_deg`，度 |
 | `CalcHOMA(mol, ring_atom_indices)` | 有序环路径 | 无量纲 `homa` 和逐键 `length_a`，Å |
 | `CalcRingPuckering(mol, ring_atom_indices)` | 至少四元的有序环 | `q_total_a`、偶数环 `q_alternating_a`，Å；六元环 `theta_deg`；各模式的 `q_a` 和 `phi_deg` |
+| `CalcMCI(mol, result, ring_atom_indices)` | 有序环和保留的密度数据 | 无量纲 `mci`、原子块矩阵和定义 |
 
 报告使用 `schema_version=1`、对应的 `report_type` 和 `protocol_version='1.0'`，
 包含 `values`、`units`、`missing`、`selection`、`analysis_settings`、`provenance`。
@@ -87,15 +110,24 @@ m=2..floor((N−1)/2) 模式的余弦和正弦分量分别为
 ## HOMA
 
 `HOMA=1-mean(alpha_AB*(R_AB-Ropt_AB)**2)`。
-默认 C–C 参数为 Ropt=1.388 Å、alpha=257.7 Å⁻²，来源是
-Krygowski, J. Chem. Inf. Comput. Sci. 1993, 33, 70–78。
+内置表包含 C–C `(1.388,257.7)`、C–N `(1.334,93.52)`、C–O `(1.265,157.38)`
+和 C–S `(1.677,94.09)`，单位分别为 Å 和 Å⁻²，来源是 Krygowski, J. Chem.
+Inf. Comput. Sci. 1993, 33, 70–78。
 保留负值，计算包括闭合边在内的全部环键。计算几何指标无需 RDKit 芳香性标签。
 
-杂原子环可指定完整的 `parameters={(6,6):(Ropt_CC,alpha_CC),
+内置参数包括 C-C `(1.388,257.7)`、C-N `(1.334,93.52)`、C-O `(1.265,157.38)`
+和 C-S `(1.677,94.09)`，单位分别为 Å 和 Å⁻²，参数来源为 Krygowski 1993。
+其他参数体系可指定完整的 `parameters={(6,6):(Ropt_CC,alpha_CC),
 (6,7):(Ropt_CN,alpha_CN)}` 和非空 `parameter_source`。
 自定义表替代内置参数表。任何元素对缺少参数时，整个 HOMA 返回 `None`，
 原因是 `unsupported_element_pair`，同时保留全部测量键长。
 HOMA 依赖几何准备和参考参数，反映芳香性的几何特征，需结合具体化学体系解释。
+
+`CalcMCI` 使用同一次计算保留的密度和重叠矩阵。Mulliken 方案从两个方向的
+`P*S` 原子块和取对称平均构造原子对矩阵，Löwdin 方案使用正交化密度。对 n 元环，
+报告首原子固定的所有环排列乘积之和，并乘以 `2^(n-2)`。环顺序、方案和原子对
+约定都写入结果，比较时需保持定义和电子结构方法一致。局部 `pi_bo` 是单键描述符，
+不能通过取平均得到 MCI。
 
 ## 多构象
 

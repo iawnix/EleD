@@ -29,6 +29,8 @@ report = CalcDescriptorReport(mol, result, record_id="molecule-1")
 | `pi_scheme` | `"lowdin"` | `"lowdin"` 或 `"mulliken"` 布居/投影定义 |
 | `pi_plane_tol_a` | `0.1` | 局部平面最大距离容差，Å；有限且非负 |
 | `pi_ref` | `None` | RDKit 原始原子编号 → 参考 π 电子数，范围 0 至 2 e |
+| `mci_rings` | `None` | 用于密度多中心指数 MCI 的命名有序环映射 |
+| `mci_scheme` | `mulliken` | `mulliken` 或 `lowdin` 原子块密度方案 |
 
 ```python
 pi_settings = dict(pi_scheme="mulliken", pi_plane_tol_a=0.05, pi_ref={0: 1.0})

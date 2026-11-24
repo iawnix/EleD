@@ -50,6 +50,8 @@ and `RunConformerAnalysis`:
 | `pi_scheme` | `"lowdin"` | `"lowdin"` or `"mulliken"` population/projection definition |
 | `pi_plane_tol_a` | `0.1` | Maximum distance from the local plane, Å; finite and nonnegative |
 | `pi_ref` | `None` | Original atom index → reference π electrons, between 0 and 2 e |
+| `mci_rings` | `None` | Named mapping of ordered rings for density-based MCI |
+| `mci_scheme` | `mulliken` | `mulliken` or `lowdin` atom-block density convention |
 
 ```python
 pi_settings = dict(pi_scheme="mulliken", pi_plane_tol_a=0.05, pi_ref={0: 1.0})

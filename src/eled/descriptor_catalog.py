@@ -58,6 +58,7 @@ _CATALOG = {
         'n_e': {'definition': 'reported modeled electron count; occupation sum if absent', 'unit': 'e', 'invariance': 'AO and MO representation invariant', 'requires': 'retained density result', 'missing': 'basis data unavailable'},
         'n_err_e': {'definition': 'trace(P S) minus reported modeled electron count (occupation sum if absent)', 'unit': 'e', 'invariance': 'AO permutation invariant', 'requires': 'density matrix and occupations', 'missing': 'basis data unavailable'},
         'shell_err_e': {'definition': 'maximum shell-to-atom population sum discrepancy', 'unit': 'e', 'invariance': 'AO permutation invariant with maps', 'requires': 'shell map and density', 'missing': 'shell map unavailable'},
+        'mci': {'definition': 'density-based multicenter index over all fixed-first cyclic permutations of an ordered ring', 'unit': 'dimensionless', 'invariance': 'AO permutation and orbital phase invariant with maps; ring order selects the reported atom set', 'requires': 'same-calculation density, overlap and ordered bonded ring', 'missing': 'basis data unavailable or ring invalid'},
     },
     'reactivity': {
         'ip_v_ev': {'definition': 'vertical ionization energy from E(Q+1)-E(Q)', 'unit': 'eV', 'invariance': 'rigid-motion invariant at fixed geometry', 'requires': 'successful Q and Q+1 GFN1/2 calculations', 'missing': 'required charge state failed'},
@@ -104,7 +105,7 @@ _STATUS = {
     },
     'exploratory': {
         'mbo', 'mul_ovlp_e', 'pi_n_e',
-        'pi_q_e', 'pi_bo', 'n_loc_1ev',
+        'pi_q_e', 'pi_bo', 'mci', 'n_loc_1ev',
     },
 }
 

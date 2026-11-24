@@ -49,6 +49,14 @@ def test_report_records_missing_basis_and_exports_fixed_columns(tmp_path):
     assert r.metadata['charge']==0
 
 
+def test_report_records_mci_request_when_basis_is_not_retained():
+    mol, r = sample()
+    report = CalcDescriptorReport(mol, r, mci_rings={'candidate': [0, 1, 2]})
+    assert report['mci'] is None
+    assert report['missing']['mci'] == 'basis_not_retained'
+    assert report['analysis_settings']['mci_rings'] == {'candidate': [0, 1, 2]}
+
+
 def test_quality_flags_fractional_and_threshold_sensitive_frontiers():
     _, r = sample()
     mixed = replace(r,orbital_occupations=(2.,1.9999995,5e-7))

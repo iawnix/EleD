@@ -201,6 +201,12 @@ def test_local_statistics_keep_entity_frontier_coverage_and_units(synthetic,monk
     assert json.loads(json.dumps(out,allow_nan=False))==out
 
 
+def test_local_units_cover_cm5_atom_descriptor():
+    reports = [{'atoms': [{'atom_index': 0, 'cm5_q_e': 0.1}]}]
+    series = {('0', 'atoms.cm5_q_e'): [0.1]}
+    assert conformers._local_units(reports, series)['atoms.cm5_q_e'] == 'e'
+
+
 def test_weighted_missing_failed_and_underflow_are_distinct():
     # A finite feature remains observed even when its energy weight underflows.
     out=conformers._summary([None,2.,None],[False,False,True],

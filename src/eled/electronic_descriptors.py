@@ -193,6 +193,8 @@ def _indices(values, limit, name):
 
 
 def _fragments(fragments, natoms):
+    if hasattr(fragments, 'atoms'):
+        fragments = fragments.atoms
     if not isinstance(fragments, Mapping) or not fragments:
         raise ValueError('fragments must be a nonempty mapping of names to atom indices')
     groups, seen = {}, set()

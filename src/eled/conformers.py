@@ -208,7 +208,8 @@ def _local_series(reports, failed, entity):
 
 
 def _local_units(reports, series):
-    units = {'atoms.q_e': 'e', 'atoms.wbo_sum': 'dimensionless', 'bonds.wbo': 'dimensionless'}
+    units = {'atoms.q_e': 'e', 'atoms.cm5_q_e': 'e',
+             'atoms.wbo_sum': 'dimensionless', 'bonds.wbo': 'dimensionless'}
     for report in reports:
         for section in ('shell_populations', 'mayer_bonds', 'frontier_bonds', 'pi'):
             data = report.get(section) or {}

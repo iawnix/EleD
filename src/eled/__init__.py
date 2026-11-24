@@ -26,6 +26,7 @@ from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
 from .density_descriptors import (
     CalcDensityMatrix, CalcShellPopulations, CalcMayerBondDescriptors,
     CalcFrontierBondDescriptors, CalcPiDescriptors, CalcDensityDescriptors,
+    CalcMCI, CalcMCIDescriptors,
 )
 from .errors import DescriptorUnavailableError
 
@@ -53,6 +54,8 @@ __all__ = [
     "CalcFrontierBondDescriptors",
     "CalcPiDescriptors",
     "CalcDensityDescriptors",
+    "CalcMCI",
+    "CalcMCIDescriptors",
     "DescriptorUnavailableError",
 ]
 
@@ -116,6 +119,12 @@ __all__ += ['CalcESP', 'GenerateESPGrid', 'FitESPCharges', 'FitRESPCharges', 'ES
 
 from .local_geometry import (
     CalcSterimol, CalcBuriedVolume, CalcPlaneDescriptors, CalcHOMA, CalcRingPuckering,
+    AnalyzeLocalGeometry, RunLocalGeometryBatch,
 )
 
-__all__ += ['CalcSterimol', 'CalcBuriedVolume', 'CalcPlaneDescriptors', 'CalcHOMA', 'CalcRingPuckering']
+__all__ += ['CalcSterimol', 'CalcBuriedVolume', 'CalcPlaneDescriptors', 'CalcHOMA',
+            'CalcRingPuckering', 'AnalyzeLocalGeometry', 'RunLocalGeometryBatch']
+
+from .selections import SelectionSet, NormalizeSelections
+
+__all__ += ['SelectionSet', 'NormalizeSelections']

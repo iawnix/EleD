@@ -18,7 +18,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcXTBFragmentDescriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
 | `CalcOrbitalPopulations(result, scheme="lowdin", orb_idx=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
 | `CalcFrontierDescriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
-| `CalcDensityDescriptors(mol, result)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond and π descriptors | Same-calculation C/S/maps; `keep_overlap=True` |
+| `CalcDensityDescriptors(mol, result, mci_rings=None)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond, π and optional MCI descriptors | Same-calculation C/S/maps; `keep_overlap=True` |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned
 molecule snapshot. Both Python result types support bond mapping, annotation and
@@ -104,6 +104,22 @@ pair sum. No spatial criterion or bond-order cutoff is silently applied.
 bond WBOs and molecular scalar descriptors. `atom_wiberg_prop` can override its
 name. Atomic charge and WBO property names must differ. All validation precedes
 in-place writes; geometry/topology changes are rejected.
+
+## Canonical selections and multicenter index
+
+`NormalizeSelections(mol, selections)` validates a shared mapping with named
+`atoms`, `reaction_sites`, `bonds` and ordered `rings`. Original RDKit atom
+indices are retained. The same selection object can label electronic reaction
+sites and drive local geometry analysis.
+
+`CalcMCI(mol, result, ring_atom_indices, scheme='mulliken')` calculates a
+density-based multicenter index for an ordered ring. It uses atom-block sums of
+`P*S` or the Löwdin orthogonal density and the fixed-first cyclic permutation
+definition recorded in the result. The reported atom-pair block is the symmetric
+average of the two directed `P*S` blocks (the Löwdin block is already symmetric).
+`CalcMCIDescriptors` accepts a named mapping of rings. MCI requires retained
+same-calculation basis data. It is an exploratory density descriptor and is not
+obtained by averaging `pi_bo`.
 
 The optional YAeHMOP adapter follows the same compact convention. Its scalar
 fields are `eht_homo_ev`, `eht_lumo_ev`, `eht_gap_ev`, `eht_fermi_ev`,
