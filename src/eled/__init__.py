@@ -113,3 +113,9 @@ __all__ += [
 from .esp import CalcESP, GenerateESPGrid, FitESPCharges, FitRESPCharges, ESPChargeFit
 
 __all__ += ['CalcESP', 'GenerateESPGrid', 'FitESPCharges', 'FitRESPCharges', 'ESPChargeFit']
+
+from .local_geometry import (
+    CalcSterimol, CalcBuriedVolume, CalcPlaneDescriptors, CalcHOMA, CalcRingPuckering,
+)
+
+__all__ += ['CalcSterimol', 'CalcBuriedVolume', 'CalcPlaneDescriptors', 'CalcHOMA', 'CalcRingPuckering']
