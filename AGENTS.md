@@ -7,7 +7,7 @@
 - 统一在 `/home/iaw/project/EleD` 工作。
 - EleD 包含 RDKit 电子结构描述符、扩展版 `libxtb`、`rdXTBTools`、报告、协议、示例和核心测试。
 - 数据集、模型训练代码、GNN 代码、训练模型和 benchmark 结果放在 EleD 仓库之外。
-- `research/eas_model/` 是本地外部研究目录，被 Git 忽略，不得由 `eled` 导入，也不进入核心 CI。
+- `research/eleD_model_studies/` 是本地外部研究目录，被 Git 忽略，不得由 `eled` 导入，也不进入核心 CI；旧 EAS 研究归档在其 `archive/legacy_eas_model_20261124/` 下。
 - 不提交运行时、构建目录、wheel、缓存和大规模生成报告。
 
 ## Conda 环境规则
@@ -53,7 +53,7 @@
   test -x research/.eas-env/bin/python || \
     .eled/runtime/bin/python -m venv --system-site-packages research/.eas-env
   research/.eas-env/bin/python -m pip install -r research/eas-requirements.txt
-  research/.eas-env/bin/python -m pytest -q research/eas_model/tests
+  research/.eas-env/bin/python -m pytest -q research/eleD_model_studies/tests
   ```
 
 ## 开发规则
