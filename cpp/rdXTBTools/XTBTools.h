@@ -64,6 +64,7 @@ struct XTBResults {
   std::vector<double> orbitalEnergiesEV;
   std::vector<double> orbitalOccupancies;
   std::vector<double> atomicCharges;         // elementary charge
+  std::vector<double> cm5Charges;            // elementary charge, GFN1/2 only; empty for GFN0
   std::vector<double> dipoleAtomicUnits;     // e * Bohr, length 3
   std::vector<double> wibergBondOrders;      // row-major [atom][atom]
   bool basisExportVerified = false;
@@ -87,5 +88,11 @@ bool runMol(const ROMol &mol, XTBResults &result,
 // engine handles escape this call. Only GFN1/2; adjacent spins are explicit.
 std::vector<XTBResults> runChargeStates(const ROMol &mol, const XTBOptions &options,
     int ionizedUnpaired, int attachedUnpaired, bool reuseReference = true);
+
+// Compute xTB CM5 charges in elementary-charge units from atomic numbers (1..118),
+// row-major [atom][xyz] Angstrom coordinates, and SCC Mulliken charges.
+std::vector<double> calcCM5Charges(const std::vector<int> &atomicNumbers,
+                                   const std::vector<double> &coordinatesAngstrom,
+                                   const std::vector<double> &mullikenCharges);
 
 }  // namespace RDKit::XTBTools

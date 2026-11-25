@@ -53,7 +53,7 @@ class AdapterTests(unittest.TestCase):
         mol = Chem.MolFromSmiles("CC")
         AllChem.EmbedMolecule(mol, randomSeed=1)
         with self.assertRaisesRegex(ValueError, "implicit hydrogens"):
-            calculate_xtb(mol, xtb_library="/does/not/matter")
+            calculate_xtb(mol, xtbLibrary="/does/not/matter")
 
 
 if __name__ == "__main__":

@@ -52,20 +52,20 @@ if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
     raise RuntimeError("could not generate a conformer")
 AllChem.MMFFOptimizeMolecule(mol)
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
 values = CalcXTBDescriptors(result)
 
 print(values["xtb_energy_ha"])
 print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBResult` is reusable. The same result feeds descriptor tables, fragment summaries, density analysis and a report, with one recorded engine call.
+`XTBResults` is reusable (`XTBResult` is an alias). The same result feeds descriptor tables, fragment summaries, density analysis and a report, with one recorded engine call. For single-call molecular tables or RDKit's property registry, use `CalcMolXTBDescriptors(mol)` or `RegisterRDKitProperties()`.
 
 ## What you get
 
 | Layer | Examples | Main entry points |
 | --- | --- | --- |
-| Molecular | energy, HOMO/LUMO, gap, dipole, charge statistics | `CalcXTBDescriptors` |
+| Molecular | energy, HOMO/LUMO, gap, dipole, charge statistics, `rdMolDescriptors.Properties` | `CalcXTBDescriptors`, `CalcMolXTBDescriptors`, `RegisterRDKitProperties` |
 | Atomic | xTB charge, Wiberg sum, Fukui and local reactivity | `CalcXTBAtomDescriptors`, `RunReactivity` |
 | [ESP and fitted charges](docs/esp-api.md) | sampled electrostatic potential, constrained ESP and single-stage RESP charges | `GenerateESPGrid`, `CalcESP`, `FitESPCharges`, `FitRESPCharges` |
 | Bond | Wiberg and Mayer bond orders, frontier-bond contributions | `CalcXTBBondDescriptors`, `CalcMayerBondDescriptors`, `CalcFrontierBondDescriptors` |
@@ -76,7 +76,7 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 
 ## See an actual output
 
-The report below comes from one EleD GFN2-xTB single point on one embedded ethanol conformer. Every panel uses that same `XTBResult`: RDKit draws the molecular map, while EleD provides the fragment charge and interaction views.
+The report below comes from one EleD GFN2-xTB single point on one embedded ethanol conformer. Every panel uses that same `XTBResults`: RDKit draws the molecular map, while EleD provides the fragment charge and interaction views.
 
 <p align="center">
   <img alt="A single EleD ethanol report with molecular, fragment and interaction views" src="docs/assets/eled-ethanol-report.svg" width="900">
@@ -93,11 +93,11 @@ from eled import (
 report = CalcDescriptorReport(
     mol,
     result,
-    record_id="ethanol",
+    recordId="ethanol",
     fragments={"ethyl": [0, 1, 3, 4, 5, 6, 7], "hydroxyl": [2, 8]},
 )
 
-molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
+molecule_svg = DrawDescriptorMap(mol, report, atomField="q_e")
 fragment_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
 ```
@@ -113,7 +113,7 @@ from eled import (
     CalcFrontierBondDescriptors, CalcPiDescriptors,
 )
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
 
 mulliken = CalcOrbitalPopulations(result, scheme="mulliken")
 lowdin = CalcOrbitalPopulations(result, scheme="lowdin")
@@ -135,8 +135,8 @@ from eled import RunReactivity, XTBOptions
 
 reactivity = RunReactivity(
     mol,
-    options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
-    population_scheme="lowdin",
+    options=XTBOptions(method="GFN2-xTB", electronicTemperature=300.0),
+    populationScheme="lowdin",
 )
 print(reactivity["values"]["ip_v_ev"])
 print(reactivity["atoms"][0]["f_plus"])

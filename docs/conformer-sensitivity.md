@@ -1,4 +1,4 @@
-# Conformer sensitivity (1.3)
+# Conformer sensitivity (1.4)
 
 `RunConformerAnalysis` evaluates **explicitly supplied conformers of one RDKit
 molecule** using native libxtb. It does not generate or optimize geometries.
@@ -18,7 +18,7 @@ params.randomSeed = 42
 params.numThreads = 1
 ids = list(AllChem.EmbedMultipleConfs(mol, numConfs=8, params=params))
 report = RunConformerAnalysis(
-    mol, conf_ids=ids, record_id="ethylene-glycol",
+    mol, confIds=ids, recordId="ethylene-glycol",
     cache=XTBDiskCache("conformers.sqlite"),
 )
 print(report["statistics"]["xtb_gap_ev"])
@@ -34,9 +34,9 @@ MMFF is RDKit's force field, not an xTB geometry optimizer.
 
 ## Contract
 
-- `conf_ids=None` uses all actual conformer IDs in RDKit order. IDs need not be
+- `confIds=None` uses all actual conformer IDs in RDKit order. IDs need not be
   contiguous; duplicate, missing and negative IDs are rejected. Select with
-  `conf_ids`, leaving `options.conf_id=-1`. Molecule inputs are copied; all
+  `confIds`, leaving `options.confId=-1`. Molecule inputs are copied; all
   selected geometries are validated before calculation starts.
 - All conformers use the same method, charge, spin and numerical settings.
   Results must match their input hashes; mixed engine/parameter/settings
@@ -55,14 +55,14 @@ MMFF is RDKit's force field, not an xTB geometry optimizer.
   such as fractional occupations. Inspect the individual reports.
 - Invalid inputs/settings, unavailable engine capabilities, environment errors,
   corrupted storage and unexpected analysis errors **raise**. With
-  `return_errors=False`, single-point calculation failures also raise.
+  `returnErrors=False`, single-point calculation failures also raise.
 - `XTBCache` and `XTBDiskCache` reuse successful individual single points with
   the existing geometry/settings/engine/implementation keys. Analysis choices
   do not change the underlying calculation; reports are recomputed from results.
 
 ## Which descriptors are summarized?
 
-`ConformerDescriptorColumns(charge=0, frontier_depth=2)` returns the default
+`ConformerDescriptorColumns(charge=0, frontierDepth=2)` returns the default
 ordered scalar schema. Energies, frontier gaps, charge/WBO summaries, frontier
 participation/entropy/overlap and centroid **separation** are included. Counts
 are retained to expose changes in frontier classification. Indices, categorical
@@ -82,12 +82,12 @@ change composition with conformation; inspect counts and quality flags.
 
 These are equally weighted statistics over the **supplied geometries**, including
 any duplicates. This is the default and remains the main sensitivity report.
-For an optional ensemble-style summary, pass `boltzmann_weighted=True`:
+For an optional ensemble-style summary, pass `boltzmannWeighted=True`:
 
 ```python
 report = RunConformerAnalysis(
-    mol, conf_ids=ids, boltzmann_weighted=True,
-    boltzmann_temperature=300.0,
+    mol, confIds=ids, boltzmannWeighted=True,
+    boltzmannTemperature=300.0,
 )
 weighted = report["boltzmann"]["statistics"]["xtb_gap_ev"]
 weights = report["boltzmann"]["weights"]
@@ -107,7 +107,7 @@ butane and 0.151 eV for phenethylamine. Ethanol and benzene each retain only one
 geometry; their zero spread is uninformative about unsampled conformations.
 These orbital gaps are not vertical optical excitation energies.
 
-π extraction accepts `pi_scheme`, `pi_plane_tol_a` and `pi_ref` as described
+π extraction accepts `piScheme`, `piPlaneTolAngstrom` and `piRef` as described
 in [report settings](descriptor-reports.md). The settings apply to every supplied
 conformer and are retained in both the ensemble and individual reports.
 Equal-weight and electronic-energy-weighted π statistics use that definition.

@@ -1,4 +1,4 @@
-# Installing EleD 0.11
+# Installing EleD 0.12
 
 The installer sets up RDKit, EleD, its project-built xTB calculation library
 (`libxtb`) and the `rdXTBTools` C++ extension. The xTB build includes EleD’s
@@ -65,7 +65,7 @@ build/research-env/bin/python -I -m eled doctor --check native --keep-overlap
 ```
 
 Library discovery checks the venv, then its base Python prefix, then environment
-prefixes and system lookup. Explicit `xtb_library`/`XTB_LIBRARY` selections still
+prefixes and system lookup. Explicit `xtbLibrary`/`XTB_LIBRARY` selections still
 take priority; a broken explicit selection raises rather than silently falling
 back. The base runtime must already have been installed.
 
@@ -78,8 +78,8 @@ from eled import XTBCalculator, rdXTBTools, CalcOrbitalPopulations
 
 mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-print(result.total_energy_hartree)  # Hartree
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
+print(result.totalEnergyHartree)  # Hartree
 print(CalcOrbitalPopulations(result))
 
 ok, compiled = rdXTBTools.RunMol(mol, method="GFN0-xTB", keepOverlap=True)
@@ -88,7 +88,7 @@ if not ok:
 print(CalcOrbitalPopulations(compiled))
 ```
 
-Omit `keep_overlap` / `keepOverlap` for basic descriptors to avoid retaining
+Omit `keepOverlap` for basic descriptors to avoid retaining
 the additional overlap matrix. Both APIs retain results in original atom order.
 The source build disables tblite and CPCM-X, and needs neither Python tblite
 nor ASE. GFN0/1/2 and radicals use the same engine, with spin-summed populations.

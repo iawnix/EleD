@@ -27,15 +27,15 @@ def calculate(library):
         for i, xyz in enumerate(case['positions_angstrom']): conf.SetAtomPosition(i, xyz)
         mol.AddConformer(conf)
         for method in ('GFN0-xTB', 'GFN1-xTB', 'GFN2-xTB'):
-            result = XTBCalculator(method=method, xtb_library=str(library)).calculate(
-                mol, keep_overlap=True)
+            result = XTBCalculator(method=method, xtbLibrary=str(library)).Calculate(
+                mol, keepOverlap=True)
             population = CalcOrbitalPopulations(result, scheme='mulliken')
-            rows.append({'name': case['name'], 'method': method, 'energy_eh': result.total_energy_hartree,
-                         'orbital_energies_ev': result.orbital_energies_ev,
-                         'charges_e': result.partial_charges, 'dipole_e_bohr': result.dipole_e_bohr,
-                         'wiberg': result.wiberg_bond_orders,
+            rows.append({'name': case['name'], 'method': method, 'energy_eh': result.totalEnergyHartree,
+                         'orbital_energies_ev': result.orbitalEnergiesEV,
+                         'charges_e': result.atomicCharges, 'dipole_e_bohr': result.dipoleAtomicUnits,
+                         'wiberg': result.wibergBondOrders,
                          'orthonormality_error': population['orthonormality_error'],
-                         'electron_error': float(abs(sum(population['electron_populations_e']) - result.number_of_electrons))})
+                         'electron_error': float(abs(sum(population['mo_n_e']) - result.numElectrons))})
     return {'library': str(library.resolve()), 'sha256': _fingerprint(library), 'rows': rows}
 
 

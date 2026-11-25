@@ -17,7 +17,7 @@ fragments = {
 }
 report = CalcDescriptorReport(mol, result, fragments=fragments)
 
-molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
+molecule_svg = DrawDescriptorMap(mol, report, atomField="q_e")
 summary_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
 html_fragment = RenderFragmentAnalysis(mol, report)
@@ -25,8 +25,8 @@ html_fragment = RenderFragmentAnalysis(mol, report)
 
 `DrawDescriptorMap` 使用 RDKit 的 `rdMolDraw2D`，保留原始 RDKit 原子编号。
 默认会隐藏显式氢，避免氢原子标签挤压重原子描述符；报告中的氢原子描述符
-仍然保留。需要显示氢原子时使用 `include_hydrogens=True`，使用
-`add_atom_indices=True` 可以把原始编号加入每个数值标签。`PlotFragmentSummary`
+仍然保留。需要显示氢原子时使用 `includeHydrogens=True`，使用
+`addAtomIndices=True` 可以把原始编号加入每个数值标签。`PlotFragmentSummary`
 绘制带正负号的片段数值，例如电荷、Fukui 指数或局部
 软度。`PlotFragmentInteractions` 使用
 `report["fragments"]["pairs"]` 中明确给出的片段对 Wiberg 值，不会再次把两个

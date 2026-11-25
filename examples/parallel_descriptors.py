@@ -8,8 +8,8 @@ def main():
         prepared = PrepareConformers(smiles)
         if not prepared.success: raise RuntimeError(prepared.report['error'])
         molecules.append(prepared.molecule)
-    reports = RunDescriptorBatch(molecules, record_ids=['water', 'ethanol', 'benzene'],
-                                   max_workers=2, timeout=30)
+    reports = RunDescriptorBatch(molecules, recordIds=['water', 'ethanol', 'benzene'],
+                                 maxWorkers=2, timeout=30)
     for report in reports:
         if report['error']: raise RuntimeError(report['error'])
         print(report['record_id'], report['values']['xtb_gap_ev'], 'eV',

@@ -75,9 +75,9 @@ def main():
                 row['cli_fukui'] = cli.tolist()
             for initialization in ('reference','independent'):
                 report = RunReactivity(mol, options=XTBOptions(method=f'gfn{method}',
-                    xtb_library=str(library), accuracy=.1, electronic_temperature=300.),
-                    ionized_uhf=spin-1 if spin else 1, attached_uhf=spin-1 if spin else 1,
-                    initialization=initialization, return_errors=True)
+                    xtbLibrary=str(library), accuracy=.1, electronicTemperature=300.),
+                    ionizedUnpaired=spin-1 if spin else 1, attachedUnpaired=spin-1 if spin else 1,
+                    initialization=initialization, returnErrors=True)
                 row['reports'][initialization] = report
             reference = row['reports']['reference']
             if valid and reference['error'] is None:

@@ -5,31 +5,30 @@ import pytest
 from rdkit import Chem
 
 from eled import (
-    XTBResult, CalcDensityMatrix, CalcShellPopulations,
+    XTBResults, CalcDensityMatrix, CalcShellPopulations,
     CalcMayerBondDescriptors, CalcFrontierBondDescriptors,
     CalcPiDescriptors, CalcMCI, CalcMCIDescriptors,
+    DescriptorCatalog, DescriptorColumns, CalcDescriptorReport,
 )
 from eled.input import _input_metadata, _xyz_from_mol
 from eled.reports import DescriptorSensitivity
-from eled import DescriptorCatalog, DescriptorColumns
-from eled import CalcDescriptorReport
 
 
 def result():
-    # Two atoms, each with one s and one Cartesian p shell.  Identity S/C
+    # Two atoms, each with one s and one Cartesian p shell. Identity S/C
     # keeps this a small analytical test while retaining the real shell maps.
     atom_map = (0, 0, 0, 0, 1, 1, 1, 1)
     shell_map = (0, 1, 1, 1, 2, 3, 3, 3)
-    return XTBResult(
+    return XTBResults(
         'GFN2-xTB', 'test', -1.0, 1.0, 8, 8, 0,
-        orbital_energies_ev=tuple(float(i) for i in range(8)),
-        orbital_occupations=(2., 2., 2., 2., 0., 0., 0., 0.),
-        partial_charges=(0., 0.), dipole_e_bohr=(0., 0., 0.),
-        wiberg_bond_orders=((0., 1.), (1., 0.)),
-        orbital_coefficients=tuple(map(tuple, np.eye(8))),
-        overlap_matrix=tuple(map(tuple, np.eye(8))),
-        ao_atom_indices=atom_map, ao_shell_indices=shell_map,
-        shell_atom_indices=(0, 0, 1, 1), shell_angular_momenta=(0, 1, 0, 1),
+        orbitalEnergiesEV=tuple(float(i) for i in range(8)),
+        orbitalOccupancies=(2., 2., 2., 2., 0., 0., 0., 0.),
+        atomicCharges=(0., 0.), dipoleAtomicUnits=(0., 0., 0.),
+        wibergBondOrders=((0., 1.), (1., 0.)),
+        orbitalCoefficients=tuple(map(tuple, np.eye(8))),
+        overlapMatrix=tuple(map(tuple, np.eye(8))),
+        aoAtomMap=atom_map, aoShellMap=shell_map,
+        shellAtomMap=(0, 0, 1, 1), shellAngularMomenta=(0, 1, 0, 1),
         metadata=_input_metadata(molecule(), -1, 0, 0, _xyz_from_mol(molecule(), -1)),
     )
 
@@ -58,24 +57,19 @@ def test_density_and_shell_conservation():
 def test_mci_uses_explicit_multicenter_density_definition():
     r = result()
     mol = molecule()
-    # Identity basis gives P*S diagonal only, so every cyclic multicenter
-    # product vanishes. The result still exposes the selected atom matrix and
-    # the convention used for the index.
     with pytest.raises(ValueError):
         CalcMCI(mol, r, [0, 1, 0])
-    # A two-atom synthetic molecule is not a ring. Use a four-atom ring and
-    # retain the same identity density for a zero multicenter product.
     four = Chem.MolFromSmiles('[CH0]1[CH0][CH0][CH0]1')
     conf = Chem.Conformer(4); conf.Set3D(True)
     for i, xy in enumerate(((0., 0.), (1., 0.), (1., 1.), (0., 1.))):
         conf.SetAtomPosition(i, (xy[0], xy[1], 0.))
     four.AddConformer(conf)
-    expanded = replace(r, partial_charges=(0.,) * 4,
+    expanded = replace(r, atomicCharges=(0.,) * 4,
                        metadata=_input_metadata(four, -1, 0, 0, _xyz_from_mol(four, -1)),
-                       ao_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
-                       ao_shell_indices=tuple(range(8)),
-                       shell_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
-                       shell_angular_momenta=(0,) * 8)
+                       aoAtomMap=(0, 0, 1, 1, 2, 2, 3, 3),
+                       aoShellMap=tuple(range(8)),
+                       shellAtomMap=(0, 0, 1, 1, 2, 2, 3, 3),
+                       shellAngularMomenta=(0,) * 8)
     report = CalcMCI(four, expanded, [0, 1, 2, 3])
     assert report['mci'] == pytest.approx(0.)
     assert report['definition'].startswith('2^(n-2)')
@@ -89,18 +83,18 @@ def test_descriptor_report_includes_mci_when_basis_is_retained():
     for i, xy in enumerate(((0., 0.), (1., 0.), (1., 1.), (0., 1.))):
         conf.SetAtomPosition(i, (xy[0], xy[1], 0.))
     four.AddConformer(conf)
-    expanded = replace(r, partial_charges=(0.,) * 4,
+    expanded = replace(r, atomicCharges=(0.,) * 4,
                        metadata=_input_metadata(four, -1, 0, 0, _xyz_from_mol(four, -1)),
-                       ao_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
-                       ao_shell_indices=tuple(range(8)),
-                       shell_atom_indices=(0, 0, 1, 1, 2, 2, 3, 3),
-                       shell_angular_momenta=(0,) * 8,
-                       wiberg_bond_orders=tuple(tuple(1. if i != j else 0.
-                                                       for j in range(4)) for i in range(4)))
-    report = CalcDescriptorReport(four, expanded, mci_rings={'ring': [0, 1, 2, 3]})
+                       aoAtomMap=(0, 0, 1, 1, 2, 2, 3, 3),
+                       aoShellMap=tuple(range(8)),
+                       shellAtomMap=(0, 0, 1, 1, 2, 2, 3, 3),
+                       shellAngularMomenta=(0,) * 8,
+                       wibergBondOrders=tuple(tuple(1. if i != j else 0.
+                                                    for j in range(4)) for i in range(4)))
+    report = CalcDescriptorReport(four, expanded, mciRings={'ring': [0, 1, 2, 3]})
     assert report['mci']['ring']['mci'] == pytest.approx(0.)
     assert report['missing'].get('mci') is None
-    assert report['analysis_settings']['mci_scheme'] == 'mulliken'
+    assert report['analysis_settings']['mciScheme'] == 'mulliken'
 
 
 def test_mayer_and_frontier_bonds_and_open_shell_missing_reason():
@@ -111,13 +105,13 @@ def test_mayer_and_frontier_bonds_and_open_shell_missing_reason():
     assert mayer['bonds'][0]['mbo'] == pytest.approx(0.)
     frontier = CalcFrontierBondDescriptors(mol, r)
     assert frontier['bonds']
-    open_shell = replace(r, number_of_unpaired_electrons=1)
+    open_shell = replace(r, numUnpairedElectrons=1)
     assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mbo'] is None
-    assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['mayer_missing_reason']
+    assert CalcMayerBondDescriptors(mol, open_shell)['bonds'][0]['missing']['mbo'] == 'spin_density_unavailable_for_open_shell'
 
 
 def test_gfn0_shell_population_is_not_eeq_charge():
-    r = replace(result(), method='GFN0-xTB', partial_charges=(.3, -.3))
+    r = replace(result(), method='GFN0-xTB', atomicCharges=(.3, -.3))
     rows = CalcShellPopulations(r)['atoms']
     assert rows[0]['low_qrec_e'] is None
 
@@ -125,16 +119,15 @@ def test_gfn0_shell_population_is_not_eeq_charge():
 def test_density_descriptors_are_invariant_to_ao_permutation_and_phase():
     r = result(); mol = molecule()
     permutation = np.array([2, 0, 3, 1, 6, 4, 7, 5])
-    c = np.asarray(r.orbital_coefficients)[permutation]
-    s = np.asarray(r.overlap_matrix)[np.ix_(permutation, permutation)]
-    ao_atom = np.asarray(r.ao_atom_indices)[permutation]
-    ao_shell = np.asarray(r.ao_shell_indices)[permutation]
-    changed = replace(r, orbital_coefficients=tuple(map(tuple, c * np.array([1,-1,1,-1,1,-1,1,-1])[:,None])),
-                      overlap_matrix=tuple(map(tuple, s)), ao_atom_indices=tuple(ao_atom),
-                      ao_shell_indices=tuple(ao_shell))
+    c = np.asarray(r.orbitalCoefficients)[permutation]
+    s = np.asarray(r.overlapMatrix)[np.ix_(permutation, permutation)]
+    ao_atom = np.asarray(r.aoAtomMap)[permutation]
+    ao_shell = np.asarray(r.aoShellMap)[permutation]
+    changed = replace(r, orbitalCoefficients=tuple(map(tuple, c * np.array([1,-1,1,-1,1,-1,1,-1])[:,None])),
+                      overlapMatrix=tuple(map(tuple, s)), aoAtomMap=tuple(ao_atom),
+                      aoShellMap=tuple(ao_shell))
     a = CalcShellPopulations(r)['atoms']; b = CalcShellPopulations(changed)['atoms']
-    for key in ('mul_s_e', 'mul_p_e',
-                'low_s_e', 'low_p_e'):
+    for key in ('mul_s_e', 'mul_p_e', 'low_s_e', 'low_p_e'):
         np.testing.assert_allclose([x[key] for x in a], [x[key] for x in b], atol=1e-12)
     np.testing.assert_allclose(
         [x['mul_ovlp_e'] for x in CalcFrontierBondDescriptors(mol, r)['bonds']],
@@ -151,8 +144,8 @@ def test_sensitivity_keeps_missing_comparisons_explicit():
     from eled import CalcDescriptorReport
     mol, r = sample()
     r = replace(r, metadata={**r.metadata, 'engine': {'sha256': 'fixture'}})
-    reference = CalcDescriptorReport(mol, r, include_orbitals=False)
-    other = CalcDescriptorReport(mol, replace(r, method='GFN1-xTB', total_energy_hartree=-1.5), include_orbitals=False)
+    reference = CalcDescriptorReport(mol, r, includeOrbitals=False)
+    other = CalcDescriptorReport(mol, replace(r, method='GFN1-xTB', totalEnergyHartree=-1.5), includeOrbitals=False)
     d = DescriptorSensitivity(reference, gfn1=other, gfn2=reference)
     assert d['values']['xtb_energy_ha']['conformer_dispersion'] is None
     assert d['values']['xtb_energy_ha']['gfn12_delta'] == .5
@@ -174,7 +167,7 @@ def test_descriptor_catalog_and_scalar_units_are_explicit():
     assert all(item['missing'] for group in catalog.values() for item in group.values())
 
 
-@pytest.mark.parametrize('field', ['overlap_matrix', 'orbital_coefficients', 'ao_atom_indices'])
+@pytest.mark.parametrize('field', ['overlapMatrix', 'orbitalCoefficients', 'aoAtomMap'])
 @pytest.mark.parametrize('missing', [None, ()])
 def test_optional_basis_absence_across_interfaces(field, missing):
     from eled import CalcDescriptorReport, CalcOrbitalPopulations, DescriptorUnavailableError
@@ -184,11 +177,11 @@ def test_optional_basis_absence_across_interfaces(field, missing):
             read(r)
     report = CalcDescriptorReport(molecule(), r)
     assert report['missing']['populations'] == 'basis_not_retained'
-    assert report['values']['xtb_energy_ha'] == r.total_energy_hartree
+    assert report['values']['xtb_energy_ha'] == r.totalEnergyHartree
 
 
-@pytest.mark.parametrize('damage', [{'ao_atom_indices': (0,) * 8},
-                                    {'overlap_matrix': ((1.,),)}])
+@pytest.mark.parametrize('damage', [{'aoAtomMap': (0,) * 8},
+                                    {'overlapMatrix': ((1.,),)}])
 def test_corrupt_retained_basis_across_interfaces(damage):
     from eled import CalcDescriptorReport, CalcOrbitalPopulations
     r = replace(result(), **damage)

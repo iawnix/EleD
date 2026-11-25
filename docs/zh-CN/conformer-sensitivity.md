@@ -1,4 +1,4 @@
-# 构象统计与敏感性（1.3）
+# 构象统计与敏感性（1.4）
 
 `RunConformerAnalysis` 对输入分子的指定构象计算描述符，默认等权统计。
 原子和键编号在构象间固定。该函数读取已有三维构象；构象生成或优化由
@@ -7,8 +7,8 @@
 ```python
 from eled import RunConformerAnalysis
 
-report = RunConformerAnalysis(mol, boltzmann_weighted=True,
-                              boltzmann_temperature=300.0)
+report = RunConformerAnalysis(mol, boltzmannWeighted=True,
+                              boltzmannTemperature=300.0)
 gap = report["statistics"]["xtb_gap_ev"]
 charge = report["atom_statistics"]["0"]["atoms.q_e"]
 homo = report["bond_statistics"]["0"]["frontier_bonds.homo.mul_ovlp_e"]
@@ -16,7 +16,7 @@ lumo = report["bond_statistics"]["0"]["frontier_bonds.lumo.mul_ovlp_e"]
 pi_bond = report["bond_statistics"]["0"]["pi.pi_bo"]
 ```
 
-π 分析通过 `pi_scheme`、`pi_plane_tol_a` 和 `pi_ref` 配置，详见
+π 分析通过 `piScheme`、`piPlaneTolAngstrom` 和 `piRef` 配置，详见
 [报告参数](descriptor-reports.md#π-分析参数)。同一组参数应用于所有输入构象，
 并记录在汇总报告和逐构象报告中；等权和电子能加权统计均使用该 π 定义。
 
@@ -38,7 +38,7 @@ pi_bond = report["bond_statistics"]["0"]["pi.pi_bo"]
 
 ## 电子能加权
 
-可选的 `boltzmann_weighted=True` 增加独立的 `boltzmann` 区段，保留默认的
+可选的 `boltzmannWeighted=True` 增加独立的 `boltzmann` 区段，保留默认的
 等权统计。权重为：
 
 ```text
@@ -46,8 +46,8 @@ w_i ∝ exp[−(E_i − E_min)/(k_B T)]
 ```
 
 `E_i` 来自同一计算协议下的 xTB 电子能。这是**电子能权重，不是自由能权重**；
-未计入振动熵、零点能或溶剂效应。`boltzmann_temperature` 是构象汇总温度，
-与控制轨道占据平滑的 xTB `electronic_temperature` 分开设置。
+未计入振动熵、零点能或溶剂效应。`boltzmannTemperature` 是构象汇总温度，
+与控制轨道占据平滑的 xTB `electronicTemperature` 分开设置。
 
 `boltzmann.statistics`、`boltzmann.atom_statistics` 和
 `boltzmann.bond_statistics` 给出加权均值、标准差及覆盖计数。

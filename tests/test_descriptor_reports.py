@@ -2,18 +2,17 @@
 from dataclasses import replace
 import csv
 import json
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 from rdkit import Chem
 
 from eled import (
-    XTBOptions, XTBResult, XTBRunError, DescriptorColumns, CalcDescriptorReport,
+    XTBOptions, XTBResults, XTBRunError, DescriptorColumns, CalcDescriptorReport,
     AssessDescriptorQuality, ExportDescriptorReports, RunDescriptorBatch,
 )
 from eled.input import _input_metadata, _xyz_from_mol
-from eled.options import CalculationSettings
+from eled.options import _validate_calculation_settings
 
 
 def sample():
@@ -21,15 +20,15 @@ def sample():
     for i, xyz in enumerate(((0,0,0),(1,0,0),(0,1,0))): conf.SetAtomPosition(i,xyz)
     mol.AddConformer(conf)
     meta = _input_metadata(mol,-1,0,0,_xyz_from_mol(mol,-1))
-    meta.update(CalculationSettings=CalculationSettings(),calculation_status='success')
-    r = XTBResult('GFN2-xTB',None,-1.,3.,3,4,0,orbital_energies_ev=(-10.,-2.,1.),
-        orbital_occupations=(2.,2.,0.),partial_charges=(-.6,.3,.3),dipole_e_bohr=(0.,0.,1.),
-        wiberg_bond_orders=((0.,1.,1.),(1.,0.,0.),(1.,0.,0.)),metadata=meta)
+    meta.update(calculation_settings=_validate_calculation_settings(),calculation_status='success')
+    r = XTBResults('GFN2-xTB',None,-1.,3.,3,4,0,orbitalEnergiesEV=(-10.,-2.,1.),
+        orbitalOccupancies=(2.,2.,0.),atomicCharges=(-.6,.3,.3),dipoleAtomicUnits=(0.,0.,1.),
+        wibergBondOrders=((0.,1.,1.),(1.,0.,0.),(1.,0.,0.)),metadata=meta)
     return mol,r
 
 
 def test_report_records_missing_basis_and_exports_fixed_columns(tmp_path):
-    mol,r = sample(); report = CalcDescriptorReport(mol,r,record_id='water')
+    mol,r = sample(); report = CalcDescriptorReport(mol,r,recordId='water')
     assert report['quality']['status']=='partial'
     assert report['missing']['populations']=='basis_not_retained'
     assert report['values']['homo_pr'] is None
@@ -51,30 +50,30 @@ def test_report_records_missing_basis_and_exports_fixed_columns(tmp_path):
 
 def test_report_records_mci_request_when_basis_is_not_retained():
     mol, r = sample()
-    report = CalcDescriptorReport(mol, r, mci_rings={'candidate': [0, 1, 2]})
+    report = CalcDescriptorReport(mol, r, mciRings={'candidate': [0, 1, 2]})
     assert report['mci'] is None
     assert report['missing']['mci'] == 'basis_not_retained'
-    assert report['analysis_settings']['mci_rings'] == {'candidate': [0, 1, 2]}
+    assert report['analysis_settings']['mciRings'] == {'candidate': [0, 1, 2]}
 
 
 def test_quality_flags_fractional_and_threshold_sensitive_frontiers():
     _, r = sample()
-    mixed = replace(r,orbital_occupations=(2.,1.9999995,5e-7))
+    mixed = replace(r,orbitalOccupancies=(2.,1.9999995,5e-7))
     quality=AssessDescriptorQuality(mixed)
     assert 'frontier_threshold_sensitive' in {f['code'] for f in quality['flags']}
-    quality=AssessDescriptorQuality(replace(r,orbital_occupations=(2.,1.5,.5)))
+    quality=AssessDescriptorQuality(replace(r,orbitalOccupancies=(2.,1.5,.5)))
     assert quality['fractional_orb_idx']==[1,2]
     assert quality['status']=='warning'
-    q=AssessDescriptorQuality(replace(r,partial_charges=(1.,1.,1.)))
+    q=AssessDescriptorQuality(replace(r,atomicCharges=(1.,1.,1.)))
     assert q['status']=='error' and q['charge_sum_error_e']==3
     q=AssessDescriptorQuality(replace(r,metadata={}))
     assert 'calculation_settings_unknown' in {f['code'] for f in q['flags']}
     with pytest.raises(ValueError,match='exceed two'):
-        AssessDescriptorQuality(replace(r,orbital_occupations=(3.,1.,0.)))
+        AssessDescriptorQuality(replace(r,orbitalOccupancies=(3.,1.,0.)))
 
 
 def test_export_rejects_schema_mismatch_before_overwriting(tmp_path):
-    mol,r=sample(); a=CalcDescriptorReport(mol,r); b=CalcDescriptorReport(mol,r,frontier_depth=3)
+    mol,r=sample(); a=CalcDescriptorReport(mol,r); b=CalcDescriptorReport(mol,r,frontierDepth=3)
     path=tmp_path/'data.csv';path.write_text('keep')
     with pytest.raises(ValueError,match='incompatible'): ExportDescriptorReports([a,b],path)
     assert path.read_text()=='keep'
@@ -86,7 +85,7 @@ def test_export_rejects_schema_mismatch_before_overwriting(tmp_path):
 def test_batch_failures_preserve_order_ids_and_null_features():
     mol,r=sample()
     with patch('eled.batch.RunXTBBatch',return_value=[r,XTBRunError('no convergence'),r]):
-        reports=RunDescriptorBatch([mol]*3,record_ids=['a','b','c'])
+        reports=RunDescriptorBatch([mol]*3,recordIds=['a','b','c'])
     assert [v['record_id'] for v in reports]==['a','b','c']
     assert reports[1]['quality']['status']=='error'
     assert reports[1]['error']['type']=='XTBRunError'
@@ -96,8 +95,8 @@ def test_batch_failures_preserve_order_ids_and_null_features():
     assert reports[1]['provenance']['requested_options']['accuracy']==1.
 
 
-@pytest.mark.parametrize('kwargs',[{'typo':1},{'degeneracy_ev':-1},
-                                  {'occupation_threshold':float('nan')}, {'include_orbitals':1}])
+@pytest.mark.parametrize('kwargs',[{'typo':1},{'degeneracyEV':-1},
+                                  {'occupationThreshold':float('nan')}, {'includeOrbitals':1}])
 def test_batch_rejects_global_analysis_errors_before_calculation(kwargs):
     mol,_=sample()
     with patch('eled.batch.RunXTBBatch',side_effect=AssertionError('must not calculate')):
@@ -106,17 +105,17 @@ def test_batch_rejects_global_analysis_errors_before_calculation(kwargs):
 
 
 @pytest.mark.parametrize('kwargs',[
-    {'max_iterations':True},{'max_iterations':2.5},{'max_iterations':0},
-    {'max_iterations':2**32},{'accuracy':True},{'accuracy':1e-5},
-    {'accuracy':1001.},{'accuracy':float('nan')},{'electronic_temperature':-1},
-    {'electronic_temperature':float('inf')},{'electronic_temperature':True},
+    {'maxIterations':True},{'maxIterations':2.5},{'maxIterations':0},
+    {'maxIterations':2**32},{'accuracy':True},{'accuracy':1e-5},
+    {'accuracy':1001.},{'accuracy':float('nan')},{'electronicTemperature':-1},
+    {'electronicTemperature':float('inf')},{'electronicTemperature':True},
 ])
 def test_calculation_options_reject_clamping_and_invalid_numbers(kwargs):
     with pytest.raises(ValueError): XTBOptions(**kwargs)
 
 
 def test_zero_temperature_records_actual_engine_floor():
-    settings=CalculationSettings(electronic_temperature=0)
+    settings=_validate_calculation_settings(electronicTemperature=0)
     assert settings['electronic_temperature']==0
     assert settings['effective_electronic_temperature']==1e-6
 

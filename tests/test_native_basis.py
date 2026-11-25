@@ -47,23 +47,23 @@ def test_native_basis_on_frozen_corpus(method,case,library):
     conf=Chem.Conformer(mol.GetNumAtoms()); conf.Set3D(True)
     for i,xyz in enumerate(case['positions_angstrom']): conf.SetAtomPosition(i,xyz)
     mol.AddConformer(conf)
-    result=calculate_xtb(mol,method=method,xtb_library=library,keep_overlap=True)
-    c,s=np.array(result.orbital_coefficients),np.array(result.overlap_matrix)
+    result=calculate_xtb(mol,method=method,xtbLibrary=library,keepOverlap=True)
+    c,s=np.array(result.orbitalCoefficients),np.array(result.overlapMatrix)
     np.testing.assert_allclose(c.T@s@c,np.eye(len(c)),atol=1e-8,rtol=0)
-    ao,ash,sa,l=map(np.asarray,[result.ao_atom_indices,result.ao_shell_indices,result.shell_atom_indices,result.shell_angular_momenta])
+    ao,ash,sa,l=map(np.asarray,[result.aoAtomMap,result.aoShellMap,result.shellAtomMap,result.shellAngularMomenta])
     np.testing.assert_array_equal(sa[ash],ao)
     np.testing.assert_array_equal(np.bincount(ash),2*l+1)
     assert set(ao)==set(range(mol.GetNumAtoms()))
     for scheme in ['lowdin','mulliken']:
         pop=CalcOrbitalPopulations(result,scheme=scheme)
-        assert sum(pop['mo_n_e'])==pytest.approx(result.number_of_electrons,abs=1e-7)
+        assert sum(pop['mo_n_e'])==pytest.approx(result.numElectrons,abs=1e-7)
         np.testing.assert_allclose(np.sum(pop['atom_pop'],axis=0),1.,atol=1e-10)
     assert result.metadata['overlap_source']=='same libxtb calculation'
     # Native density populations must recover independent engine charges.
     valence={1:1,6:4,7:5,8:6,9:7,14:4,15:5,16:6,17:7,35:7,53:7}
     if all(a.GetAtomicNum() in valence for a in mol.GetAtoms()):
         reference=[valence[a.GetAtomicNum()] for a in mol.GetAtoms()]
-        np.testing.assert_allclose(np.asarray(reference)-pop['mo_n_e'],result.partial_charges,atol=1e-7,rtol=0)
+        np.testing.assert_allclose(np.asarray(reference)-pop['mo_n_e'],result.atomicCharges,atol=1e-7,rtol=0)
 
 
 @pytest.mark.integration
@@ -72,12 +72,12 @@ def test_native_basis_on_frozen_corpus(method,case,library):
 def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
     rdXTBTools = pytest.importorskip("eled.rdXTBTools")
     m=molecule(smiles)
-    r=calculate_xtb(m,method=method,xtb_library=library,keep_overlap=True)
+    r=calculate_xtb(m,method=method,xtbLibrary=library,keepOverlap=True)
     ok,compiled=rdXTBTools.RunMol(m,method=method,xtbLibrary=library,keepOverlap=True)
     assert ok and compiled.overlapRetained and compiled.basisExportVerified
-    np.testing.assert_allclose(compiled.GetOverlapMatrix(),r.overlap_matrix,atol=1e-12,rtol=0)
-    for getter,field in [('GetAOAtomMap','ao_atom_indices'),('GetAOShellMap','ao_shell_indices'),
-                         ('GetShellAtomMap','shell_atom_indices'),('GetShellAngularMomenta','shell_angular_momenta')]:
+    np.testing.assert_allclose(compiled.GetOverlapMatrix(),r.overlapMatrix,atol=1e-12,rtol=0)
+    for getter,field in [('GetAOAtomMap','aoAtomMap'),('GetAOShellMap','aoShellMap'),
+                         ('GetShellAtomMap','shellAtomMap'),('GetShellAngularMomenta','shellAngularMomenta')]:
         value=getattr(compiled,getter)(); expected=getattr(r,field)
         assert value.dtype.kind=='i' and value.flags.owndata
         np.testing.assert_array_equal(value,expected)
@@ -101,7 +101,7 @@ def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
     assert CalcXTBBondDescriptors(m,compiled)
     assert AnnotateMol(m,compiled).GetAtomWithIdx(0).HasProp('xtb_wbo_sum')
     old=compiled.GetOverlapMatrix().copy()
-    calculate_xtb(molecule('CC'),xtb_library=library,keep_overlap=True)
+    calculate_xtb(molecule('CC'),xtbLibrary=library,keepOverlap=True)
     np.testing.assert_array_equal(compiled.GetOverlapMatrix(),old)
     m.GetConformer().SetAtomPosition(0,(12.,0.,0.))
     with pytest.raises(ValueError,match='coordinates'): CalcFrontierDescriptors(m,compiled)
@@ -115,10 +115,10 @@ def test_opt_in_cache_identity_and_no_other_engine(library,monkeypatch):
         return original(name,*args,**kwargs)
     monkeypatch.setattr(builtins,'__import__',guarded)
     m=molecule(); cache=XTBCache()
-    a=RunXTBBatch([m],cache=cache,xtb_library=library)[0]
-    b=RunXTBBatch([m],cache=cache,xtb_library=library,keep_overlap=True)[0]
-    assert len(cache)==2 and not a.overlap_matrix and b.overlap_matrix
-    assert a.total_energy_hartree==pytest.approx(b.total_energy_hartree,abs=1e-12)
+    a=RunXTBBatch([m],cache=cache,xtbLibrary=library)[0]
+    b=RunXTBBatch([m],cache=cache,xtbLibrary=library,keepOverlap=True)[0]
+    assert len(cache)==2 and not a.overlapMatrix and b.overlapMatrix
+    assert a.totalEnergyHartree==pytest.approx(b.totalEnergyHartree,abs=1e-12)
     with pytest.raises(DescriptorUnavailableError): CalcOrbitalPopulations(a)
     assert CalcFrontierDescriptors(m,b)['homo']
 
@@ -130,12 +130,12 @@ def test_benzene_degenerate_subspaces(library):
         for index,radius in ((i,1.4),(i+6,2.48)):
             conf.SetAtomPosition(index,(radius*np.cos(i*np.pi/3),radius*np.sin(i*np.pi/3),0.))
     m.AddConformer(conf)
-    r=calculate_xtb(m,xtb_library=library,keep_overlap=True)
-    baseline=CalcFrontierDescriptors(m,r); c=np.array(r.orbital_coefficients)
+    r=calculate_xtb(m,xtbLibrary=library,keepOverlap=True)
+    baseline=CalcFrontierDescriptors(m,r); c=np.array(r.orbitalCoefficients)
     for label in ['homo','lumo']:
         selected=baseline[label]['orb_idx']; assert len(selected)==2
         c[:,selected]=c[:,selected]@np.array([[.6,-.8],[.8,.6]])
-    changed=CalcFrontierDescriptors(m,replace(r,orbital_coefficients=tuple(map(tuple,c))))
+    changed=CalcFrontierDescriptors(m,replace(r,orbitalCoefficients=tuple(map(tuple,c))))
     for label in ['homo','lumo']:
         np.testing.assert_allclose(baseline[label]['atom_pop'],changed[label]['atom_pop'],atol=1e-12)
 
@@ -169,7 +169,7 @@ def test_standard_library_basic_support_and_missing_capability():
     if _native_basis_build(library): pytest.skip('requires an unextended library')
     m=molecule()
     with pytest.raises(XTBEnvironmentError,match='extended libxtb'):
-        calculate_xtb(m,xtb_library=library)
+        calculate_xtb(m,xtbLibrary=library)
     rdXTBTools = pytest.importorskip("eled.rdXTBTools")
     with pytest.raises(ValueError,match='extended libxtb'):
         rdXTBTools.RunMol(m,xtbLibrary=library)

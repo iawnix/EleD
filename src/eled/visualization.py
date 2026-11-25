@@ -1,9 +1,7 @@
 """RDKit-native visualizations for EleD descriptor reports.
 
 The functions in this module only consume an RDKit molecule and an existing
-report. They never call xTB. RDKit draws the molecular graph; the summary and
-interaction views are small dependency-free SVGs so the core package does not
-need matplotlib, Plotly or NetworkX.
+report. They never call xTB.
 """
 from __future__ import annotations
 
@@ -111,16 +109,15 @@ def _atom_rows(report):
     rows = report.get('atoms', ()) if isinstance(report, Mapping) else ()
     if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
         return {}
-    return {int(row['atom_index']): row for row in rows
-            if isinstance(row, Mapping) and 'atom_index' in row}
+    return {
+        int(row['atom_index']): row
+        for row in rows
+        if isinstance(row, Mapping) and 'atom_index' in row
+    }
 
 
-def BuildFragmentVisualData(mol, report, *, atom_field=None):
-    """Build a JSON-compatible mapping for molecular and fragment views.
-
-    The input fragment assignment is explicit and disjoint, as required by the
-    descriptor API. Atom indices remain RDKit indices. No calculation is run.
-    """
+def BuildFragmentVisualData(mol, report, *, atomField=None):
+    """Build a JSON-compatible mapping for molecular and fragment views."""
     if not hasattr(mol, 'GetNumAtoms'):
         raise TypeError('mol must be an RDKit molecule')
     records, pairs, section = _report_section(report)
@@ -134,16 +131,19 @@ def BuildFragmentVisualData(mol, report, *, atom_field=None):
                 raise ValueError(f'atom {index} belongs to more than one fragment')
             assignments[index] = record['name']
     atom_rows = _atom_rows(report)
-    if atom_field is None:
+    if atomField is None:
         for candidate in ('q_e', 'f_plus', 's_loc_1ev', 'homo_population'):
             if any(candidate in row for row in atom_rows.values()):
-                atom_field = candidate
+                atomField = candidate
                 break
     atoms = []
     for index in range(natoms):
         row = atom_rows.get(index, {})
-        atoms.append({'atom_index': index, 'fragment': assignments.get(index),
-                      'value': _finite_number(row.get(atom_field)) if atom_field else None})
+        atoms.append({
+            'atom_index': index,
+            'fragment': assignments.get(index),
+            'value': _finite_number(row.get(atomField)) if atomField else None,
+        })
     names = {record['name'] for record in records}
     normalized_pairs = []
     for pair in pairs:
@@ -151,12 +151,15 @@ def BuildFragmentVisualData(mol, report, *, atom_field=None):
         if first not in names or second not in names:
             continue
         value = pair.get('wbo', pair.get('value'))
-        normalized_pairs.append({'fragment_a': str(first), 'fragment_b': str(second),
-                                 'value': _finite_number(value),
-                                 'wbo': _finite_number(pair.get('wbo'))})
+        normalized_pairs.append({
+            'fragment_a': str(first),
+            'fragment_b': str(second),
+            'value': _finite_number(value),
+            'wbo': _finite_number(pair.get('wbo')),
+        })
     return {
-        'atom_field': atom_field,
-        'atom_unit': _unit(atom_field or ''),
+        'atom_field': atomField,
+        'atom_unit': _unit(atomField or ''),
         'atoms': atoms,
         'fragments': records,
         'pairs': normalized_pairs,
@@ -172,42 +175,43 @@ def _strip_xml_header(svg):
     return svg
 
 
-def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=240,
-                     add_atom_indices=False, include_hydrogens=False):
-    """Return an SVG RDKit drawing with fragments and atom values highlighted.
-
-    Explicit hydrogens are hidden by default so their labels cannot crowd the
-    heavy-atom descriptor labels.  The report still contains every atom; pass
-    ``include_hydrogens=True`` when a hydrogen-level map is required.  When
-    ``add_atom_indices`` is true, the RDKit index is included in the value
-    label (for example ``2:-0.44``) rather than drawn a second time by RDKit.
-    """
-    from rdkit.Chem.Draw import rdMolDraw2D
+def DrawDescriptorMap(
+    mol,
+    report,
+    *,
+    atomField=None,
+    width=520,
+    height=240,
+    addAtomIndices=False,
+    includeHydrogens=False,
+):
+    """Return an SVG RDKit drawing with fragments and atom values highlighted."""
     from rdkit import Chem
+    from rdkit.Chem.Draw import rdMolDraw2D
 
-    data = BuildFragmentVisualData(mol, report, atom_field=atom_field)
+    data = BuildFragmentVisualData(mol, report, atomField=atomField)
     records = data['fragments']
     assignments = {row['atom_index']: row['fragment'] for row in data['atoms']}
-    if include_hydrogens:
+    if includeHydrogens:
         draw_mol = mol
         draw_indices = list(range(int(mol.GetNumAtoms())))
     else:
-        draw_indices = [atom.GetIdx() for atom in mol.GetAtoms()
-                        if atom.GetAtomicNum() != 1]
+        draw_indices = [atom.GetIdx() for atom in mol.GetAtoms() if atom.GetAtomicNum() != 1]
         draw_mol = Chem.RemoveHs(mol) if len(draw_indices) != mol.GetNumAtoms() else mol
     original_to_draw = {original: index for index, original in enumerate(draw_indices)}
-    colors = {record['name']: _COLORS[index % len(_COLORS)]
-              for index, record in enumerate(records)}
-    highlight_atoms = [original_to_draw[index] for index, name in assignments.items()
-                       if name is not None and index in original_to_draw]
-    highlight_colors = {original_to_draw[index]: colors[name]
-                        for index, name in assignments.items()
-                        if name is not None and index in original_to_draw}
+    colors = {record['name']: _COLORS[index % len(_COLORS)] for index, record in enumerate(records)}
+    highlight_atoms = [
+        original_to_draw[index]
+        for index, name in assignments.items()
+        if name is not None and index in original_to_draw
+    ]
+    highlight_colors = {
+        original_to_draw[index]: colors[name]
+        for index, name in assignments.items()
+        if name is not None and index in original_to_draw
+    }
     drawer = rdMolDraw2D.MolDraw2DSVG(int(width), int(height))
     options = drawer.drawOptions()
-    # A fixed, moderate annotation size is more predictable than RDKit's
-    # automatic maximum for small molecules.  In particular, it prevents a
-    # nine-atom explicit-H molecule from receiving 40 px labels.
     font_size = max(10, min(18, int(min(width, height) / 18)))
     options.fixedFontSize = font_size
     options.minFontSize = max(6, font_size - 3)
@@ -215,8 +219,6 @@ def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=240,
     options.padding = 0.12
     options.additionalAtomLabelPadding = 0.04
     options.atomHighlightsAreCircles = True
-    # Indices are part of our custom label when requested.  Enabling RDKit's
-    # own index annotation as well would draw two labels at every atom.
     options.addAtomIndices = False
     if data['atom_field']:
         for row in data['atoms']:
@@ -225,33 +227,37 @@ def DrawDescriptorMap(mol, report, *, atom_field=None, width=520, height=240,
             if draw_index is not None and row['value'] is not None:
                 options.atomLabels[draw_index] = (
                     f"{original_index}:{row['value']:+.2f}"
-                    if add_atom_indices else f"{row['value']:+.2f}"
+                    if addAtomIndices
+                    else f"{row['value']:+.2f}"
                 )
-    drawer.DrawMolecule(draw_mol, highlightAtoms=highlight_atoms,
-                        highlightAtomColors=highlight_colors)
+    drawer.DrawMolecule(draw_mol, highlightAtoms=highlight_atoms, highlightAtomColors=highlight_colors)
     drawer.FinishDrawing()
     return _strip_xml_header(drawer.GetDrawingText())
 
 
-def PlotFragmentSummary(report, *, field='q_e', width=620, row_height=38):
+def PlotFragmentSummary(report, *, field='q_e', width=620, rowHeight=38):
     """Return an SVG signed bar chart for one fragment field."""
     data = BuildFragmentVisualData(_report_atom_count(report), report)
     records = data['fragments']
     values = [_finite_number(row.get(field)) for row in records]
     finite = [value for value in values if value is not None]
-    height = max(130, 70 + len(records) * row_height)
+    height = max(130, 70 + len(records) * rowHeight)
     title = escape(f"{_field_label(field)} ({_unit(field)})")
     if not finite:
-        return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-                f'role="img" aria-label="No {title} values available">{_SVG_STYLE}'
-                f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
-                f'<title>No {title} values available</title>'
-                f'<text class="eled-viz-text" x="20" y="48">No values available</text></svg>')
+        return (
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+            f'role="img" aria-label="No {title} values available">{_SVG_STYLE}'
+            f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+            f'<title>No {title} values available</title>'
+            f'<text class="eled-viz-text" x="20" y="48">No values available</text></svg>'
+        )
     maximum = max(abs(value) for value in finite) or 1.0
-    left, chart_width, center = 160, width - 210, 160 + (width - 210) / 2
-    body = [f'<line class="eled-viz-muted" x1="{center:.1f}" y1="55" x2="{center:.1f}" y2="{height - 18}" opacity=".55"/>']
+    chart_width, center = width - 210, 160 + (width - 210) / 2
+    body = [
+        f'<line class="eled-viz-muted" x1="{center:.1f}" y1="55" x2="{center:.1f}" y2="{height - 18}" opacity=".55"/>'
+    ]
     for index, (record, value) in enumerate(zip(records, values)):
-        y = 72 + index * row_height
+        y = 72 + index * rowHeight
         name = escape(str(record['name']))
         body.append(f'<text class="eled-viz-text" x="12" y="{y + 5}" font-size="14">{name}</text>')
         if value is not None:
@@ -259,14 +265,20 @@ def PlotFragmentSummary(report, *, field='q_e', width=620, row_height=38):
             x = center if value >= 0 else center - span
             fill = _SVG_SERIES[0] if value >= 0 else _SVG_SERIES[1]
             body.append(f'<rect x="{x:.1f}" y="{y - 8}" width="{span:.1f}" height="16" fill="{fill}" rx="3"/>')
-            body.append(f'<text class="eled-viz-text" x="{width - 12}" y="{y + 5}" text-anchor="end" font-size="14">{value:+.3f}</text>')
+            body.append(
+                f'<text class="eled-viz-text" x="{width - 12}" y="{y + 5}" text-anchor="end" font-size="14">{value:+.3f}</text>'
+            )
         else:
-            body.append(f'<text class="eled-viz-text" x="{width - 12}" y="{y + 5}" text-anchor="end" font-size="14">missing</text>')
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-            f'role="img" aria-label="Fragment {title} summary">{_SVG_STYLE}'
-            f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
-            f'<title>Fragment {title} summary</title>'
-            f'<text class="eled-viz-text" x="12" y="25" font-size="16">{title}</text>{"".join(body)}</svg>')
+            body.append(
+                f'<text class="eled-viz-text" x="{width - 12}" y="{y + 5}" text-anchor="end" font-size="14">missing</text>'
+            )
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+        f'role="img" aria-label="Fragment {title} summary">{_SVG_STYLE}'
+        f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+        f'<title>Fragment {title} summary</title>'
+        f'<text class="eled-viz-text" x="12" y="25" font-size="16">{title}</text>{"".join(body)}</svg>'
+    )
 
 
 def PlotFragmentInteractions(report, *, width=620, height=280):
@@ -275,16 +287,20 @@ def PlotFragmentInteractions(report, *, width=620, height=280):
     records, pairs = data['fragments'], data['pairs']
     names = [record['name'] for record in records]
     if not names:
-        return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
-                f'{_SVG_STYLE}<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
-                f'<text class="eled-viz-text" x="20" y="40">No fragments available</text></svg>')
+        return (
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
+            f'{_SVG_STYLE}<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+            f'<text class="eled-viz-text" x="20" y="40">No fragments available</text></svg>'
+        )
     positions = {}
     if len(names) == 1:
         positions[names[0]] = (width / 2, height / 2)
     else:
         for index, name in enumerate(names):
-            positions[name] = (width / 2 + (width / 2 - 90) * math.cos(2 * math.pi * index / len(names)),
-                               height / 2 + (height / 2 - 70) * math.sin(2 * math.pi * index / len(names)))
+            positions[name] = (
+                width / 2 + (width / 2 - 90) * math.cos(2 * math.pi * index / len(names)),
+                height / 2 + (height / 2 - 70) * math.sin(2 * math.pi * index / len(names)),
+            )
     finite = [pair['value'] for pair in pairs if pair['value'] is not None]
     maximum = max((abs(value) for value in finite), default=1.0)
     body = []
@@ -294,25 +310,38 @@ def PlotFragmentInteractions(report, *, width=620, height=280):
         x1, y1 = positions[pair['fragment_a']]
         x2, y2 = positions[pair['fragment_b']]
         stroke_width = 2 + 10 * abs(pair['value']) / maximum
-        body.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{_SVG_SERIES[2]}" stroke-width="{stroke_width:.1f}" stroke-linecap="round" opacity=".75"/>')
-        body.append(f'<text class="eled-viz-text" x="{(x1+x2)/2:.1f}" y="{(y1+y2)/2-10:.1f}" text-anchor="middle" font-size="14">{pair["value"]:.2f}</text>')
+        body.append(
+            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
+            f'stroke="{_SVG_SERIES[2]}" stroke-width="{stroke_width:.1f}" stroke-linecap="round" opacity=".75"/>'
+        )
+        body.append(
+            f'<text class="eled-viz-text" x="{(x1 + x2) / 2:.1f}" y="{(y1 + y2) / 2 - 10:.1f}" '
+            f'text-anchor="middle" font-size="14">{pair["value"]:.2f}</text>'
+        )
     for index, name in enumerate(names):
         x, y = positions[name]
         fill = _svg_color(_COLORS[index % len(_COLORS)])
         body.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="38" fill="{fill}" opacity=".88"/>')
-        body.append(f'<text x="{x:.1f}" y="{y+5:.1f}" text-anchor="middle" fill="#ffffff" font-size="14">{escape(name)}</text>')
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-            f'role="img" aria-label="Fragment interaction network">{_SVG_STYLE}'
-            f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
-            f'<title>Fragment interaction network</title>'
-            f'{"".join(body)}</svg>')
+        body.append(
+            f'<text x="{x:.1f}" y="{y + 5:.1f}" text-anchor="middle" fill="#ffffff" font-size="14">{escape(name)}</text>'
+        )
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+        f'role="img" aria-label="Fragment interaction network">{_SVG_STYLE}'
+        f'<rect class="eled-viz-bg" width="{width}" height="{height}"/>'
+        f'<title>Fragment interaction network</title>'
+        f'{"".join(body)}</svg>'
+    )
 
 
 def _report_atom_count(report):
-    """Make a tiny molecule-like object for report-only SVG functions."""
     class _Count:
-        def __init__(self, count): self._count = count
-        def GetNumAtoms(self): return self._count
+        def __init__(self, count):
+            self._count = count
+
+        def GetNumAtoms(self):
+            return self._count
+
     rows = report.get('atoms', ()) if isinstance(report, Mapping) else ()
     indices = [int(row['atom_index']) for row in rows if isinstance(row, Mapping) and 'atom_index' in row]
     if not indices:
@@ -321,11 +350,10 @@ def _report_atom_count(report):
     return _Count(max(indices, default=-1) + 1)
 
 
-def RenderFragmentAnalysis(mol, report, *, atom_field=None, width=620):
+def RenderFragmentAnalysis(mol, report, *, atomField=None, width=620):
     """Return a self-contained HTML fragment with the three EleD views."""
-    data = BuildFragmentVisualData(mol, report, atom_field=atom_field)
-    title = escape(_field_label(data['atom_field'] or 'descriptor'))
-    molecule = DrawDescriptorMap(mol, report, atom_field=atom_field, width=width, height=240)
+    data = BuildFragmentVisualData(mol, report, atomField=atomField)
+    molecule = DrawDescriptorMap(mol, report, atomField=atomField, width=width, height=240)
     summary = PlotFragmentSummary(report, field='q_e', width=width)
     interactions = PlotFragmentInteractions(report, width=width)
     return f'''<div class="eled-fragment-analysis">
@@ -343,6 +371,9 @@ def RenderFragmentAnalysis(mol, report, *, atom_field=None, width=620):
 
 
 __all__ = [
-    'BuildFragmentVisualData', 'DrawDescriptorMap', 'PlotFragmentSummary',
-    'PlotFragmentInteractions', 'RenderFragmentAnalysis',
+    'BuildFragmentVisualData',
+    'DrawDescriptorMap',
+    'PlotFragmentSummary',
+    'PlotFragmentInteractions',
+    'RenderFragmentAnalysis',
 ]

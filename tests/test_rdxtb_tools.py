@@ -52,22 +52,23 @@ def test_numerical_agreement_units_and_mapping(method, smiles, library):
     ok, result = rdXTBTools.RunMol(mol, confId=7, method=method, xtbLibrary=library,
                                  keepOrbitalCoefficients=True)
     assert ok and result.success and result.errorMessage == ''
-    native = calculate_xtb(mol, conf_id=7, method=method, backend='native', xtb_library=library)
-    assert result.totalEnergyHartree == pytest.approx(native.total_energy_hartree, abs=1e-10)
-    np.testing.assert_allclose(result.GetOrbitalEnergies(), native.orbital_energies_ev, atol=2e-5, rtol=0)
-    np.testing.assert_allclose(result.GetOrbitalOccupancies(), native.orbital_occupations, atol=2e-5, rtol=0)
-    np.testing.assert_allclose(result.GetAtomicCharges(), native.partial_charges, atol=2e-5, rtol=0)
-    np.testing.assert_allclose(result.GetDipole(), native.dipole_e_bohr, atol=1e-9, rtol=0)
-    np.testing.assert_allclose(result.GetWibergBondOrders(), native.wiberg_bond_orders, atol=1e-9, rtol=0)
+    native = calculate_xtb(mol, confId=7, method=method, backend='native', xtbLibrary=library)
+    assert result.totalEnergyHartree == pytest.approx(native.totalEnergyHartree, abs=1e-10)
+    np.testing.assert_allclose(result.GetOrbitalEnergies(), native.orbitalEnergiesEV, atol=2e-5, rtol=0)
+    np.testing.assert_allclose(result.GetOrbitalOccupancies(), native.orbitalOccupancies, atol=2e-5, rtol=0)
+    np.testing.assert_allclose(result.GetAtomicCharges(), native.atomicCharges, atol=2e-5, rtol=0)
+    np.testing.assert_allclose(result.GetDipole(), native.dipoleAtomicUnits, atol=1e-9, rtol=0)
+    np.testing.assert_allclose(result.GetWibergBondOrders(), native.wibergBondOrders, atol=1e-9, rtol=0)
+    np.testing.assert_allclose(native.GetAtomicCharges(), native.atomicCharges, atol=0, rtol=0)
     # Native basis tests independently check C.T S C and density populations.
     np.testing.assert_allclose(np.abs(result.GetOrbitalCoefficients()),
-                               np.abs(native.orbital_coefficients), atol=1e-8, rtol=0)
+                               np.abs(native.orbitalCoefficients), atol=1e-8, rtol=0)
     for bond in mol.GetBonds():
         i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-        assert result.GetWibergBondOrders()[i, j] == pytest.approx(native.wiberg_bond_orders[i][j], abs=2e-5)
+        assert result.GetWibergBondOrders()[i, j] == pytest.approx(native.wibergBondOrders[i][j], abs=2e-5)
     assert result.numAtoms == mol.GetNumAtoms()
-    assert result.numOrbitals == len(native.orbital_energies_ev)
-    assert result.numElectrons == native.number_of_electrons
+    assert result.numOrbitals == len(native.orbitalEnergiesEV)
+    assert result.numElectrons == native.numElectrons
     assert result.GetOrbitalOccupancies().sum() == pytest.approx(result.numElectrons, abs=1e-7)
     assert result.numTotalElectrons == sum(a.GetAtomicNum() for a in mol.GetAtoms()) - Chem.GetFormalCharge(mol)
     assert result.charge == Chem.GetFormalCharge(mol)
@@ -120,10 +121,11 @@ def test_cm5_agrees_across_backends_and_atom_permutations(library, method):
     for candidate in (mol, permuted):
         ok, compiled = rdXTBTools.RunMol(candidate, method=method, xtbLibrary=library)
         assert ok
-        native = calculate_xtb(candidate, method=method, backend='native', xtb_library=library)
-        np.testing.assert_allclose(compiled.GetCM5Charges(), native.cm5_charges, atol=2e-5, rtol=0)
-        assert sum(native.cm5_charges) == pytest.approx(0., abs=1e-7)
-        charges.append(np.asarray(native.cm5_charges))
+        native = calculate_xtb(candidate, method=method, backend='native', xtbLibrary=library)
+        np.testing.assert_allclose(compiled.GetCM5Charges(), native.cm5Charges, atol=2e-5, rtol=0)
+        np.testing.assert_allclose(compiled.GetCM5Charges(), native.GetCM5Charges(), atol=2e-5, rtol=0)
+        assert sum(native.cm5Charges) == pytest.approx(0., abs=1e-7)
+        charges.append(np.asarray(native.cm5Charges))
     np.testing.assert_allclose(charges[0][order], charges[1], atol=2e-5, rtol=0)
 
 
@@ -219,7 +221,7 @@ def test_mixed_threads_share_lock_and_preserve_method_state(library):
         def calculate(index):
             method = methods[index]
             if index % 2:
-                return calculate_xtb(mol, method=method, backend='native', xtb_library=library).total_energy_hartree
+                return calculate_xtb(mol, method=method, backend='native', xtbLibrary=library).totalEnergyHartree
             ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library)
             assert ok
             return result.totalEnergyHartree
@@ -272,7 +274,7 @@ def test_common_descriptors_accept_compiled_results(library):
     mol = molecule()
     ok, compiled = rdXTBTools.RunMol(mol, xtbLibrary=library)
     assert ok
-    native = calculate_xtb(mol, xtb_library=library)
+    native = calculate_xtb(mol, xtbLibrary=library)
     a, b = CalcXTBDescriptors(compiled), CalcXTBDescriptors(native)
     for key in a:
         if key in ('xtb_backend', 'xtb_version'): continue

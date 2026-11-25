@@ -64,31 +64,31 @@ def main(argv=None):
                 'charge': row.get('charge', 0), 'uhf': row.get('uhf', 0),
                 'atom_features': _atom_features(row['smiles'])}
         try:
-            prepared = PrepareConformers(row['smiles'], num_conformers=args.num_conformers,
-                method=protocol['geometry']['embedding']['method'], fallback_methods=(),
-                attempts_per_strategy=protocol['geometry']['embedding']['attempts_per_strategy'],
-                retry_random_coords=protocol['geometry']['embedding']['retry_random_coords'],
-                max_embedding_iterations=protocol['geometry']['embedding']['max_embedding_iterations'],
-                optimize='xTB', xtb_method='GFN2-xTB', xtb_library=args.xtb_library,
-                optimization_iterations=protocol['geometry']['optimization']['max_iterations'],
-                random_seed=seed, charge=row.get('charge'), uhf=row.get('uhf'))
+            prepared = PrepareConformers(row['smiles'], numConformers=args.num_conformers,
+                method=protocol['geometry']['embedding']['method'], fallbackMethods=(),
+                attemptsPerStrategy=protocol['geometry']['embedding']['attempts_per_strategy'],
+                retryRandomCoords=protocol['geometry']['embedding']['retry_random_coords'],
+                maxEmbeddingIterations=protocol['geometry']['embedding']['max_embedding_iterations'],
+                optimize='xTB', xtbMethod='GFN2-xTB', xtbLibrary=args.xtb_library,
+                optimizationIterations=protocol['geometry']['optimization']['max_iterations'],
+                randomSeed=seed, charge=row.get('charge'), numUnpairedElectrons=row.get('uhf'))
             item['preparation'] = prepared.report
             if not prepared.success:
                 item['status'] = 'preparation_failed'; records.append(item); continue
-            common = dict(xtb_library=args.xtb_library, keep_overlap=True,
-                          electronic_temperature=protocol['calculation']['electronic_temperature_K'],
-                          charge=row.get('charge'), uhf=row.get('uhf'))
+            common = dict(xtbLibrary=args.xtb_library, keepOverlap=True,
+                          electronicTemperature=protocol['calculation']['electronic_temperature_K'],
+                          charge=row.get('charge'), numUnpairedElectrons=row.get('uhf'))
             primary = RunConformerAnalysis(prepared.molecule,
-                options=XTBOptions(method='GFN2-xTB', **common), record_id=row['id'],
-                return_errors=True)
+                options=XTBOptions(method='GFN2-xTB', **common), recordId=row['id'],
+                returnErrors=True)
             gfn1 = RunConformerAnalysis(prepared.molecule,
-                options=XTBOptions(method='GFN1-xTB', **common), record_id=row['id'],
-                return_errors=True)
-            hot_common = {**common, 'electronic_temperature':
+                options=XTBOptions(method='GFN1-xTB', **common), recordId=row['id'],
+                returnErrors=True)
+            hot_common = {**common, 'electronicTemperature':
                           protocol['calculation']['diagnostic_electronic_temperature_K']}
             hot = RunConformerAnalysis(prepared.molecule,
                 options=XTBOptions(method='GFN2-xTB', **hot_common),
-                record_id=row['id'], return_errors=True)
+                recordId=row['id'], returnErrors=True)
             reactivity = []
             valid_conformer_ids = [int(report['record_id']) for report in primary.get('reports', [])
                                    if report.get('quality', {}).get('status') != 'error'
@@ -96,16 +96,16 @@ def main(argv=None):
             for conformer_id in valid_conformer_ids:
                 reactivity.append(RunReactivity(
                     prepared.molecule,
-                    options=XTBOptions(method='GFN2-xTB', conf_id=conformer_id, **common),
-                    ionized_uhf=row.get('ionized_uhf'),
-                    attached_uhf=row.get('attached_uhf'),
-                    record_id=f"{row['id']}:{conformer_id}", return_errors=True))
+                    options=XTBOptions(method='GFN2-xTB', confId=conformer_id, **common),
+                    ionizedUnpaired=row.get('ionized_uhf'),
+                    attachedUnpaired=row.get('attached_uhf'),
+                    recordId=f"{row['id']}:{conformer_id}", returnErrors=True))
             item['analysis'] = primary
             item['analyses'] = {'gfn2_300K': primary, 'gfn1_300K': gfn1,
                                 'gfn2_1000K': hot, 'gfn2_reactivity_300K': reactivity}
             item['sensitivity'] = DescriptorSensitivity(
                 primary, gfn1=gfn1, gfn2=primary,
-                temperature_300=primary, temperature_1000=hot)
+                temperature300=primary, temperature1000=hot)
             def _geometry_hashes(report):
                 return tuple(sorted(i.get('geometry_sha256') for i in report.get('inputs', [])
                                     if i.get('geometry_sha256')))

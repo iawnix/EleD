@@ -36,7 +36,7 @@ mol = Chem.AddHs(Chem.MolFromSmiles("CCO"))
 assert AllChem.EmbedMolecule(mol, randomSeed=1) == 0
 AllChem.MMFFOptimizeMolecule(mol)
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
 print(CalcXTBDescriptors(result))
 ```
 

@@ -25,7 +25,7 @@ def main():
     alkyl = {a.GetIdx() for a in mol.GetAtoms() if a.GetAtomicNum() == 6}
     alkyl.update(n.GetIdx() for i in list(alkyl) for n in mol.GetAtomWithIdx(i).GetNeighbors() if n.GetAtomicNum() == 1)
     fragments = {'alkyl': sorted(alkyl), 'hydroxyl': sorted(set(range(mol.GetNumAtoms())) - alkyl)}
-    result = XTBCalculator().calculate(mol, keep_overlap=args.populations)
+    result = XTBCalculator().Calculate(mol, keepOverlap=args.populations)
     report = {
         'scalars': CalcXTBDescriptors(result),
         'atoms': CalcXTBAtomDescriptors(result),

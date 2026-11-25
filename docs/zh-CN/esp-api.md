@@ -21,18 +21,18 @@ from eled import (XTBCalculator, GenerateESPGrid, CalcESP,
 
 mol = Chem.AddHs(Chem.MolFromSmiles("O"))
 AllChem.EmbedMolecule(mol, randomSeed=42)
-points = GenerateESPGrid(mol, scales=(1.4, 1.6, 1.8, 2.0), points_per_atom=100)
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, esp_points_angstrom=points)
+points = GenerateESPGrid(mol, scales=(1.4, 1.6, 1.8, 2.0), pointsPerAtom=100)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, espPointsAngstrom=points)
 potential = CalcESP(result)  # 元组，Hartree/e
 esp = FitESPCharges(result)
-resp = FitRESPCharges(result, equivalence_groups=[(1, 2)])
-print(esp.charges_e, resp.charges_e)  # 原始 RDKit 原子顺序，单位 e
-record = resp.to_dict()  # 可写入 JSON，包含拟合结果、诊断、设置和来源
+resp = FitRESPCharges(result, equivalenceGroups=[(1, 2)])
+print(esp.charges, resp.GetCharges())  # 原始 RDKit 原子顺序，单位 e
+record = resp.ToDict()  # 可写入 JSON，包含拟合结果、诊断、设置和来源
 ```
 
-`esp_points_angstrom` 接受有限实数 `[npoints, 3]` 数组或序列；`None` 或空序列表示
-不采样。`XTBOptions` 会保存不可变的独立副本。结果中的 `esp_points_angstrom` 和
-`esp_values_au` 分别保存采样坐标与静电势，与其他描述符来自同一次单点计算。
+`espPointsAngstrom` 接受有限实数 `[npoints, 3]` 数组或序列；`None` 或空序列表示
+不采样。`XTBOptions` 会保存不可变的独立副本。结果中的 `espPointsAngstrom` 和
+`espValuesAU`（或 `GetESPPoints()` / `GetESPValues()`）分别保存采样坐标与静电势，与其他描述符来自同一次单点计算。
 `CalcESP` 读取已有采样值；需要新位置的静电势时，要在计算时提供这些位置。
 Python 返回前会释放所有原生句柄，磁盘缓存和工作进程不依赖存活的引擎对象。
 采样坐标参与缓存及断点续算配置标识。批处理选项会把同一组坐标用于所有输入；
@@ -50,18 +50,18 @@ if not ok:
     raise RuntimeError(compiled.errorMessage)
 xyz = compiled.GetESPPoints()  # 独立 NumPy 副本，Angstrom [point, xyz]
 v = compiled.GetESPValues()   # 独立 NumPy 副本，Hartree/e [point]
-resp = FitRESPCharges(compiled, equivalence_groups=[(1, 2)])
+resp = FitRESPCharges(compiled, equivalenceGroups=[(1, 2)])
 ```
 
 `compiled.espSampled` 表示是否有采样结果。公共的 `CalcESP`、`FitESPCharges` 和
 `FitRESPCharges` 接受两种后端的结果。独立 C++ 接口使用
 `XTBOptions::espPointsAngstrom` 和 `XTBResults::espPointsAngstrom/espValuesAU`
 （按点展开的向量）。已有 Mulliken/EEQ/CM5 字段保持其定义；拟合电荷通过独立的
-`ESPChargeFit` 返回，并标明 `charge_model`。
+`ESPChargeFit` 返回，并标明 `chargeModel`。
 
 ## 采样和拟合定义
 
-`GenerateESPGrid(mol, conf_id=-1, scales=(1.4,1.6,1.8,2.0), points_per_atom=100)`
+`GenerateESPGrid(mol, confId=-1, scales=(1.4,1.6,1.8,2.0), pointsPerAtom=100)`
 使用 RDKit 范德华半径，以及固定在实验室坐标系中的 Fibonacci 球面方向。
 每个原子的每层球面生成候选点，移除落入同层其他原子球体内部的点。
 输入必须有显式氢原子和有限三维坐标。这是一套明确的采样规则，不称为 CHELPG
@@ -72,30 +72,30 @@ resp = FitRESPCharges(compiled, equivalence_groups=[(1, 2)])
 分子静电势，总电荷来自计算来源信息，拟合电荷单位为 e。接口签名为：
 
 ```python
-FitESPCharges(result, *, weights=None, equivalence_groups=(), fixed_charges=None,
+FitESPCharges(result, *, weights=None, equivalenceGroups=(), fixedCharges=None,
               rcond=1e-12)
-FitRESPCharges(result, *, restraint_strength=0.0005, restraint_width=0.1,
-               restrain_hydrogens=False, weights=None, equivalence_groups=(),
-               fixed_charges=None, max_iterations=1000, tolerance=1e-8, rcond=1e-12)
+FitRESPCharges(result, *, restraintStrength=0.0005, restraintWidth=0.1,
+               restrainHydrogens=False, weights=None, equivalenceGroups=(),
+               fixedCharges=None, maxIterations=1000, tolerance=1e-8, rcond=1e-12)
 ```
 
 ESP 最小化 `0.5 * sum(w * (Aq - V)**2)`。单阶段 RESP 另外加入
-`sum(a_i * (sqrt(q_i**2 + b**2) - b))`，其中 `b` 为 `restraint_width`（单位 e），
-`a_i` 为 `restraint_strength`，默认不约束氢原子，所以氢的 `a_i=0`。
+`sum(a_i * (sqrt(q_i**2 + b**2) - b))`，其中 `b` 为 `restraintWidth`（单位 e），
+`a_i` 为 `restraintStrength`，默认不约束氢原子，所以氢的 `a_i=0`。
 强度参数是上述原子单位数值目标函数中的系数。权重乘在残差平方上，默认均为 1，
 允许零，必须非负且至少有一个正值。权重**不会归一化**；改变权重尺度或采样密度
 会改变惩罚项的相对强度。
 
-总电荷、用户指定的等价关系 `equivalence_groups` 和固定电荷
-`fixed_charges={原子编号: 电荷_e}` 通过约束零空间求解精确满足。编号遵循输入顺序，
+总电荷、用户指定的等价关系 `equivalenceGroups` 和固定电荷
+`fixedCharges={原子编号: 电荷_e}` 通过约束零空间求解精确满足。编号遵循输入顺序，
 不会自动根据分子图推断等价原子。约束冲突时失败。ESP 要求剩余自由参数方向上的
 拟合矩阵满秩；RESP 只在惩罚项消除剩余歧义时才能接受欠秩数据，否则也会失败。
 `rcond` 控制秩判定。RESP 在最大电荷变化不超过 `tolerance` e 时收敛，达到迭代
 上限仍未收敛时抛出 `RuntimeError`，不返回成功拟合结果。
 
-`ESPChargeFit` 包含原子电荷、拟合静电势、残差（拟合减参考）、加权 RMS、最大残差、
+`ESPChargeFit` 包含原子电荷（`charges` / `GetCharges()`）、拟合静电势、残差（拟合减参考）、加权 RMS、最大残差、
 约束误差、数据秩、自由参数数量、条件数、迭代次数和目标函数值。
-数据矩阵欠秩时 `condition_number=None`，即使 RESP 惩罚项能够确定唯一解也如此。
+数据矩阵欠秩时 `conditionNumber=None`，即使 RESP 惩罚项能够确定唯一解也如此。
 结果还包含完整拟合设置、引擎/参数/计算来源，以及数值输入与拟合设置的 SHA256。
 协议 ID 为 `eled-esp-v1` 和 `eled-resp-single-stage-v1`。
 

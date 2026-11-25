@@ -1,16 +1,16 @@
 # Density descriptors
 
 EleD extracts shell populations, bond indices and local π features from a
-retained xTB result. Extraction adds no engine calls. `keep_overlap=True`
+retained xTB result. Extraction adds no engine calls. `keepOverlap=True`
 retains the overlap matrix `S`, coefficients `C`, occupations `n`, AO/shell
 maps and p-component directions from the same calculation.
 
 ```python
 from eled import XTBCalculator, CalcDensityDescriptors, CalcPiDescriptors
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
 density = CalcDensityDescriptors(mol, result)
-pi = CalcPiDescriptors(mol, result, scheme="lowdin", plane_tol_a=0.1)
+pi = CalcPiDescriptors(mol, result, scheme="lowdin", planeTolAngstrom=0.1)
 ```
 
 Atom and bond indices follow the original RDKit molecule. Functions taking
@@ -89,9 +89,9 @@ with null overlap values and a `frontier_group_unavailable` reason.
 p shell and a defined plane. For a ring atom the fitted plane uses all atoms
 in rings containing it; for other atoms it uses the atom and its neighbors.
 At least three noncollinear points are required. The maximum distance from
-the fitted plane must not exceed `plane_tol_a` (default 0.1 Å).
+the fitted plane must not exceed `planeTolAngstrom` (default 0.1 Å).
 
-The result records `ao_p_directions` with each AO row. These directions turn
+The result records `aoPDirections` with each AO row. These directions turn
 the local unit normal into a vector `vA` supported on atom A's p shell.
 Thus the projection remains well-defined after an AO permutation or sign change.
 With `scheme="lowdin"` (default) or `"mulliken"`:
@@ -104,11 +104,11 @@ With `scheme="lowdin"` (default) or `"mulliken"`:
 
 The default π reference is **1 e for neutral, nonradical sp²/aromatic carbon**.
 For other atoms `pi_n_e` can still be available, while `pi_q_e` requires an
-explicit reference, for example `pi_ref={atom_index: 2.0}`. References must
+explicit reference, for example `piRef={atom_index: 2.0}`. References must
 lie between 0 and 2 e. Total atomic valence is not a π reference.
 The returned `pi_ref` records explicit overrides with JSON-compatible string keys.
 `CalcDensityDescriptors`, reports, batches and conformer analysis accept
-`pi_scheme`, `pi_plane_tol_a` and `pi_ref`; see [report settings](descriptor-reports.md).
+`piScheme`, `piPlaneTolAngstrom` and `piRef`; see [report settings](descriptor-reports.md).
 
 `pi_bo` is a projected bond index, not an absolute overlap population or a
 complete decomposition of the total bond order. It requires a closed shell
@@ -140,8 +140,8 @@ Definitions and units are available programmatically from `DescriptorCatalog()`;
 
 ## Sensitivity diagnostics
 
-`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature_300=...,
-temperature_1000=...)` consumes existing single-point or conformer reports.
+`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature300=...,
+temperature1000=...)` consumes existing single-point or conformer reports.
 It reports conformer standard deviation, absolute GFN1/GFN2 differences and
 absolute 300 K/1000 K electronic-temperature differences, without recalculation.
 

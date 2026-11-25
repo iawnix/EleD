@@ -25,9 +25,9 @@ study = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(study)
 pilot = study.pilot
 ROOT = Path(__file__).resolve().parents[1]
-PREPARATION = dict(num_conformers=8, method='ETKDGv3', fallback_methods=['ETKDGv4', 'srETKDGv3'],
-    attempts_per_strategy=2, retry_random_coords=True, max_embedding_iterations=300,
-    optimize='MMFF94', optimization_iterations=500, require_assigned_stereo=False)
+PREPARATION = dict(numConformers=8, method='ETKDGv3', fallbackMethods=['ETKDGv4', 'srETKDGv3'],
+    attemptsPerStrategy=2, retryRandomCoords=True, maxEmbeddingIterations=300,
+    optimize='MMFF94', optimizationIterations=500, requireAssignedStereo=False)
 
 
 def read_checked(root, name, *, lines=False):
@@ -113,7 +113,7 @@ def main():
                     mol = None
             else:
                 seed = int(hashlib.sha256((protocol+':'+identifier).encode()).hexdigest()[:8], 16) % 2147483646 + 1
-                prepared = PrepareConformers(original['smiles'], random_seed=seed, **PREPARATION)
+                prepared = PrepareConformers(original['smiles'], randomSeed=seed, **PREPARATION)
                 info = {'id': identifier, **prepared.report}
                 mol = prepared.molecule if prepared.success else None
                 if mol is None:
@@ -133,7 +133,7 @@ def main():
                 two_d += fpgen.GetFingerprintAsNumPy(heavy).astype(float).tolist()
                 if not np.allclose(two_d, original['rdkit'], atol=1e-10, rtol=1e-12):
                     raise ValueError('2D reconstruction mismatch')
-                try: result = XTBCalculator(**frozen['options']).calculate(mol)
+                try: result = XTBCalculator(**study._options_from_manifest(frozen['options']).ToDict()).Calculate(mol)
                 except XTBEnvironmentError: raise
                 except XTBRunError as exc:
                     failures.append({'id': identifier, 'stage': 'xtb', 'reason': str(exc)}); continue

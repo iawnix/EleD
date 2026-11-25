@@ -31,7 +31,7 @@ def molecule():
 
 def test_real_single_point_disk_cache_and_process_roundtrip(library,tmp_path):
     mol=molecule();path=tmp_path/'cache.sqlite';cache=XTBDiskCache(path)
-    opts=XTBOptions(xtb_library=library,keep_overlap=bool(_native_basis_build(library)))
+    opts=XTBOptions(xtbLibrary=library,keepOverlap=bool(_native_basis_build(library)))
     first=RunXTBBatch([mol],options=opts,cache=cache)[0]
     with patch('eled.batch._run_xtb',side_effect=AssertionError('recalculated')):
         again=RunXTBBatch([mol],options=opts,cache=XTBDiskCache(path))[0]
@@ -41,19 +41,19 @@ def test_real_single_point_disk_cache_and_process_roundtrip(library,tmp_path):
     source = Path(__file__).resolve().parents[1] / 'src'
     command=(f'import sys; sys.path.insert(0, {str(source)!r}); '
              'from eled import XTBDiskCache; import sys,json; '
-             'r=XTBDiskCache(sys.argv[1]).get(sys.argv[2]); '
-             'print(json.dumps([r.total_energy_hartree,r.partial_charges]))')
+             'r=XTBDiskCache(sys.argv[1]).Get(sys.argv[2]); '
+             'print(json.dumps([r.totalEnergyHartree,r.atomicCharges]))')
     child=subprocess.run([sys.executable,'-I','-c',command,str(path),key],capture_output=True,text=True,check=True)
     energy,charges=json.loads(child.stdout)
-    assert energy==first.total_energy_hartree and charges==list(first.partial_charges)
+    assert energy==first.totalEnergyHartree and charges==list(first.atomicCharges)
 
 
 @pytest.mark.parametrize('interface',['native','compiled'])
 def test_real_reactivity_resume_preserves_failures_and_requires_capabilities(library,tmp_path,interface):
     if interface=='compiled':pytest.importorskip('eled.rdXTBTools')
-    opts=XTBOptions(xtb_library=library)
+    opts=XTBOptions(xtbLibrary=library)
     jobs=[ReactivityJob('water',molecule(),opts),
-          ReactivityJob('forced-scf-failure',molecule(),replace(opts,max_iterations=1))]
+          ReactivityJob('forced-scf-failure',molecule(),replace(opts,maxIterations=1))]
     rows=RunReactivityBatch(jobs,interface=interface,cache=XTBDiskCache(tmp_path/'cache.sqlite'),checkpoint=tmp_path/'rows.sqlite')
     assert rows[0]['error'] is None and rows[1]['error']['type']=='ChargeStateCalculationError'
     with patch('eled.reactivity_batch.RunReactivity',side_effect=AssertionError('recalculated')):
@@ -61,4 +61,4 @@ def test_real_reactivity_resume_preserves_failures_and_requires_capabilities(lib
     assert resumed[0]['values']==rows[0]['values'] and resumed[1]['error']==rows[1]['error']
     if not _native_basis_build(library):
         with pytest.raises(DescriptorUnavailableError):
-            RunReactivityBatch(jobs,interface=interface,population_scheme='lowdin')
+            RunReactivityBatch(jobs,interface=interface,populationScheme='lowdin')

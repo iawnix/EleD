@@ -202,14 +202,14 @@ def main():
     candidates, excluded, source_count = read_source(args.data)
     if args.size > len(candidates): raise ValueError('size exceeds eligible source')
     selected = candidates[:args.size]
-    options = XTBOptions(keep_overlap=True)
+    options = XTBOptions(keepOverlap=True)
     manifest = {'protocol': 'qm8-pilot-v1', 'script_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'source': URL, 'sha256': SHA256,
         'reference_doi': '10.1063/1.4928757', 'target': 'E1-CC2, RI-CC2/def2-TZVP, Hartree converted to eV',
         'hartree_to_eV': HARTREE_TO_EV, 'source_count': source_count, 'eligible_count': len(candidates),
         'exclusions': excluded, 'selection': 'first N SHA256(qm8-pilot-v1:nonstereo canonical identity); target-blind',
         'geometry': 'provided ground-state geometry, SDF coordinates rounded to 4 decimals; no reoptimization',
-        'options': options.to_dict(), 'selected': [row for row, mol in selected],
+        'options': options.ToDict(), 'selected': [row for row, mol in selected],
         'rdkit_features': list(TWO_D) + ['Morgan radius2, 1024bits, no chirality'],
         'basic_features': BASIC, 'orbital_features': CURRENT_ORBITAL,
         'seeds': SEEDS, 'test_fraction_of_groups': .2,
@@ -227,7 +227,7 @@ def main():
             row['rdkit_seconds'] = time.perf_counter()-t
             t = time.perf_counter()
             try:
-                result = XTBCalculator(**options.to_dict()).calculate(mol)
+                result = XTBCalculator(**options.ToDict()).Calculate(mol)
             except XTBEnvironmentError: raise
             except XTBRunError as exc:
                 failures.append({**metadata, 'reason': str(exc)}); continue

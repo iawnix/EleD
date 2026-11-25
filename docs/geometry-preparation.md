@@ -10,13 +10,13 @@ not a new embedding algorithm.
 from eled import PrepareConformers, XTBCalculator
 
 prepared = PrepareConformers(
-    'C[C@H](O)C(=O)O', num_conformers=8, random_seed=42,
+    'C[C@H](O)C(=O)O', numConformers=8, randomSeed=42,
     optimize='MMFF94',
 )
 if prepared.success:
     molecule = prepared.molecule
-    result = XTBCalculator().calculate(
-        molecule, conf_id=prepared.report['recommended_conformer_id'])
+    result = XTBCalculator().Calculate(
+        molecule, confId=prepared.report['recommended_conformer_id'])
 else:
     print(prepared.report['error'], prepared.report['attempts'])
 ```
@@ -33,7 +33,7 @@ and up to 300 internal embedding iterations per requested conformer. Try standar
 distance-geometry initialization, then random coordinates. Repeat these strategies
 with ETKDGv4 and srETKDGv3 if the installed RDKit exposes them. Missing default
 presets are recorded; explicitly requesting an unavailable or unknown preset
-raises. `fallback_methods=()` disables other presets. `random_seed=42` is fixed
+raises. `fallbackMethods=()` disables other presets. `randomSeed=42` is fixed
 by default; retries use `(seed + 104729 * attempt_index) % 2147483647`.
 
 Every attempt enforces specified stereochemistry and uses one thread. Within
@@ -49,11 +49,11 @@ before embedding, with no force-field substitution. `optimize=None` returns
 checked, unoptimized embeddings and labels them accordingly. After optimization,
 coordinate and stereo checks run again. Nonconverged or stereochemically changed
 coordinates never enter the returned molecule. `optimize='xTB'` uses GFN2-xTB by
-default (override with `xtb_method`), records the full gradient optimization
+default (override with `xtbMethod`), records the full gradient optimization
 report under each candidate, and requires the reviewed extended libxtb. The
 standalone `OptimizeXTB()` API exposes convergence tolerances, bounded step
-size, fixed atoms and a separate `scf_max_iterations` limit. `PrepareConformers`
-uses `optimization_iterations` for the geometry-step limit and keeps the other
+size, fixed atoms and a separate `scfMaxIterations` limit. `PrepareConformers`
+uses `optimizationIterations` for the geometry-step limit and keeps the other
 optimizer controls at their documented defaults. Unexpected exceptions
 propagate; they are not hidden as ordinary embedding failures.
 
@@ -92,7 +92,7 @@ Relative geometries for salts/complexes require explicit user preparation;
 already prepared structures can still be passed directly to `XTBCalculator`.
 
 Unspecified stereochemistry is flagged in `unspecified_stereo` and `warnings`.
-Set `require_assigned_stereo=True` to reject it. Otherwise the output can be
+Set `requireAssignedStereo=True` to reject it. Otherwise the output can be
 one of several allowed stereoisomers; it is not an enumeration or a unique
 chemical identity. Checks protect only **specified and supported** stereo.
 Embedding/optimization success cannot establish that an input SMILES inferred

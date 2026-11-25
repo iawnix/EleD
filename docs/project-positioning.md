@@ -19,7 +19,7 @@ RDKit Mol / Conformer
         │
         ├── checked geometry preparation
         │
-        ├── XTBCalculator → XTBResult
+        ├── XTBCalculator → XTBResults
         │                         │
         │                         ├── molecular/atom/bond descriptors
         │                         ├── density and shell descriptors
@@ -54,8 +54,8 @@ The public calculation API is the reusable calculator object:
 from eled import XTBCalculator
 from eled import CalcXTBDescriptors
 
-calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
-result = calculator.calculate(mol, keep_overlap=True)
+calculator = XTBCalculator(method="GFN2-xTB", electronicTemperature=300.0)
+result = calculator.Calculate(mol, keepOverlap=True)
 features = CalcXTBDescriptors(result)
 ```
 

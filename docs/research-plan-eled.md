@@ -30,7 +30,7 @@ The project is organized into four layers with separate release criteria:
 
 | Layer | Repository location | Output | Acceptance gate |
 | --- | --- | --- | --- |
-| Descriptor engine | `src/eled/`, `cpp/rdXTBTools/` | `XTBResult` and indexed descriptor reports | units, conservation, invariance, failure semantics and native/compiled parity |
+| Descriptor engine | `src/eled/`, `cpp/rdXTBTools/` | `XTBResults` and indexed descriptor reports | units, conservation, invariance, failure semantics and native/compiled parity |
 | Feature archive | `tools/run_*_features.py`, protocol JSON | versioned JSON/JSONL with atom and bond identity | protocol hash, coordinate hash, coverage and explicit missing reasons |
 | Application case | external research workspace | model-ready archive and study report | frozen data split, untouched test set and reproducible metrics |
 | Research artifact | `docs/`, release archive | report, environment lock and checksums | a reader can reproduce the case without changing the core API |
@@ -44,7 +44,7 @@ RDKit Mol + conformer
 extended libxtb single point / optional optimization
         │
         ▼
-XTBResult (C, S, AO maps, energies, charges, provenance)
+XTBResults (C, S, AO maps, energies, charges, provenance)
         │
         ├── descriptor reports and RDKit annotations
         └── versioned feature archive ──► tabular model / GNN case
@@ -106,7 +106,7 @@ must not become the acceptance condition for EleD.
 ### Optional Case C: graph-level transfer
 
 After Cases A and B are stable, use a second small public task to test whether
-the same `XTBResult`-derived node and edge schema can be consumed by a graph
+the same `XTBResults`-derived node and edge schema can be consumed by a graph
 model without changing the descriptor API. This case is about schema reuse and
 developer ergonomics, not about claiming state-of-the-art accuracy.
 
@@ -135,7 +135,7 @@ The common electronic protocol is:
   otherwise;
 - 300 K for the main analysis and 1000 K only as an electronic-occupation
   sensitivity diagnostic;
-- `keep_overlap=True` for density, shell, frontier and π features;
+- `keepOverlap=True` for density, shell, frontier and π features;
 - explicit failure rows and missing reasons; no zero imputation during feature
   generation;
 - all train-time imputation, scaling and feature selection fitted inside the

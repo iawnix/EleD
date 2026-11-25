@@ -25,7 +25,7 @@ native/compiled 一致性和失败报告。模型训练和数据集相关代码�
 
 | 层级 | 仓库位置 | 产物 | 验收条件 |
 | --- | --- | --- | --- |
-| 描述符引擎 | `src/eled/`、`cpp/rdXTBTools/` | `XTBResult` 和带索引的描述符报告 | 单位、守恒、不变性、失败语义以及 native/compiled 一致 |
+| 描述符引擎 | `src/eled/`、`cpp/rdXTBTools/` | `XTBResults` 和带索引的描述符报告 | 单位、守恒、不变性、失败语义以及 native/compiled 一致 |
 | 特征归档 | `tools/run_*_features.py`、协议 JSON | 带原子/键身份的版本化 JSON/JSONL | 协议哈希、坐标哈希、覆盖率和明确缺失原因 |
 | 应用案例 | 外部研究工作区 | 可供模型消费的归档和研究报告 | 固定数据划分、未触碰的测试集和可复现指标 |
 | 研究产物 | `docs/`、release 归档 | 报告、环境锁定和校验和 | 不改变核心 API 即可复现实验 |
@@ -39,7 +39,7 @@ RDKit Mol + 构象
 扩展版 libxtb 单点 / 可选优化
         │
         ▼
-XTBResult（C、S、AO 映射、能量、电荷、来源信息）
+XTBResults（C、S、AO 映射、能量、电荷、来源信息）
         │
         ├── 描述符报告和 RDKit 注释
         └── 版本化特征归档 ──► 表格模型 / GNN 案例
@@ -92,7 +92,7 @@ RegioSQM 特征或其他系统的比较属于可选消融，不应成为 EleD �
 
 ### 可选案例 C：图级迁移
 
-在 A、B 稳定后，再使用第二个小型公开任务检验同一套 `XTBResult` 节点/边 schema
+在 A、B 稳定后，再使用第二个小型公开任务检验同一套 `XTBResults` 节点/边 schema
 能否被图模型直接消费，而不改变描述符接口。该案例关注 schema 复用和开发者
 体验，不追求 state-of-the-art。
 
@@ -113,7 +113,7 @@ RegioSQM 特征或其他系统的比较属于可选消融，不应成为 EleD �
 - 只使用扩展版 `libxtb`；
 - 除非案例另有说明，主几何或单点特征使用 GFN2；
 - 主分析使用 300 K，1000 K 只作为电子占据敏感性诊断；
-- 密度、shell、前线和 π 描述符使用 `keep_overlap=True`；
+- 密度、shell、前线和 π 描述符使用 `keepOverlap=True`；
 - 保留失败行和缺失原因，特征生成阶段不填零；
 - 缺失值填补、标准化和特征选择只在训练集内部拟合。
 

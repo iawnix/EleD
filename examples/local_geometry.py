@@ -27,7 +27,7 @@ def main():
     naphthalene = prepared('c1ccc2ccccc2c1')
     rings = list(naphthalene.GetRingInfo().AtomRings())
     homa = [CalcHOMA(naphthalene, ring) for ring in rings]
-    planes = CalcPlaneDescriptors(naphthalene, rings[0], other_atom_indices=rings[1])
+    planes = CalcPlaneDescriptors(naphthalene, rings[0], otherAtomIndices=rings[1])
     cyclohexane = prepared('C1CCCCC1')
     puckering = CalcRingPuckering(cyclohexane, cyclohexane.GetRingInfo().AtomRings()[0])
     print(json.dumps(dict(sterimol=sterimol['values'], buried_volume=volume['values'],

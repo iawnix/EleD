@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from numbers import Integral
 from typing import Any, Mapping
 
 from .electronic_descriptors import _indices
@@ -15,14 +14,14 @@ class SelectionSet:
     atoms: dict[str, tuple[int, ...]]
     bonds: dict[str, tuple[tuple[int, int], ...]]
     rings: dict[str, tuple[int, ...]]
-    reaction_sites: dict[str, tuple[int, ...]]
+    reactionSites: dict[str, tuple[int, ...]]
 
-    def to_dict(self) -> dict[str, dict[str, list]]:
+    def ToDict(self) -> dict[str, dict[str, list]]:
         return {
             'atoms': {name: list(values) for name, values in self.atoms.items()},
             'bonds': {name: [list(pair) for pair in values] for name, values in self.bonds.items()},
             'rings': {name: list(values) for name, values in self.rings.items()},
-            'reaction_sites': {name: list(values) for name, values in self.reaction_sites.items()},
+            'reaction_sites': {name: list(values) for name, values in self.reactionSites.items()},
         }
 
 
@@ -75,9 +74,10 @@ def _bonds(mol, values):
 
 def _atoms(mol, values, field):
     result = {}
+    label = field[:-1] if field.endswith('s') else field
     for raw_name, raw_indices in _named_mapping(values, field).items():
-        name = _name(raw_name, field[:-1] if field.endswith('s') else field)
-        indices = _indices(raw_indices, mol.GetNumAtoms(), f'{field[:-1]} {name!r}')
+        name = _name(raw_name, label)
+        indices = _indices(raw_indices, mol.GetNumAtoms(), f'{label} {name!r}')
         result[name] = tuple(map(int, indices))
     return result
 
@@ -86,24 +86,23 @@ def NormalizeSelections(mol, selections: Mapping[str, Any] | SelectionSet | None
     """Validate one shared selection schema for fragment and local analyses.
 
     The mapping may contain ``atoms``, ``bonds``, ``rings`` and
-    ``reaction_sites``. Values are named mappings to original atom indices.
-    ``rings`` are ordered closed paths. ``bonds`` are atom pairs.
+    ``reactionSites`` (or JSON wire key ``reaction_sites``).
     """
     if isinstance(selections, SelectionSet):
-        # Selection validity depends on the molecule being analyzed. Re-run
-        # the inexpensive index/topology checks when a reusable selection set
-        # is applied to another molecule.
-        selections = selections.to_dict()
+        selections = selections.ToDict()
     if selections is None:
         selections = {}
     if not isinstance(selections, Mapping):
         raise TypeError('selections must be a mapping or SelectionSet')
-    unknown = set(selections) - {'atoms', 'bonds', 'rings', 'reaction_sites'}
+    unknown = set(selections) - {'atoms', 'bonds', 'rings', 'reactionSites', 'reaction_sites'}
     if unknown:
         raise ValueError(f'unknown selection fields: {sorted(unknown)}')
+    if 'reactionSites' in selections and 'reaction_sites' in selections:
+        raise ValueError("specify only one of 'reactionSites' or 'reaction_sites'")
+    raw_sites = selections.get('reactionSites', selections.get('reaction_sites'))
     return SelectionSet(
         atoms=_atoms(mol, selections.get('atoms'), 'atoms'),
         bonds=_bonds(mol, selections.get('bonds')),
         rings=_rings(mol, selections.get('rings')),
-        reaction_sites=_atoms(mol, selections.get('reaction_sites'), 'reaction_sites'),
+        reactionSites=_atoms(mol, raw_sites, 'reactionSites'),
     )

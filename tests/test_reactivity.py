@@ -7,10 +7,10 @@ import numpy as np
 import pytest
 from rdkit import Chem
 
-from eled import (XTBOptions, XTBResult, XTBRunError, CalcReactivityDescriptors,
-                       RunReactivity, ChargeStateCalculationError)
+from eled import (XTBOptions, XTBResults, XTBRunError, CalcReactivityDescriptors,
+                  RunReactivity, ChargeStateCalculationError)
 from eled.input import _input_metadata,_xyz_from_mol
-from eled.options import CalculationSettings
+from eled.options import _validate_calculation_settings
 from eled.backends.native import HARTREE_TO_EV
 
 
@@ -25,9 +25,9 @@ def states(ip=10.,ea=2.):
         (-1,1,9,-10.-ea/HARTREE_TO_EV,(-.8,-.1,-.1),(2,2,2,2,1))]:
         meta=_input_metadata(mol,-1,charge,spin,_xyz_from_mol(mol,-1))
         meta.update(engine={'sha256':'same-engine'},parameter_file={'sha256':'same-parameters'},
-                    CalculationSettings=CalculationSettings(electronic_temperature=0.),calculation_status='success')
-        results.append(XTBResult('GFN2-xTB',None,energy,None,5,ne,spin,
-            orbital_energies_ev=(-10.,-8.,-6.,-4.,1.),orbital_occupations=occ,partial_charges=q,metadata=meta))
+                    calculation_settings=_validate_calculation_settings(electronicTemperature=0.),calculation_status='success')
+        results.append(XTBResults('GFN2-xTB',None,energy,None,5,ne,spin,
+            orbitalEnergiesEV=(-10.,-8.,-6.,-4.,1.),orbitalOccupancies=occ,atomicCharges=q,metadata=meta))
     return mol,results
 
 
@@ -47,7 +47,7 @@ def test_vertical_formulas_fukui_signs_and_fragment_conservation():
 def test_named_reaction_sites_share_the_atom_selection_schema():
     mol, results = states()
     report = CalcReactivityDescriptors(
-        mol, *results, reaction_sites={'carbon_site': [0], 'hydrogen_sites': [1, 2]})
+        mol, *results, reactionSites={'carbon_site': [0], 'hydrogen_sites': [1, 2]})
     assert report['reaction_sites']['carbon_site']['atom_indices'] == [0]
     assert report['reaction_sites']['hydrogen_sites']['f_plus'] == pytest.approx(.8)
     assert report['reaction_sites']['hydrogen_sites']['dual'] == pytest.approx(.1)
@@ -70,11 +70,11 @@ def test_mixed_or_invalid_charge_states_are_rejected(damage):
     elif damage=='charge':meta['charge']=2
     elif damage=='engine':meta['engine']['sha256']='different'
     elif damage=='parameters':meta['parameter_file']['sha256']='different'
-    elif damage=='settings':meta['CalculationSettings']['accuracy']=.1
+    elif damage=='settings':meta['calculation_settings']['accuracy']=.1
     r[1]=replace(r[1],metadata=meta)
     if damage=='method':r[1]=replace(r[1],method='GFN1-xTB')
-    if damage=='electron':r[1]=replace(r[1],number_of_electrons=8)
-    if damage=='conservation':r[1]=replace(r[1],partial_charges=(0.,0.,0.))
+    if damage=='electron':r[1]=replace(r[1],numElectrons=8)
+    if damage=='conservation':r[1]=replace(r[1],atomicCharges=(0.,0.,0.))
     with pytest.raises(ValueError):CalcReactivityDescriptors(mol,*r)
 
 
@@ -96,17 +96,17 @@ def test_charge_states_require_explicit_charge_and_spin(state, field, missing):
 def test_failed_required_state_never_yields_partial_reactivity():
     mol,r=states()
     with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('eled.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
-        report=RunReactivity(mol,return_errors=True,initialization="independent")
+         patch('eled.reactivity.XTBCalculator.Calculate',side_effect=[r[0],XTBRunError('SCF failure')]) as calculate:
+        report=RunReactivity(mol,returnErrors=True,initialization="independent")
     assert calculate.call_count==2
     assert report['states']['attached']['status']=='not_run'
     assert report['states']['reference']['energy_hartree']==-10.
     assert report['quality']['status']=='error'
     assert report['analysis_settings']['unpaired_electrons']=={'reference':0,'ionized':1,'attached':1}
-    assert report['analysis_settings']['requested_options']['electronic_temperature']==300.
+    assert report['analysis_settings']['requested_options']['electronicTemperature']==300.
     assert all(v is None for v in report['values'].values())
     with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \
-         patch('eled.reactivity.XTBCalculator.calculate',side_effect=[r[0],XTBRunError('SCF failure')]):
+         patch('eled.reactivity.XTBCalculator.Calculate',side_effect=[r[0],XTBRunError('SCF failure')]):
         with pytest.raises(ChargeStateCalculationError) as error:RunReactivity(mol,initialization="independent")
     assert error.value.state=='ionized'
 
@@ -122,7 +122,7 @@ def test_different_valid_conformers_are_not_vertical_charge_states():
         CalcReactivityDescriptors(mol,*r)
 
 
-@pytest.mark.parametrize('change',[{'number_of_unpaired_electrons':3},
+@pytest.mark.parametrize('change',[{'numUnpairedElectrons':3},
                                  {'metadata_status':'error'}])
 def test_invalid_spin_or_failed_state_is_rejected(change):
     mol,r=states()
@@ -137,25 +137,25 @@ def test_open_shell_and_gfn0_policies_are_checked_before_engine_lookup():
     mol,r=states()
     with patch('eled.reactivity._resolve_options',side_effect=AssertionError('must not load')):
         with pytest.raises(ValueError,match='open-shell'):
-            RunReactivity(mol,options=XTBOptions(charge=1,uhf=1))
+            RunReactivity(mol,options=XTBOptions(charge=1,numUnpairedElectrons=1))
         with pytest.raises(ValueError,match='GFN1/2'):
             RunReactivity(mol,options=XTBOptions(method='gfn0'))
         with pytest.raises(ValueError,match='electron count'):
-            RunReactivity(mol,ionized_uhf=0)
+            RunReactivity(mol,ionizedUnpaired=0)
         with pytest.raises(ValueError,match='initialization'):
             RunReactivity(mol,initialization='auto')
 
 
 def test_default_protocol_uses_300k_reference_copies_and_records_version():
     mol,r=states()
-    r=[replace(v,metadata={**v.metadata,'CalculationSettings':CalculationSettings()}) for v in r]
+    r=[replace(v,metadata={**v.metadata,'calculation_settings':_validate_calculation_settings()}) for v in r]
     with patch('eled.reactivity._resolve_options',side_effect=lambda x:x), \
          patch('eled.reactivity._charge_state_results',return_value=iter(r)) as calculate:
         # A generator is required because early returns explicitly close it.
         calculate.return_value=(v for v in r)
         report=RunReactivity(mol)
     _,configs,interface,initialization=calculate.call_args.args
-    assert all(v.electronic_temperature==300. for v in configs)
+    assert all(v.electronicTemperature==300. for v in configs)
     assert initialization=='reference' and interface=='native'
-    assert report['analysis_settings']['protocol_version']=='2.0'
+    assert report['analysis_settings']['protocol_version']=='2.1'
     assert report['analysis_settings']['initialization']=='reference'

@@ -1,6 +1,48 @@
 # Changes
 
-## Unreleased — project identity is `EleD`
+## 0.12.0 — RDKit interface alignment, single-step wrappers and C++ CM5 parity
+
+Breaking pre-1.0 API alignment:
+
+- Unified all public Python function/method names on RDKit `PascalCase`
+  (`XTBCalculator.Calculate`, `GetOptions`, `ToDict`, `FromDict`, `XTBCache.Get`/
+  `Set`/`GetOrCompute`/`Clear`, `ReactivityCheckpoint.GetHistory`/`GetReports`,
+  `ESPChargeFit.GetCharges`/`ToDict`, `SelectionSet.ToDict`,
+  `ConformerGenerationResult.GetMolecule`/`GetReport`,
+  `XTBOptimizationResult.GetMolecule`/`GetReport`/`GetResult`,
+  `GetInstallationInfo`, `CheckBackend`) and all public parameters, dataclass
+  fields and result attributes on RDKit `camelCase` (`confId`,
+  `numUnpairedElectrons`, `xtbLibrary`, `keepOverlap`, `espPointsAngstrom`,
+  `maxIterations`, `electronicTemperature`, `frontierDepth`,
+  `occupationThreshold`, `populationScheme`, `recordId`, `returnErrors`,
+  `maxWorkers`, etc.). Serialized report/CSV feature column names remain
+  compact unit-suffixed lowercase `snake_case`.
+- Renamed the primary Python result model to `XTBResults` (`XTBResult` retained
+  as a compatibility alias), matching `rdXTBTools.XTBResults` scalar attribute
+  names (`totalEnergyHartree`, `orbitalEnergiesEV`, `orbitalOccupancies`,
+  `atomicCharges`, `cm5Charges`, `dipoleAtomicUnits`, `wibergBondOrders`,
+  `overlapMatrix`, `aoAtomMap`, `aoShellMap`, `shellAtomMap`,
+  `shellAngularMomenta`, `aoPDirections`, `espPointsAngstrom`, `espValuesAU`)
+  and `Get*()` owned NumPy copy getters.
+- Added `CalcMolXTBDescriptors(mol, confId=-1, ..., missingVal=None, silent=False, cache=None)`
+  mirroring `rdkit.Chem.Descriptors.CalcMolDescriptors` and
+  `RegisterRDKitProperties(...)` registering numeric xTB scalar descriptors with
+  `rdkit.Chem.rdMolDescriptors.Properties` via `Descriptors.PropertyFunctor`
+  with shared per-conformer single-point deduplication. Added `privateProps` to
+  `AnnotateMol` for RDKit `_`-prefixed private properties.
+- Implemented `RDKit::XTBTools::calcCM5Charges` and `XTBResults::cm5Charges`
+  directly in C++ and moved numerical settings and ESP coordinate validation into
+  C++/NumPy C-API (`Wrap.cpp`), decoupling standalone and Python `rdXTBTools`
+  execution from Python helper modules.
+- Removed EAS study dataset-splitting utilities from top-level `eled.__all__`
+  (available in `eled.eas`), removed the legacy `populationScheme="charges"`
+  alias in favor of `"xtb_scc"`, standardized provenance
+  `metadata["calculation_settings"]` and `CalcMayerBondDescriptors`
+  `missing["mbo"]`, privatized internal helper functions, and bumped
+  `DESCRIPTOR_VERSION = "1.4"`, `REACTIVITY_PROTOCOL_VERSION = "2.1"`,
+  `STORAGE_VERSION = 2` and `XTBCache` schema `6`.
+
+### Earlier 0.12 development notes
 
 - Expanded the machine-readable catalog to exact shell and reconstructed-charge
   field names and corrected the visualization charge label.

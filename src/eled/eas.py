@@ -1,6 +1,6 @@
 """Input validation and leakage-safe splits for atom-labelled EAS records.
 
-This module intentionally does not download a dataset or run xTB.  It turns a
+This module intentionally does not download a dataset or run xTB. It turns a
 locally supplied public-data export into a frozen, auditable record table.
 """
 from __future__ import annotations
@@ -19,12 +19,7 @@ _PROTOCOL_PATHS = (Path(__file__).with_name('protocol.json'), Path(__file__).res
 
 
 def LoadFrozenProtocol():
-    """Load the repository's frozen EAS protocol.
-
-    The protocol is an input artifact, rather than a second set of Python
-    defaults.  Keeping this loader here lets manifests carry a digest of the
-    exact JSON used for selection and splitting.
-    """
+    """Load the repository's frozen EAS protocol."""
     for protocol_path in _PROTOCOL_PATHS:
         if protocol_path.exists():
             payload = json.loads(protocol_path.read_text(encoding='utf-8'))
@@ -52,24 +47,30 @@ def _load_rows(path):
     if path.suffix.lower() in ('.jsonl', '.ndjson'):
         return [json.loads(line) for line in text.splitlines() if line.strip()]
     payload = json.loads(text)
-    if isinstance(payload, list): return payload
+    if isinstance(payload, list):
+        return payload
     if isinstance(payload, dict):
         for key in ('records', 'data', 'reactions', 'molecules'):
-            if isinstance(payload.get(key), list): return payload[key]
+            if isinstance(payload.get(key), list):
+                return payload[key]
     raise ValueError('input must be a JSON list/object, JSONL, or CSV')
 
 
 def _atoms(value):
-    if value is None or value == '': return []
+    if value is None or value == '':
+        return []
     if isinstance(value, str):
         value = value.strip()
-        if value.startswith('['): value = json.loads(value)
-        else: value = [x for x in value.replace(';', ',').split(',') if x.strip()]
+        if value.startswith('['):
+            value = json.loads(value)
+        else:
+            value = [x for x in value.replace(';', ',').split(',') if x.strip()]
     if not isinstance(value, (list, tuple)):
         raise ValueError('reactive atom labels must be a list of integer atom indices')
     out = []
     for item in value:
-        if isinstance(item, bool): raise ValueError('Boolean atom labels are invalid')
+        if isinstance(item, bool):
+            raise ValueError('Boolean atom labels are invalid')
         out.append(int(item))
     return out
 
@@ -85,31 +86,34 @@ def _scaffold(mol):
 
 
 def NormalizeEASRecords(rows: Iterable[Mapping], *, source='local'):
-    """Validate and normalize public EAS records.
-
-    Accepted label keys are ``reactive_atoms``, ``target_atoms``,
-    ``label_atoms`` and ``labels``. Labels are zero-based atom indices in the
-    supplied SMILES. Invalid rows are returned in ``excluded`` with a reason;
-    no row is silently repaired.
-    """
+    """Validate and normalize public EAS records."""
     protocol = LoadFrozenProtocol()
-    allowed = {Chem.GetPeriodicTable().GetAtomicNumber(symbol)
-               for symbol in protocol['selection']['allowed_elements']}
+    allowed = {
+        Chem.GetPeriodicTable().GetAtomicNumber(symbol)
+        for symbol in protocol['selection']['allowed_elements']
+    }
     records, excluded, seen, seen_ids = [], [], set(), set()
     for ordinal, raw in enumerate(rows):
         try:
-            if not isinstance(raw, Mapping): raise ValueError('record is not an object')
+            if not isinstance(raw, Mapping):
+                raise ValueError('record is not an object')
             identifier = str(raw.get('id', raw.get('record_id', ordinal))).strip()
             smiles = str(raw.get('smiles', '')).strip()
-            if not identifier or not smiles: raise ValueError('id and smiles are required')
+            if not identifier or not smiles:
+                raise ValueError('id and smiles are required')
             mol = Chem.MolFromSmiles(smiles)
-            if mol is None: raise ValueError('SMILES sanitization failed')
-            if len(Chem.GetMolFrags(mol)) != 1: raise ValueError('disconnected mixture is excluded')
+            if mol is None:
+                raise ValueError('SMILES sanitization failed')
+            if len(Chem.GetMolFrags(mol)) != 1:
+                raise ValueError('disconnected mixture is excluded')
             if any(atom.GetAtomicNum() not in allowed for atom in mol.GetAtoms()):
                 raise ValueError('molecule contains an element outside the frozen allowed set')
             event = raw.get('event_type', raw.get('reaction_class'))
             if event is not None and str(event).strip().lower() not in {
-                    'eas', 'electrophilic aromatic substitution', 'electrophilic_aromatic_substitution'}:
+                'eas',
+                'electrophilic aromatic substitution',
+                'electrophilic_aromatic_substitution',
+            }:
                 raise ValueError('record is not an electrophilic aromatic substitution event')
             map_key = next((k for k in ('reactive_atom_maps', 'target_atom_maps') if k in raw), None)
             if map_key is not None:
@@ -122,8 +126,10 @@ def NormalizeEASRecords(rows: Iterable[Mapping], *, source='local'):
             else:
                 key = next((k for k in ('reactive_atoms', 'target_atoms', 'label_atoms', 'labels') if k in raw), None)
                 labels = None
-            if key is None: raise ValueError('missing atom-level target labels')
-            if labels is None: labels = sorted(set(_atoms(raw[key])))
+            if key is None:
+                raise ValueError('missing atom-level target labels')
+            if labels is None:
+                labels = sorted(set(_atoms(raw[key])))
             if not labels or any(i < 0 or i >= mol.GetNumAtoms() for i in labels):
                 raise ValueError('target atom index is outside the molecule')
             canonical = _canonical_smiles(mol)
@@ -154,47 +160,65 @@ def NormalizeEASRecords(rows: Iterable[Mapping], *, source='local'):
                     if isinstance(value, bool) or int(value) < 0:
                         raise ValueError(f'{name} must be a nonnegative integer')
                     value = int(value)
-                if name == 'ionized_uhf': ionized_uhf = value
-                else: attached_uhf = value
+                if name == 'ionized_uhf':
+                    ionized_uhf = value
+                else:
+                    attached_uhf = value
             dedup_key = (reaction_id, scaffold)
             if identifier in seen_ids:
                 raise ValueError('duplicate record id')
-            if dedup_key in seen: raise ValueError('duplicate reaction/scaffold record')
-            seen.add(dedup_key); seen_ids.add(identifier)
-            records.append({'id': identifier, 'smiles': smiles,
-                            'canonical_smiles': canonical,
-                            'reactive_atoms': labels,
-                            'scaffold': scaffold,
-                            'reaction_id': reaction_id,
-                            'charge': requested_charge,
-                            'uhf': requested_uhf,
-                            'ionized_uhf': ionized_uhf,
-                            'attached_uhf': attached_uhf,
-                            'dedup_key': f'{reaction_id}:{scaffold}',
-                            'source': source,
-                            'source_row': ordinal})
+            if dedup_key in seen:
+                raise ValueError('duplicate reaction/scaffold record')
+            seen.add(dedup_key)
+            seen_ids.add(identifier)
+            records.append({
+                'id': identifier,
+                'smiles': smiles,
+                'canonical_smiles': canonical,
+                'reactive_atoms': labels,
+                'scaffold': scaffold,
+                'reaction_id': reaction_id,
+                'charge': requested_charge,
+                'uhf': requested_uhf,
+                'ionized_uhf': ionized_uhf,
+                'attached_uhf': attached_uhf,
+                'dedup_key': f'{reaction_id}:{scaffold}',
+                'source': source,
+                'source_row': ordinal,
+            })
         except Exception as exc:
-            excluded.append({'source_row': ordinal, 'reason': str(exc), 'record': dict(raw) if isinstance(raw, Mapping) else raw})
+            excluded.append({
+                'source_row': ordinal,
+                'reason': str(exc),
+                'record': dict(raw) if isinstance(raw, Mapping) else raw,
+            })
     return records, excluded
 
 
 def _union_find(n):
     parent = list(range(n))
+
     def find(i):
         while parent[i] != i:
-            parent[i] = parent[parent[i]]; i = parent[i]
+            parent[i] = parent[parent[i]]
+            i = parent[i]
         return i
+
     def union(a, b):
         a, b = find(a), find(b)
-        if a != b: parent[b] = a
+        if a != b:
+            parent[b] = a
+
     return parent, find, union
 
 
-def ClusterKeys(records, threshold=0.7, *, radius=2, fp_size=1024, include_chirality=False):
+def ClusterKeys(records, threshold=0.7, *, radius=2, fpSize=1024, includeChirality=False):
     """Return single-linkage Morgan clusters at the frozen Tanimoto threshold."""
-    if not 0 < threshold <= 1: raise ValueError('threshold must be in (0, 1]')
-    generator = rdFingerprintGenerator.GetMorganGenerator(radius=radius, fpSize=fp_size,
-                                                          includeChirality=include_chirality)
+    if not 0 < threshold <= 1:
+        raise ValueError('threshold must be in (0, 1]')
+    generator = rdFingerprintGenerator.GetMorganGenerator(
+        radius=radius, fpSize=fpSize, includeChirality=includeChirality
+    )
     fps = []
     for row in records:
         mol = Chem.MolFromSmiles(row['smiles'])
@@ -202,18 +226,24 @@ def ClusterKeys(records, threshold=0.7, *, radius=2, fp_size=1024, include_chira
     parent, find, union = _union_find(len(records))
     for i in range(len(fps)):
         for j in range(i):
-            if DataStructs.TanimotoSimilarity(fps[i], fps[j]) >= threshold: union(i, j)
+            if DataStructs.TanimotoSimilarity(fps[i], fps[j]) >= threshold:
+                union(i, j)
     roots = {}
     keys = []
     for i in range(len(records)):
-        root = find(i); keys.append(roots.setdefault(root, f'cluster-{len(roots):05d}'))
+        root = find(i)
+        keys.append(roots.setdefault(root, f'cluster-{len(roots):05d}'))
     return keys
 
 
-def _leakage_groups(records, *, threshold=0.7, radius=2, fp_size=1024,
-                    include_chirality=False):
-    clusters = ClusterKeys(records, threshold=threshold, radius=radius,
-                            fp_size=fp_size, include_chirality=include_chirality)
+def _leakage_groups(records, *, threshold=0.7, radius=2, fpSize=1024, includeChirality=False):
+    clusters = ClusterKeys(
+        records,
+        threshold=threshold,
+        radius=radius,
+        fpSize=fpSize,
+        includeChirality=includeChirality,
+    )
     parent, find, union = _union_find(len(records))
     owners = {}
     for index, (row, cluster) in enumerate(zip(records, clusters)):
@@ -230,39 +260,54 @@ def _leakage_groups(records, *, threshold=0.7, radius=2, fp_size=1024,
 
 def _frozen_cluster_settings():
     cluster = LoadFrozenProtocol()['split']['cluster']
-    return dict(threshold=cluster['threshold'], radius=cluster['radius'],
-                fp_size=cluster['fp_size'], include_chirality=cluster['include_chirality'])
+    return dict(
+        threshold=cluster['threshold'],
+        radius=cluster['radius'],
+        fpSize=cluster['fp_size'],
+        includeChirality=cluster['include_chirality'],
+    )
 
 
-def AssignEASSplits(records, *, seed=20261106, train_fraction=0.8, valid_fraction=0.1):
+def AssignEASSplits(records, *, seed=20261106, trainFraction=0.8, validFraction=0.1):
     """Assign scaffold-plus-cluster groups to train/valid/test deterministically."""
-    if not 0 < train_fraction < 1 or not 0 <= valid_fraction < 1 or train_fraction + valid_fraction >= 1:
+    if not 0 < trainFraction < 1 or not 0 <= validFraction < 1 or trainFraction + validFraction >= 1:
         raise ValueError('split fractions must leave a positive test fraction')
     groups = _leakage_groups(records, **_frozen_cluster_settings())
     ordered = sorted(groups, key=lambda ids: (-len(ids), hashlib.sha256(f'{seed}:{ids}'.encode()).hexdigest()))
-    totals = {'train': 0, 'valid': 0, 'test': 0}; n = len(records)
+    totals = {'train': 0, 'valid': 0, 'test': 0}
+    n = len(records)
     result = {}
     for ids in ordered:
         candidates = ('train', 'valid', 'test')
-        split = min(candidates, key=lambda name: (totals[name] / max(n, 1) /
-            ({'train': train_fraction, 'valid': valid_fraction, 'test': 1-train_fraction-valid_fraction}[name]),
-            candidates.index(name)))
-        for identifier in ids: result[identifier] = split
+        split = min(
+            candidates,
+            key=lambda name: (
+                totals[name]
+                / max(n, 1)
+                / ({
+                    'train': trainFraction,
+                    'valid': validFraction,
+                    'test': 1 - trainFraction - validFraction,
+                }[name]),
+                candidates.index(name),
+            ),
+        )
+        for identifier in ids:
+            result[identifier] = split
         totals[split] += len(ids)
     return result
 
 
-def AssignEASFolds(records, *, seed=20261106, n_splits=5):
+def AssignEASFolds(records, *, seed=20261106, nSplits=5):
     """Assign deterministic leakage-safe grouped folds for model selection."""
-    if isinstance(n_splits, bool) or not isinstance(n_splits, int) or n_splits < 2:
-        raise ValueError('n_splits must be an integer >= 2')
+    if isinstance(nSplits, bool) or not isinstance(nSplits, int) or nSplits < 2:
+        raise ValueError('nSplits must be an integer >= 2')
     groups = _leakage_groups(records, **_frozen_cluster_settings())
-    ordered = sorted(groups, key=lambda ids: (-len(ids), hashlib.sha256(
-        f'{seed}:{ids}'.encode()).hexdigest()))
-    totals = [0] * n_splits
+    ordered = sorted(groups, key=lambda ids: (-len(ids), hashlib.sha256(f'{seed}:{ids}'.encode()).hexdigest()))
+    totals = [0] * nSplits
     result = {}
     for ids in ordered:
-        fold = min(range(n_splits), key=lambda i: (totals[i], i))
+        fold = min(range(nSplits), key=lambda i: (totals[i], i))
         for identifier in ids:
             result[identifier] = fold
         totals[fold] += len(ids)
@@ -277,17 +322,25 @@ def PrepareEASDataset(path, *, source='local', seed=None):
         raise ValueError(f'seed must equal frozen protocol value {protocol["split"]["seed"]}')
     rows, excluded = NormalizeEASRecords(_load_rows(path), source=source)
     fractions = protocol['split']['fractions']
-    splits = AssignEASSplits(rows, seed=seed, train_fraction=fractions['train'],
-                               valid_fraction=fractions['valid']) if rows else {}
-    folds = AssignEASFolds(rows, seed=seed, n_splits=protocol['split']['secondary_folds']) if rows else {}
+    splits = (
+        AssignEASSplits(rows, seed=seed, trainFraction=fractions['train'], validFraction=fractions['valid'])
+        if rows
+        else {}
+    )
+    folds = AssignEASFolds(rows, seed=seed, nSplits=protocol['split']['secondary_folds']) if rows else {}
     for row in rows:
         row['split'] = splits[row['id']]
         row['cv_fold'] = folds[row['id']]
-    return {'protocol_id': 'eas_regioselectivity_v1', 'source': source,
-            'protocol_sha256': FrozenProtocolSHA256(protocol),
-            'split_seed': seed,
-            'input_path': str(Path(path)), 'n_input': len(rows) + len(excluded),
-            'n_selected': len(rows), 'n_excluded': len(excluded),
-            'records': rows, 'excluded': excluded,
-            'split_counts': {name: sum(r['split'] == name for r in rows) for name in ('train','valid','test')}}
-
+    return {
+        'protocol_id': 'eas_regioselectivity_v1',
+        'source': source,
+        'protocol_sha256': FrozenProtocolSHA256(protocol),
+        'split_seed': seed,
+        'input_path': str(Path(path)),
+        'n_input': len(rows) + len(excluded),
+        'n_selected': len(rows),
+        'n_excluded': len(excluded),
+        'records': rows,
+        'excluded': excluded,
+        'split_counts': {name: sum(r['split'] == name for r in rows) for name in ('train', 'valid', 'test')},
+    }

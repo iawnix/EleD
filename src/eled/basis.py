@@ -1,8 +1,10 @@
 """Component directions for the pinned xTB spherical AO convention."""
+from __future__ import annotations
+
 import numpy as np
 
 
-def NativePDirections(ao_shell_indices, shell_angular_momenta):
+def _native_p_directions(aoShellIndices, shellAngularMomenta) -> tuple[tuple[float, float, float], ...]:
     """Capture p_x/p_y/p_z directions at the native extraction boundary.
 
     The pinned xTB src/xtb/basisset.f90:set_p_function enumerates lao=2,3,4;
@@ -10,10 +12,10 @@ def NativePDirections(ao_shell_indices, shell_angular_momenta):
     rows so a later permutation or AO sign change can transform them too.
     Non-p rows contain zero vectors.
     """
-    shells = np.asarray(ao_shell_indices)
+    shells = np.asarray(aoShellIndices)
     directions = np.zeros((len(shells), 3))
-    for sh, angular_momentum in enumerate(shell_angular_momenta):
-        if angular_momentum != 1:
+    for sh, angularMomentum in enumerate(shellAngularMomenta):
+        if angularMomentum != 1:
             continue
         rows = np.flatnonzero(shells == sh)
         if len(rows) != 3:

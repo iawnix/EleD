@@ -32,10 +32,10 @@ def test_eas_splits_keep_scaffold_and_cluster_components_together():
     assert len(set(splits[r['id']] for r in rows if r['scaffold'] == rows[0]['scaffold'])) == 1
     assert set(splits.values()) <= {'train', 'valid', 'test'}
     assert splits == AssignEASSplits(rows, seed=7)
-    folds = AssignEASFolds(rows, seed=7, n_splits=5)
+    folds = AssignEASFolds(rows, seed=7, nSplits=5)
     assert set(folds) == {r['id'] for r in rows}
     assert set(folds.values()) <= set(range(5))
-    assert folds == AssignEASFolds(rows, seed=7, n_splits=5)
+    assert folds == AssignEASFolds(rows, seed=7, nSplits=5)
 
 
 def test_prepare_eas_dataset_jsonl_manifest(tmp_path):

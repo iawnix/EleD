@@ -56,7 +56,7 @@ _PAIR = {(1, 6): 0.0502, (1, 7): 0.1747, (1, 8): 0.1671,
          (6, 7): 0.0556, (6, 8): 0.0234, (7, 8): -0.0346}
 
 
-def charge_model_for_method(method: str) -> str:
+def _charge_model_for_method(method: str) -> str:
     """Return the exact model used by xTB's atomic-charge result getter."""
     if method == "GFN0-xTB":
         return CHARGE_MODEL_EEQ
@@ -65,8 +65,8 @@ def charge_model_for_method(method: str) -> str:
     raise ValueError(f"no atomic charge model is defined for {method!r}")
 
 
-def calc_cm5_charges(atomic_numbers: Sequence[int], coordinates_angstrom: Sequence[Sequence[float]],
-                     mulliken_charges: Sequence[float]) -> tuple[float, ...]:
+def _calc_cm5_charges(atomicNumbers: Sequence[int], coordinatesAngstrom: Sequence[Sequence[float]],
+                      mullikenCharges: Sequence[float]) -> tuple[float, ...]:
     """Apply the xTB CM5 correction to SCC Mulliken charges.
 
     Coordinates are Angstrom and charges are in elementary-charge units.  CM5
@@ -74,9 +74,9 @@ def calc_cm5_charges(atomic_numbers: Sequence[int], coordinates_angstrom: Sequen
     charges.  The pair correction is antisymmetric, so the molecular charge is
     conserved to floating-point precision.
     """
-    numbers = tuple(int(z) for z in atomic_numbers)
-    coords = tuple(tuple(float(v) for v in row) for row in coordinates_angstrom)
-    q = tuple(float(v) for v in mulliken_charges)
+    numbers = tuple(int(z) for z in atomicNumbers)
+    coords = tuple(tuple(float(v) for v in row) for row in coordinatesAngstrom)
+    q = tuple(float(v) for v in mullikenCharges)
     n = len(numbers)
     if len(coords) != n or len(q) != n:
         raise ValueError("CM5 inputs must have matching atom counts")
@@ -109,4 +109,3 @@ def calc_cm5_charges(atomic_numbers: Sequence[int], coordinates_angstrom: Sequen
             correction[i] += weight * pij
             correction[j] -= weight * pij
     return tuple(qi + di for qi, di in zip(q, correction))
-

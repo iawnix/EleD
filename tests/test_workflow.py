@@ -9,7 +9,7 @@ import pytest
 Chem = pytest.importorskip('rdkit.Chem')
 from rdkit.Chem import AllChem
 from eled import (
-    XTBOptions, XTBResult, XTBRunError, XTBCache,
+    XTBOptions, XTBResults, XTBRunError, XTBCache,
     AnnotateMol, RunXTBBatch, XTBCacheKey,
 )
 from eled.input import _input_metadata, _xyz_from_mol
@@ -23,11 +23,11 @@ def molecule(smiles='CCO'):
 
 def sample_result(mol):
     n = mol.GetNumAtoms()
-    return XTBResult(
+    return XTBResults(
         'GFN2-xTB', 'test', -1.0, 2.0, 2, 2, 0,
-        orbital_energies_ev=(-2., 0.), orbital_occupations=(2., 0.),
-        partial_charges=tuple(i * .01 for i in range(n)),
-        wiberg_bond_orders=tuple(tuple(0. if i == j else .8 for j in range(n)) for i in range(n)),
+        orbitalEnergiesEV=(-2., 0.), orbitalOccupancies=(2., 0.),
+        atomicCharges=tuple(i * .01 for i in range(n)),
+        wibergBondOrders=tuple(tuple(0. if i == j else .8 for j in range(n)) for i in range(n)),
         metadata=_input_metadata(mol, -1, 0, 0, _xyz_from_mol(mol, -1)),
     )
 
@@ -47,8 +47,8 @@ def engine(tmp_path, monkeypatch):
 
 
 def test_options_are_serializable_and_validate():
-    opts = XTBOptions(method='gfn2', xtb_library=Path('/test/xtb'))
-    assert XTBOptions(**json.loads(json.dumps(opts.to_dict()))) == opts
+    opts = XTBOptions(method='gfn2', xtbLibrary=Path('/test/xtb'))
+    assert XTBOptions.FromDict(json.loads(json.dumps(opts.ToDict()))) == opts
     assert opts.backend == 'native'
     with pytest.raises(ValueError, match='backend'):
         XTBOptions(backend='unknown')
@@ -83,8 +83,8 @@ def test_mapping_rejects_wrong_order_isomer_geometry_and_legacy_result():
 def test_invalid_arrays_fail_before_inplace_mutation():
     mol = molecule()
     result = sample_result(mol)
-    for damaged in (replace(result, partial_charges=(.1,)),
-                    replace(result, wiberg_bond_orders=((float('nan'),),))):
+    for damaged in (replace(result, atomicCharges=(.1,)),
+                    replace(result, wibergBondOrders=((float('nan'),),))):
         with pytest.raises(ValueError):
             AnnotateMol(mol, damaged, copy=False)
         assert not mol.GetAtomWithIdx(0).HasProp('xtb_partial_charge')
@@ -96,58 +96,58 @@ def test_atom_hydrogen_counts_are_not_explicit_hydrogen_vertices():
     conf.Set3D(True)
     mol.AddConformer(conf)
     with pytest.raises(ValueError, match='Chem.AddHs'):
-        calculate_xtb(mol, xtb_library='/missing')
+        calculate_xtb(mol, xtbLibrary='/missing')
 
 
 def test_coordinate_and_spin_validation_happens_before_engine_lookup():
     mol = molecule()
     with pytest.raises(ValueError, match='electron count'):
-        calculate_xtb(mol, uhf=1, xtb_library='/missing')
+        calculate_xtb(mol, numUnpairedElectrons=1, xtbLibrary='/missing')
     with pytest.raises(ValueError, match='integers'):
-        calculate_xtb(mol, charge=.5, xtb_library='/missing')
+        calculate_xtb(mol, charge=.5, xtbLibrary='/missing')
     mol.GetConformer().Set3D(False)
     with pytest.raises(ValueError, match='3D'):
-        calculate_xtb(mol, xtb_library='/missing')
+        calculate_xtb(mol, xtbLibrary='/missing')
     mol.GetConformer().Set3D(True)
     mol.GetConformer().SetAtomPosition(0, (float('nan'), 0., 0.))
     with pytest.raises(ValueError, match='finite'):
-        calculate_xtb(mol, xtb_library='/missing')
+        calculate_xtb(mol, xtbLibrary='/missing')
 
 
 def test_cache_keys_include_geometry_options_library_and_parameters(engine, monkeypatch):
     mol = molecule()
-    base = XTBCacheKey(mol, xtb_library=engine)
-    assert base == XTBCacheKey(mol, xtb_library=str(engine), method='gfn2', conf_id=0)
-    assert base != XTBCacheKey(mol, xtb_library=engine, method='gfn1')
-    assert base != XTBCacheKey(mol, xtb_library=engine, charge=1, uhf=1)
+    base = XTBCacheKey(mol, xtbLibrary=engine)
+    assert base == XTBCacheKey(mol, xtbLibrary=str(engine), method='gfn2', confId=0)
+    assert base != XTBCacheKey(mol, xtbLibrary=engine, method='gfn1')
+    assert base != XTBCacheKey(mol, xtbLibrary=engine, charge=1, numUnpairedElectrons=1)
     mol.GetConformer().SetAtomPosition(0, (0., 0., 0.))
-    assert base != XTBCacheKey(mol, xtb_library=engine)
+    assert base != XTBCacheKey(mol, xtbLibrary=engine)
     mol = molecule()
     engine.write_text('test engine B')
-    assert base != XTBCacheKey(mol, xtb_library=engine)
-    changed_binary = XTBCacheKey(mol, xtb_library=engine)
+    assert base != XTBCacheKey(mol, xtbLibrary=engine)
+    changed_binary = XTBCacheKey(mol, xtbLibrary=engine)
     parameter = engine.parent / 'share/xtb/param_gfn2-xtb.txt'
     parameter.parent.mkdir(parents=True)
     parameter.write_text('test parameters A')
     monkeypatch.setenv('XTBPATH', str(parameter.parent))
-    with_parameter = XTBCacheKey(mol, xtb_library=engine)
+    with_parameter = XTBCacheKey(mol, xtbLibrary=engine)
     assert changed_binary != with_parameter
     parameter.write_text('test parameters B')
-    assert with_parameter != XTBCacheKey(mol, xtb_library=engine)
+    assert with_parameter != XTBCacheKey(mol, xtbLibrary=engine)
     monkeypatch.setenv('XTB_LIBRARY', str(engine))
-    assert XTBCacheKey(mol) == XTBCacheKey(mol, xtb_library=engine)
+    assert XTBCacheKey(mol) == XTBCacheKey(mol, xtbLibrary=engine)
 
 
 def test_batch_reuses_results_and_isolates_metadata(engine):
     mol = molecule()
     cache = XTBCache()
     with patch('eled.batch._run_xtb', return_value=sample_result(mol)) as calculate:
-        results = RunXTBBatch([mol] * 12, cache=cache, xtb_library=engine)
+        results = RunXTBBatch([mol] * 12, cache=cache, xtbLibrary=engine)
     assert calculate.call_count == 1
     assert len(cache) == 1
     results[0].metadata['charge'] = 100
     assert results[1].metadata['charge'] == 0
-    assert cache.get(XTBCacheKey(mol, xtb_library=engine)).metadata['charge'] == 0
+    assert cache.Get(XTBCacheKey(mol, xtbLibrary=engine)).metadata['charge'] == 0
 
 
 def test_batch_keeps_order_and_retries_failed_calculations(engine):
@@ -158,16 +158,16 @@ def test_batch_keeps_order_and_retries_failed_calculations(engine):
             raise XTBRunError('test failure')
         return sample_result(mol)
     with patch('eled.batch._run_xtb', side_effect=fake):
-        results = RunXTBBatch([a, b, a], cache=cache, xtb_library=engine,
-                                return_exceptions=True)
+        results = RunXTBBatch([a, b, a], cache=cache, xtbLibrary=engine,
+                                returnExceptions=True)
     assert isinstance(results[1], XTBRunError)
     assert results[0] == results[2]
     assert len(cache) == 1
     with patch('eled.batch._run_xtb', return_value=sample_result(b)) as calculate:
-        RunXTBBatch([b], cache=cache, xtb_library=engine)
+        RunXTBBatch([b], cache=cache, xtbLibrary=engine)
     assert calculate.call_count == 1
-    with pytest.raises(ValueError, match='max_workers'):
-        RunXTBBatch([a], backend='native', max_workers=0)
+    with pytest.raises(ValueError, match='maxWorkers'):
+        RunXTBBatch([a], backend='native', maxWorkers=0)
     with pytest.raises(TypeError):
         RunXTBBatch([a], unsupported_option=True, cache=cache)
 
@@ -190,8 +190,11 @@ def test_removed_backends_fail_before_calculation(backend, monkeypatch):
         RunXTBBatch([molecule()], backend=backend)
 
 
-@pytest.mark.parametrize('option,value', [('xtb_path', '/bin/xtb'), ('keep_files', True),
-                                        ('timeout', 30), ('optimize', True), ('solvent', 'water')])
+@pytest.mark.parametrize('option,value', [
+    ('xtb_path', '/bin/xtb'), ('keep_files', True), ('timeout', 30),
+    ('optimize', True), ('solvent', 'water'),
+    ('conf_id', 0), ('uhf', 1), ('keep_overlap', True),
+])
 def test_removed_options_are_not_silently_ignored(option, value):
     with pytest.raises(TypeError, match=option):
         calculate_xtb(molecule(), **{option: value})

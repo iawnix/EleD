@@ -42,27 +42,44 @@ py::object espValues(const XTBResults &r) {
   return array(r.espValuesAU, {static_cast<npy_intp>(r.espValuesAU.size())});
 }
 std::vector<double> readESPPoints(const py::object &value) {
-  py::object points = py::import("eled.esp_input").attr("ESPPoints")(value);
-  std::vector<double> output;
-  for (Py_ssize_t i = 0; i < py::len(points); ++i)
-    for (int j = 0; j < 3; ++j) output.push_back(py::extract<double>(points[i][j]));
+  if (value.is_none()) return {};
+  PyObject *rawObj = PyArray_FromAny(value.ptr(), nullptr, 0, 0, NPY_ARRAY_ENSUREARRAY, nullptr);
+  if (!rawObj) {
+    PyErr_Clear();
+    throw std::invalid_argument("espPointsAngstrom must be a real [npoints, 3] array");
+  }
+  py::handle<> rawHandle(rawObj);
+  auto *raw = reinterpret_cast<PyArrayObject *>(rawObj);
+  const int ndim = PyArray_NDIM(raw);
+  const npy_intp *dims = PyArray_DIMS(raw);
+  if (PyArray_SIZE(raw) == 0 &&
+      ((ndim == 1 && dims[0] == 0) || (ndim == 2 && dims[0] == 0 && dims[1] == 3))) {
+    return {};
+  }
+  const char kind = PyArray_DESCR(raw)->kind;
+  if ((kind != 'i' && kind != 'u' && kind != 'f') || ndim != 2 || dims[1] != 3)
+    throw std::invalid_argument("espPointsAngstrom must be a real [npoints, 3] array");
+  if (dims[0] > static_cast<npy_intp>(std::numeric_limits<int>::max()))
+    throw std::invalid_argument("espPointsAngstrom must be finite and fit the C API point count");
+  PyObject *contigObj = PyArray_FROM_OTF(rawObj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+  if (!contigObj) py::throw_error_already_set();
+  py::handle<> contigHandle(contigObj);
+  const auto *data = static_cast<const double *>(
+      PyArray_DATA(reinterpret_cast<PyArrayObject *>(contigObj)));
+  const size_t total = static_cast<size_t>(dims[0]) * 3;
+  std::vector<double> output(data, data + total);
+  for (double v : output) {
+    if (!std::isfinite(v))
+      throw std::invalid_argument("espPointsAngstrom must be finite and fit the C API point count");
+  }
   return output;
 }
 bool hasESP(const XTBResults &r) { return r.success && !r.espValuesAU.empty(); }
 py::object cm5Charges(const XTBResults &r) {
   requireSuccess(r);
-  if (r.chargeModel != "xtb_scc_mulliken")
+  if (r.chargeModel != "xtb_scc_mulliken" || r.cm5Charges.size() != r.numAtoms)
     throw std::invalid_argument("CM5 charges require GFN1/2 SCC Mulliken charges; GFN0 exposes PEEQ/EEQ");
-  py::list numbers, coordinates, base;
-  for (int value : r.atomicNumbers) numbers.append(value);
-  for (unsigned int i = 0; i < r.numAtoms; ++i) {
-    py::list row;
-    for (unsigned int axis = 0; axis < 3; ++axis)
-      row.append(r.coordinatesAngstrom[3 * i + axis]);
-    coordinates.append(row);
-  }
-  for (double value : r.atomicCharges) base.append(value);
-  return py::import("eled.charges").attr("calc_cm5_charges")(numbers, coordinates, base);
+  return array(r.cm5Charges, {r.numAtoms});
 }
 py::object energies(const XTBResults &r) {
   requireSuccess(r); return array(r.orbitalEnergiesEV, {r.numOrbitals});
@@ -127,6 +144,72 @@ std::optional<int> optionalInteger(const py::object &value, const char *name) {
   return static_cast<int>(number);
 }
 
+int parseMaxIterations(const py::object &value) {
+  if (PyBool_Check(value.ptr()) || !PyIndex_Check(value.ptr()))
+    throw std::invalid_argument("maxIterations (iteration limit) must be an integer in [1, 2147483647]");
+  py::handle<> indexed(PyNumber_Index(value.ptr()));
+  if (!indexed) py::throw_error_already_set();
+  const long number = PyLong_AsLong(indexed.get());
+  if (PyErr_Occurred()) {
+    PyErr_Clear();
+    throw std::invalid_argument("maxIterations (iteration limit) must be an integer in [1, 2147483647]");
+  }
+  if (number < 1 || number > std::numeric_limits<int>::max())
+    throw std::invalid_argument("maxIterations (iteration limit) must be an integer in [1, 2147483647]");
+  return static_cast<int>(number);
+}
+
+double parseReal(const py::object &value, const char *message) {
+  if (PyBool_Check(value.ptr()) || PyComplex_Check(value.ptr()) ||
+      PyUnicode_Check(value.ptr()) || PyBytes_Check(value.ptr()) || PyByteArray_Check(value.ptr()))
+    throw std::invalid_argument(message);
+  PyObject *flt = PyNumber_Float(value.ptr());
+  if (!flt) {
+    PyErr_Clear();
+    throw std::invalid_argument(message);
+  }
+  py::handle<> handle(flt);
+  const double result = PyFloat_AsDouble(flt);
+  if (PyErr_Occurred() || !std::isfinite(result)) {
+    PyErr_Clear();
+    throw std::invalid_argument(message);
+  }
+  return result;
+}
+
+void applySettings(XTBOptions &options, const py::object &maxIterations,
+                   const py::object &accuracy, const py::object &electronicTemperature) {
+  options.maxIterations = parseMaxIterations(maxIterations);
+  options.accuracy = parseReal(accuracy, "accuracy must be a finite real number");
+  if (options.accuracy < 1e-4 || options.accuracy > 1e3)
+    throw std::invalid_argument("accuracy must be in [0.0001, 1000]; avoid silent engine clamping");
+  options.electronicTemperature = parseReal(electronicTemperature,
+                                            "electronic temperature must be a finite real number");
+  if (options.electronicTemperature < 0.0)
+    throw std::invalid_argument("electronic temperature must be nonnegative (kelvin)");
+}
+
+py::object optionalModule(const char *name) {
+  PyObject *mod = PyImport_ImportModule(name);
+  if (mod) return py::object(py::handle<>(mod));
+  if (PyErr_ExceptionMatches(PyExc_ModuleNotFoundError)) {
+    PyErr_Clear();
+    return py::object();
+  }
+  py::throw_error_already_set();
+  return py::object();
+}
+
+void recordInputProvenance(const RDKit::ROMol &snapshot, XTBResults &result) {
+  py::object input = optionalModule("eled.input");
+  if (input.is_none()) return;
+  py::object snapshotObject(py::ptr(&snapshot));
+  py::object xyz = input.attr("_xyz_from_mol")(snapshotObject, result.conformerId);
+  py::object metadata = input.attr("_input_metadata")(snapshotObject, result.conformerId,
+                                                      result.charge, result.numUnpairedElectrons, xyz);
+  result.inputProvenanceJSON = py::extract<std::string>(py::import("json").attr("dumps")(metadata));
+}
+
 struct ReleaseGIL {
   PyThreadState *state = PyEval_SaveThread();
   ~ReleaseGIL() { PyEval_RestoreThread(state); }
@@ -145,41 +228,35 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.keepOrbitalCoefficients = keepCoefficients;
   options.keepOverlap = keepOverlap;
   options.espPointsAngstrom = readESPPoints(espPointsAngstrom);
-  // Use the active Python runtime, including relocated distributions. An explicit
-  // path remains authoritative; the standalone C++ default is unchanged.
-  options.libraryPath = library.empty() ? py::extract<std::string>(
-      py::import("eled.runtime").attr("_find_xtb_library")()) : library;
+  // Use the active Python runtime when eled is installed; an explicit path
+  // remains authoritative, and standalone C++/Python fallback is preserved.
+  if (library.empty()) {
+    py::object runtime = optionalModule("eled.runtime");
+    options.libraryPath = runtime.is_none()
+        ? std::string()
+        : std::string(py::extract<std::string>(runtime.attr("_find_xtb_library")()));
+  } else {
+    options.libraryPath = library;
+  }
   options.parameterDirectory = parameterDirectory;
-  py::object settings = py::import("eled.options").attr("CalculationSettings")(
-      maxIterations, accuracy, electronicTemperature);
-  options.maxIterations = py::extract<int>(settings["max_iterations"]);
-  options.accuracy = py::extract<double>(settings["accuracy"]);
-  options.electronicTemperature = py::extract<double>(settings["electronic_temperature"]);
+  applySettings(options, maxIterations, accuracy, electronicTemperature);
   // Snapshot the molecule under the GIL before allowing Python threads to run.
   RDKit::ROMol snapshot(mol);
   auto result = std::make_shared<XTBResults>();
-  // Coordinate with the existing ctypes adapter as well as the core C++ mutex.
-  py::object lock = py::import("eled.backends.native").attr("_native_lock");
-  lock.attr("acquire")();
+  // Coordinate with the existing ctypes adapter when present as well as the core C++ mutex.
+  py::object nativeMod = optionalModule("eled.backends.native");
+  py::object lock = nativeMod.is_none() ? py::object() : nativeMod.attr("_native_lock");
+  if (!lock.is_none()) lock.attr("acquire")();
   bool ok = false;
   try {
     ReleaseGIL released;
     ok = RDKit::XTBTools::runMol(snapshot, *result, options);
   } catch (...) {
-    lock.attr("release")();
+    if (!lock.is_none()) lock.attr("release")();
     throw;
   }
-  lock.attr("release")();
-  if (ok) {
-    // Hash the immutable snapshot actually passed to C++, not the caller's
-    // molecule (which another Python thread could change while GIL is released).
-    py::object input = py::import("eled.input");
-    py::object snapshotObject(py::ptr(&snapshot));
-    py::object xyz = input.attr("_xyz_from_mol")(snapshotObject, result->conformerId);
-    py::object metadata = input.attr("_input_metadata")(snapshotObject, result->conformerId,
-                                  result->charge, result->numUnpairedElectrons, xyz);
-    result->inputProvenanceJSON = py::extract<std::string>(py::import("json").attr("dumps")(metadata));
-  }
+  if (!lock.is_none()) lock.attr("release")();
+  if (ok) recordInputProvenance(snapshot, *result);
   return py::make_tuple(ok, result);
 }
 
@@ -191,44 +268,36 @@ void runtimeError(const std::runtime_error &error) { PyErr_SetString(PyExc_Runti
 py::list runStates(const RDKit::ROMol &mol, const py::object &config,
                    const py::object &ionized, const py::object &attached, bool reuseReference) {
   XTBOptions options;
-  options.confId = py::extract<int>(config.attr("conf_id"));
+  options.confId = py::extract<int>(config.attr("confId"));
   options.method = py::extract<std::string>(config.attr("method"));
   options.charge = optionalInteger(config.attr("charge"), "charge");
-  options.numUnpairedElectrons = optionalInteger(config.attr("uhf"), "uhf");
-  options.libraryPath = py::extract<std::string>(config.attr("xtb_library"));
-  options.keepOverlap = py::extract<bool>(config.attr("keep_overlap"));
-  options.espPointsAngstrom = readESPPoints(config.attr("esp_points_angstrom"));
-  py::object settings = py::import("eled.options").attr("CalculationSettings")(
-      py::object(config.attr("max_iterations")), py::object(config.attr("accuracy")),
-      py::object(config.attr("electronic_temperature")));
-  options.maxIterations = py::extract<int>(settings["max_iterations"]);
-  options.accuracy = py::extract<double>(settings["accuracy"]);
-  options.electronicTemperature = py::extract<double>(settings["electronic_temperature"]);
-  auto ionSpin = optionalInteger(ionized, "ionized_uhf");
-  auto attachSpin = optionalInteger(attached, "attached_uhf");
+  options.numUnpairedElectrons = optionalInteger(config.attr("numUnpairedElectrons"), "numUnpairedElectrons");
+  py::object libObj = config.attr("xtbLibrary");
+  options.libraryPath = libObj.is_none() ? std::string() : std::string(py::extract<std::string>(libObj));
+  options.keepOverlap = py::extract<bool>(config.attr("keepOverlap"));
+  options.espPointsAngstrom = readESPPoints(config.attr("espPointsAngstrom"));
+  applySettings(options, py::object(config.attr("maxIterations")),
+                py::object(config.attr("accuracy")),
+                py::object(config.attr("electronicTemperature")));
+  auto ionSpin = optionalInteger(ionized, "ionizedUnpaired");
+  auto attachSpin = optionalInteger(attached, "attachedUnpaired");
   if (!ionSpin || !attachSpin) throw std::invalid_argument("Adjacent spins must be explicit");
   RDKit::ROMol snapshot(mol);
   std::vector<XTBResults> results;
-  py::object lock = py::import("eled.backends.native").attr("_native_lock");
-  lock.attr("acquire")();
+  py::object nativeMod = optionalModule("eled.backends.native");
+  py::object lock = nativeMod.is_none() ? py::object() : nativeMod.attr("_native_lock");
+  if (!lock.is_none()) lock.attr("acquire")();
   try {
     ReleaseGIL released;
     results = RDKit::XTBTools::runChargeStates(snapshot, options, *ionSpin, *attachSpin, reuseReference);
   } catch (...) {
-    lock.attr("release")();
+    if (!lock.is_none()) lock.attr("release")();
     throw;
   }
-  lock.attr("release")();
+  if (!lock.is_none()) lock.attr("release")();
   py::list output;
   for (auto &value : results) {
-    if (value.success) {
-      py::object input = py::import("eled.input");
-      py::object snapshotObject(py::ptr(&snapshot));
-      py::object xyz = input.attr("_xyz_from_mol")(snapshotObject, value.conformerId);
-      py::object metadata = input.attr("_input_metadata")(snapshotObject, value.conformerId,
-                                       value.charge, value.numUnpairedElectrons, xyz);
-      value.inputProvenanceJSON = py::extract<std::string>(py::import("json").attr("dumps")(metadata));
-    }
+    if (value.success) recordInputProvenance(snapshot, value);
     output.append(std::make_shared<XTBResults>(std::move(value)));
   }
   return output;

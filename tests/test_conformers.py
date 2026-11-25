@@ -8,12 +8,12 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from eled import (XTBOptions, XTBResult, XTBRunError, XTBEnvironmentError,
-                       XTBCacheError, XTBDiskCache, RunConformerAnalysis,
-                       ConformerDescriptorColumns)
+from eled import (XTBOptions, XTBResults, XTBRunError, XTBEnvironmentError,
+                  XTBCacheError, XTBDiskCache, RunConformerAnalysis,
+                  ConformerDescriptorColumns)
 from eled import conformers
 from eled.input import _input_metadata, _xyz_from_mol
-from eled.options import CalculationSettings
+from eled.options import _validate_calculation_settings
 
 
 @pytest.fixture
@@ -25,22 +25,22 @@ def synthetic(monkeypatch):
         mol.AddConformer(conf, assignId=False)
     monkeypatch.setattr('eled.batch._resolve_options', lambda options: options)
     def calculate(self, molecule, **kwargs):
-        identifier = kwargs.get('conf_id', self.options.conf_id)
+        identifier = kwargs.get('confId', self.options.confId)
         h = {3: -3., 8: -2., 12: -1.}[identifier]
         metadata = _input_metadata(molecule, identifier, 0, 0, _xyz_from_mol(molecule, identifier))
-        metadata.update(CalculationSettings=CalculationSettings(), calculation_status='success',
+        metadata.update(calculation_settings=_validate_calculation_settings(), calculation_status='success',
                         engine={'sha256': 'fixture-engine'}, initialization='independent')
-        return XTBResult('GFN2-xTB', None, -1. + h * .001, 3., 3, 4, 0,
-            orbital_energies_ev=(-10., h, 1.), orbital_occupations=(2., 2., 0.),
-            partial_charges=(-.6, .3, .3), dipole_e_bohr=(0., 0., 1.),
-            wiberg_bond_orders=((0., 1., 1.), (1., 0., 0.), (1., 0., 0.)), metadata=metadata)
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', calculate)
+        return XTBResults('GFN2-xTB', None, -1. + h * .001, 3., 3, 4, 0,
+            orbitalEnergiesEV=(-10., h, 1.), orbitalOccupancies=(2., 2., 0.),
+            atomicCharges=(-.6, .3, .3), dipoleAtomicUnits=(0., 0., 1.),
+            wibergBondOrders=((0., 1., 1.), (1., 0., 0.), (1., 0., 0.)), metadata=metadata)
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', calculate)
     return mol, calculate
 
 
 def test_statistics_order_coverage_and_input_unchanged(synthetic):
     mol, _ = synthetic; before = mol.ToBinary()
-    report = RunConformerAnalysis(mol, record_id='water')
+    report = RunConformerAnalysis(mol, recordId='water')
     assert report['conformer_ids'] == [3, 8, 12]
     assert report['status'] == 'partial'  # synthetic results lack basis arrays
     stats = report['statistics']['xtb_homo_ev']
@@ -48,19 +48,19 @@ def test_statistics_order_coverage_and_input_unchanged(synthetic):
                          mean=-2., std=np.std([-3., -2., -1.]), min=-3., max=-1., range=2.)
     missing = report['statistics']['homo_pr']
     assert missing['n_missing'] == 3 and missing['mean'] is None and missing['n_failed'] == 0
-    reverse = RunConformerAnalysis(mol, conf_ids=[12, 8, 3])
+    reverse = RunConformerAnalysis(mol, confIds=[12, 8, 3])
     assert reverse['statistics'] == report['statistics']
     assert mol.ToBinary() == before
     assert json.loads(json.dumps(report, allow_nan=False)) == report
-    single = RunConformerAnalysis(mol, conf_ids=[8], columns=['xtb_homo_ev'])
+    single = RunConformerAnalysis(mol, confIds=[8], columns=['xtb_homo_ev'])
     assert single['status'] == 'complete' and single['statistics']['xtb_homo_ev']['std'] == 0
 
 
 def test_boltzmann_statistics_are_separate_and_energy_weighted(synthetic):
     mol, _ = synthetic
     report = RunConformerAnalysis(mol, columns=['xtb_homo_ev'],
-                                  boltzmann_weighted=True,
-                                  boltzmann_temperature=300.)
+                                  boltzmannWeighted=True,
+                                  boltzmannTemperature=300.)
     weights = report['boltzmann']['weights']
     assert report['weighting'] == 'uniform_supplied_geometries'
     assert report['boltzmann']['enabled'] is True
@@ -74,52 +74,52 @@ def test_boltzmann_statistics_are_separate_and_energy_weighted(synthetic):
 def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
     mol, calculate = synthetic
     def fail_middle(self, mol, **kwargs):
-        if kwargs.get('conf_id', self.options.conf_id) == 8: raise XTBRunError('SCF failed')
+        if kwargs.get('confId', self.options.confId) == 8: raise XTBRunError('SCF failed')
         return calculate(self, mol, **kwargs)
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', fail_middle)
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', fail_middle)
     report = RunConformerAnalysis(mol, columns=['xtb_homo_ev'])
     assert report['n_failed'] == 1 and report['status'] == 'partial'
     assert report['statistics']['xtb_homo_ev']['n_valid'] == 2
     assert report['statistics']['xtb_homo_ev']['n_missing'] == 0
     assert report['reports'][1]['error']['message'] == 'SCF failed'
-    with pytest.raises(XTBRunError): RunConformerAnalysis(mol, return_errors=False)
+    with pytest.raises(XTBRunError): RunConformerAnalysis(mol, returnErrors=False)
     for error in (XTBEnvironmentError('runtime'), RuntimeError('unexpected'), ValueError('analysis')):
         def fail(*a, **k): raise error
-        monkeypatch.setattr(conformers.XTBCalculator, 'calculate', fail)
+        monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', fail)
         with pytest.raises(type(error)): RunConformerAnalysis(mol)
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', lambda *a, **k: (_ for _ in ()).throw(XTBRunError('SCF')))
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', lambda *a, **k: (_ for _ in ()).throw(XTBRunError('SCF')))
     report = RunConformerAnalysis(mol)
     assert report['status'] == 'failed' and report['n_failed'] == 3
     assert all(s['mean'] is None and s['n_failed'] == 3 for s in report['statistics'].values())
 
 
-@pytest.mark.parametrize('kwargs', [dict(conf_ids=[]), dict(conf_ids=[3, 3]), dict(conf_ids=[True]),
-    dict(conf_ids=[-1]), dict(conf_ids=[999]), dict(columns=['xtb_homo_idx']),
-    dict(columns=['xtb_dip_x_ebohr']), dict(columns=[]), dict(degeneracy_ev=-1),
-    dict(options=XTBOptions(conf_id=3)), dict(return_errors=1)])
+@pytest.mark.parametrize('kwargs', [dict(confIds=[]), dict(confIds=[3, 3]), dict(confIds=[True]),
+    dict(confIds=[-1]), dict(confIds=[999]), dict(columns=['xtb_homo_idx']),
+    dict(columns=['xtb_dip_x_ebohr']), dict(columns=[]), dict(degeneracyEV=-1),
+    dict(options=XTBOptions(confId=3)), dict(returnErrors=1)])
 def test_invalid_inputs_do_not_calculate(synthetic, monkeypatch, kwargs):
     mol, _ = synthetic
     def unexpected(*a, **k): raise AssertionError('must validate first')
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', unexpected)
     with pytest.raises(ValueError): RunConformerAnalysis(mol, **kwargs)
 
 
 def test_bad_later_geometry_rejected_before_first_calculation(synthetic, monkeypatch):
     mol, _ = synthetic; mol.GetConformer(12).SetAtomPosition(0, (float('nan'), 0, 0))
     def unexpected(*a, **k): raise AssertionError('must validate all first')
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', unexpected)
     with pytest.raises(ValueError, match='finite'): RunConformerAnalysis(mol)
 
 
 @pytest.mark.parametrize('field,value', [('engine', {'sha256': 'other'}), ('charge', 2),
-                                        ('conformer_id', 3), ('CalculationSettings', {})])
+                                        ('conformer_id', 3), ('calculation_settings', {})])
 def test_mixed_or_wrong_provenance_is_rejected(synthetic, monkeypatch, field, value):
     mol, calculate = synthetic
     def mixed(self, mol, **kwargs):
         r = calculate(self, mol, **kwargs)
-        identifier = kwargs.get('conf_id', self.options.conf_id)
+        identifier = kwargs.get('confId', self.options.confId)
         return replace(r, metadata={**r.metadata, field: value}) if identifier == 8 else r
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', mixed)
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', mixed)
     with pytest.raises(ValueError, match='provenance|protocol'): RunConformerAnalysis(mol)
 
 
@@ -127,7 +127,7 @@ def test_cache_errors_are_fatal(synthetic, monkeypatch):
     mol, _ = synthetic
     monkeypatch.setattr(conformers, '_key', lambda *a: 'key')
     class Broken:
-        def get(self, key): raise XTBCacheError('corrupt')
+        def Get(self, key): raise XTBCacheError('corrupt')
     with pytest.raises(XTBCacheError): RunConformerAnalysis(mol, cache=Broken())
 
 
@@ -155,12 +155,12 @@ def test_real_engine_rigid_transform_and_disk_cache(smiles, tmp_path, monkeypatc
     for i, pos in enumerate(transformed): conf.SetAtomPosition(i, pos)
     mol.AddConformer(conf, assignId=False)
     cache = XTBDiskCache(tmp_path/'conformers.sqlite')
-    report = RunConformerAnalysis(mol, cache=cache, frontier_depth=0)
+    report = RunConformerAnalysis(mol, cache=cache, frontierDepth=0)
     assert report['status'] == 'complete' and len(cache) == 2
     for key, stats in report['statistics'].items(): assert stats['range'] < 1e-6, key
     def unexpected(*a, **k): raise AssertionError('cache should hit')
-    monkeypatch.setattr(conformers.XTBCalculator, 'calculate', unexpected)
-    assert RunConformerAnalysis(mol, cache=cache, frontier_depth=0) == report
+    monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', unexpected)
+    assert RunConformerAnalysis(mol, cache=cache, frontierDepth=0) == report
 
 
 def test_local_statistics_keep_entity_frontier_coverage_and_units(synthetic,monkeypatch):
@@ -179,7 +179,7 @@ def test_local_statistics_keep_entity_frontier_coverage_and_units(synthetic,monk
         out['frontier']={'homo':{'orb_idx':[1] if i==0 else [0,1]},'lumo':{'orb_idx':[2]}}
         return out
     monkeypatch.setattr(conformers,'CalcDescriptorReport',report)
-    out=RunConformerAnalysis(mol,columns=['xtb_homo_ev'],boltzmann_weighted=True)
+    out=RunConformerAnalysis(mol,columns=['xtb_homo_ev'],boltzmannWeighted=True)
     bonds=out['bond_statistics']['0']; atoms=out['atom_statistics']['0']
     assert bonds['frontier_bonds.homo.mul_ovlp_e']['mean']==2.
     assert bonds['frontier_bonds.lumo.mul_ovlp_e']['mean']==-2.

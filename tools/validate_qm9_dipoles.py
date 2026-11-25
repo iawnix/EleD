@@ -86,7 +86,7 @@ def main():
             for method in manifest['methods']:
                 row={'id':original['id'],'method':method,'reference_debye':original['reference_dipole_debye']}
                 try:
-                    result=XTBCalculator(method=method).calculate(mol)
+                    result=XTBCalculator(method=method).Calculate(mol)
                     row.update(predicted_debye=CalcXTBDescriptors(result)['xtb_dip_debye'],
                                provenance=result.metadata,error=None)
                 except XTBEnvironmentError: raise

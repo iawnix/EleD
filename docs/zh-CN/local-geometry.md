@@ -1,7 +1,7 @@
 # 局部位阻与环几何描述符
 
 EleD 分析具有显式氢和三维构象的 RDKit 分子。所有索引沿用原始原子编号。
-局部几何接口都接受 `conf_id=-1`，表示使用 RDKit 默认构象，并记录实际构象 ID。
+局部几何接口都接受 `confId=-1`，表示使用 RDKit 默认构象，并记录实际构象 ID。
 计算只需要 RDKit 和 NumPy，使用已有坐标。
 
 ```python
@@ -23,7 +23,7 @@ from eled import AnalyzeLocalGeometry, RunLocalGeometryBatch
 
 selections = {
     'atoms': {'substituent': [0, 1, 2], 'ring_atoms': [3, 4, 5, 6, 7, 8]},
-    'reaction_sites': {'electrophilic_carbon': [3]},
+    'reactionSites': {'electrophilic_carbon': [3]},
     'bonds': {'attachment': [(2, 3)]},
     'rings': {'aromatic_ring': [3, 4, 5, 6, 7, 8]},
 }
@@ -45,12 +45,12 @@ many = RunLocalGeometryBatch([mol], selections,
 
 | 接口 | 选择对象 | 主要结果 |
 | --- | --- | --- |
-| `CalcSterimol(mol, atom_indices, axis=(base, attached))` | 取代基和有向连接键 | `l_a`、`b1_a`、`b5_a`，Å |
-| `CalcBuriedVolume(mol, atom_indices, center=i)` | 占据空间的原子和被排除的中心原子 | `vbur_percent`，百分数 |
-| `CalcPlaneDescriptors(mol, atom_indices, other_atom_indices=None)` | 一个或两个至少含三个原子的集合 | `plane_rms_a`、`plane_max_a`，可选 `centroid_distance_a`，Å；`plane_angle_deg`，度 |
-| `CalcHOMA(mol, ring_atom_indices)` | 有序环路径 | 无量纲 `homa` 和逐键 `length_a`，Å |
-| `CalcRingPuckering(mol, ring_atom_indices)` | 至少四元的有序环 | `q_total_a`、偶数环 `q_alternating_a`，Å；六元环 `theta_deg`；各模式的 `q_a` 和 `phi_deg` |
-| `CalcMCI(mol, result, ring_atom_indices)` | 有序环和保留的密度数据 | 无量纲 `mci`、原子块矩阵和定义 |
+| `CalcSterimol(mol, atomIndices, axis=(base, attached))` | 取代基和有向连接键 | `l_a`、`b1_a`、`b5_a`，Å |
+| `CalcBuriedVolume(mol, atomIndices, center=i)` | 占据空间的原子和被排除的中心原子 | `vbur_percent`，百分数 |
+| `CalcPlaneDescriptors(mol, atomIndices, otherAtomIndices=None)` | 一个或两个至少含三个原子的集合 | `plane_rms_a`、`plane_max_a`，可选 `centroid_distance_a`，Å；`plane_angle_deg`，度 |
+| `CalcHOMA(mol, ringAtomIndices)` | 有序环路径 | 无量纲 `homa` 和逐键 `length_a`，Å |
+| `CalcRingPuckering(mol, ringAtomIndices)` | 至少四元的有序环 | `q_total_a`、偶数环 `q_alternating_a`，Å；六元环 `theta_deg`；各模式的 `q_a` 和 `phi_deg` |
+| `CalcMCI(mol, result, ringAtomIndices)` | 有序环和保留的密度数据 | 无量纲 `mci`、原子块矩阵和定义 |
 
 报告使用统一的 `schema_version=2`、`descriptor_version`、对应的 `report_type` 和
 `protocol_version='1.0'`，包含 `values`、`units`、`missing`、`selection`、
@@ -60,8 +60,8 @@ many = RunLocalGeometryBatch([mol], selections,
 用 `json.dumps(report, allow_nan=False)` 保存 JSON 或 JSONL。
 `ExportDescriptorReports` 使用电子描述符报告 schema，局部几何报告直接保存为 JSON。
 
-位阻默认使用 RDKit van der Waals 半径，`radius_scale=1.0`。
-其他半径体系通过完整原子长度的 `radii_angstrom` 向量传入。
+位阻默认使用 RDKit van der Waals 半径，`radiusScale=1.0`。
+其他半径体系通过完整原子长度的 `radiiAngstrom` 向量传入。
 报告保存有效半径和 RDKit 版本。氢是否参与由选择集合显式决定。
 比较结果时应保持半径、氢处理、几何准备和描述符参数一致。
 
@@ -70,21 +70,21 @@ many = RunLocalGeometryBatch([mol], selections,
 轴由 base 指向 attached，两原子必须成键。集合必须包含 attached 并排除 base。
 每个被选原子是一个给定半径的球，相对位置以 base 为原点。
 
-- `L=max(轴向位置+半径)+l_correction_angstrom`，默认修正 0.4 Å。
+- `L=max(轴向位置+半径)+lCorrectionAngstrom`，默认修正 0.4 Å。
 - `B1=min_方向 max_原子(横向位置·方向+半径)`。
 - `B5=max_原子(到轴的距离+半径)`。
 
-B1 默认沿横截面整圆均匀采样 `angular_samples=7200` 个方向，离散计算相对精确
+B1 默认沿横截面整圆均匀采样 `angularSamples=7200` 个方向，离散计算相对精确
 极小值的正偏差不超过 `最大横向距离*pi/采样数`，记录在
 `b1_error_bound_angstrom`。增加采样数可缩小误差界。
 一个轴上原子球给出 B1=B5=球半径。与文献结果比较时需核对半径体系和 L 的定义。
 
 ## 埋藏体积
 
-以 `center` 原子为球心，`sphere_radius_angstrom=3.5`，计算所选原子球并集占据的
+以 `center` 原子为球心，`sphereRadiusAngstrom=3.5`，计算所选原子球并集占据的
 球内比例。中心原子必须从集合中排除，所选氢原子参与体积计算。
 
-采用以球心为中心的 Cartesian 中点网格，默认请求间距 `spacing_angstrom=0.1`。
+采用以球心为中心的 Cartesian 中点网格，默认请求间距 `spacingAngstrom=0.1`。
 球直径分成整数个网格单元，记录有效间距、球内点数和占据点数，百分数为
 `100*占据点数/球内点数`，重叠部分只计一次。有限网格下旋转不变性有数值误差，
 可减小间距检查结果敏感性。支持直径方向 4–256 个单元，按平面处理控制内存。
@@ -119,7 +119,7 @@ Inf. Comput. Sci. 1993, 33, 70–78。
 内置参数包括 C-C `(1.388,257.7)`、C-N `(1.334,93.52)`、C-O `(1.265,157.38)`
 和 C-S `(1.677,94.09)`，单位分别为 Å 和 Å⁻²，参数来源为 Krygowski 1993。
 其他参数体系可指定完整的 `parameters={(6,6):(Ropt_CC,alpha_CC),
-(6,7):(Ropt_CN,alpha_CN)}` 和非空 `parameter_source`。
+(6,7):(Ropt_CN,alpha_CN)}` 和非空 `parameterSource`。
 自定义表替代内置参数表。任何元素对缺少参数时，整个 HOMA 返回 `None`，
 原因是 `unsupported_element_pair`，同时保留全部测量键长。
 HOMA 依赖几何准备和参考参数，反映芳香性的几何特征，需结合具体化学体系解释。
@@ -139,7 +139,7 @@ B5 可按下式计算等权均值和总体标准差。
 import numpy as np
 from eled import CalcSterimol
 
-rows = [CalcSterimol(mol, substituent, axis=axis, conf_id=c.GetId())
+rows = [CalcSterimol(mol, substituent, axis=axis, confId=c.GetId())
         for c in mol.GetConformers()]
 b5 = np.array([row['values']['b5_a'] for row in rows])
 mean, std = float(b5.mean()), float(b5.std())

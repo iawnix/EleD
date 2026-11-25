@@ -52,20 +52,20 @@ if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
     raise RuntimeError("could not generate a conformer")
 AllChem.MMFFOptimizeMolecule(mol)
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
 values = CalcXTBDescriptors(result)
 
 print(values["xtb_energy_ha"])
 print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBResult` 可以重复使用。同一个结果可以继续生成描述符表、片段汇总、密度分析和报告，所有视图共享同一次已记录的引擎计算。
+`XTBResults` 可以重复使用（`XTBResult` 为兼容别名）。同一个结果可以继续生成描述符表、片段汇总、密度分析和报告，所有视图共享同一次已记录的引擎计算。如果只需要一步提取分子标量字典或注册到 RDKit 属性表，可使用 `CalcMolXTBDescriptors(mol)` 或 `RegisterRDKitProperties()`。
 
 ## 可以得到什么？
 
 | 层级 | 示例 | 主要入口 |
 | --- | --- | --- |
-| 分子级 | 能量、HOMO/LUMO、能隙、偶极矩、电荷统计 | `CalcXTBDescriptors` |
+| 分子级 | 能量、HOMO/LUMO、能隙、偶极矩、电荷统计、`rdMolDescriptors.Properties` | `CalcXTBDescriptors`、`CalcMolXTBDescriptors`、`RegisterRDKitProperties` |
 | 原子级 | xTB 电荷、Wiberg 总和、Fukui 函数和局部反应性 | `CalcXTBAtomDescriptors`、`RunReactivity` |
 | [静电势与拟合电荷](docs/zh-CN/esp-api.md) | 静电势采样、带约束的 ESP 和单阶段 RESP 电荷 | `GenerateESPGrid`、`CalcESP`、`FitESPCharges`、`FitRESPCharges` |
 | 键级 | Wiberg/Mayer 键级、前线轨道键贡献 | `CalcXTBBondDescriptors`、`CalcMayerBondDescriptors`、`CalcFrontierBondDescriptors` |
@@ -76,7 +76,7 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 
 ## 看一个实际输出
 
-下面的报告只来自一个嵌入后的乙醇构象和一次 EleD GFN2-xTB 单点计算。所有面板都使用同一个 `XTBResult`：分子图由 RDKit 绘制，片段电荷和相互作用视图由 EleD 生成。
+下面的报告只来自一个嵌入后的乙醇构象和一次 EleD GFN2-xTB 单点计算。所有面板都使用同一个 `XTBResults`：分子图由 RDKit 绘制，片段电荷和相互作用视图由 EleD 生成。
 
 <p align="center">
   <img alt="同一个 EleD 乙醇报告中的分子、片段和相互作用视图" src="docs/assets/eled-ethanol-report.svg" width="900">
@@ -93,11 +93,11 @@ from eled import (
 report = CalcDescriptorReport(
     mol,
     result,
-    record_id="ethanol",
+    recordId="ethanol",
     fragments={"ethyl": [0, 1, 3, 4, 5, 6, 7], "hydroxyl": [2, 8]},
 )
 
-molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
+molecule_svg = DrawDescriptorMap(mol, report, atomField="q_e")
 fragment_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
 ```
@@ -113,7 +113,7 @@ from eled import (
     CalcFrontierBondDescriptors, CalcPiDescriptors,
 )
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
 
 mulliken = CalcOrbitalPopulations(result, scheme="mulliken")
 lowdin = CalcOrbitalPopulations(result, scheme="lowdin")
@@ -124,7 +124,7 @@ frontier_bonds = CalcFrontierBondDescriptors(mol, result)
 pi = CalcPiDescriptors(mol, result)
 ```
 
-密度层直接消费已经保留的数据并沿用同一次 xTB 计算。单位、不变性约定和缺失值语义见[描述符目录](docs/zh-CN/descriptor-catalog.md)和[密度描述符说明](docs/density-descriptors.md)。
+密度层直接消费已经保留的数据并沿用同一次 xTB 计算。单位、不变性约定和缺失值语义见[描述符目录](docs/zh-CN/descriptor-catalog.md)和[密度描述符说明](docs/zh-CN/density-descriptors.md)。
 
 ## 反应性和几何
 
@@ -135,8 +135,8 @@ from eled import RunReactivity, XTBOptions
 
 reactivity = RunReactivity(
     mol,
-    options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
-    population_scheme="lowdin",
+    options=XTBOptions(method="GFN2-xTB", electronicTemperature=300.0),
+    populationScheme="lowdin",
 )
 print(reactivity["values"]["ip_v_ev"])
 print(reactivity["atoms"][0]["f_plus"])

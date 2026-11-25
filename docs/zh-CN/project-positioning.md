@@ -15,7 +15,7 @@ RDKit Mol / Conformer
         │
         ├── 几何准备和检查
         │
-        ├── XTBCalculator → XTBResult
+        ├── XTBCalculator → XTBResults
         │                         │
         │                         ├── 分子/原子/键描述符
         │                         ├── 密度和 shell 描述符
@@ -50,8 +50,8 @@ YAeHMOP 适配器只整理 RDKit 已有接口，供结果对照使用；它不�
 ```python
 from eled import XTBCalculator, CalcXTBDescriptors
 
-calculator = XTBCalculator(method="GFN2-xTB", electronic_temperature=300.0)
-result = calculator.calculate(mol, keep_overlap=True)
+calculator = XTBCalculator(method="GFN2-xTB", electronicTemperature=300.0)
+result = calculator.Calculate(mol, keepOverlap=True)
 features = CalcXTBDescriptors(result)
 ```
 

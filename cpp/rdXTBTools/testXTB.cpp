@@ -35,6 +35,9 @@ int main() {
     RDKit::XTBTools::XTBResults before, after, intermediate;
     require(RDKit::XTBTools::runMol(mol, before, options), "GFN2 calculation failed");
     require(before.numAtoms == 3 && before.numElectrons == 8 && before.numTotalElectrons == 10 && before.conformerId == 7, "Input identity or electron semantics changed");
+    require(before.cm5Charges.size() == 3, "GFN2 CM5 charges missing");
+    require(std::abs(before.cm5Charges[0] + before.cm5Charges[1] + before.cm5Charges[2]) < 1e-12, "CM5 charge conservation failed");
+    require(std::abs(before.cm5Charges[0] - before.atomicCharges[0]) > 1e-4, "CM5 correction was zero on water");
     require(before.gradientHartreePerBohr.size() == 9, "Gradient dimensions incorrect");
     for (double value : before.gradientHartreePerBohr)
       require(std::isfinite(value), "Gradient contains a non-finite value");
@@ -42,6 +45,7 @@ int main() {
     options.method = "GFN0-xTB";
     if (before.gfn0StateFixVerified) {
       require(RDKit::XTBTools::runMol(mol, intermediate, options), "GFN0 calculation failed");
+      require(intermediate.cm5Charges.empty(), "GFN0 should not expose CM5 charges");
     } else {
       bool rejected = false;
       try { RDKit::XTBTools::runMol(mol, intermediate, options); }

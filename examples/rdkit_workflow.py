@@ -3,16 +3,18 @@ import json
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from eled import (
-    XTBCache, XTBOptions, RunXTBBatch, AnnotateMol, CalcXTBDescriptors,
+    XTBCache, XTBOptions, RunXTBBatch, AnnotateMol, CalcMolXTBDescriptors, CalcXTBDescriptors,
 )
 
 mol = Chem.AddHs(Chem.MolFromSmiles('CCO'))
 if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
     raise RuntimeError('could not generate the ethanol conformer')
 cache = XTBCache()
+single_step = CalcMolXTBDescriptors(mol, cache=cache)
 results = RunXTBBatch([mol, mol], cache=cache, options=XTBOptions(backend='native'))
 annotated = AnnotateMol(mol, results[0])
 print(json.dumps({
+    'single_step_gap_ev': single_step['xtb_gap_ev'],
     'descriptors': CalcXTBDescriptors(results[0]),
     'engine': results[0].metadata['engine'],
     'carbon_charge': annotated.GetAtomWithIdx(0).GetDoubleProp('xtb_partial_charge'),

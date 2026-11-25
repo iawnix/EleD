@@ -11,7 +11,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 from eled import (XTBOptions, RunDescriptorBatch, RunReactivity,
-                       ExportDescriptorReports)
+                  ExportDescriptorReports)
 
 
 def molecule(smiles):
@@ -29,10 +29,10 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     smiles = ['O', 'CCO', '[CH3]']
     mols = [molecule(s) for s in smiles]
-    reports = RunDescriptorBatch(mols, record_ids=smiles)
+    reports = RunDescriptorBatch(mols, recordIds=smiles)
     for kind in ('csv', 'jsonl'):
         ExportDescriptorReports(reports, args.output / f'single-points.{kind}')
-    water = RunReactivity(mols[0], record_id='water', population_scheme='lowdin')
+    water = RunReactivity(mols[0], recordId='water', populationScheme='lowdin')
     ExportDescriptorReports([water], args.output / 'water-reactivity.jsonl')
     if args.sensitivity:
         # Each temperature is an explicit independent protocol, never a retry.
@@ -47,8 +47,8 @@ def main():
             for temperature in (0., 300., 1000.):
                 rows.append(RunReactivity(mol,
                     options=XTBOptions(method=method, accuracy=.1,
-                                       electronic_temperature=temperature),
-                    record_id=f'{smi}/{method}/{temperature}K', return_errors=True))
+                                       electronicTemperature=temperature),
+                    recordId=f'{smi}/{method}/{temperature}K', returnErrors=True))
         (args.output / 'sensitivity-inputs.json').write_text(json.dumps(inputs, indent=2) + '\n')
         for kind in ('csv', 'jsonl'):
             ExportDescriptorReports(rows, args.output / f'sensitivity.{kind}')

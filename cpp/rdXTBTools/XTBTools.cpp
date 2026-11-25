@@ -484,6 +484,10 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       for (size_t j = 0; j < i; ++j)
         std::swap(result.wibergBondOrders[i * n + j], result.wibergBondOrders[j * n + i]);
     requireFinite(result.atomicCharges, "atomic charges");
+    if (result.chargeModel == "xtb_scc_mulliken") {
+      result.cm5Charges = calcCM5Charges(result.atomicNumbers, result.coordinatesAngstrom,
+                                         result.atomicCharges);
+    }
     requireFinite(result.dipoleAtomicUnits, "dipole");
     requireFinite(result.wibergBondOrders, "bond orders");
     requireFinite(result.orbitalEnergiesEV, "orbital energies");
@@ -535,5 +539,81 @@ std::vector<XTBResults> runChargeStates(const ROMol &mol, const XTBOptions &opti
         !index && reuseReference ? &reference.res : nullptr)) break;
   }
   return results;
+}
+
+std::vector<double> calcCM5Charges(const std::vector<int> &atomicNumbers,
+                                   const std::vector<double> &coordinatesAngstrom,
+                                   const std::vector<double> &mullikenCharges) {
+  static constexpr std::array<double, 118> kRadiiAngstrom = {
+      0.32, 0.37, 1.30, 0.99, 0.84, 0.75, 0.71, 0.64, 0.60, 0.62,
+      1.60, 1.40, 1.24, 1.14, 1.09, 1.04, 1.00, 1.01, 2.00, 1.74,
+      1.59, 1.48, 1.44, 1.30, 1.29, 1.24, 1.18, 1.17, 1.22, 1.20,
+      1.23, 1.20, 1.20, 1.18, 1.17, 1.16, 2.15, 1.90, 1.76, 1.64,
+      1.56, 1.46, 1.38, 1.36, 1.34, 1.30, 1.36, 1.40, 1.42, 1.40,
+      1.40, 1.37, 1.36, 1.36, 2.38, 2.06, 1.94, 1.84, 1.90, 1.88,
+      1.86, 1.85, 1.83, 1.82, 1.81, 1.80, 1.79, 1.77, 1.77, 1.78,
+      1.74, 1.64, 1.58, 1.50, 1.41, 1.36, 1.32, 1.30, 1.30, 1.32,
+      1.44, 1.45, 1.50, 1.42, 1.48, 1.46, 2.42, 2.11, 2.01, 1.90,
+      1.84, 1.83, 1.80, 1.80, 1.73, 1.68, 1.68, 1.68, 1.65, 1.67,
+      1.73, 1.76, 1.61, 1.57, 1.49, 1.43, 1.41, 1.34, 1.29, 1.28,
+      1.21, 1.22, 1.36, 1.43, 1.62, 1.75, 1.65, 1.57,
+  };
+  static constexpr std::array<double, 118> kA0 = {
+      0.0056,  -0.1543, 0.0000,  0.0333,  -0.1030, -0.0446, -0.1072,
+      -0.0802, -0.0629, -0.1088, 0.0184,  0.0000,  -0.0726, -0.0790,
+      -0.0756, -0.0565, -0.0444, -0.0767, 0.0130,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  -0.0512, -0.0557, -0.0533, -0.0399, -0.0313,
+      -0.0541, 0.0092,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  -0.0361,
+      -0.0393, -0.0376, -0.0281, -0.0220, -0.0381, 0.0065,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  -0.0255, -0.0277, -0.0265, -0.0198, -0.0155,
+      -0.0269, 0.0046,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+      -0.0179, -0.0195, -0.0187, -0.0140, -0.0110, -0.0189,
+  };
+  const size_t n = atomicNumbers.size();
+  if (coordinatesAngstrom.size() != 3 * n || mullikenCharges.size() != n)
+    throw std::invalid_argument("CM5 inputs must have matching atom counts");
+  for (int z : atomicNumbers)
+    if (z < 1 || z > 118) throw std::invalid_argument("CM5 supports atomic numbers 1..118");
+  for (double v : coordinatesAngstrom)
+    if (!std::isfinite(v)) throw std::invalid_argument("CM5 coordinates must be finite 3-vectors");
+  for (double v : mullikenCharges)
+    if (!std::isfinite(v)) throw std::invalid_argument("Mulliken charges must be finite");
+  std::vector<double> out(mullikenCharges);
+  for (size_t i = 0; i < n; ++i) {
+    const int zi = atomicNumbers[i];
+    for (size_t j = 0; j < i; ++j) {
+      const int zj = atomicNumbers[j];
+      const double dx = coordinatesAngstrom[3 * i] - coordinatesAngstrom[3 * j];
+      const double dy = coordinatesAngstrom[3 * i + 1] - coordinatesAngstrom[3 * j + 1];
+      const double dz = coordinatesAngstrom[3 * i + 2] - coordinatesAngstrom[3 * j + 2];
+      const double distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+      if (distance == 0.0) throw std::invalid_argument("CM5 requires distinct atom coordinates");
+      if (zi == zj) continue;
+      const int zMin = std::min(zi, zj);
+      const int zMax = std::max(zi, zj);
+      double base = 0.0;
+      bool paired = true;
+      if (zMin == 1 && zMax == 6) base = 0.0502;
+      else if (zMin == 1 && zMax == 7) base = 0.1747;
+      else if (zMin == 1 && zMax == 8) base = 0.1671;
+      else if (zMin == 6 && zMax == 7) base = 0.0556;
+      else if (zMin == 6 && zMax == 8) base = 0.0234;
+      else if (zMin == 7 && zMax == 8) base = -0.0346;
+      else paired = false;
+      const double pij = paired ? (zi < zj ? base : -base) : (kA0[zi - 1] - kA0[zj - 1]);
+      const double weight = std::exp(-2.4740 * (distance - kRadiiAngstrom[zi - 1] - kRadiiAngstrom[zj - 1]));
+      out[i] += weight * pij;
+      out[j] -= weight * pij;
+    }
+  }
+  return out;
 }
 }  // namespace RDKit::XTBTools

@@ -1,51 +1,108 @@
 """An RDKit extension for electronic-structure descriptors backed by xTB.
 
-The public package is centered on :class:`XTBCalculator` and the project-built
-extended ``libxtb``.  The optional ``eled.descriptors`` module contains a
-small adapter for RDKit's pre-existing YAeHMOP/EHT interface; it is not part of
-the xTB descriptor protocol.
+The public package is centered on :class:`XTBCalculator`, :class:`XTBResults`
+and the project-built extended ``libxtb``, following RDKit's ``PascalCase``
+function/method and ``camelCase`` parameter/property conventions. Dataset
+splitting utilities for the frozen EAS study live in :mod:`eled.eas`.
 """
 
-from .xtb import (
+from .batch import RunXTBBatch, XTBCache, XTBCacheKey
+from .calculator import XTBCalculator
+from .conformers import ConformerDescriptorColumns, RunConformerAnalysis
+from .density_descriptors import (
+    CalcDensityDescriptors,
+    CalcDensityMatrix,
+    CalcFrontierBondDescriptors,
+    CalcMCI,
+    CalcMCIDescriptors,
+    CalcMayerBondDescriptors,
+    CalcPiDescriptors,
+    CalcShellPopulations,
+)
+from .descriptor_catalog import DescriptorCatalog, DescriptorStatus
+from .descriptors import CalcEHTDescriptors, CalcOrbitalDescriptors
+from .electronic_descriptors import (
+    CalcCM5Charges,
+    CalcXTBAtomDescriptors,
+    CalcXTBBondDescriptors,
+    CalcXTBFragmentDescriptors,
+)
+from .errors import (
+    DescriptorUnavailableError,
+    XTBCacheError,
+    XTBEnvironmentError,
     XTBError,
-    XTBResult,
-    XTBRunError,
     XTBNativeNotFoundError,
-    CalcXTBDescriptors,
+    XTBRunError,
+    XTBTimeoutError,
+    XTBWorkerError,
+)
+from .esp import CalcESP, ESPChargeFit, FitESPCharges, FitRESPCharges, GenerateESPGrid
+from .geometry import ConformerGenerationResult, PrepareConformers
+from .local_geometry import (
+    AnalyzeLocalGeometry,
+    CalcBuriedVolume,
+    CalcHOMA,
+    CalcPlaneDescriptors,
+    CalcRingPuckering,
+    CalcSterimol,
+    RunLocalGeometryBatch,
 )
 from .mapping import AnnotateMol
-from .batch import XTBCache, RunXTBBatch, XTBCacheKey
+from .optimization import OptimizeXTB, XTBOptimizationResult
 from .options import XTBOptions
-from .calculator import XTBCalculator
-
-from .electronic_descriptors import (
-    CalcXTBAtomDescriptors, CalcXTBBondDescriptors, CalcXTBFragmentDescriptors,
-    CalcCM5Charges,
+from .persistence import ReactivityCheckpoint, XTBDiskCache
+from .populations import CalcFrontierDescriptors, CalcOrbitalPopulations
+from .rdkit_descriptors import CalcMolXTBDescriptors, RegisterRDKitProperties
+from .reactivity import CalcReactivityDescriptors, ChargeStateCalculationError, RunReactivity
+from .reactivity_batch import ReactivityJob, RunReactivityBatch
+from .reports import (
+    DESCRIPTOR_VERSION,
+    AssessDescriptorQuality,
+    CalcDescriptorReport,
+    DescriptorColumns,
+    DescriptorSensitivity,
+    ExportDescriptorReports,
+    RunDescriptorBatch,
 )
-from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
-from .density_descriptors import (
-    CalcDensityMatrix, CalcShellPopulations, CalcMayerBondDescriptors,
-    CalcFrontierBondDescriptors, CalcPiDescriptors, CalcDensityDescriptors,
-    CalcMCI, CalcMCIDescriptors,
+from .selections import NormalizeSelections, SelectionSet
+from .visualization import (
+    BuildFragmentVisualData,
+    DrawDescriptorMap,
+    PlotFragmentInteractions,
+    PlotFragmentSummary,
+    RenderFragmentAnalysis,
 )
-from .errors import DescriptorUnavailableError
+from .xtb import CalcXTBDescriptors, XTBResult, XTBResults
 
 __all__ = [
     "XTBError",
+    "XTBResults",
     "XTBResult",
     "XTBRunError",
     "XTBNativeNotFoundError",
-    "CalcXTBDescriptors",
-    "AnnotateMol",
-    "XTBCache",
-    "RunXTBBatch",
-    "XTBCacheKey",
+    "XTBCacheError",
+    "XTBEnvironmentError",
+    "XTBTimeoutError",
+    "XTBWorkerError",
+    "DescriptorUnavailableError",
+    "ChargeStateCalculationError",
     "XTBOptions",
     "XTBCalculator",
+    "XTBCache",
+    "XTBDiskCache",
+    "XTBCacheKey",
+    "RunXTBBatch",
+    "CalcMolXTBDescriptors",
+    "RegisterRDKitProperties",
+    "CalcXTBDescriptors",
     "CalcXTBAtomDescriptors",
     "CalcXTBBondDescriptors",
     "CalcXTBFragmentDescriptors",
     "CalcCM5Charges",
+    "CalcEHTDescriptors",
+    "CalcOrbitalDescriptors",
+    "AnnotateMol",
     "CalcOrbitalPopulations",
     "CalcFrontierDescriptors",
     "CalcDensityMatrix",
@@ -56,75 +113,43 @@ __all__ = [
     "CalcDensityDescriptors",
     "CalcMCI",
     "CalcMCIDescriptors",
-    "DescriptorUnavailableError",
+    "DESCRIPTOR_VERSION",
+    "DescriptorColumns",
+    "AssessDescriptorQuality",
+    "CalcDescriptorReport",
+    "RunDescriptorBatch",
+    "ExportDescriptorReports",
+    "DescriptorSensitivity",
+    "DescriptorCatalog",
+    "DescriptorStatus",
+    "CalcReactivityDescriptors",
+    "RunReactivity",
+    "ReactivityJob",
+    "ReactivityCheckpoint",
+    "RunReactivityBatch",
+    "ConformerDescriptorColumns",
+    "RunConformerAnalysis",
+    "ConformerGenerationResult",
+    "PrepareConformers",
+    "XTBOptimizationResult",
+    "OptimizeXTB",
+    "BuildFragmentVisualData",
+    "DrawDescriptorMap",
+    "PlotFragmentSummary",
+    "PlotFragmentInteractions",
+    "RenderFragmentAnalysis",
+    "CalcESP",
+    "GenerateESPGrid",
+    "FitESPCharges",
+    "FitRESPCharges",
+    "ESPChargeFit",
+    "CalcSterimol",
+    "CalcBuriedVolume",
+    "CalcPlaneDescriptors",
+    "CalcHOMA",
+    "CalcRingPuckering",
+    "AnalyzeLocalGeometry",
+    "RunLocalGeometryBatch",
+    "SelectionSet",
+    "NormalizeSelections",
 ]
-
-from .reports import (
-    DESCRIPTOR_VERSION, DescriptorColumns, AssessDescriptorQuality,
-    CalcDescriptorReport, RunDescriptorBatch, ExportDescriptorReports,
-    DescriptorSensitivity,
-)
-from .reactivity import CalcReactivityDescriptors, RunReactivity, ChargeStateCalculationError
-
-__all__ += [
-    'DESCRIPTOR_VERSION', 'DescriptorColumns', 'AssessDescriptorQuality',
-    'CalcDescriptorReport', 'RunDescriptorBatch', 'ExportDescriptorReports',
-    'DescriptorSensitivity',
-    'CalcReactivityDescriptors', 'RunReactivity', 'ChargeStateCalculationError',
-]
-
-from .persistence import XTBDiskCache, ReactivityCheckpoint
-from .reactivity_batch import ReactivityJob, RunReactivityBatch
-from .errors import XTBCacheError, XTBEnvironmentError
-from .errors import XTBTimeoutError, XTBWorkerError
-
-__all__ += ['XTBDiskCache', 'ReactivityCheckpoint', 'ReactivityJob',
-            'RunReactivityBatch', 'XTBCacheError', 'XTBEnvironmentError',
-            'XTBTimeoutError', 'XTBWorkerError']
-
-from .conformers import ConformerDescriptorColumns, RunConformerAnalysis
-
-__all__ += ['ConformerDescriptorColumns', 'RunConformerAnalysis']
-
-from .geometry import ConformerGenerationResult, PrepareConformers
-
-__all__ += ['ConformerGenerationResult', 'PrepareConformers']
-
-from .optimization import XTBOptimizationResult, OptimizeXTB
-
-__all__ += ['XTBOptimizationResult', 'OptimizeXTB']
-
-from .eas import (NormalizeEASRecords, ClusterKeys, AssignEASSplits,
-                  AssignEASFolds, PrepareEASDataset, LoadFrozenProtocol,
-                  FrozenProtocolSHA256)
-from .descriptor_catalog import DescriptorCatalog, DescriptorStatus
-
-from .visualization import (
-    BuildFragmentVisualData, DrawDescriptorMap, PlotFragmentSummary,
-    PlotFragmentInteractions, RenderFragmentAnalysis,
-)
-
-__all__ += ['NormalizeEASRecords', 'ClusterKeys', 'AssignEASSplits', 'AssignEASFolds',
-            'PrepareEASDataset', 'LoadFrozenProtocol', 'FrozenProtocolSHA256',
-            'DescriptorCatalog', 'DescriptorStatus']
-
-__all__ += [
-    'BuildFragmentVisualData', 'DrawDescriptorMap', 'PlotFragmentSummary',
-    'PlotFragmentInteractions', 'RenderFragmentAnalysis',
-]
-
-from .esp import CalcESP, GenerateESPGrid, FitESPCharges, FitRESPCharges, ESPChargeFit
-
-__all__ += ['CalcESP', 'GenerateESPGrid', 'FitESPCharges', 'FitRESPCharges', 'ESPChargeFit']
-
-from .local_geometry import (
-    CalcSterimol, CalcBuriedVolume, CalcPlaneDescriptors, CalcHOMA, CalcRingPuckering,
-    AnalyzeLocalGeometry, RunLocalGeometryBatch,
-)
-
-__all__ += ['CalcSterimol', 'CalcBuriedVolume', 'CalcPlaneDescriptors', 'CalcHOMA',
-            'CalcRingPuckering', 'AnalyzeLocalGeometry', 'RunLocalGeometryBatch']
-
-from .selections import SelectionSet, NormalizeSelections
-
-__all__ += ['SelectionSet', 'NormalizeSelections']

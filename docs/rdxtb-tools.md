@@ -154,9 +154,12 @@ Python calls also share the existing ctypes adapter's lock. Independent xTB
 bindings and separately linked copies of the static C++ library do not share
 that lock. This does not establish general libxtb thread safety.
 
-The low-level `XTBResults` object is distinct from the `XTBResult` dataclass.
-Both work with the shared descriptor functions and `AnnotateMol`. Batch/cache
-APIs continue to produce the dataclass through ctypes.
+The low-level `rdXTBTools.XTBResults` object and the Python `XTBResults`
+(`XTBResult` alias) dataclass share matching `camelCase` scalar properties and
+`Get*()` NumPy copy getters, and both work with the shared descriptor functions
+and `AnnotateMol`. Batch/cache APIs produce the `XTBResults` dataclass through
+ctypes. Standalone C++ `RDKit::XTBTools::XTBResults` also populates
+`cm5Charges` directly for `GFN1/2` via `RDKit::XTBTools::calcCM5Charges`.
 
 ## Shared descriptor extraction
 

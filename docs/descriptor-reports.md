@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (1.3)
+# Descriptor reports and vertical reactivity (1.4)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.
@@ -9,9 +9,9 @@ are no additional Python dependencies.
 
 | Python / `XTBOptions` | `rdXTBTools.RunMol` | Default / constraint |
 | --- | --- | --- |
-| `max_iterations` | `maxIterations` | 250; positive 32-bit integer |
+| `maxIterations` | `maxIterations` | 250; positive 32-bit integer |
 | `accuracy` | `accuracy` | 1.0; finite, 1e-4 to 1e3; smaller is tighter |
-| `electronic_temperature` | `electronicTemperature` | 300 K; finite, nonnegative |
+| `electronicTemperature` | `electronicTemperature` | 300 K; finite, nonnegative |
 
 These are xTB numerical controls, not accuracy estimates. Booleans are rejected.
 Values outside the supported accuracy range are rejected instead of silently
@@ -27,9 +27,9 @@ from eled import (
     ExportDescriptorReports, XTBOptions, XTBCache,
 )
 
-result = XTBCalculator(accuracy=0.1).calculate(mol, keep_overlap=True)
-report = CalcDescriptorReport(mol, result, record_id="molecule-1")
-reports = RunDescriptorBatch(molecules, record_ids=identifiers, cache=XTBCache())
+result = XTBCalculator(accuracy=0.1).Calculate(mol, keepOverlap=True)
+report = CalcDescriptorReport(mol, result, recordId="molecule-1")
+reports = RunDescriptorBatch(molecules, recordIds=identifiers, cache=XTBCache())
 ExportDescriptorReports(reports, "features.csv")
 ExportDescriptorReports(reports, "features.jsonl")
 ```
@@ -39,7 +39,7 @@ topology and geometry before attaching atom/bond/spatial descriptors. It combine
 the [existing descriptors](descriptors.md), both population definitions and
 degeneracy-aware frontier distributions. `RunDescriptorBatch` retains overlap by default and supports
 [isolated parallel execution](isolated-batches.md). The same extended library
-is used for basic and overlap-aware features; set `keep_overlap=False` only
+is used for basic and overlap-aware features; set `keepOverlap=False` only
 when the additional basis snapshot is not needed.
 
 π analysis uses the same settings in `CalcDescriptorReport`, `RunDescriptorBatch`
@@ -47,20 +47,20 @@ and `RunConformerAnalysis`:
 
 | Argument | Default | Meaning |
 | --- | --- | --- |
-| `pi_scheme` | `"lowdin"` | `"lowdin"` or `"mulliken"` population/projection definition |
-| `pi_plane_tol_a` | `0.1` | Maximum distance from the local plane, Å; finite and nonnegative |
-| `pi_ref` | `None` | Original atom index → reference π electrons, between 0 and 2 e |
-| `mci_rings` | `None` | Named mapping of ordered rings for density-based MCI |
-| `mci_scheme` | `mulliken` | `mulliken` or `lowdin` atom-block density convention |
+| `piScheme` | `"lowdin"` | `"lowdin"` or `"mulliken"` population/projection definition |
+| `piPlaneTolAngstrom` | `0.1` | Maximum distance from the local plane, Å; finite and nonnegative |
+| `piRef` | `None` | Original atom index → reference π electrons, between 0 and 2 e |
+| `mciRings` | `None` | Named mapping of ordered rings for density-based MCI |
+| `mciScheme` | `mulliken` | `mulliken` or `lowdin` atom-block density convention |
 
 ```python
-pi_settings = dict(pi_scheme="mulliken", pi_plane_tol_a=0.05, pi_ref={0: 1.0})
+pi_settings = dict(piScheme="mulliken", piPlaneTolAngstrom=0.05, piRef={0: 1.0})
 report = CalcDescriptorReport(mol, result, **pi_settings)
 reports = RunDescriptorBatch([mol], **pi_settings)
 ```
 
 All settings are retained in `analysis_settings`, including failed batch rows.
-`pi_ref` overrides only the listed atoms; unlisted atoms follow the
+`piRef` overrides only the listed atoms; unlisted atoms follow the
 [default reference rules](density-descriptors.md#local-π-projections).
 The reference map is copied and stored with decimal string keys so exported
 JSON settings can be reused with `CalcDescriptorReport(..., **settings)`.
@@ -71,8 +71,8 @@ input molecule are rejected before batch/conformer engine calls.
 Changing these analysis settings does not change the underlying xTB cache key.
 Sensitivity comparisons require the same π settings.
 
-The report schema version is **2** and descriptor-definition version is **1.3**;
-neither is the package version. `DescriptorColumns(frontier_depth=2)` returns
+The report schema version is **2** and descriptor-definition version is **1.4**;
+neither is the package version. `DescriptorColumns(frontierDepth=2)` returns
 the ordered scalar schema and units. Each report includes:
 
 - `values`, `units`: fixed molecular/frontier scalar fields. Numeric units are
@@ -116,13 +116,13 @@ Convergence criteria are not an experimental accuracy guarantee.
 from eled import RunReactivity, XTBOptions, CalcReactivityDescriptors
 
 # Default protocol: GFN2, 300 K, reference wavefunction copies, fixed geometry.
-reaction = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
+reaction = RunReactivity(mol, populationScheme="lowdin", returnErrors=True)
 print(reaction["values"]["ip_v_ev"])
 print(reaction["atoms"])  # f_plus, f_minus, f_radical, dual
 
 # Explicit independent initialization for comparison; no automatic selection.
-reaction = RunReactivity(mol, options=XTBOptions(electronic_temperature=300.),
-                          interface="compiled", initialization="independent", return_errors=True)
+reaction = RunReactivity(mol, options=XTBOptions(electronicTemperature=300.),
+                         interface="compiled", initialization="independent", returnErrors=True)
 # Existing compatible results can instead be analyzed without new calculations:
 # CalcReactivityDescriptors(mol, reference, ionized, attached)
 ```
@@ -138,12 +138,12 @@ ionized Q+1 and attached Q−1 at the **same input geometry**, method, numerical
 settings, engine and parameter identity. Inputs require explicit H atoms and
 a 3D conformer, as for `XTBCalculator`. No optimization or spin-state search occurs.
 For a closed-shell reference, adjacent states default to one unpaired electron.
-For an open-shell reference, explicitly supply both `ionized_uhf` and
-`attached_uhf`; spin parity is validated. The selected states are not asserted
+For an open-shell reference, explicitly supply both `ionizedUnpaired` and
+`attachedUnpaired`; spin parity is validated. The selected states are not asserted
 to be ground states.
 
 Since 0.7, `RunReactivity()` and `XTBOptions()` both default to 300 K.
-Explicit `XTBOptions(electronic_temperature=0.)` still requests the 1e-6 K
+Explicit `XTBOptions(electronicTemperature=0.)` still requests the 1e-6 K
 engine floor. Temperature is an electronic occupation setting, not a nuclear
 thermal ensemble or a solution free energy. Finite-T results retain their flag.
 
@@ -157,10 +157,10 @@ triplet workflow, including failures. Returned results contain owned arrays.
 
 `initialization="independent"` uses fresh guesses for every state, reproducing
 0.6 initialization. To reproduce the complete 0.6 default protocol, also set
-`electronic_temperature=0.` explicitly. Reports record `protocol_version="2.0"`
+`electronicTemperature=0.` explicitly. Reports record `protocol_version="2.1"`
 and requested initialization in `analysis_settings`; successful state provenance
-records the actual initialization. Descriptor version 1.3 and schema 2 identify
-the added nested density sections; existing scalar columns remain unchanged.
+records the actual initialization. Descriptor version 1.4 and schema 2 identify
+the aligned settings and nested density sections; existing scalar columns remain unchanged.
 
 Reference reuse can improve convergence, but neither initialization guarantees
 the lowest SCF solution. Compare protocols explicitly if this matters; the API
@@ -186,10 +186,9 @@ bound anion. These values use the libxtb total-energy API and are approximate
 GFN descriptors, **not calibrated experimental IP/EA or optical excitations**.
 
 For atomic electron populations nA, f+ = nA(N+1)−nA(N), f− = nA(N)−nA(N−1),
-f0 = (f++f−)/2, dual = f+−f−. `population_scheme="xtb_scc"` uses differences
-of the converged GFN1/2 SCC Mulliken charges; `population_scheme="cm5"` uses
-the explicitly derived xTB CM5 charges. For compatibility, `"charges"` maps to
-`"xtb_scc"`. `"mulliken"` and `"lowdin"` refer to
+f0 = (f++f−)/2, dual = f+−f−. `populationScheme="xtb_scc"` uses differences
+of the converged GFN1/2 SCC Mulliken charges; `populationScheme="cm5"` uses
+the explicitly derived xTB CM5 charges. `"mulliken"` and `"lowdin"` refer to
 occupation-weighted orbital populations and require the extended basis API.
 The report records both the population scheme and charge model; signed values
 are preserved and sums are checked against 1, 1 and 0. Explicit disjoint
@@ -197,10 +196,10 @@ are preserved and sums are checked against 1, 1 and 0. Explicit disjoint
 distinct from frontier-MO population approximations.
 
 Any charge-state calculation failure stops subsequent states. Runtime/setup,
-allocation/extraction and unexpected errors propagate even with `return_errors=True`
+allocation/extraction and unexpected errors propagate even with `returnErrors=True`
 (since 0.8); only genuine single-point failures receive error reports. By default this
 raises `ChargeStateCalculationError`, with `.state` and `.states` diagnostics.
-`return_errors=True` returns null derived features and retains completed states,
+`returnErrors=True` returns null derived features and retains completed states,
 failed-state diagnostics, requested settings/spins and `not_run` states. Invalid
 inputs, unsupported options and engine resolution errors before the state loop,
 or incompatible results during analysis, still raise; this flag is not a blanket
@@ -225,7 +224,7 @@ behavior, not predictive accuracy. Conformer sensitivity and a QM8 descriptor pi
 Solvent support and calibrated IP/EA validation remain outside this protocol.
 
 
-The `charges` and `mulliken` options for gas-phase GFN1/2 are two extraction/
+The `xtb_scc` and `mulliken` options for gas-phase GFN1/2 are two extraction/
 validation paths for the same population definition, rather than independent
 new descriptors. Löwdin is a distinct, established partition. Original xTB
 already supports atomic charge-difference Fukui via `--vfukui`; our contribution

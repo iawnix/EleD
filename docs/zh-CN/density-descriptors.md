@@ -1,15 +1,15 @@
 # 密度描述符
 
 EleD 从保留的 xTB 结果中提取 shell 布居、键级和局部 π 特征，不增加引擎调用。
-`keep_overlap=True` 保存同一次计算的重叠矩阵 `S`、系数 `C`、占据数 `n`、
+`keepOverlap=True` 保存同一次计算的重叠矩阵 `S`、系数 `C`、占据数 `n`、
 AO/shell 映射及 p 轨道分量方向。
 
 ```python
 from eled import XTBCalculator, CalcDensityDescriptors, CalcPiDescriptors
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
 density = CalcDensityDescriptors(mol, result)
-pi = CalcPiDescriptors(mol, result, scheme="lowdin", plane_tol_a=0.1)
+pi = CalcPiDescriptors(mol, result, scheme="lowdin", planeTolAngstrom=0.1)
 ```
 
 原子和键沿用 RDKit 输入编号。接受 `mol` 的分析函数会核对拓扑、原子顺序和
@@ -79,9 +79,9 @@ mul_ovlp_e(A,B) = 2 Σ[μ∈A,ν∈B] PGμν Sμν
 `CalcPiDescriptors` 适用于具有一个完整 p 壳层、且局部平面明确的 sp²/芳香
 原子。环原子的拟合平面使用所有包含该原子的环的原子集合；其他原子使用
 自身及相邻原子。至少需要三个不共线点，所有点到拟合平面的最大距离不得
-超过 `plane_tol_a`，默认 0.1 Å。
+超过 `planeTolAngstrom`，默认 0.1 Å。
 
-结果的 `ao_p_directions` 将 p 分量方向附在 AO 行上。局部单位法向据此
+结果的 `aoPDirections` 将 p 分量方向附在 AO 行上。局部单位法向据此
 映射为仅在原子 A 的 p 壳层上非零的向量 `vA`。AO 排列或符号变化时，同步
 变换方向信息即可保持投影定义。`scheme` 支持默认的 `"lowdin"` 和 `"mulliken"`：
 
@@ -92,10 +92,10 @@ mul_ovlp_e(A,B) = 2 Σ[μ∈A,ν∈B] PGμν Sμν
 | `pi_bo` | `(vAᵀ D vB)²` | `(vAᵀ M vB)(vBᵀ M vA)` | 无量纲 |
 
 π 参考电子数默认仅对**中性、无自由基的 sp²/芳香碳取 1 e**。其他原子的
-`pi_n_e` 仍可计算；`pi_q_e` 则需要显式参考值，例如 `pi_ref={atom_index: 2.0}`。
+`pi_n_e` 仍可计算；`pi_q_e` 则需要显式参考值，例如 `piRef={atom_index: 2.0}`。
 参考值范围为 0 至 2 e。原子的总价电子数不能作为 π 参考电子数。
 返回的 `pi_ref` 使用 JSON 字符串键记录显式覆盖值。`CalcDensityDescriptors`、
-报告、批处理和构象分析均支持 `pi_scheme`、`pi_plane_tol_a`、`pi_ref`，
+报告、批处理和构象分析均支持 `piScheme`、`piPlaneTolAngstrom`、`piRef`，
 详见[报告参数](descriptor-reports.md#π-分析参数)。
 
 `pi_bo` 是投影键指标，不是重叠布居的绝对值，也不是总键级的完整分解。
@@ -125,8 +125,8 @@ mul_ovlp_e(A,B) = 2 Σ[μ∈A,ν∈B] PGμν Sμν
 
 ## 敏感性诊断
 
-`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature_300=...,
-temperature_1000=...)` 读取已有的单点或构象报告，分别输出构象标准差、
+`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature300=...,
+temperature1000=...)` 读取已有的单点或构象报告，分别输出构象标准差、
 GFN1/GFN2 绝对差值和 300 K/1000 K 电子温度绝对差值，不重新计算。
 
 比较要求原子顺序、几何、电荷/自旋、引擎、分析设置及失败构象位置一致。

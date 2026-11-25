@@ -14,7 +14,7 @@ from eled import (
 # Supply explicit-H molecules with finite 3D conformers.
 jobs = [
     ReactivityJob("water", water),
-    ReactivityJob("radical", methyl_radical, ionized_uhf=0, attached_uhf=0),
+    ReactivityJob("radical", methyl_radical, ionizedUnpaired=0, attachedUnpaired=0),
     ReactivityJob("custom", another_mol, options=XTBOptions(accuracy=0.1),
                   fragments={"first_atom": [0]}),
 ]
@@ -28,7 +28,7 @@ ExportDescriptorReports(rows, "results/descriptors.jsonl")
 Call the same function with the same jobs and checkpoint after interruption.
 IDs must be nonempty, unique strings; output order follows input order. A job's
 `options` overrides the batch `options` object as a whole, rather than merging
-individual fields. `population_scheme`, `interface` and `initialization` are
+individual fields. `populationScheme`, `interface` and `initialization` are
 batch-wide settings with the same meanings as `RunReactivity`. Open-shell jobs
 must specify both adjacent spin counts. Every input molecule is snapshotted.
 
@@ -49,10 +49,10 @@ molecule from its reference. A successful cache write just before interruption
 can still be reused even if its checkpoint row was not committed.
 
 Completed checkpoint rows are reused by default, including failed rows. Use
-`retry_failed=True` to retry failures explicitly under the same protocol.
-`checkpoint.history(record_id)` returns all saved attempts; replacing a failed
+`retryFailed=True` to retry failures explicitly under the same protocol.
+`checkpoint.GetHistory(recordId)` returns all saved attempts; replacing a failed
 current row with a successful retry preserves the earlier diagnostic.
-`checkpoint.reports()` returns completed rows in dataset order. Interrupted
+`checkpoint.GetReports()` returns completed rows in dataset order. Interrupted
 attempts with no completed report are not counted as committed attempts.
 
 Changing IDs, order, geometry or any calculation protocol rejects the existing
@@ -96,7 +96,7 @@ failures retain their three-state diagnostics and null derived descriptors.
 Missing open-shell spins, invalid spin parity, fragment definitions, duplicate
 IDs, unsupported methods, missing/incompatible libraries or basis capabilities
 raise. Unexpected programming/analysis errors also raise. Since 0.8,
-`RunReactivity(return_errors=True)` no longer suppresses arbitrary exceptions:
+`RunReactivity(returnErrors=True)` no longer suppresses arbitrary exceptions:
 allocation/setup/extraction failures raise `XTBEnvironmentError`, while genuine
 single-point failures retain `ChargeStateCalculationError` reporting. C++ results
 expose `failureKind` for that distinction; rebuild compiled consumers on upgrade.

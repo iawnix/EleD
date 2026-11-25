@@ -4,9 +4,11 @@ The public descriptor API has five layers. The complete machine-readable
 catalog is returned by `eled.DescriptorCatalog()`; this page states which
 layers are appropriate for validation.
 
-Public descriptor functions follow RDKit's `Calc...` / `Run...` naming.
-Report fields and Python analysis arguments use `snake_case`. Unit suffixes are lower-case and explicit, for example
-`xtb_gap_ev`, `xtb_energy_ha`, `xtb_dip_ebohr` and
+Public descriptor functions and class methods follow RDKit's `PascalCase`
+(`Calc...`, `Run...`, `Calculate`, `Get*`), and Python parameters and result
+attributes use `camelCase` (`confId`, `keepOverlap`, `totalEnergyHartree`).
+Serialized report/CSV feature column names use compact unit-suffixed lowercase
+`snake_case`, for example `xtb_gap_ev`, `xtb_energy_ha`, `xtb_dip_ebohr` and
 `s_1ev`. There is one public spelling for each field. `DescriptorCatalog()` expands grouped
 definitions into exact fields such as `mul_s_e`, `low_d_e` and `low_qrec_e`.
 
@@ -25,9 +27,9 @@ The naming rules keep feature columns short while retaining their meaning:
 
 | Layer | Main API | What it means | Engine calls during extraction |
 | --- | --- | --- | --- |
-| Molecular | `CalcXTBDescriptors` | Energy, frontier energies, dipole, charge and Wiberg summaries | 0 |
+| Molecular | `CalcXTBDescriptors`, `CalcMolXTBDescriptors`, `RegisterRDKitProperties` | Energy, frontier energies, dipole, charge and Wiberg summaries | 0 for `CalcXTBDescriptors`; 1 single point for single-step wrappers |
 | Atom/bond topology | `CalcXTBAtomDescriptors`, `CalcXTBBondDescriptors` | Engine charges, incident Wiberg sums and RDKit-bond Wiberg orders | 0 |
-| Orbital density | `CalcOrbitalPopulations`, `CalcShellPopulations`, `CalcDensityMatrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keep_overlap=True` |
+| Orbital density | `CalcOrbitalPopulations`, `CalcShellPopulations`, `CalcDensityMatrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keepOverlap=True` |
 | Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcMayerBondDescriptors` | Degeneracy-invariant HOMO/LUMO localization and signed bond decompositions | 0; closed-shell Mayer only |
 | Reactivity | `CalcReactivityDescriptors`, `RunReactivity` | Vertical ΔSCF IP/EA, Fukui and local conceptual-DFT indices | 0 for `CalcReactivityDescriptors`; 3 single points for `RunReactivity` |
 
@@ -53,7 +55,7 @@ The stable feature groups for the EAS study are:
   order. These are available from one ordinary single-point calculation.
 - **Density features** (the candidate extension for the EAS study): Mulliken
   and Löwdin s/p/d populations and p/s ratios. They require the extended
-  libxtb result with `keep_overlap=True`, but add no engine call.
+  libxtb result with `keepOverlap=True`, but add no engine call.
 - **Reactivity features**: vertical IP/EA, global hardness/softness and
   atom-level Fukui/local indices. They require three matched GFN1/2 charge
   states at the same geometry, so they are a separate analysis rather than

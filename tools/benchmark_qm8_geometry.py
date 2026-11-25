@@ -29,6 +29,22 @@ _spec.loader.exec_module(pilot)
 
 PROTOCOL = 'qm8-geometry-v1'
 BOOTSTRAP_REPLICATES = 5000
+_LEGACY_OPTION_KEYS = {
+    'conf_id': 'confId',
+    'uhf': 'numUnpairedElectrons',
+    'xtb_library': 'xtbLibrary',
+    'keep_overlap': 'keepOverlap',
+    'max_iterations': 'maxIterations',
+    'electronic_temperature': 'electronicTemperature',
+    'esp_points_angstrom': 'espPointsAngstrom',
+}
+
+
+def _options_from_manifest(raw):
+    if not isinstance(raw, dict):
+        raise ValueError('options must be a JSON object')
+    mapped = {_LEGACY_OPTION_KEYS.get(k, k): v for k, v in raw.items()}
+    return XTBOptions(**mapped)
 
 
 def prepare_geometry(smiles, identifier):
@@ -112,7 +128,7 @@ def read_evidence(root):
     with gzip.open(root/required[1], 'rt') as handle: rows = [json.loads(line) for line in handle]
     if manifest['protocol'] != 'qm8-pilot-v1' or manifest['sha256'] != pilot.SHA256:
         raise ValueError('unsupported source protocol')
-    if (manifest['options'] != XTBOptions(keep_overlap=True).to_dict()
+    if (_options_from_manifest(manifest['options']) != XTBOptions(keepOverlap=True)
             or manifest['basic_features'] != list(pilot.FROZEN_BASIC) or manifest['orbital_features'] != list(pilot.ORBITAL)
             or manifest['rdkit_features'] != list(pilot.TWO_D) + ['Morgan radius2, 1024bits, no chirality']):
         raise ValueError('feature or calculation protocol differs from frozen pilot')
@@ -187,7 +203,7 @@ def main():
             if not np.allclose(two_d, original['rdkit'], atol=1e-10, rtol=1e-12):
                 raise ValueError('2D features changed after canonical reconstruction: ' + identifier)
             t = time.perf_counter()
-            try: result = XTBCalculator(**frozen['options']).calculate(mol)
+            try: result = XTBCalculator(**_options_from_manifest(frozen['options']).ToDict()).Calculate(mol)
             except XTBEnvironmentError: raise
             except XTBRunError as exc:
                 failures.append({'id': identifier, 'stage': 'xtb', 'reason': str(exc)}); continue

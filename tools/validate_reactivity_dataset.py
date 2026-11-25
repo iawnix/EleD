@@ -25,13 +25,13 @@ def load_jobs(path, method):
         for i,xyz in enumerate(case['positions_angstrom']):conf.SetAtomPosition(i,xyz)
         mol.AddConformer(conf)
         jobs.append(ReactivityJob(case['name'],mol,
-            options=XTBOptions(method=method,charge=case['charge'],uhf=case['uhf'],accuracy=.1),
-            ionized_uhf=case['ionized_uhf'],attached_uhf=case['attached_uhf']))
+            options=XTBOptions(method=method,charge=case['charge'],numUnpairedElectrons=case['uhf'],accuracy=.1),
+            ionizedUnpaired=case['ionized_uhf'],attachedUnpaired=case['attached_uhf']))
     for name in ['ethanol','ammonium']:
-        job=next(j for j in jobs if j.record_id==name)
-        jobs.append(replace(job,record_id=name+'-cold',options=replace(job.options,electronic_temperature=0.)))
-    job=next(j for j in jobs if j.record_id=='ethanol')
-    jobs.append(replace(job,record_id='ethanol-one-iteration',options=replace(job.options,max_iterations=1)))
+        job=next(j for j in jobs if j.recordId==name)
+        jobs.append(replace(job,recordId=name+'-cold',options=replace(job.options,electronicTemperature=0.)))
+    job=next(j for j in jobs if j.recordId=='ethanol')
+    jobs.append(replace(job,recordId='ethanol-one-iteration',options=replace(job.options,maxIterations=1)))
     return jobs
 
 

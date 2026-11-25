@@ -1,5 +1,4 @@
 """Interruptions, protocol isolation, transaction integrity and fatal errors."""
-from copy import deepcopy
 from dataclasses import replace
 import json
 import sqlite3
@@ -8,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from rdkit import Chem
 
-from eled import (XTBOptions, XTBResult, XTBDiskCache, ReactivityCheckpoint,
+from eled import (XTBOptions, XTBResults, XTBDiskCache, ReactivityCheckpoint,
     ReactivityJob, RunReactivityBatch, XTBCacheError, XTBEnvironmentError,
     RunReactivity, ExportDescriptorReports)
 from eled.reactivity import _empty_report, REACTIVITY_UNITS
@@ -23,7 +22,7 @@ def molecule(smi='O'):
 
 
 def report(failed=False):
-    r=_empty_report(None,'charges',{k:{'status':'success'} for k in ('reference','ionized','attached')})
+    r=_empty_report(None,'xtb_scc',{k:{'status':'success'} for k in ('reference','ionized','attached')})
     r['quality']={'status':'error' if failed else 'ok','flags':[]}
     if failed:
         r['error']={'type':'ChargeStateCalculationError','state':'ionized','message':'SCF failed'}
@@ -35,7 +34,7 @@ def report(failed=False):
 @pytest.fixture
 def environment(monkeypatch):
     import eled.reactivity_batch as batch
-    monkeypatch.setattr(batch,'_resolve_options',lambda c:replace(c,xtb_library='/fake/libxtb.so'))
+    monkeypatch.setattr(batch,'_resolve_options',lambda c:replace(c,xtbLibrary='/fake/libxtb.so'))
     monkeypatch.setattr(batch,'_engine_identity',lambda *a:{'sha256':'engine-v1','orbital_basis':True})
     monkeypatch.setattr(batch,'_parameter_file',lambda *a:{'sha256':'parameters-v1'})
     monkeypatch.setattr(batch,'_parameter_context',lambda :{})
@@ -44,24 +43,24 @@ def environment(monkeypatch):
 
 def test_disk_cache_roundtrips_arrays_across_instances_and_rejects_corruption(tmp_path):
     path=tmp_path/'cache.sqlite'
-    result=XTBResult('GFN2-xTB',None,-1.,2.,2,2,0,orbital_energies_ev=(-1.,1.),
-        orbital_occupations=(2.,0.),overlap_matrix=((1.,0.),(0.,1.)),
+    result=XTBResults('GFN2-xTB',None,-1.,2.,2,2,0,orbitalEnergiesEV=(-1.,1.),
+        orbitalOccupancies=(2.,0.),overlapMatrix=((1.,0.),(0.,1.)),
         metadata={'calculation_status':'success','nested':{'value':1}})
-    XTBDiskCache(path).set('single',result)
-    loaded=XTBDiskCache(path).get('single')
-    assert loaded==result and isinstance(loaded.overlap_matrix[0],tuple)
+    XTBDiskCache(path).Set('single',result)
+    loaded=XTBDiskCache(path).Get('single')
+    assert loaded==result and isinstance(loaded.overlapMatrix[0],tuple)
     loaded.metadata['nested']['value']=9
-    assert XTBDiskCache(path).get('single').metadata['nested']['value']==1
+    assert XTBDiskCache(path).Get('single').metadata['nested']['value']==1
     with sqlite3.connect(path) as db:
         db.execute("UPDATE records SET payload='{}' WHERE key='single'")
-    with pytest.raises(XTBCacheError,match='checksum'):XTBDiskCache(path).get('single')
+    with pytest.raises(XTBCacheError,match='checksum'):XTBDiskCache(path).Get('single')
 
 
 def test_cache_refuses_failed_nonfinite_and_unrelated_database(tmp_path):
     cache=XTBDiskCache(tmp_path/'cache.sqlite')
-    with pytest.raises(ValueError):cache.set('failed',report(True))
+    with pytest.raises(ValueError):cache.Set('failed',report(True))
     bad=report();bad['values']['ip_v_ev']=float('nan')
-    with pytest.raises(ValueError):cache.set('bad',bad)
+    with pytest.raises(ValueError):cache.Set('bad',bad)
     assert len(cache)==0
     path=tmp_path/'unrelated.sqlite'
     with sqlite3.connect(path) as db:db.execute('CREATE TABLE keep_me (v TEXT)')
@@ -74,7 +73,7 @@ def test_interruption_commits_only_completed_rows_and_resumes(environment,tmp_pa
     checkpoint=tmp_path/'checkpoint.sqlite'
     with patch('eled.reactivity_batch.RunReactivity',side_effect=[report(),KeyboardInterrupt]):
         with pytest.raises(KeyboardInterrupt):RunReactivityBatch(jobs,checkpoint=checkpoint)
-    assert len(ReactivityCheckpoint(checkpoint).reports())==1
+    assert len(ReactivityCheckpoint(checkpoint).GetReports())==1
     with patch('eled.reactivity_batch.RunReactivity',return_value=report()) as calculate:
         rows=RunReactivityBatch(jobs,checkpoint=checkpoint)
     assert calculate.call_count==1
@@ -97,9 +96,9 @@ def test_failure_history_is_preserved_and_only_explicitly_retried(environment,tm
     with patch('eled.reactivity_batch.RunReactivity',side_effect=AssertionError('retried')):
         assert RunReactivityBatch(jobs,checkpoint=checkpoint)[0]['error']
     with patch('eled.reactivity_batch.RunReactivity',return_value=report()) as calculate:
-        rows=RunReactivityBatch(jobs,checkpoint=checkpoint,cache=cache,retry_failed=True)
+        rows=RunReactivityBatch(jobs,checkpoint=checkpoint,cache=cache,retryFailed=True)
     assert calculate.call_count==1 and len(cache)==1 and rows[0]['execution']['attempt']==2
-    history=checkpoint.history('water')
+    history=checkpoint.GetHistory('water')
     assert len(history)==2 and history[0]['report']['error'] and history[1]['report']['error'] is None
 
 
@@ -127,15 +126,15 @@ def test_protocol_changes_do_not_hit_old_cache(environment,tmp_path,monkeypatch,
     kwargs={}
     with patch.object(batch,'RunReactivity',side_effect=lambda *a,**k:report()) as calculate:
         RunReactivityBatch([job],cache=cache)
-        if change=='temperature':kwargs['options']=XTBOptions(electronic_temperature=0.)
+        if change=='temperature':kwargs['options']=XTBOptions(electronicTemperature=0.)
         if change=='accuracy':kwargs['options']=XTBOptions(accuracy=.1)
-        if change=='iterations':kwargs['options']=XTBOptions(max_iterations=300)
+        if change=='iterations':kwargs['options']=XTBOptions(maxIterations=300)
         if change=='method':kwargs['options']=XTBOptions(method='gfn1')
         if change=='initialization':kwargs['initialization']='independent'
-        if change=='scheme':kwargs['population_scheme']='lowdin'
+        if change=='scheme':kwargs['populationScheme']='lowdin'
         if change=='interface':kwargs['interface']='compiled'
         if change=='geometry':job.mol.GetConformer().SetAtomPosition(1,(3.,2.,1.))
-        if change=='spin':job=replace(job,ionized_uhf=3)
+        if change=='spin':job=replace(job,ionizedUnpaired=3)
         if change=='fragments':job=replace(job,fragments={'oxygen':[0]})
         if change=='engine':monkeypatch.setattr(batch,'_engine_identity',lambda *a:{'sha256':'engine-v2','orbital_basis':True})
         if change=='parameters':monkeypatch.setattr(batch,'_parameter_file',lambda *a:{'sha256':'parameters-v2'})
@@ -162,7 +161,7 @@ def test_runtime_failures_abort_without_recording_a_molecular_failure(environmen
     cp=ReactivityCheckpoint(tmp_path/'checkpoint.sqlite')
     with patch('eled.reactivity_batch.RunReactivity',side_effect=error):
         with pytest.raises(type(error)):RunReactivityBatch([ReactivityJob('a',molecule())],checkpoint=cp)
-    assert cp.reports()==[]
+    assert cp.GetReports()==[]
 
 
 def test_checkpoint_concurrent_writer_and_tampered_row_are_rejected(environment,tmp_path):
@@ -176,8 +175,8 @@ def test_checkpoint_concurrent_writer_and_tampered_row_are_rejected(environment,
 
 def test_single_reactivity_does_not_hide_runtime_errors():
     with patch('eled.reactivity._resolve_options',side_effect=lambda c:c), \
-         patch('eled.reactivity.XTBCalculator.calculate',side_effect=ImportError('broken runtime')):
-        with pytest.raises(ImportError):RunReactivity(molecule(),return_errors=True,initialization='independent')
+         patch('eled.reactivity.XTBCalculator.Calculate',side_effect=ImportError('broken runtime')):
+        with pytest.raises(ImportError):RunReactivity(molecule(),returnErrors=True,initialization='independent')
 
 
 def test_concurrent_disk_writes_are_complete(tmp_path):
@@ -185,8 +184,8 @@ def test_concurrent_disk_writes_are_complete(tmp_path):
     path=tmp_path/'concurrent.sqlite'
     def write(index):
         cache=XTBDiskCache(path)
-        cache.set(str(index),report())
-        assert cache.get(str(index))['error'] is None
+        cache.Set(str(index),report())
+        assert cache.Get(str(index))['error'] is None
     with ThreadPoolExecutor(max_workers=4) as executor:
         list(executor.map(write,range(12)))
     assert len(XTBDiskCache(path))==12
@@ -202,4 +201,4 @@ def test_checkpoint_write_error_aborts_and_keeps_prior_commit(environment,tmp_pa
     with patch.object(cp,'_save',save),patch('eled.reactivity_batch.RunReactivity',side_effect=lambda *a,**k:report()):
         with pytest.raises(sqlite3.OperationalError,match='disk full'):
             RunReactivityBatch(jobs,checkpoint=cp)
-    assert [r['record_id'] for r in cp.reports()]==['water']
+    assert [r['record_id'] for r in cp.GetReports()]==['water']

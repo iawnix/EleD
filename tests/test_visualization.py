@@ -27,7 +27,7 @@ def _report():
 
 def test_visual_data_preserves_rdkit_indices_and_pair_values():
     mol, report = _report()
-    data = BuildFragmentVisualData(mol, report, atom_field='f_plus')
+    data = BuildFragmentVisualData(mol, report, atomField='f_plus')
     assert data['atom_field'] == 'f_plus'
     assert data['unassigned_atom_indices'] == []
     assert data['atoms'][0] == {'atom_index': 0, 'fragment': 'acetyl', 'value': pytest.approx(1 / 55)}
@@ -36,7 +36,7 @@ def test_visual_data_preserves_rdkit_indices_and_pair_values():
 
 def test_rdkit_map_and_svg_views_are_self_contained():
     mol, report = _report()
-    molecule = DrawDescriptorMap(mol, report, atom_field='q_e')
+    molecule = DrawDescriptorMap(mol, report, atomField='q_e')
     summary = PlotFragmentSummary(report, field='q_e')
     network = PlotFragmentInteractions(report)
     html = RenderFragmentAnalysis(mol, report)
@@ -58,9 +58,9 @@ def test_explicit_hydrogens_are_hidden_from_map_by_default():
             'pairs': [],
         },
     }
-    compact = DrawDescriptorMap(mol, report, atom_field='q_e')
-    complete = DrawDescriptorMap(mol, report, atom_field='q_e',
-                                 include_hydrogens=True)
+    compact = DrawDescriptorMap(mol, report, atomField='q_e')
+    complete = DrawDescriptorMap(mol, report, atomField='q_e',
+                                 includeHydrogens=True)
     assert "class='atom-8'" not in compact
     assert "class='atom-8'" in complete
 

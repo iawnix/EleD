@@ -64,8 +64,8 @@ def test_homa_heteroatom_parameters_and_ring_validation():
                     + 4 * 257.7 * (1.388 - 1.388)**2) / 6
     assert report['values']['homa'] == pytest.approx(expected)
     params = {(6, 6): (1.388, 257.7), (6, 7): (1.388, 100.)}
-    assert CalcHOMA(mol, range(6), parameters=params, parameter_source='analytic test')['values']['homa'] == pytest.approx(1.)
-    with pytest.raises(ValueError, match='source'):
+    assert CalcHOMA(mol, range(6), parameters=params, parameterSource='analytic test')['values']['homa'] == pytest.approx(1.)
+    with pytest.raises(ValueError, match='parameterSource'):
         CalcHOMA(mol, range(6), parameters=params)
     for indices in ([0, 2, 1, 3, 4, 5], [0, 1, 2], [0, 1, 1], [True, 1, 2]):
         with pytest.raises(ValueError):
@@ -76,9 +76,9 @@ def test_sterimol_axial_sphere_and_transverse_sphere_reference():
     mol = molecule('CCC', [(0, 0, 0), (1.5, 0, 0), (1.5, 2., 0)])
     radii = np.ones(mol.GetNumAtoms())
     for candidate in (mol, moved(mol)):
-        axial = CalcSterimol(candidate, [1], axis=(0, 1), radii_angstrom=radii)
+        axial = CalcSterimol(candidate, [1], axis=(0, 1), radiiAngstrom=radii)
         assert axial['values'] == pytest.approx(dict(l_a=2.9, b1_a=1., b5_a=1.))
-        full = CalcSterimol(candidate, [1, 2], axis=(0, 1), radii_angstrom=radii)
+        full = CalcSterimol(candidate, [1, 2], axis=(0, 1), radiiAngstrom=radii)
         assert full['values'] == pytest.approx(dict(l_a=2.9, b1_a=1., b5_a=3.))
         assert full['analysis_settings']['b1_error_bound_angstrom'] < .001
     for selection, axis in [([0, 1], [0, 1]), ([2], [0, 1]), ([2], [0, 2])]:
@@ -88,14 +88,14 @@ def test_sterimol_axial_sphere_and_transverse_sphere_reference():
 
 def test_buried_volume_sphere_fraction_and_union():
     mol = molecule('[He].[He].[He]', [(0, 0, 0)]*3)
-    report = CalcBuriedVolume(mol, [1], center=0, radii_angstrom=[1]*3,
-                             sphere_radius_angstrom=2., spacing_angstrom=.05)
+    report = CalcBuriedVolume(mol, [1], center=0, radiiAngstrom=[1]*3,
+                             sphereRadiusAngstrom=2., spacingAngstrom=.05)
     assert report['values']['vbur_percent'] == pytest.approx(100/8, abs=.12)
-    duplicate = CalcBuriedVolume(mol, [1, 2], center=0, radii_angstrom=[1]*3,
-                                 sphere_radius_angstrom=2., spacing_angstrom=.05)
+    duplicate = CalcBuriedVolume(mol, [1, 2], center=0, radiiAngstrom=[1]*3,
+                                 sphereRadiusAngstrom=2., spacingAngstrom=.05)
     assert duplicate['values'] == report['values']
-    assert CalcBuriedVolume(mol, [1], center=0, radii_angstrom=[3]*3,
-                            sphere_radius_angstrom=2.)['values']['vbur_percent'] == 100.
+    assert CalcBuriedVolume(mol, [1], center=0, radiiAngstrom=[3]*3,
+                            sphereRadiusAngstrom=2.)['values']['vbur_percent'] == 100.
     with pytest.raises(ValueError, match='exclude'):
         CalcBuriedVolume(mol, [0, 1], center=0)
     mol.GetConformer().SetAtomPosition(1, (8., 0, 0))
@@ -108,8 +108,8 @@ def test_buried_volume_partial_overlap_convergence_and_motion():
     # divided by sphere volume 4*pi/3 gives 5/16.
     for spacing, tol in ((.1, .8), (.04, .3)):
         for candidate in (mol, moved(mol)):
-            report = CalcBuriedVolume(candidate, [1], center=0, radii_angstrom=[1, 1],
-                                       sphere_radius_angstrom=1., spacing_angstrom=spacing)
+            report = CalcBuriedVolume(candidate, [1], center=0, radiiAngstrom=[1, 1],
+                                       sphereRadiusAngstrom=1., spacingAngstrom=spacing)
             assert report['values']['vbur_percent'] == pytest.approx(31.25, abs=tol)
 
 
@@ -117,7 +117,7 @@ def test_planes_angle_distance_and_degenerate_missing():
     mol = molecule('[He].[He].[He].[He].[He].[He]',
                    [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (0, 1, 1), (0, 0, 2)])
     for candidate in (mol, moved(mol)):
-        report = CalcPlaneDescriptors(candidate, [0, 1, 2], other_atom_indices=[3, 4, 5])
+        report = CalcPlaneDescriptors(candidate, [0, 1, 2], otherAtomIndices=[3, 4, 5])
         assert report['values']['plane_angle_deg'] == pytest.approx(90.)
         assert report['values']['plane_rms_a'] == pytest.approx(0., abs=1e-12)
         assert report['values']['centroid_distance_a'] == pytest.approx(np.sqrt(17)/3)
@@ -149,11 +149,11 @@ def test_conformer_selection_input_validation_and_json():
     mol = ring()
     for fn, kwargs in [(CalcHOMA, {}), (CalcRingPuckering, {}), (CalcPlaneDescriptors, {})]:
         with pytest.raises(ValueError):
-            fn(mol, range(6), conf_id=True, **kwargs)
-        report = fn(mol, range(6), conf_id=7, **kwargs)
+            fn(mol, range(6), confId=True, **kwargs)
+        report = fn(mol, range(6), confId=7, **kwargs)
         assert json.loads(json.dumps(report, allow_nan=False)) == report
     with pytest.raises(ValueError, match='radii'):
-        CalcBuriedVolume(mol, [1], center=0, radii_angstrom=[1.])
+        CalcBuriedVolume(mol, [1], center=0, radiiAngstrom=[1.])
     bad = Chem.Mol(mol)
     bad.GetConformer().SetAtomPosition(0, (float('nan'), 0., 0.))
     with pytest.raises(ValueError, match='finite'):
@@ -163,14 +163,19 @@ def test_conformer_selection_input_validation_and_json():
 def test_canonical_selection_schema_and_local_geometry_batch():
     mol = ring()
     selection = {'atoms': {'ring': list(range(6)), 'site': [0, 1]},
-                 'reaction_sites': {'electrophilic': [0]},
+                 'reactionSites': {'electrophilic': [0]},
                  'bonds': {'edge': [(0, 1)]},
                  'rings': {'benzene': list(range(6))}}
     normalized = NormalizeSelections(mol, selection)
-    canonical = dict(selection, bonds={'edge': [[0, 1]]})
-    assert normalized.to_dict() == canonical
+    canonical = dict(
+        atoms=selection['atoms'],
+        reaction_sites={'electrophilic': [0]},
+        bonds={'edge': [[0, 1]]},
+        rings=selection['rings'],
+    )
+    assert normalized.ToDict() == canonical
     report = AnalyzeLocalGeometry(mol, selections=selection,
-        homa={'benzene': {}}, planes={'ring': {'other_atom_selection': 'site'}})
+        homa={'benzene': {}}, planes={'ring': {'otherAtomSelection': 'site'}})
     assert report['schema_version'] == 2
     assert report['descriptor_version']
     assert report['reports']['homa:benzene']['values']['homa'] == pytest.approx(1.)
@@ -194,8 +199,8 @@ def test_fused_rings_conformer_ids_and_missing_puckering_schema():
     for i, p in enumerate(conf.GetPositions()):
         conf.SetAtomPosition(i, p * 1.1)
     mol.AddConformer(conf, assignId=False)
-    assert CalcHOMA(mol, range(6), conf_id=7)['values']['homa'] == pytest.approx(1.)
-    assert CalcHOMA(mol, range(6), conf_id=12)['values']['homa'] < 1.
+    assert CalcHOMA(mol, range(6), confId=7)['values']['homa'] == pytest.approx(1.)
+    assert CalcHOMA(mol, range(6), confId=12)['values']['homa'] < 1.
     good = CalcRingPuckering(mol, range(6))
     for i in range(mol.GetNumAtoms()):
         mol.GetConformer().SetAtomPosition(i, (i, 0, 0))

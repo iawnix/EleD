@@ -1,8 +1,9 @@
 # 描述符目录
 
 项目的机器可读目录由 `eled.DescriptorCatalog()` 提供，成熟度由
-`eled.DescriptorStatus()` 提供。公开描述符函数采用 RDKit 风格的
-`Calc...` / `Run...` 命名；字段和 Python 分析参数使用小写 `snake_case`。
+`eled.DescriptorStatus()` 提供。公开描述符函数与类方法采用 RDKit 风格的
+`PascalCase`（`Calc...`、`Run...`、`Calculate`、`Get*`），Python 参数与结果属性采用
+`camelCase`（`confId`、`keepOverlap`、`totalEnergyHartree`）；导出的报告/CSV 特征列名统一采用带单位后缀的小写 `snake_case`。
 
 ## 推荐特征
 

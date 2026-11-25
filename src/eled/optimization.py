@@ -11,7 +11,7 @@ import numpy as np
 
 from .backends.native import ANGSTROM_TO_BOHR, _run_xtb_native
 from .errors import XTBRunError
-from .result import XTBResult
+from .result import XTBResults
 
 HARTREE_TO_KCAL_MOL = 627.5094740631
 
@@ -22,11 +22,20 @@ class XTBOptimizationResult:
 
     molecule: Any
     report: dict
-    result: XTBResult | None = None
+    result: XTBResults | None = None
 
     @property
     def success(self) -> bool:
         return bool(self.report.get("converged", False))
+
+    def GetMolecule(self) -> Any:
+        return self.molecule
+
+    def GetReport(self) -> dict:
+        return self.report
+
+    def GetResult(self) -> XTBResults | None:
+        return self.result
 
 
 def _positive(value, name, *, integer=False):
@@ -39,21 +48,24 @@ def _positive(value, name, *, integer=False):
 
 def _fixed_indices(values: Iterable[int], natoms: int) -> tuple[int, ...]:
     if values is None or isinstance(values, (str, bytes)):
-        raise ValueError("fixed_atoms must be a sequence of atom indices")
+        raise ValueError("fixedAtoms must be a sequence of atom indices")
     result = []
     for value in values:
         if isinstance(value, bool) or not isinstance(value, Integral) or not 0 <= value < natoms:
-            raise ValueError("fixed_atoms contains an invalid atom index")
+            raise ValueError("fixedAtoms contains an invalid atom index")
         result.append(int(value))
     return tuple(sorted(set(result)))
 
 
-def _gradient(result: XTBResult, natoms: int) -> np.ndarray:
-    values = result.metadata.get("gradient_hartree_per_bohr")
-    if values is None or len(values) != 3 * natoms:
-        raise ValueError("the selected libxtb build did not return a gradient")
-    array = np.asarray(values, dtype=float).reshape(natoms, 3)
-    if not np.isfinite(array).all():
+def _gradient(result: XTBResults, natoms: int) -> np.ndarray:
+    if len(result.gradientHartreePerBohr) == natoms:
+        array = np.asarray(result.gradientHartreePerBohr, dtype=float)
+    else:
+        values = result.metadata.get("gradient_hartree_per_bohr")
+        if values is None or len(values) != 3 * natoms:
+            raise ValueError("the selected libxtb build did not return a gradient")
+        array = np.asarray(values, dtype=float).reshape(natoms, 3)
+    if array.shape != (natoms, 3) or not np.isfinite(array).all():
         raise ValueError("xTB returned a nonfinite gradient")
     return array
 
@@ -82,58 +94,53 @@ def _lbfgs_direction(gradient: np.ndarray, pairs: list[tuple[np.ndarray, np.ndar
 def OptimizeXTB(
     mol: Any,
     *,
-    conf_id: int = -1,
+    confId: int = -1,
     method: str = "GFN2-xTB",
     charge: int | None = None,
-    uhf: int | None = None,
-    xtb_library=None,
-    max_iterations: int = 200,
-    scf_max_iterations: int = 250,
-    gradient_tolerance: float = 1.0e-4,
-    energy_tolerance: float = 1.0e-8,
-    step_tolerance: float = 1.0e-5,
-    max_step: float = 0.20,
-    fixed_atoms: Iterable[int] = (),
+    numUnpairedElectrons: int | None = None,
+    xtbLibrary=None,
+    maxIterations: int = 200,
+    scfMaxIterations: int = 250,
+    gradientTolerance: float = 1.0e-4,
+    energyTolerance: float = 1.0e-8,
+    stepTolerance: float = 1.0e-5,
+    maxStep: float = 0.20,
+    fixedAtoms: Iterable[int] = (),
     accuracy: float = 1.0,
-    electronic_temperature: float = 300.0,
+    electronicTemperature: float = 300.0,
 ) -> XTBOptimizationResult:
-    """Optimize one RDKit conformer with an extended-libxtb gradient.
-
-    The input molecule is copied. Coordinates are updated with bounded
-    L-BFGS steps and an energy-backtracking line search; all engine calls
-    use the same reviewed extended library as :class:`XTBCalculator`. ``max_iterations``
-    counts geometry steps, while ``scf_max_iterations`` is passed to xTB for
-    each energy/gradient evaluation. ``max_step`` and ``step_tolerance`` are in
-    Angstrom, while gradient and energy tolerances use Hartree/Bohr and Hartree.
-    """
+    """Optimize one RDKit conformer with an extended-libxtb gradient."""
     from rdkit import Chem
 
-    iterations = _positive(max_iterations, "max_iterations", integer=True)
-    scf_iterations = _positive(scf_max_iterations, "scf_max_iterations", integer=True)
-    grad_tol = _positive(gradient_tolerance, "gradient_tolerance")
-    energy_tol = _positive(energy_tolerance, "energy_tolerance")
-    step_tol = _positive(step_tolerance, "step_tolerance")
-    step_limit = _positive(max_step, "max_step")
+    iterations = _positive(maxIterations, "maxIterations", integer=True)
+    scf_iterations = _positive(scfMaxIterations, "scfMaxIterations", integer=True)
+    grad_tol = _positive(gradientTolerance, "gradientTolerance")
+    energy_tol = _positive(energyTolerance, "energyTolerance")
+    step_tol = _positive(stepTolerance, "stepTolerance")
+    step_limit = _positive(maxStep, "maxStep")
     working = Chem.Mol(mol)
-    # Validate the conformer before copying coordinates.  The native call
-    # repeats this validation, but doing it here gives callers a deterministic
-    # error before allocating an optimization state.
     from .input import _xyz_from_mol
-    _xyz_from_mol(working, conf_id)
+    _xyz_from_mol(working, confId)
     natoms = working.GetNumAtoms()
-    fixed = _fixed_indices(fixed_atoms, natoms)
+    fixed = _fixed_indices(fixedAtoms, natoms)
     if len(fixed) == natoms:
-        raise ValueError("fixed_atoms cannot contain every atom")
-    coordinates = np.asarray(working.GetConformer(conf_id).GetPositions(), dtype=float)
+        raise ValueError("fixedAtoms cannot contain every atom")
+    coordinates = np.asarray(working.GetConformer(confId).GetPositions(), dtype=float)
     if not np.isfinite(coordinates).all():
         raise ValueError("coordinates must be finite")
 
-    options = dict(conf_id=conf_id, method=method, charge=charge, uhf=uhf,
-                   xtb_library=xtb_library, accuracy=accuracy,
-                   electronic_temperature=electronic_temperature,
-                   _return_gradient=True)
-    current = _run_xtb_native(working, max_iterations=scf_iterations, **options)
-    initial_energy = float(current.total_energy_hartree)
+    options = dict(
+        confId=confId,
+        method=method,
+        charge=charge,
+        numUnpairedElectrons=numUnpairedElectrons,
+        xtbLibrary=xtbLibrary,
+        accuracy=accuracy,
+        electronicTemperature=electronicTemperature,
+        _return_gradient=True,
+    )
+    current = _run_xtb_native(working, maxIterations=scf_iterations, **options)
+    initial_energy = float(current.totalEnergyHartree)
     history = []
     converged = False
     reason = "max_iterations"
@@ -141,8 +148,9 @@ def OptimizeXTB(
     movable = np.ones(natoms, dtype=bool)
     movable[list(fixed)] = False
     initial_masked = final_gradient[movable]
-    initial_max_gradient = (float(np.linalg.norm(initial_masked, axis=1).max())
-                            if len(initial_masked) else 0.0)
+    initial_max_gradient = (
+        float(np.linalg.norm(initial_masked, axis=1).max()) if len(initial_masked) else 0.0
+    )
     pairs: list[tuple[np.ndarray, np.ndarray, float]] = []
 
     for iteration in range(iterations + 1):
@@ -173,18 +181,18 @@ def OptimizeXTB(
             displacement_bohr = direction * (scale * (0.5 ** backtrack))
             displacement_angstrom = displacement_bohr / ANGSTROM_TO_BOHR
             trial = Chem.Mol(working)
-            trial_conf = trial.GetConformer(conf_id)
+            trial_conf = trial.GetConformer(confId)
             for atom_index, delta in enumerate(displacement_angstrom):
                 if movable[atom_index]:
                     point = coordinates[atom_index] + delta
                     trial_conf.SetAtomPosition(atom_index, point)
             try:
-                trial_result = _run_xtb_native(trial, max_iterations=scf_iterations, **options)
+                trial_result = _run_xtb_native(trial, maxIterations=scf_iterations, **options)
             except XTBRunError as exc:
                 last_error = exc
                 continue
             evaluated_trial = True
-            delta_energy = float(current.total_energy_hartree - trial_result.total_energy_hartree)
+            delta_energy = float(current.totalEnergyHartree - trial_result.totalEnergyHartree)
             if delta_energy > 0.0:
                 accepted, accepted_delta, accepted_step = trial, delta_energy, displacement_angstrom
                 current = trial_result
@@ -195,7 +203,7 @@ def OptimizeXTB(
             reason = "line_search_failed"
             break
         working = accepted
-        coordinates = np.asarray(working.GetConformer(conf_id).GetPositions(), dtype=float)
+        coordinates = np.asarray(working.GetConformer(confId).GetPositions(), dtype=float)
         final_gradient = _gradient(current, natoms)
         s = accepted_step[movable].reshape(-1) * ANGSTROM_TO_BOHR
         y = (final_gradient[movable] - old_gradient[movable]).reshape(-1)
@@ -205,16 +213,17 @@ def OptimizeXTB(
             del pairs[:-7]
         max_step_observed = float(np.linalg.norm(accepted_step[movable], axis=1).max())
         final_masked = final_gradient[movable]
-        max_gradient_after = (float(np.linalg.norm(final_masked, axis=1).max())
-                              if len(final_masked) else 0.0)
-        history.append({"iteration": iteration + 1, "energy_hartree": float(current.total_energy_hartree),
-                        "energy_change_hartree": accepted_delta,
-                        "max_gradient_before_hartree_per_bohr": max_gradient,
-                        "max_gradient_hartree_per_bohr": max_gradient_after,
-                        "max_displacement_angstrom": max_step_observed})
-        # Energy/step stagnation alone is not sufficient for a stationary
-        # point.  Check the new gradient immediately so a line-search plateau
-        # cannot be reported as a successful optimization.
+        max_gradient_after = (
+            float(np.linalg.norm(final_masked, axis=1).max()) if len(final_masked) else 0.0
+        )
+        history.append({
+            "iteration": iteration + 1,
+            "energy_hartree": float(current.totalEnergyHartree),
+            "energy_change_hartree": accepted_delta,
+            "max_gradient_before_hartree_per_bohr": max_gradient,
+            "max_gradient_hartree_per_bohr": max_gradient_after,
+            "max_displacement_angstrom": max_step_observed,
+        })
         if (max_gradient_after <= grad_tol and accepted_delta <= energy_tol
                 and max_step_observed <= step_tol):
             converged, reason = True, "gradient_energy_and_step_tolerance"
@@ -233,7 +242,7 @@ def OptimizeXTB(
         "status": "converged" if converged else "failed",
         "reason": reason,
         "method": current.method,
-        "conformer_id": int(current.metadata.get("conformer_id", conf_id)),
+        "conformer_id": int(current.metadata.get("conformer_id", confId)),
         "n_atoms": natoms,
         "n_iterations": len(history),
         "max_iterations": iterations,
@@ -244,8 +253,8 @@ def OptimizeXTB(
         "step_tolerance_angstrom": step_tol,
         "max_step_angstrom": step_limit,
         "initial_energy_hartree": initial_energy,
-        "final_energy_hartree": float(current.total_energy_hartree),
-        "final_energy_kcal_mol": float(current.total_energy_hartree * HARTREE_TO_KCAL_MOL),
+        "final_energy_hartree": float(current.totalEnergyHartree),
+        "final_energy_kcal_mol": float(current.totalEnergyHartree * HARTREE_TO_KCAL_MOL),
         "initial_max_gradient_hartree_per_bohr": initial_max_gradient,
         "final_max_gradient_hartree_per_bohr": final_max_gradient,
         "history": history,

@@ -2,7 +2,6 @@
 from helpers import calculate_xtb
 from dataclasses import replace
 import json
-import os
 from unittest.mock import patch
 
 import numpy as np
@@ -11,7 +10,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 from eled import (XTBOptions, XTBNativeNotFoundError, RunXTBBatch, XTBCache,
-    CalcDescriptorReport, RunReactivity, CalcReactivityDescriptors, AssessDescriptorQuality)
+    CalcDescriptorReport, RunReactivity)
 from eled.runtime import _find_xtb_library, _native_basis_build
 
 pytestmark = pytest.mark.integration
@@ -34,16 +33,16 @@ def molecule(smiles='O'):
 @pytest.mark.parametrize('temperature',[0.,1200.])
 def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temperature):
     mod=pytest.importorskip('eled.rdXTBTools');m=molecule('CCO')
-    a=calculate_xtb(m,method=method,xtb_library=library,accuracy=.1,max_iterations=333,
-              electronic_temperature=temperature,keep_overlap=True)
+    a=calculate_xtb(m,method=method,xtbLibrary=library,accuracy=.1,maxIterations=333,
+              electronicTemperature=temperature,keepOverlap=True)
     ok,b=mod.RunMol(m,method=method,xtbLibrary=library,accuracy=.1,maxIterations=333,
                    electronicTemperature=temperature,keepOverlap=True)
     assert ok
     ra,rb=CalcDescriptorReport(m,a),CalcDescriptorReport(m,b)
-    assert ra['provenance']['CalculationSettings']==rb['provenance']['CalculationSettings']
+    assert ra['provenance']['calculation_settings']==rb['provenance']['calculation_settings']
     assert b.maxIterations==333 and b.accuracy==.1
     assert b.effectiveElectronicTemperature==max(temperature,1e-6)
-    np.testing.assert_allclose(a.orbital_energies_ev,b.GetOrbitalEnergies(),atol=1e-9,rtol=0)
+    np.testing.assert_allclose(a.orbitalEnergiesEV,b.GetOrbitalEnergies(),atol=1e-9,rtol=0)
     for field in ra['values']:
         va,vb=ra['values'][field],rb['values'][field]
         if field=='xtb_backend': continue
@@ -53,11 +52,11 @@ def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temp
 
 
 def test_cache_distinguishes_each_numerical_setting(library):
-    m=molecule(); cache=XTBCache(); opts=XTBOptions(xtb_library=library)
+    m=molecule(); cache=XTBCache(); opts=XTBOptions(xtbLibrary=library)
     base=RunXTBBatch([m],options=opts,cache=cache)[0]
-    for change in [{'accuracy':.2},{'max_iterations':300},{'electronic_temperature':1000.}]:
+    for change in [{'accuracy':.2},{'maxIterations':300},{'electronicTemperature':1000.}]:
         result=RunXTBBatch([m],options=replace(opts,**change),cache=cache)[0]
-        assert result.metadata['CalculationSettings'] != base.metadata['CalculationSettings']
+        assert result.metadata['calculation_settings'] != base.metadata['calculation_settings']
     assert len(cache)==4
 
 
@@ -66,10 +65,10 @@ def test_cache_distinguishes_each_numerical_setting(library):
 @pytest.mark.parametrize('initialization',['reference','independent'])
 def test_vertical_states_interfaces_and_population_definitions(library,method,smiles,initialization):
     pytest.importorskip('eled.rdXTBTools');m=molecule(smiles);original=m.ToBinary()
-    opts=XTBOptions(method=method,xtb_library=library,accuracy=.1,electronic_temperature=300.)
-    spins={'ionized_uhf':0,'attached_uhf':0} if smiles=='[CH3]' else {}
-    a=RunReactivity(m,options=opts,population_scheme='mulliken',initialization=initialization,**spins)
-    b=RunReactivity(m,options=opts,population_scheme='charges',interface='compiled',initialization=initialization,**spins)
+    opts=XTBOptions(method=method,xtbLibrary=library,accuracy=.1,electronicTemperature=300.)
+    spins={'ionizedUnpaired':0,'attachedUnpaired':0} if smiles=='[CH3]' else {}
+    a=RunReactivity(m,options=opts,populationScheme='mulliken',initialization=initialization,**spins)
+    b=RunReactivity(m,options=opts,populationScheme='xtb_scc',interface='compiled',initialization=initialization,**spins)
     assert a['values']==pytest.approx(b['values'],abs=1e-8)
     for key in ['f_plus','f_minus','f_radical','dual']:
         np.testing.assert_allclose([v[key] for v in a['atoms']],[v[key] for v in b['atoms']],atol=1e-7,rtol=0)
@@ -98,8 +97,8 @@ def test_reference_restart_is_copied_for_each_neighbor_and_freed(library):
                 deleted.append(pointer._obj.value);return fn(pointer)
             return delete
         return fn
-    m=molecule();base=XTBOptions(xtb_library=library)
-    configs=[replace(base,charge=q,uhf=spin) for q,spin in [(0,0),(1,1),(-1,1)]]
+    m=molecule();base=XTBOptions(xtbLibrary=library)
+    configs=[replace(base,charge=q,numUnpairedElectrons=spin) for q,spin in [(0,0),(1,1),(-1,1)]]
     with patch.object(_NativeXTB,'_bind',bind):
         results=list(_native_charge_states(m,configs))
     assert len(copies)==3 and copies[1][0]==copies[2][0]==copies[0][1]
@@ -107,7 +106,7 @@ def test_reference_restart_is_copied_for_each_neighbor_and_freed(library):
     # Reversing neighboring calculations must not turn this into a sequential restart.
     reversed_results=list(_native_charge_states(m,[configs[0],configs[2],configs[1]]))
     for a,b in zip(results,[reversed_results[i] for i in [0,2,1]]):
-        np.testing.assert_allclose(a.partial_charges,b.partial_charges,atol=1e-10,rtol=0)
+        np.testing.assert_allclose(a.atomicCharges,b.atomicCharges,atol=1e-10,rtol=0)
     copies.clear();deleted.clear()
     with patch.object(_NativeXTB,'_bind',bind):
         iterator=_native_charge_states(m,configs)
@@ -132,37 +131,37 @@ def test_restart_copy_allocation_failure_is_reported_and_recovers(library,fail_o
     from eled import XTBEnvironmentError
     with patch.object(_NativeXTB,'_bind',bind):
         with pytest.raises(XTBEnvironmentError,match='copy'):
-            RunReactivity(molecule(),options=XTBOptions(xtb_library=library),return_errors=True)
-    assert RunReactivity(molecule(),options=XTBOptions(xtb_library=library))['error'] is None
+            RunReactivity(molecule(),options=XTBOptions(xtbLibrary=library),returnErrors=True)
+    assert RunReactivity(molecule(),options=XTBOptions(xtbLibrary=library))['error'] is None
 
 
 @pytest.mark.parametrize('interface',['native','compiled'])
 def test_actual_scf_failure_keeps_protocol_and_does_not_poison_next_call(library,interface):
     if interface=='compiled': pytest.importorskip('eled.rdXTBTools')
-    report=RunReactivity(molecule('CCO'), interface=interface, return_errors=True,
-        options=XTBOptions(xtb_library=library,max_iterations=1,electronic_temperature=0.))
+    report=RunReactivity(molecule('CCO'), interface=interface, returnErrors=True,
+        options=XTBOptions(xtbLibrary=library,maxIterations=1,electronicTemperature=0.))
     assert report['error']['state']=='reference'
     assert 'converge' in report['error']['message']
     assert all(v is None for v in report['values'].values())
     assert report['states']['ionized']['status']=='not_run'
-    assert report['analysis_settings']['requested_options']['max_iterations']==1
+    assert report['analysis_settings']['requested_options']['maxIterations']==1
     successful=RunReactivity(molecule(),interface=interface,
-        options=XTBOptions(xtb_library=library,electronic_temperature=0.))
+        options=XTBOptions(xtbLibrary=library,electronicTemperature=0.))
     assert successful['error'] is None
     assert successful['values']['ip_v_ev'] > 0
 
 
 def test_lowdin_fukui_and_finite_temperature_label(library):
     m=molecule('CCO')
-    r=RunReactivity(m,options=XTBOptions(xtb_library=library,electronic_temperature=1000.),
-                     population_scheme='lowdin',fragments={'all':list(range(m.GetNumAtoms()))})
+    r=RunReactivity(m,options=XTBOptions(xtbLibrary=library,electronicTemperature=1000.),
+                     populationScheme='lowdin',fragments={'all':list(range(m.GetNumAtoms()))})
     assert r['fragments']['all']['f_plus']==pytest.approx(1.,abs=1e-7)
     assert 'finite_electronic_temperature' in {f['code'] for f in r['quality']['flags']}
 
 
 def test_report_does_not_recalculate_and_labels_thermal_occupations(library):
     m=molecule('c1ccccc1')
-    result=calculate_xtb(m,xtb_library=library,electronic_temperature=50000.,keep_overlap=True)
+    result=calculate_xtb(m,xtbLibrary=library,electronicTemperature=50000.,keepOverlap=True)
     with patch('eled.xtb._run_xtb',side_effect=AssertionError('must not calculate')):
         report=CalcDescriptorReport(m,result)
     assert report['quality']['fractional_orb_idx']

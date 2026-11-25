@@ -141,8 +141,8 @@ def run_case(smiles: str, *, executable: Path, library: str | None, method: str,
     initial_geometry_sha256 = _geometry_hash(_xyz_from_mol(mol, -1))
     python_started = time.perf_counter()
     optimized = OptimizeXTB(
-        mol, method=method, charge=charge, uhf=uhf, xtb_library=library,
-        max_iterations=cycles, scf_max_iterations=scf_max_iterations,
+        mol, method=method, charge=charge, numUnpairedElectrons=uhf, xtbLibrary=library,
+        maxIterations=cycles, scfMaxIterations=scf_max_iterations,
         accuracy=accuracy,
     )
     python_elapsed = time.perf_counter() - python_started

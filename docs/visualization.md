@@ -18,7 +18,7 @@ fragments = {
 }
 report = CalcDescriptorReport(mol, result, fragments=fragments)
 
-molecule_svg = DrawDescriptorMap(mol, report, atom_field="q_e")
+molecule_svg = DrawDescriptorMap(mol, report, atomField="q_e")
 summary_svg = PlotFragmentSummary(report, field="q_e")
 network_svg = PlotFragmentInteractions(report)
 html_fragment = RenderFragmentAnalysis(mol, report)
@@ -27,8 +27,8 @@ html_fragment = RenderFragmentAnalysis(mol, report)
 `DrawDescriptorMap` uses RDKit's `rdMolDraw2D` and keeps the original RDKit atom
 indices. Explicit hydrogens are omitted from the map by default so their labels
 do not crowd the heavy-atom values; the report still contains their descriptors.
-Use `include_hydrogens=True` for a hydrogen-level map. Set
-`add_atom_indices=True` to include the original index in each value label.
+Use `includeHydrogens=True` for a hydrogen-level map. Set
+`addAtomIndices=True` to include the original index in each value label.
 `PlotFragmentSummary` renders signed fragment values such as charge, Fukui
 indices or local softness. `PlotFragmentInteractions` uses the explicit
 fragment-pair Wiberg values from `report["fragments"]["pairs"]`; it does not add

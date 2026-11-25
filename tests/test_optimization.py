@@ -27,14 +27,14 @@ def library():
 
 def test_optimization_validates_fixed_atoms():
     with pytest.raises(ValueError, match='every atom'):
-        OptimizeXTB(molecule('O'), max_iterations=1, fixed_atoms=[0, 1, 2])
-    with pytest.raises(ValueError, match='scf_max_iterations'):
-        OptimizeXTB(molecule('O'), scf_max_iterations=0)
+        OptimizeXTB(molecule('O'), maxIterations=1, fixedAtoms=[0, 1, 2])
+    with pytest.raises(ValueError, match='scfMaxIterations'):
+        OptimizeXTB(molecule('O'), scfMaxIterations=0)
 
 
 @pytest.mark.parametrize('mode', ['recover', 'all_fail', 'mixed', 'no_descent'])
 def test_line_search_handles_failed_trial_calculations(monkeypatch, mode):
-    from eled import optimization, XTBResult
+    from eled import optimization, XTBResults
 
     mol = molecule('O')
     original = mol.ToBinary()
@@ -49,7 +49,7 @@ def test_line_search_handles_failed_trial_calculations(monkeypatch, mode):
                          (mode == 'mixed' and call > 2)):
             raise error
         recovered = mode == 'recover' and call > 2
-        return XTBResult(
+        return XTBResults(
             'GFN2-xTB', None, -1.1 if recovered else -1.0, None, 3, 8, 0,
             metadata={'gradient_hartree_per_bohr':
                       (0.0,) * 9 if recovered else (0.2, 0.0, 0.0) * 3},
@@ -73,7 +73,7 @@ def test_line_search_handles_failed_trial_calculations(monkeypatch, mode):
             assert not result.success
             assert result.report['reason'] == 'line_search_failed'
             assert result.report['n_iterations'] == 0
-            assert result.result.total_energy_hartree == -1.0
+            assert result.result.totalEnergyHartree == -1.0
             assert len(positions) == 15
     assert mol.ToBinary() == original
 
@@ -82,7 +82,7 @@ def test_line_search_handles_failed_trial_calculations(monkeypatch, mode):
 def test_xtb_optimization_is_owned_and_reduces_energy(library):
     mol = molecule()
     before = mol.ToBinary()
-    result = OptimizeXTB(mol, xtb_library=library, max_iterations=100)
+    result = OptimizeXTB(mol, xtbLibrary=library, maxIterations=100)
     assert result.success
     assert mol.ToBinary() == before
     report = result.report
@@ -95,10 +95,10 @@ def test_xtb_optimization_is_owned_and_reduces_energy(library):
 
 @pytest.mark.integration
 def test_prepare_conformers_can_use_xtb_optimization(library):
-    result = PrepareConformers('CCO', optimize='xTB', xtb_library=library,
-                                optimization_iterations=100,
-                                attempts_per_strategy=1,
-                                retry_random_coords=False)
+    result = PrepareConformers('CCO', optimize='xTB', xtbLibrary=library,
+                               optimizationIterations=100,
+                               attemptsPerStrategy=1,
+                               retryRandomCoords=False)
     assert result.success
     candidate = result.report['attempts'][0]['candidates'][0]
     assert candidate['optimization_status'] == 0

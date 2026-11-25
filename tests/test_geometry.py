@@ -11,13 +11,13 @@ from rdkit.Chem import AllChem
 from eled import geometry, PrepareConformers
 
 
-FAST = dict(fallback_methods=(), attempts_per_strategy=1, retry_random_coords=False)
+FAST = dict(fallbackMethods=(), attemptsPerStrategy=1, retryRandomCoords=False)
 
 
 def test_deterministic_owned_conformer_pool_and_partial_coverage():
     source = Chem.MolFromSmiles('CCO'); before = source.ToBinary()
-    a = PrepareConformers(source, num_conformers=8, **FAST)
-    b = PrepareConformers(source, num_conformers=8, **FAST)
+    a = PrepareConformers(source, numConformers=8, **FAST)
+    b = PrepareConformers(source, numConformers=8, **FAST)
     assert source.ToBinary() == before
     assert a.success and 0 < a.molecule.GetNumConformers() <= 8
     assert a.report == b.report
@@ -83,7 +83,7 @@ def test_retries_use_fresh_seeds_and_keep_stereo(monkeypatch):
         p = kwargs['params']; seen.append((p.randomSeed, p.useRandomCoords, p.enforceChirality))
         return [] if len(seen) < 3 else embed(mol, **kwargs)
     monkeypatch.setattr(AllChem, 'EmbedMultipleConfs', fail_first)
-    r = PrepareConformers('CCO', fallback_methods=())
+    r = PrepareConformers('CCO', fallbackMethods=())
     assert r.success and len(seen) == 3
     assert len({s[0] for s in seen}) == 3
     assert [s[1] for s in seen] == [False, False, True]
@@ -100,14 +100,14 @@ def test_unavailable_default_preset_is_explicit_but_explicit_request_raises(monk
     monkeypatch.delattr(AllChem, 'ETKDGv4', raising=False)
     r = PrepareConformers('CCO')
     assert r.success and r.report['retry_policy']['unavailable_default_fallbacks'] == ['ETKDGv4']
-    with pytest.raises(ValueError, match='lacks'): PrepareConformers('CCO', fallback_methods=['ETKDGv4'])
+    with pytest.raises(ValueError, match='lacks'): PrepareConformers('CCO', fallbackMethods=['ETKDGv4'])
 
 
 def test_unspecified_stereo_is_flagged_or_rejected():
     r = PrepareConformers('CC(O)C(=O)O', **FAST)
     assert r.success and r.report['unspecified_stereo'] and r.report['warnings']
     with pytest.raises(ValueError, match='unspecified'):
-        PrepareConformers('CC(O)C(=O)O', require_assigned_stereo=True)
+        PrepareConformers('CC(O)C(=O)O', requireAssignedStereo=True)
 
 
 def test_input_coordinates_are_discarded_from_a_copy():
@@ -117,10 +117,10 @@ def test_input_coordinates_are_discarded_from_a_copy():
     assert not r.report['source_coordinates_used'] and mol.ToBinary() == before
 
 
-@pytest.mark.parametrize('kwargs', [{'num_conformers': 0}, {'num_conformers': True},
-    {'attempts_per_strategy': 0}, {'random_seed': -1}, {'random_seed': 2**32},
-    {'max_embedding_iterations': 0}, {'optimization_iterations': 1.5}, {'optimize': 'other'},
-    {'method': 'MolFromSmiles'}, {'fallback_methods': ['typo']}, {'fallback_methods': 'ETKDGv4'}])
+@pytest.mark.parametrize('kwargs', [{'numConformers': 0}, {'numConformers': True},
+    {'attemptsPerStrategy': 0}, {'randomSeed': -1}, {'randomSeed': 2**32},
+    {'maxEmbeddingIterations': 0}, {'optimizationIterations': 1.5}, {'optimize': 'other'},
+    {'method': 'MolFromSmiles'}, {'fallbackMethods': ['typo']}, {'fallbackMethods': 'ETKDGv4'}])
 def test_invalid_configuration_rejected_before_embedding(monkeypatch, kwargs):
     def forbidden(*a, **k): raise AssertionError('must not embed')
     monkeypatch.setattr(AllChem, 'EmbedMultipleConfs', forbidden)
@@ -144,5 +144,5 @@ def test_raw_failure_counters_and_exhausted_plan_are_retained():
 def test_prepared_molecule_connects_to_existing_xtb_api():
     if os.environ.get('ELED_REQUIRE_RDXTB') != '1': pytest.skip('native integration profile')
     r = PrepareConformers('O', **FAST)
-    result = calculate_xtb(r.molecule, conf_id=r.report['recommended_conformer_id'])
+    result = calculate_xtb(r.molecule, confId=r.report['recommended_conformer_id'])
     assert result.metadata['geometry_sha256'] == r.report['conformers'][0]['geometry_sha256']

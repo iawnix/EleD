@@ -14,14 +14,14 @@ def main():
     mol = Chem.AddHs(Chem.MolFromSmiles('O'))
     if AllChem.EmbedMolecule(mol, randomSeed=42) != 0:
         raise RuntimeError('Could not generate water coordinates')
-    grid_settings = dict(scales=(1.4, 1.6, 1.8, 2.0), points_per_atom=100)
+    grid_settings = dict(scales=(1.4, 1.6, 1.8, 2.0), pointsPerAtom=100)
     points = GenerateESPGrid(mol, **grid_settings)
-    result = XTBCalculator().calculate(mol, esp_points_angstrom=points)
-    fits = [FitESPCharges(result, equivalence_groups=[(1, 2)]),
-            FitRESPCharges(result, equivalence_groups=[(1, 2)])]
-    print(json.dumps({'grid_settings': grid_settings, 'points_angstrom': result.esp_points_angstrom,
-                      'potential_au': result.esp_values_au,
-                      'fits': [fit.to_dict() for fit in fits]}, indent=2, allow_nan=False))
+    result = XTBCalculator().Calculate(mol, espPointsAngstrom=points)
+    fits = [FitESPCharges(result, equivalenceGroups=[(1, 2)]),
+            FitRESPCharges(result, equivalenceGroups=[(1, 2)])]
+    print(json.dumps({'grid_settings': grid_settings, 'points_angstrom': result.espPointsAngstrom,
+                      'potential_au': result.espValuesAU,
+                      'fits': [fit.ToDict() for fit in fits]}, indent=2, allow_nan=False))
 
 
 if __name__ == '__main__':

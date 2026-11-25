@@ -25,19 +25,19 @@ from eled import (XTBCalculator, GenerateESPGrid, CalcESP,
 
 mol = Chem.AddHs(Chem.MolFromSmiles("O"))
 AllChem.EmbedMolecule(mol, randomSeed=42)
-points = GenerateESPGrid(mol, scales=(1.4, 1.6, 1.8, 2.0), points_per_atom=100)
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, esp_points_angstrom=points)
+points = GenerateESPGrid(mol, scales=(1.4, 1.6, 1.8, 2.0), pointsPerAtom=100)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, espPointsAngstrom=points)
 potential = CalcESP(result)  # tuple, Hartree/e
 esp = FitESPCharges(result)
-resp = FitRESPCharges(result, equivalence_groups=[(1, 2)])
-print(esp.charges_e, resp.charges_e)  # original RDKit atom order, e
-record = resp.to_dict()  # JSON-compatible fit, diagnostics, settings and provenance
+resp = FitRESPCharges(result, equivalenceGroups=[(1, 2)])
+print(esp.charges, resp.GetCharges())  # original RDKit atom order, e
+record = resp.ToDict()  # JSON-compatible fit, diagnostics, settings and provenance
 ```
 
-`esp_points_angstrom` accepts a finite real `[npoints, 3]` array or sequence;
+`espPointsAngstrom` accepts a finite real `[npoints, 3]` array or sequence;
 `None`/empty disables sampling. `XTBOptions` freezes a private copy. The sampled
-coordinates and values are returned as `result.esp_points_angstrom` and
-`result.esp_values_au`. Sampling uses the same singlepoint as the other descriptors.
+coordinates and values are returned as `result.espPointsAngstrom` and
+`result.espValuesAU` (or `result.GetESPPoints()` / `result.GetESPValues()`). Sampling uses the same singlepoint as the other descriptors.
 `CalcESP` reads these values; it does not evaluate new points on an old result.
 Supply the desired points when calculating. All native handles are released
 before the Python result is returned; disk caches and worker processes need no
@@ -58,18 +58,18 @@ if not ok:
     raise RuntimeError(compiled.errorMessage)
 xyz = compiled.GetESPPoints()  # independent NumPy copy, Angstrom [point, xyz]
 v = compiled.GetESPValues()   # independent NumPy copy, Hartree/e [point]
-resp = FitRESPCharges(compiled, equivalence_groups=[(1, 2)])
+resp = FitRESPCharges(compiled, equivalenceGroups=[(1, 2)])
 ```
 
 `compiled.espSampled` reports availability. The common `CalcESP`, `FitESPCharges`
 and `FitRESPCharges` functions accept either result type. Standalone C++ uses
 `XTBOptions::espPointsAngstrom` and `XTBResults::espPointsAngstrom/espValuesAU`
 (flat point-major vectors). Existing Mulliken/EEQ/CM5 fields retain their meanings;
-fitted charges are returned in a separate `ESPChargeFit` with `charge_model`.
+fitted charges are returned in a separate `ESPChargeFit` with `chargeModel`.
 
 ## Sampling and charge-fitting definitions
 
-`GenerateESPGrid(mol, conf_id=-1, scales=(1.4,1.6,1.8,2.0), points_per_atom=100)`
+`GenerateESPGrid(mol, confId=-1, scales=(1.4,1.6,1.8,2.0), pointsPerAtom=100)`
 uses RDKit vdW radii and fixed lab-frame Fibonacci directions on each atom/shell.
 Points buried inside another atom's sphere on that shell are removed. Explicit
 hydrogen atoms and a finite 3D conformer are required. This is a documented
@@ -82,23 +82,23 @@ sampled molecular potential, and total charge is read from the calculation's
 provenance. The fitted charge unit is e. Interfaces are:
 
 ```python
-FitESPCharges(result, *, weights=None, equivalence_groups=(), fixed_charges=None,
+FitESPCharges(result, *, weights=None, equivalenceGroups=(), fixedCharges=None,
               rcond=1e-12)
-FitRESPCharges(result, *, restraint_strength=0.0005, restraint_width=0.1,
-               restrain_hydrogens=False, weights=None, equivalence_groups=(),
-               fixed_charges=None, max_iterations=1000, tolerance=1e-8, rcond=1e-12)
+FitRESPCharges(result, *, restraintStrength=0.0005, restraintWidth=0.1,
+               restrainHydrogens=False, weights=None, equivalenceGroups=(),
+               fixedCharges=None, maxIterations=1000, tolerance=1e-8, rcond=1e-12)
 ```
 
 ESP minimizes `0.5 * sum(w * (Aq - V)**2)`. Single-stage RESP additionally uses
-`sum(a_i * (sqrt(q_i**2 + b**2) - b))`, where `b` is `restraint_width` in e,
-and `a_i` is `restraint_strength` (zero on H by default). Strength is the
+`sum(a_i * (sqrt(q_i**2 + b**2) - b))`, where `b` is `restraintWidth` in e,
+and `a_i` is `restraintStrength` (zero on H by default). Strength is the
 coefficient in this numerical atomic-unit objective. Weights multiply squared
 residuals, default to one, may be zero, and must be nonnegative with a positive
 total. They are **not normalized**: changing their scale or sampling density
 changes the relative effect of the restraint.
 
-Total charge, user-specified equalities (`equivalence_groups`) and fixed values
-(`fixed_charges={atom_index: charge_e}`) are enforced exactly through a null-space
+Total charge, user-specified equalities (`equivalenceGroups`) and fixed values
+(`fixedCharges={atom_index: charge_e}`) are enforced exactly through a null-space
 solve. Indices follow the input molecule. Equivalent atoms are not inferred from
 the graph. Inconsistent constraints fail. ESP requires full rank in the remaining
 free parameters. RESP can resolve deficient data only if its restraints remove
@@ -106,10 +106,10 @@ the remaining ambiguity; otherwise it also fails. `rcond` controls rank decision
 RESP iterations stop when the maximum charge change is at most `tolerance` e;
 nonconvergence raises `RuntimeError` and does not return a successful fit.
 
-`ESPChargeFit` includes charges, predicted potentials, residuals (fit minus
+`ESPChargeFit` includes `charges` (`GetCharges()`), predicted potentials, residuals (fit minus
 reference), weighted RMS, maximum residual, constraint error, data rank, number
 of free parameters, condition number, iteration count and objective. A deficient
-data matrix has `condition_number=None`, including when a RESP fit is determined
+data matrix has `conditionNumber=None`, including when a RESP fit is determined
 by restraints. Settings, source engine/parameter/calculation provenance and a
 SHA256 of numerical inputs plus fitting settings accompany the result. Protocol
 IDs are `eled-esp-v1` and `eled-resp-single-stage-v1`.

@@ -1,29 +1,27 @@
 """ctypes binding for the xTB C API, loaded only when requested."""
 
 from __future__ import annotations
+
 import ctypes
-import os
-import time
 from functools import wraps
+import os
 from threading import RLock
+import time
 from typing import Any, Sequence
 
-from ..errors import XTBNativeNotFoundError, XTBRunError, XTBEnvironmentError, DescriptorUnavailableError
-from ..options import CalculationSettings
-from ..result import XTBResult, _frontier_energies
-from ..input import _xyz_from_mol, _method_flag, _effective_charge_uhf, _input_metadata
-from ..runtime import _find_xtb_library, _engine_identity, _parameter_file, _require_extended_libxtb
-from ..charges import charge_model_for_method, calc_cm5_charges, CHARGE_MODEL_CM5
+from ..charges import CHARGE_MODEL_CM5, _calc_cm5_charges, _charge_model_for_method
+from ..errors import DescriptorUnavailableError, XTBEnvironmentError, XTBNativeNotFoundError, XTBRunError
+from ..input import _effective_charge_uhf, _input_metadata, _method_flag, _xyz_from_mol
+from ..options import _validate_calculation_settings
+from ..result import XTBResults, _frontier_energies
+from ..runtime import _engine_identity, _find_xtb_library, _parameter_file, _require_extended_libxtb
 
 HARTREE_TO_EV = 27.211386245988
 ANGSTROM_TO_BOHR = 1.8897261254578281
 
-class _NativeXTB:
-    """Small ctypes binding for the stable xTB C API.
 
-    The binding is loaded lazily.  Installing eled therefore does not
-    require a shared xTB library until a native calculation is requested.
-    """
+class _NativeXTB:
+    """Small ctypes binding for the stable xTB C API."""
 
     _handle = ctypes.c_void_p
 
@@ -32,9 +30,6 @@ class _NativeXTB:
         self.lib = ctypes.CDLL(library)
         self.get_api_version = self._bind("xtb_getAPIVersion", ctypes.c_int, [])
         api_version = self.get_api_version()
-        # API 2 changes xtb_setSolvent, which this binding does not use. The
-        # gas-phase molecule/calculator/result functions bound here retain
-        # their API 1 signatures (verified against upstream a9040512).
         if api_version // 10000 not in (1, 2):
             raise XTBNativeNotFoundError(f'unsupported xTB C API version {api_version}')
         self._bind_api()
@@ -131,7 +126,7 @@ class _NativeXTB:
             raise DescriptorUnavailableError('unsupported native ESP API')
         self.set_keep_esp = self._bind('xtb_rdkit_setKeepESP', None, [h, h, ctypes.c_bool])
         self.get_esp = self._bind('xtb_rdkit_getESP', i,
-                                [h, h, i, ctypes.POINTER(d), i, ctypes.POINTER(d)])
+                                  [h, h, i, ctypes.POINTER(d), i, ctypes.POINTER(d)])
 
     def esp_data(self, environment, results, points):
         count = len(points)
@@ -141,7 +136,7 @@ class _NativeXTB:
         self.check(environment, 'ESP evaluation')
         if not ok:
             raise XTBEnvironmentError('native ESP evaluation failed without a diagnostic')
-        return dict(esp_points_angstrom=points, esp_values_au=tuple(values))
+        return dict(espPointsAngstrom=points, espValuesAU=tuple(values))
 
     def basis_data(self, environment, results, natoms, nao):
         sizes = (ctypes.c_int * 3)()
@@ -156,11 +151,15 @@ class _NativeXTB:
         self.get_overlap(environment, results, nao * nao, overlap)
         self.get_basis_map(environment, results, nao, nshell, aa, ash, sa, sl)
         self.check(environment, 'basis extraction')
-        from ..basis import NativePDirections
-        return dict(ao_p_directions=NativePDirections(tuple(ash), tuple(sl)),
-                    overlap_matrix=tuple(tuple(overlap[j * nao + i] for j in range(nao)) for i in range(nao)),
-                    ao_atom_indices=tuple(aa), ao_shell_indices=tuple(ash),
-                    shell_atom_indices=tuple(sa), shell_angular_momenta=tuple(sl))
+        from ..basis import _native_p_directions
+        return dict(
+            aoPDirections=_native_p_directions(tuple(ash), tuple(sl)),
+            overlapMatrix=tuple(tuple(overlap[j * nao + i] for j in range(nao)) for i in range(nao)),
+            aoAtomMap=tuple(aa),
+            aoShellMap=tuple(ash),
+            shellAtomMap=tuple(sa),
+            shellAngularMomenta=tuple(sl),
+        )
 
     def error(self, environment: Any) -> str:
         buffer = ctypes.create_string_buffer(4096)
@@ -198,57 +197,50 @@ def _serialized(function):
 def _run_xtb_native(
     mol: Any,
     *,
-    conf_id: int = -1,
+    confId: int = -1,
     method: str = "GFN2-xTB",
     charge: int | None = None,
-    uhf: int | None = None,
-    xtb_library: str | os.PathLike[str] | None = None,
-    keep_overlap: bool = False,
-    esp_points_angstrom=(),
-    max_iterations: int = 250,
+    numUnpairedElectrons: int | None = None,
+    xtbLibrary: str | os.PathLike[str] | None = None,
+    keepOverlap: bool = False,
+    espPointsAngstrom=(),
+    maxIterations: int = 250,
     accuracy: float = 1.0,
-    electronic_temperature: float = 300.0,
+    electronicTemperature: float = 300.0,
     _restart=None,
     _save_restart=None,
     _return_gradient=False,
-) -> XTBResult:
-    """Run a single point through a shared ``libxtb`` C API library.
-
-    This adapter evaluates gas-phase single points and can optionally return
-    the nuclear gradient. Geometry-step orchestration lives in
-    :mod:`eled.optimization`; solvent setup remains outside this API.
-    """
-
+) -> XTBResults:
+    """Run a single point through a shared ``libxtb`` C API library."""
     from rdkit import Chem
-    from ..esp_input import ESPPoints
-    esp_points_angstrom = ESPPoints(esp_points_angstrom)
-    settings = CalculationSettings(max_iterations, accuracy, electronic_temperature)
+    from ..esp_input import _normalize_esp_points
+    espPointsAngstrom = _normalize_esp_points(espPointsAngstrom)
+    settings = _validate_calculation_settings(maxIterations, accuracy, electronicTemperature)
     mol = Chem.Mol(mol)  # Own the exact geometry/topology while ctypes releases the GIL.
-    if not isinstance(keep_overlap, bool):
-        raise ValueError('keep_overlap must be a bool')
-    xyz = _xyz_from_mol(mol, conf_id)
+    if not isinstance(keepOverlap, bool):
+        raise ValueError('keepOverlap must be a bool')
+    xyz = _xyz_from_mol(mol, confId)
     method_name, _ = _method_flag(method)
     if method_name == 'GFN-FF':
         raise ValueError('GFN-FF does not provide molecular orbital descriptors')
-    charge, uhf = _effective_charge_uhf(mol, charge, uhf)
-    library = _NativeXTB(_find_xtb_library(xtb_library))
+    charge, unpaired = _effective_charge_uhf(mol, charge, numUnpairedElectrons)
+    library = _NativeXTB(_find_xtb_library(xtbLibrary))
     _require_extended_libxtb(library.library)
     engine = _engine_identity('native', library.library)
-    if esp_points_angstrom:
+    if espPointsAngstrom:
         library.bind_esp_api()
-    if keep_overlap:
+    if keepOverlap:
         if not engine['orbital_basis']:
-            raise DescriptorUnavailableError('keep_overlap requires a verified native basis extension; rebuild with tools/build_patched_xtb.py')
+            raise DescriptorUnavailableError(
+                'keepOverlap requires a verified native basis extension; rebuild with tools/build_patched_xtb.py'
+            )
         library.bind_basis_api()
-    # Check again here because callers can use run_xtb_native directly. Do
-    # this before creating handles or loading any method's parameters.
     if method_name == 'GFN0-xTB' and not engine['native_gfn0']:
-        raise ValueError('native GFN0 requires a verified patched xTB build; '
-                         'run tools/build_patched_xtb.sh')
+        raise ValueError('native GFN0 requires a verified patched xTB build; run tools/build_patched_xtb.sh')
     parameter = _parameter_file(method_name, library.library)
     started = time.perf_counter()
     natoms = mol.GetNumAtoms()
-    conf = mol.GetConformer(conf_id)
+    conf = mol.GetConformer(confId)
     atom_count = ctypes.c_int(natoms)
     atomic_numbers = (ctypes.c_int * natoms)(*(int(atom.GetAtomicNum()) for atom in mol.GetAtoms()))
     coordinates = (ctypes.c_double * (3 * natoms))()
@@ -261,7 +253,7 @@ def _run_xtb_native(
             position.z * ANGSTROM_TO_BOHR,
         )
     charge_value = ctypes.c_double(charge)
-    uhf_value = ctypes.c_int(uhf)
+    uhf_value = ctypes.c_int(unpaired)
     lattice = (ctypes.c_double * 9)(*([0.0] * 9))
     periodic = (ctypes.c_bool * 3)(False, False, False)
     environment = library.new_environment()
@@ -305,10 +297,10 @@ def _run_xtb_native(
             if _restart:
                 raise XTBEnvironmentError('native xTB could not copy the reference wavefunction')
             raise XTBEnvironmentError("native xTB could not create a results object")
-        if keep_overlap:
+        if keepOverlap:
             library.set_keep_overlap(environment, results, True)
             library.check(environment, "basis retention setup")
-        if esp_points_angstrom:
+        if espPointsAngstrom:
             library.set_keep_esp(environment, results, True)
             library.check(environment, "ESP retention setup")
         library.singlepoint(environment, molecule, calculator, results)
@@ -340,17 +332,22 @@ def _run_xtb_native(
         energies_ev = tuple(value * HARTREE_TO_EV for value in orbital_energies)
         occupation_values = tuple(float(value) for value in occupations)
         homo, lumo = _frontier_energies(energies_ev, occupation_values)
-        esp = library.esp_data(environment, results, esp_points_angstrom) if esp_points_angstrom else {}
-        basis = library.basis_data(environment, results, natoms, nao.value) if keep_overlap else {}
+        esp = library.esp_data(environment, results, espPointsAngstrom) if espPointsAngstrom else {}
+        basis = library.basis_data(environment, results, natoms, nao.value) if keepOverlap else {}
         from ..runtime import _native_diagnostics_build
         from ..scf import scf_record
         scf = scf_record(method_name)
         if _native_diagnostics_build(library.library):
             version = library._bind('xtb_rdkit_getSCFAPIVersion', ctypes.c_int, [])
-            getter = library._bind('xtb_rdkit_getSCFDiagnostics', ctypes.c_int,
-                [library._handle, library._handle, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_double)])
-            if version() != 1: raise XTBEnvironmentError('unsupported SCC diagnostics API')
-            count = ctypes.c_int(-1); data = (ctypes.c_double * 4)()
+            getter = library._bind(
+                'xtb_rdkit_getSCFDiagnostics',
+                ctypes.c_int,
+                [library._handle, library._handle, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_double)],
+            )
+            if version() != 1:
+                raise XTBEnvironmentError('unsupported SCC diagnostics API')
+            count = ctypes.c_int(-1)
+            data = (ctypes.c_double * 4)()
             if getter(environment, results, ctypes.byref(count), data):
                 scf = scf_record(method_name, count.value, list(data))
         if _save_restart is not None:
@@ -358,40 +355,55 @@ def _run_xtb_native(
             if not saved:
                 raise XTBEnvironmentError('native xTB could not copy the reference wavefunction')
             _save_restart.append((library, saved))
-        return XTBResult(
+        grad_rows = (
+            tuple(
+                tuple(float(gradient[3 * row + axis]) for axis in range(3))
+                for row in range(natoms)
+            )
+            if gradient is not None
+            else ()
+        )
+        return XTBResults(
             **esp,
             **basis,
+            gradientHartreePerBohr=grad_rows,
             method=method_name,
             version=engine["version"],
-            total_energy_hartree=float(energy.value),
-            homo_lumo_gap_ev=(lumo - homo if homo is not None and lumo is not None else None),
-            number_of_molecular_orbitals=int(nao.value),
-            number_of_electrons=int(round(sum(occupation_values))),
-            number_of_unpaired_electrons=int(uhf),
-            orbital_energies_ev=energies_ev,
-            orbital_occupations=occupation_values,
-            partial_charges=tuple(float(value) for value in charges),
-            charge_model=charge_model_for_method(method_name),
-            cm5_charges=(calc_cm5_charges(
-                [atom.GetAtomicNum() for atom in mol.GetAtoms()],
-                [[conf.GetAtomPosition(i).x, conf.GetAtomPosition(i).y, conf.GetAtomPosition(i).z]
-                 for i in range(natoms)],
-                tuple(float(value) for value in charges)
-            ) if method_name in ('GFN1-xTB', 'GFN2-xTB') else ()),
-            dipole_e_bohr=tuple(float(value) for value in dipole),
-            wiberg_bond_orders=tuple(
+            totalEnergyHartree=float(energy.value),
+            homoLumoGapEV=(lumo - homo if homo is not None and lumo is not None else None),
+            numOrbitals=int(nao.value),
+            numElectrons=int(round(sum(occupation_values))),
+            numUnpairedElectrons=int(unpaired),
+            orbitalEnergiesEV=energies_ev,
+            orbitalOccupancies=occupation_values,
+            atomicCharges=tuple(float(value) for value in charges),
+            chargeModel=_charge_model_for_method(method_name),
+            cm5Charges=(
+                _calc_cm5_charges(
+                    [atom.GetAtomicNum() for atom in mol.GetAtoms()],
+                    [
+                        [conf.GetAtomPosition(i).x, conf.GetAtomPosition(i).y, conf.GetAtomPosition(i).z]
+                        for i in range(natoms)
+                    ],
+                    tuple(float(value) for value in charges),
+                )
+                if method_name in ('GFN1-xTB', 'GFN2-xTB')
+                else ()
+            ),
+            dipoleAtomicUnits=tuple(float(value) for value in dipole),
+            wibergBondOrders=tuple(
                 tuple(float(bond_orders[row * natoms + column]) for column in range(natoms))
                 for row in range(natoms)
             ),
-            orbital_coefficients=tuple(
+            orbitalCoefficients=tuple(
                 tuple(float(coefficients[column * nao.value + row]) for column in range(nao.value))
                 for row in range(nao.value)
             ),
             backend="native",
-            raw_json={"native_api_version": int(library.get_api_version())},
+            rawJSON={"native_api_version": int(library.get_api_version())},
             metadata={
-                **_input_metadata(mol, conf_id, charge, uhf, xyz),
-                'CalculationSettings': settings,
+                **_input_metadata(mol, confId, charge, unpaired, xyz),
+                'calculation_settings': settings,
                 'calculation_status': 'success',
                 'scf': scf,
                 'initialization': 'reference' if _restart else 'independent',
@@ -402,13 +414,26 @@ def _run_xtb_native(
                 'native_api_version': int(library.get_api_version()),
                 'elapsed_seconds': time.perf_counter() - started,
                 'coefficient_axes': ['AO', 'MO'],
-                'charge_model': charge_model_for_method(method_name),
+                'charge_model': _charge_model_for_method(method_name),
                 'cm5_model': CHARGE_MODEL_CM5 if method_name in ('GFN1-xTB', 'GFN2-xTB') else None,
-                **({'esp': {'api_version': 1, 'potential_unit': 'hartree/e',
-                            'coordinate_unit': 'angstrom', 'source': 'native_density'}} if esp else {}),
-                'overlap_source': 'same libxtb calculation' if keep_overlap else None,
-                **({'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
-                   if gradient is not None else {}),
+                **(
+                    {
+                        'esp': {
+                            'api_version': 1,
+                            'potential_unit': 'hartree/e',
+                            'coordinate_unit': 'angstrom',
+                            'source': 'native_density',
+                        }
+                    }
+                    if esp
+                    else {}
+                ),
+                'overlap_source': 'same libxtb calculation' if keepOverlap else None,
+                **(
+                    {'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
+                    if gradient is not None
+                    else {}
+                ),
             },
         )
     finally:
@@ -418,30 +443,50 @@ def _run_xtb_native(
         library._delete(library.del_environment, environment)
 
 
-def run_xtb_native(mol, *, conf_id=-1, method='GFN2-xTB', charge=None, uhf=None,
-                   xtb_library=None, keep_overlap=False, esp_points_angstrom=(), max_iterations=250,
-                   accuracy=1.0, electronic_temperature=300.0):
+def run_xtb_native(
+    mol,
+    *,
+    confId=-1,
+    method='GFN2-xTB',
+    charge=None,
+    numUnpairedElectrons=None,
+    xtbLibrary=None,
+    keepOverlap=False,
+    espPointsAngstrom=(),
+    maxIterations=250,
+    accuracy=1.0,
+    electronicTemperature=300.0,
+):
     """Run an independently initialized gas-phase libxtb single point."""
-    return _run_xtb_native(mol, conf_id=conf_id, method=method, charge=charge, uhf=uhf,
-        xtb_library=xtb_library, keep_overlap=keep_overlap, esp_points_angstrom=esp_points_angstrom, max_iterations=max_iterations,
-        accuracy=accuracy, electronic_temperature=electronic_temperature)
+    return _run_xtb_native(
+        mol,
+        confId=confId,
+        method=method,
+        charge=charge,
+        numUnpairedElectrons=numUnpairedElectrons,
+        xtbLibrary=xtbLibrary,
+        keepOverlap=keepOverlap,
+        espPointsAngstrom=espPointsAngstrom,
+        maxIterations=maxIterations,
+        accuracy=accuracy,
+        electronicTemperature=electronicTemperature,
+    )
 
 
 def _native_charge_states(mol, configurations):
-    """Scoped reference restart; callers must close this iterator on early exit.
-
-    The fixed-geometry/settings configurations are validated by RunReactivity.
-    Each neighbor receives its own deep copy of the untouched reference.
-    """
+    """Scoped reference restart; callers must close this iterator on early exit."""
     saved = []
     with _native_lock:
         try:
             for index, config in enumerate(configurations):
-                options = config.to_dict()
+                options = config.ToDict()
                 options.pop('backend')
-                yield _run_xtb_native(mol, **options,
+                yield _run_xtb_native(
+                    mol,
+                    **options,
                     _restart=saved[0][1] if index else None,
-                    _save_restart=saved if not index else None)
+                    _save_restart=saved if not index else None,
+                )
         finally:
             for library, handle in saved:
                 library._delete(library.del_results, handle)

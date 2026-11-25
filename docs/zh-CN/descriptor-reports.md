@@ -1,12 +1,12 @@
-# 报告与反应性
+# 报告与反应性（1.4）
 
 ## 单点报告
 
 ```python
 from eled import XTBCalculator, CalcDescriptorReport
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
-report = CalcDescriptorReport(mol, result, record_id="molecule-1")
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
+report = CalcDescriptorReport(mol, result, recordId="molecule-1")
 ```
 
 `CalcDescriptorReport()` 不会再次调用引擎。报告包含：
@@ -26,19 +26,19 @@ report = CalcDescriptorReport(mol, result, record_id="molecule-1")
 
 | 参数 | 默认值 | 含义 |
 | --- | --- | --- |
-| `pi_scheme` | `"lowdin"` | `"lowdin"` 或 `"mulliken"` 布居/投影定义 |
-| `pi_plane_tol_a` | `0.1` | 局部平面最大距离容差，Å；有限且非负 |
-| `pi_ref` | `None` | RDKit 原始原子编号 → 参考 π 电子数，范围 0 至 2 e |
-| `mci_rings` | `None` | 用于密度多中心指数 MCI 的命名有序环映射 |
-| `mci_scheme` | `mulliken` | `mulliken` 或 `lowdin` 原子块密度方案 |
+| `piScheme` | `"lowdin"` | `"lowdin"` 或 `"mulliken"` 布居/投影定义 |
+| `piPlaneTolAngstrom` | `0.1` | 局部平面最大距离容差，Å；有限且非负 |
+| `piRef` | `None` | RDKit 原始原子编号 → 参考 π 电子数，范围 0 至 2 e |
+| `mciRings` | `None` | 用于密度多中心指数 MCI 的命名有序环映射 |
+| `mciScheme` | `mulliken` | `mulliken` 或 `lowdin` 原子块密度方案 |
 
 ```python
-pi_settings = dict(pi_scheme="mulliken", pi_plane_tol_a=0.05, pi_ref={0: 1.0})
+pi_settings = dict(piScheme="mulliken", piPlaneTolAngstrom=0.05, piRef={0: 1.0})
 report = CalcDescriptorReport(mol, result, **pi_settings)
 reports = RunDescriptorBatch([mol], **pi_settings)
 ```
 
-这些参数写入 `analysis_settings`，失败的批处理行也保留设置。`pi_ref` 只覆盖
+这些参数写入 `analysis_settings`，失败的批处理行也保留设置。`piRef` 只覆盖
 列出的原子，其他原子遵循[默认参考规则](density-descriptors.md#局部-π-投影)。
 输入支持整数索引和标准十进制字符串索引，报告复制映射并统一保存为字符串键，
 从 JSON 读回后可通过 `CalcDescriptorReport(..., **settings)` 重用。
@@ -53,7 +53,7 @@ reports = RunDescriptorBatch([mol], **pi_settings)
 from eled import RunDescriptorBatch, ExportDescriptorReports
 
 reports = RunDescriptorBatch(
-    molecules, record_ids=ids, max_workers=4, isolate=True,
+    molecules, recordIds=ids, maxWorkers=4, isolate=True,
 )
 ExportDescriptorReports(reports, "features.jsonl")
 ExportDescriptorReports(reports, "features.csv")
@@ -70,9 +70,9 @@ from eled import RunReactivity, XTBOptions
 
 report = RunReactivity(
     mol,
-    options=XTBOptions(method="GFN2-xTB", electronic_temperature=300.0),
-    population_scheme="xtb_scc",
-    return_errors=True,
+    options=XTBOptions(method="GFN2-xTB", electronicTemperature=300.0),
+    populationScheme="xtb_scc",
+    returnErrors=True,
 )
 ```
 
@@ -86,15 +86,14 @@ report = RunReactivity(
 三种电荷态使用相同几何、方法、参数、电子温度和引擎。300 K 是电子占据
 平滑的计算设置，不是分子热力学温度。GFN0 不参与 ΔSCF 反应性分析。
 
-`population_scheme="xtb_scc"` 使用 GFN1/2 收敛后的 SCC Mulliken 电荷差分；
-`population_scheme="cm5"` 使用显式推导的 CM5 电荷差分。旧名称
-为兼容已有程序，`"charges"` 映射到 `"xtb_scc"`。报告会同时记录
-population scheme 和 charge model；`"mulliken"`、`"lowdin"` 指轨道人口分析，
+`populationScheme="xtb_scc"` 使用 GFN1/2 收敛后的 SCC Mulliken 电荷差分；
+`populationScheme="cm5"` 使用显式推导的 CM5 电荷差分。报告会同时记录
+population scheme 和 charge model；`"mulliken"`、`"lowdin"` 指轨道布居分析，
 对应轨道布居定义。
 
 ## 报告版本
 
-当前单点报告使用 schema 2、descriptor version 1.3。报告字段带有显式单位，
+当前单点报告使用 schema 2、descriptor version 1.4，反应性协议版本为 2.1。报告字段带有显式单位，
 原子编号固定遵循输入分子。修改公开字段时需要同步更新目录、测试和版本说明。
 
 英文详细说明见 [descriptor-reports.md](../descriptor-reports.md)。

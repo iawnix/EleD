@@ -1,20 +1,20 @@
-# 描述符
+# 描述符（1.4）
 
-所有描述符都使用小写 `snake_case` 字段名，并明确单位。描述符函数只分析
-已有的 xTB 结果；只有 `XTBCalculator.calculate()`、`RunReactivity()` 等入口会调用引擎。
+公开函数/方法采用 RDKit `PascalCase`，参数与结果属性采用 `camelCase`，导出的描述符字段名统一采用带显式单位后缀的小写 `snake_case`。基于结果对象的描述符函数只分析已有的 `XTBResults`；需要一步从 `Mol` 提取分子标量或接入 `rdMolDescriptors.Properties` 时，可使用 `CalcMolXTBDescriptors()` 与 `RegisterRDKitProperties()`；只有 `XTBCalculator.Calculate()`、`CalcMolXTBDescriptors()`、`RunReactivity()` 等入口会调用引擎。
 
 ## 单点描述符
 
 ```python
 from eled import (
-    XTBCalculator, CalcXTBDescriptors, CalcXTBAtomDescriptors,
-    CalcXTBBondDescriptors,
+    XTBCalculator, CalcMolXTBDescriptors, CalcXTBDescriptors,
+    CalcXTBAtomDescriptors, CalcXTBBondDescriptors,
 )
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
 molecular = CalcXTBDescriptors(result)
 atoms = CalcXTBAtomDescriptors(result)
 bonds = CalcXTBBondDescriptors(mol, result)
+# 或单步提取标量字典：CalcMolXTBDescriptors(mol)
 ```
 
 主要字段包括：
@@ -51,7 +51,7 @@ HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不�
 ```python
 from eled import XTBCalculator, CalcShellPopulations, CalcDensityMatrix
 
-result = XTBCalculator(method="GFN2-xTB").calculate(mol, keep_overlap=True)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
 shells = CalcShellPopulations(result)
 density = CalcDensityMatrix(result)
 ```
@@ -96,7 +96,7 @@ pi = CalcPiDescriptors(mol, result)
 ```python
 from eled import RunReactivity
 
-report = RunReactivity(mol, population_scheme="lowdin", return_errors=True)
+report = RunReactivity(mol, populationScheme="lowdin", returnErrors=True)
 ```
 
 固定几何计算 Q、Q+1、Q−1，得到 `ip_v_ev`、`ea_v_ev`、

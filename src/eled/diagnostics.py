@@ -12,10 +12,10 @@ import platform
 import sys
 
 
-def installation_info():
+def GetInstallationInfo():
     """Report installed packages without importing optional calculation engines."""
-    import rdkit
     import eled
+    import rdkit
 
     versions = {}
     for name in ("eled", "rdkit", "numpy"):
@@ -37,13 +37,13 @@ def installation_info():
     }
 
 
-def check_backend(backend, method, library=None, keep_overlap=False, reactivity=False):
+def CheckBackend(backend, method, library=None, keepOverlap=False, reactivity=False):
     """Calculate fixed water, returning actual engine identity and explicit units."""
     from rdkit import Chem
 
     mol = Chem.AddHs(Chem.MolFromSmiles("O"))
     conf = Chem.Conformer(3)
-    for index, xyz in enumerate(((0., 0., 0.), (.9572, 0., 0.), (-.239987, .927297, 0.))):
+    for index, xyz in enumerate(((0.0, 0.0, 0.0), (0.9572, 0.0, 0.0), (-0.239987, 0.927297, 0.0))):
         conf.SetAtomPosition(index, xyz)
     conf.Set3D(True)
     mol.AddConformer(conf)
@@ -56,68 +56,88 @@ def check_backend(backend, method, library=None, keep_overlap=False, reactivity=
                 "ELED_BUILD_RDXTB=1 in the locked RDKit SDK environment; "
                 "see docs/install.md. " + str(exc)
             ) from exc
-        ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library or "", keepOverlap=keep_overlap)
+        ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library or "", keepOverlap=keepOverlap)
         if not ok:
             raise RuntimeError(result.errorMessage)
         energy = result.totalEnergyHartree
         charges = result.GetAtomicCharges()
         nao = result.numOrbitals
-        engine = {"library": result.libraryPath, "sha256": result.librarySHA256,
-                  "api_version": result.apiVersion, "parameter_file": result.parameterFile,
-                  "parameter_sha256": result.parameterSHA256,
-                  "source_commit": result.sourceCommit,
-                  "native_gfn0_verified": result.gfn0StateFixVerified,
-                  "compiled_rdkit_version": rdXTBTools.rdkitVersion,
-                  "basis_export_verified": result.basisExportVerified,
-                  "overlap_retained": result.overlapRetained}
+        engine = {
+            "library": result.libraryPath,
+            "sha256": result.librarySHA256,
+            "api_version": result.apiVersion,
+            "parameter_file": result.parameterFile,
+            "parameter_sha256": result.parameterSHA256,
+            "source_commit": result.sourceCommit,
+            "native_gfn0_verified": result.gfn0StateFixVerified,
+            "compiled_rdkit_version": rdXTBTools.rdkitVersion,
+            "basis_export_verified": result.basisExportVerified,
+            "overlap_retained": result.overlapRetained,
+        }
     else:
         from . import XTBCalculator
-        result = XTBCalculator(method=method, backend=backend,
-                                xtb_library=library,
-                                keep_overlap=keep_overlap).calculate(mol)
-        energy = result.total_energy_hartree
-        charges = result.partial_charges
-        nao = result.number_of_molecular_orbitals
+        result = XTBCalculator(
+            method=method,
+            backend=backend,
+            xtbLibrary=library,
+            keepOverlap=keepOverlap,
+        ).Calculate(mol)
+        energy = result.totalEnergyHartree
+        charges = result.GetAtomicCharges()
+        nao = result.numOrbitals
         engine = result.metadata["engine"]
     if (energy is None or not math.isfinite(energy) or energy >= 0
             or nao is None or nao < 1 or len(charges) != 3
             or not all(math.isfinite(float(q)) for q in charges)
             or abs(sum(charges)) > 1e-5):
         raise RuntimeError("water single point returned invalid energy, orbital count or charges")
-    from .electronic_descriptors import CalcXTBDescriptors, CalcXTBAtomDescriptors, CalcXTBFragmentDescriptors
+    from .electronic_descriptors import CalcXTBAtomDescriptors, CalcXTBDescriptors, CalcXTBFragmentDescriptors
     descriptors = CalcXTBDescriptors(result)
     atoms = CalcXTBAtomDescriptors(result)
     fragments = CalcXTBFragmentDescriptors(result, {"oxygen": [0], "hydrogens": [1, 2]})
     if len(atoms) != 3 or abs(sum(a["q_e"] for a in atoms)) > 1e-5:
         raise RuntimeError("atomic descriptors failed the charge check")
     population_check = None
-    if keep_overlap:
-        from .populations import CalcOrbitalPopulations, CalcFrontierDescriptors
+    if keepOverlap:
+        from .populations import CalcFrontierDescriptors, CalcOrbitalPopulations
         populations = CalcOrbitalPopulations(result)
         frontier = CalcFrontierDescriptors(mol, result)
         electrons = sum(populations["mo_n_e"])
         if abs(electrons - descriptors["xtb_n_e"]) > 1e-6:
             raise RuntimeError("orbital populations failed the electron count check")
-        population_check = {"electron_sum_e": electrons,
-                            "orthonormality_error": populations["orthonormality_error"],
-                            "hl_ovlp": frontier["hl_ovlp"]}
+        population_check = {
+            "electron_sum_e": electrons,
+            "orthonormality_error": populations["orthonormality_error"],
+            "hl_ovlp": frontier["hl_ovlp"],
+        }
     from .reports import CalcDescriptorReport
-    descriptor_report = CalcDescriptorReport(mol, result, include_orbitals=keep_overlap)
+    descriptor_report = CalcDescriptorReport(mol, result, includeOrbitals=keepOverlap)
     if descriptor_report['quality']['status'] == 'error':
         raise RuntimeError('descriptor report failed quality checks')
     reactivity_report = None
     if reactivity:
         from .options import XTBOptions
         from .reactivity import RunReactivity
-        reactivity_report = RunReactivity(mol, interface=backend,
-            options=XTBOptions(method=method, xtb_library=library),
-            population_scheme='lowdin' if keep_overlap else 'xtb_scc')
-    return {"backend": backend, "method": method, "molecule": "water",
-            "total_energy_hartree": energy, "n_orb": nao,
-            "charge_sum_e": float(sum(charges)), "engine": engine,
-            "descriptors": descriptors, "fragment_descriptors": fragments,
-            "population_check": population_check,
-            "descriptor_report": descriptor_report, "reactivity_report": reactivity_report}
+        reactivity_report = RunReactivity(
+            mol,
+            interface=backend,
+            options=XTBOptions(method=method, xtbLibrary=library),
+            populationScheme='lowdin' if keepOverlap else 'xtb_scc',
+        )
+    return {
+        "backend": backend,
+        "method": method,
+        "molecule": "water",
+        "total_energy_hartree": energy,
+        "n_orb": nao,
+        "charge_sum_e": float(sum(charges)),
+        "engine": engine,
+        "descriptors": descriptors,
+        "fragment_descriptors": fragments,
+        "population_check": population_check,
+        "descriptor_report": descriptor_report,
+        "reactivity_report": reactivity_report,
+    }
 
 
 def main(argv=None):
@@ -128,16 +148,26 @@ def main(argv=None):
     doctor.add_argument("--check", choices=("native", "compiled"))
     doctor.add_argument("--method", default="GFN2-xTB", choices=("GFN0-xTB", "GFN1-xTB", "GFN2-xTB"))
     doctor.add_argument("--library", help="explicit libxtb shared library for native/compiled checks")
-    doctor.add_argument("--keep-overlap", action="store_true", help="verify native basis export and population descriptors")
-    doctor.add_argument("--reactivity", action="store_true", help="also verify fixed-geometry GFN1/2 charge-state descriptors")
+    doctor.add_argument(
+        "--keep-overlap",
+        action="store_true",
+        help="verify native basis export and population descriptors",
+    )
+    doctor.add_argument(
+        "--reactivity",
+        action="store_true",
+        help="also verify fixed-geometry GFN1/2 charge-state descriptors",
+    )
     args = parser.parse_args(argv)
     if args.reactivity and (not args.check or args.method == 'GFN0-xTB'):
         parser.error('--reactivity requires --check and GFN1/2')
-    report = installation_info()
+    report = GetInstallationInfo()
     report["status"] = "inventory"
     if args.check:
         try:
-            report["check"] = check_backend(args.check, args.method, args.library, args.keep_overlap, args.reactivity)
+            report["check"] = CheckBackend(
+                args.check, args.method, args.library, keepOverlap=args.keep_overlap, reactivity=args.reactivity
+            )
             report["status"] = "ok"
             if args.check == "compiled":
                 report["compiled_module_import_checked"] = True
@@ -153,8 +183,10 @@ def main(argv=None):
         print(f"RDKit: {report['versions']['rdkit']}")
         print(f"C++ module file: {report['compiled_module_path'] or 'not installed'}")
         if report["status"] == "ok":
-            print(f"{args.check} / {args.method}: OK, water energy "
-                  f"{report['check']['total_energy_hartree']:.10f} Hartree")
+            print(
+                f"{args.check} / {args.method}: OK, water energy "
+                f"{report['check']['total_energy_hartree']:.10f} Hartree"
+            )
         elif report["status"] == "error":
             print(report["error"])
         else:

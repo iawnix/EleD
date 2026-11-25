@@ -50,19 +50,19 @@ def molecule(smiles):
 def test_native_results_and_mapping_without_executable(smiles, method, library, no_executable):
     mol = molecule(smiles)
     original = mol.ToBinary()
-    native = calculate_xtb(mol, method=method, xtb_library=library)
+    native = calculate_xtb(mol, method=method, xtbLibrary=library)
     assert native.backend == 'native'
-    assert np.isfinite(native.total_energy_hartree) and native.total_energy_hartree < 0
-    assert sum(native.partial_charges) == pytest.approx(Chem.GetFormalCharge(mol), abs=1e-6)
-    assert sum(native.orbital_occupations) == pytest.approx(native.number_of_electrons, abs=1e-7)
-    assert np.isfinite(native.orbital_energies_ev).all()
-    nao = native.number_of_molecular_orbitals
-    assert np.shape(native.orbital_coefficients) == (nao, nao)
-    np.testing.assert_allclose(native.wiberg_bond_orders, np.array(native.wiberg_bond_orders).T, atol=1e-10)
+    assert np.isfinite(native.totalEnergyHartree) and native.totalEnergyHartree < 0
+    assert sum(native.atomicCharges) == pytest.approx(Chem.GetFormalCharge(mol), abs=1e-6)
+    assert sum(native.orbitalOccupancies) == pytest.approx(native.numElectrons, abs=1e-7)
+    assert np.isfinite(native.orbitalEnergiesEV).all()
+    nao = native.numOrbitals
+    assert np.shape(native.orbitalCoefficients) == (nao, nao)
+    np.testing.assert_allclose(native.wibergBondOrders, np.array(native.wibergBondOrders).T, atol=1e-10)
     target = AnnotateMol(mol, native)
     for bond in mol.GetBonds():
         i, j = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
-        assert target.GetBondWithIdx(bond.GetIdx()).GetDoubleProp('xtb_wbo') == native.wiberg_bond_orders[i][j]
+        assert target.GetBondWithIdx(bond.GetIdx()).GetDoubleProp('xtb_wbo') == native.wibergBondOrders[i][j]
     assert native.metadata['engine']['sha256']
     api_version = ctypes.CDLL(library).xtb_getAPIVersion
     api_version.argtypes = []
@@ -81,8 +81,8 @@ def test_fixed_water_matches_archived_reference(library, no_executable):
         conf.SetAtomPosition(i, xyz)
     conf.Set3D(True)
     mol.AddConformer(conf)
-    result = calculate_xtb(mol, xtb_library=library)
-    assert result.total_energy_hartree == pytest.approx(-5.07037168, abs=2e-7)
+    result = calculate_xtb(mol, xtbLibrary=library)
+    assert result.totalEnergyHartree == pytest.approx(-5.07037168, abs=2e-7)
 
 
 def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable):
@@ -92,22 +92,21 @@ def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable)
     expected = os.environ.get('ELED_EXPECT_NATIVE_GFN0')
     if expected is not None:
         assert bool(verified) == (expected == '1')
-    before = calculate_xtb(mol, xtb_library=library)
+    before = calculate_xtb(mol, xtbLibrary=library)
     if verified:
-        gfn0 = calculate_xtb(mol, method='GFN0-xTB', xtb_library=library)
+        gfn0 = calculate_xtb(mol, method='GFN0-xTB', xtbLibrary=library)
         assert gfn0.backend == 'native' and gfn0.method == 'GFN0-xTB'
-        assert gfn0.orbital_energies_ev
+        assert gfn0.orbitalEnergiesEV
         assert gfn0.metadata['engine']['native_gfn0']['library_sha256'] == gfn0.metadata['engine']['sha256']
-        calculate_xtb(molecule('CO'), method='gfn1', xtb_library=library)
-        run_xtb_native(molecule('O'), method='gfn0', xtb_library=library)
+        calculate_xtb(molecule('CO'), method='gfn1', xtbLibrary=library)
+        run_xtb_native(molecule('O'), method='gfn0', xtbLibrary=library)
     else:
-        for entry in (run_xtb_native):
-            with pytest.raises(ValueError, match='verified patched'):
-                entry(mol, method='GFN0-xTB', xtb_library=library)
-    after = calculate_xtb(mol, xtb_library=library)
-    assert after.total_energy_hartree == pytest.approx(before.total_energy_hartree, abs=1e-10)
-    np.testing.assert_allclose(after.orbital_energies_ev, before.orbital_energies_ev, atol=1e-8, rtol=0)
-    np.testing.assert_allclose(after.orbital_coefficients, before.orbital_coefficients, atol=1e-8, rtol=0)
+        with pytest.raises(ValueError, match='verified patched'):
+            run_xtb_native(mol, method='GFN0-xTB', xtbLibrary=library)
+    after = calculate_xtb(mol, xtbLibrary=library)
+    assert after.totalEnergyHartree == pytest.approx(before.totalEnergyHartree, abs=1e-10)
+    np.testing.assert_allclose(after.orbitalEnergiesEV, before.orbitalEnergiesEV, atol=1e-8, rtol=0)
+    np.testing.assert_allclose(after.orbitalCoefficients, before.orbitalCoefficients, atol=1e-8, rtol=0)
 
 
 @pytest.mark.parametrize('method', ['GFN0-xTB', 'GFN2-xTB'])
@@ -118,7 +117,7 @@ def test_native_batch_and_cache_without_executable(method, library, no_executabl
     mol = molecule('CCO')
     cache = XTBCache()
     with patch('eled.xtb.run_xtb_native', wraps=run_xtb_native) as calculate:
-        results = RunXTBBatch([mol, mol], method=method, cache=cache, xtb_library=library)
+        results = RunXTBBatch([mol, mol], method=method, cache=cache, xtbLibrary=library)
     assert calculate.call_count == 1
     assert len(cache) == 1
     assert results[0] == results[1]
@@ -127,4 +126,4 @@ def test_native_batch_and_cache_without_executable(method, library, no_executabl
 
 def test_missing_library_fails_without_fallback(no_executable):
     with pytest.raises(XTBNativeNotFoundError):
-        calculate_xtb(molecule('O'), xtb_library='/does/not/exist')
+        calculate_xtb(molecule('O'), xtbLibrary='/does/not/exist')

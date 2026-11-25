@@ -8,7 +8,7 @@ from eled import PrepareConformers
 
 prepared = PrepareConformers(
     "C[C@H](O)C(=O)O",
-    num_conformers=4,
+    numConformers=4,
     method="ETKDGv3",
     optimize="MMFF94",
 )
