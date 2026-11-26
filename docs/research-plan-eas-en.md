@@ -34,7 +34,7 @@ the case as a pilot. Do not turn a pilot into a generalization claim.
 - Run GFN2/300 K as the primary feature calculation.
 - Run GFN1/300 K on the identical coordinates as an optional method diagnostic.
 - Run GFN2/1000 K as an electronic-occupation sensitivity diagnostic.
-- Set `keep_overlap=True` for density, shell, frontier and π features.
+- Set `keepOverlap=True` for density, shell, frontier and π features.
 - Keep engine/parameter hashes, coordinate hashes, coverage and failure rows.
 - Never convert a failed or undefined descriptor into zero during feature export.
 

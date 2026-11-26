@@ -7,14 +7,26 @@
 ```python
 from eled import (
     XTBCalculator, CalcMolXTBDescriptors, CalcXTBDescriptors,
-    CalcXTBAtomDescriptors, CalcXTBBondDescriptors,
+    CalcXTBAtomDescriptors, CalcXTBBondDescriptors, AnnotateMol,
 )
 
 result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
 molecular = CalcXTBDescriptors(result)
 atoms = CalcXTBAtomDescriptors(result)
 bonds = CalcXTBBondDescriptors(mol, result)
+annotated = AnnotateMol(mol, result, privateProps=True)  # 写入 _ 前缀的 RDKit 私有属性
 # 或单步提取标量字典：CalcMolXTBDescriptors(mol)
+```
+
+如需将数值型分子描述符注册到 RDKit 的 `rdMolDescriptors.Properties`（同一构象的多次属性查询共享一次单点计算，缺失标量返回 `NaN`）：
+
+```python
+from rdkit.Chem import rdMolDescriptors
+from eled import RegisterRDKitProperties
+
+names = RegisterRDKitProperties(method="GFN2-xTB")
+props = rdMolDescriptors.Properties(["xtb_energy_ha", "xtb_gap_ev", "xtb_dip_debye"])
+energy_ha, gap_ev, dipole_debye = props.ComputeProperties(mol)
 ```
 
 主要字段包括：

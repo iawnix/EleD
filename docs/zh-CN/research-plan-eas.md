@@ -30,7 +30,7 @@ RegioML/RegioSQM 风格 EAS 导出。`protocol.json` 冻结元素范围、事件
 - 主特征计算使用 GFN2/300 K；
 - GFN1/300 K 在完全相同坐标上运行，只作为可选方法诊断；
 - GFN2/1000 K 只作为电子占据敏感性诊断；
-- 密度、shell、前线和 π 特征使用 `keep_overlap=True`；
+- 密度、shell、前线和 π 特征使用 `keepOverlap=True`；
 - 保存引擎/参数哈希、坐标哈希、覆盖率和失败行；
 - 特征导出阶段不能把失败或未定义描述符改成零。
 

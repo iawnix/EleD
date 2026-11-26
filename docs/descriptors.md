@@ -15,7 +15,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | Function | Output | Supported input |
 | --- | --- | --- |
 | `CalcMolXTBDescriptors(mol, confId=-1, ..., missingVal=None, silent=False, cache=None)` | Flat molecular features in one call | Explicit-H RDKit `Mol` with a 3D conformer |
-| `RegisterRDKitProperties(method="GFN2-xTB", confId=-1, ..., prefix="")` | Tuple of registered numeric property names | Integrates with `rdMolDescriptors.Properties` |
+| `RegisterRDKitProperties(*, method="GFN2-xTB", confId=-1, ..., prefix="")` | Tuple of registered numeric property names | Integrates with `rdMolDescriptors.Properties` |
 | `CalcXTBDescriptors(result, frontierDepth=2, occupationThreshold=1e-7)` | Flat molecular features | Native `XTBResults` or compiled `rdXTBTools.XTBResults` |
 | `CalcXTBAtomDescriptors(result)` | One row per atom | Both result paths |
 | `CalcXTBBondDescriptors(mol, result)` | One row per existing RDKit bond | Either result type with matching input provenance |
@@ -45,6 +45,17 @@ bonds = CalcXTBBondDescriptors(mol, result)
 fragments = CalcXTBFragmentDescriptors(result, {"first": [0], "second": [1, 2]})
 annotated = AnnotateMol(mol, result)
 # Or in a single step: CalcMolXTBDescriptors(mol, frontierDepth=2)
+```
+
+To expose numeric xTB scalar descriptors through RDKit's property registry (sharing one single-point evaluation per conformer across all requested properties):
+
+```python
+from rdkit.Chem import rdMolDescriptors
+from eled import RegisterRDKitProperties
+
+names = RegisterRDKitProperties(method="GFN2-xTB")
+props = rdMolDescriptors.Properties(["xtb_energy_ha", "xtb_gap_ev", "xtb_dip_debye"])
+energy_ha, gap_ev, dipole_debye = props.ComputeProperties(mol)
 ```
 
 `CalcXTBDescriptors` retains the original method/backend/version, total energy

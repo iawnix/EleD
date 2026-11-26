@@ -118,7 +118,8 @@ The call signature is:
 RunMol(mol, confId=-1, method="GFN2-xTB", charge=None,
        numUnpairedElectrons=None, keepOrbitalCoefficients=False,
        xtbLibrary="", parameterDirectory="", maxIterations=250,
-       accuracy=1.0, electronicTemperature=300.0, keepOverlap=False)
+       accuracy=1.0, electronicTemperature=300.0, keepOverlap=False,
+       espPointsAngstrom=None)
 ```
 
 `confId` is an RDKit conformer **ID**, not its position in the conformer list;

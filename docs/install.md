@@ -111,6 +111,18 @@ differ by more than `1e-5` Hartree, or the aligned geometries differ by more
 than `0.05` Å. These are implementation regression thresholds; they do not
 claim that either optimizer is a benchmark for experimental structures.
 
+## Upgrade from 0.11
+
+Rebuild/reinstall the adapter and restart Python; the extended `libxtb` binary
+is unchanged. `0.12.0` aligns all public Python classes, methods, parameters and
+result attributes with RDKit `PascalCase`/`camelCase` conventions (for example
+`XTBCalculator.Calculate`, `XTBResults`, `confId`, `keepOverlap` and
+`electronicTemperature`), adds native C++ `cm5Charges` to `rdXTBTools.XTBResults`
+(requiring recompilation of C++ consumers and the `rdXTBTools` extension), and
+bumps `DESCRIPTOR_VERSION` to `1.4`, `REACTIVITY_PROTOCOL_VERSION` to `2.1`,
+`STORAGE_VERSION` to `2` and `XTBCache` payload schema to `6`. Create fresh
+cache/checkpoint files when upgrading from `0.11`.
+
 ## Upgrade from 0.7
 
 Rebuild/reinstall the adapter and restart Python; libxtb is unchanged. The C++
@@ -123,8 +135,8 @@ for disk cache/checkpoint identity, explicit retry and storage limits.
 Rebuild/reinstall the adapter with the standard installer and restart Python.
 The native engine is unchanged. Reactivity now defaults to 300 K and reference
 wavefunction reuse. For the former defaults, explicitly pass
-`XTBOptions(electronic_temperature=0.)` and `initialization="independent"`.
-Protocol version 2.0 and each state's initialization are recorded in reports.
+`XTBOptions(electronicTemperature=0.)` and `initialization="independent"`.
+Protocol version (`2.1` since 0.12) and each state's initialization are recorded in reports.
 
 ## Upgrade from 0.5
 
@@ -170,10 +182,10 @@ To reproduce an independent artifact directory in the standard environment:
 
 ```bash
 python tools/build_release.py --compiled --xtb-prefix "$CONDA_PREFIX" \
-  --output build/release-0.8.0
-python tools/check_wheel.py build/release-0.8.0/compiled/*.whl \
+  --output build/release-0.12.0
+python tools/check_wheel.py build/release-0.12.0/compiled/*.whl \
   --kind compiled --check compiled --check native --keep-overlap \
-  --output build/release-0.8.0/installed.json
+  --output build/release-0.12.0/installed.json
 ```
 
 Choose a new/empty output directory. Wheels contain the adapter, not copies of

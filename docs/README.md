@@ -17,6 +17,7 @@ EleD 是基于 xTB 的 RDKit 电子结构描述符扩展。文档按实际使用
 | Install / 安装 | [Install](install.md) | [安装说明](zh-CN/install.md) |
 | Prepare geometry / 准备构象 | [Geometry preparation](geometry-preparation.md) | [构象准备](zh-CN/geometry-preparation.md) |
 | Calculate descriptors / 计算描述符 | [Descriptors](descriptors.md) | [描述符定义](zh-CN/descriptors.md) |
+| ESP and fitted charges / 静电势与拟合电荷 | [ESP and RESP](esp-api.md) | [静电势与拟合电荷](zh-CN/esp-api.md) |
 | Local sterics and rings / 局部位阻与环 | [Local geometry](local-geometry.md) | [局部几何](zh-CN/local-geometry.md) |
 | Build reports / 生成报告 | [Reports and reactivity](descriptor-reports.md) | [报告与反应性](zh-CN/descriptor-reports.md) |
 | Explore results / 查看结果 | [Visualization](visualization.md) | [可视化](zh-CN/visualization.md) |
