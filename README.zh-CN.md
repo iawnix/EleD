@@ -20,8 +20,6 @@
 
 EleD 是 RDKit 的电子结构描述符扩展。RDKit 分子对象始终是中心：原子和键编号、构象、片段以及注释会贯穿 EleD 的项目扩展版 `libxtb` 计算，并连接到分子级、原子级、键级、密度和反应性分析。
 
-![EleD 从 RDKit 分子到描述符和报告的工作流](docs/assets/eled-workflow.svg)
-
 ## EleD 解决什么问题？
 
 RDKit 擅长表示分子结构，xTB 擅长快速给出近似电子结构。EleD 将这两层连接起来，使一次计算能够在多个层级上复用，同时保留原始 RDKit 原子编号和键编号。
@@ -74,32 +72,28 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | 构象 | 均值、标准差、范围以及可选的电子能加权 | `RunConformerAnalysis` |
 | 报告 | 来源、单位、质量标记、缺失原因以及 JSONL/CSV 导出 | `CalcDescriptorReport`、`ExportDescriptorReports` |
 
-## 看一个实际输出
+## 在 RDKit 分子上直接可视化描述符
 
-下面的报告只来自一个嵌入后的乙醇构象和一次 EleD GFN2-xTB 单点计算。所有面板都使用同一个 `XTBResults`：分子图由 RDKit 绘制，片段电荷和相互作用视图由 EleD 生成。
+同一次 GFN2-xTB 单点计算可以直接在 RDKit 二维分子图上渲染原子级和键级描述符，同时保留原始原子/键编号与元素符号：
 
 <p align="center">
-  <img alt="同一个 EleD 乙醇报告中的分子、片段和相互作用视图" src="docs/assets/eled-ethanol-report.svg" width="900">
+  <img alt="对硝基苯胺 GFN2-xTB 原子电荷与 Wiberg 键级可视化" src="docs/assets/eled-descriptors-map.svg" width="860">
 </p>
 
-这张组合图背后仍然是结构化报告：
-
 ```python
-from eled import (
-    CalcDescriptorReport, DrawDescriptorMap, PlotFragmentSummary,
-    PlotFragmentInteractions,
-)
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from eled import XTBCalculator, CalcDescriptorReport, DrawDescriptorMap
 
-report = CalcDescriptorReport(
-    mol,
-    result,
-    recordId="ethanol",
-    fragments={"ethyl": [0, 1, 3, 4, 5, 6, 7], "hydroxyl": [2, 8]},
-)
+mol = Chem.AddHs(Chem.MolFromSmiles("Nc1ccc([N+](=O)[O-])cc1"))
+AllChem.EmbedMolecule(mol, randomSeed=42)
+AllChem.MMFFOptimizeMolecule(mol)
 
-molecule_svg = DrawDescriptorMap(mol, report, atomField="q_e")
-fragment_svg = PlotFragmentSummary(report, field="q_e")
-network_svg = PlotFragmentInteractions(report)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
+report = CalcDescriptorReport(mol, result, recordId="4-nitroaniline")
+
+charge_svg = DrawDescriptorMap(mol, report, atomField="q_e")
+bond_svg = DrawDescriptorMap(mol, report, bondField="wbo")
 ```
 
 ## 密度和轨道分析

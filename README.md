@@ -20,8 +20,6 @@
 
 EleD is an RDKit extension for electronic-structure descriptors. The RDKit molecule stays at the center: atom and bond indices, conformers, fragments and annotations remain connected while EleD runs the project's extended `libxtb` backend and turns one calculation into several analysis views.
 
-![EleD workflow: RDKit molecule to descriptors and reports](docs/assets/eled-workflow.svg)
-
 ## Why EleD?
 
 RDKit is excellent at representing molecular structure. xTB is excellent at producing fast approximate electronic structure. EleD joins those two layers in a reusable API so that one calculation can be inspected at molecular, atomic, bond, fragment, density and reactivity levels while preserving the original RDKit indexing.
@@ -74,32 +72,28 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | Conformers | mean, standard deviation, range and optional electronic-energy weighting | `RunConformerAnalysis` |
 | Reports | provenance, units, quality flags, missing-value reasons and JSONL/CSV export | `CalcDescriptorReport`, `ExportDescriptorReports` |
 
-## See an actual output
+## Visualizing descriptors on an RDKit molecule
 
-The report below comes from one EleD GFN2-xTB single point on one embedded ethanol conformer. Every panel uses that same `XTBResults`: RDKit draws the molecular map, while EleD provides the fragment charge and interaction views.
+One GFN2-xTB calculation feeds both atomic and bond maps directly on the RDKit 2D structure while preserving original atom/bond indices and element symbols:
 
 <p align="center">
-  <img alt="A single EleD ethanol report with molecular, fragment and interaction views" src="docs/assets/eled-ethanol-report.svg" width="900">
+  <img alt="4-Nitroaniline GFN2-xTB atomic charges and Wiberg bond orders rendered with EleD" src="docs/assets/eled-descriptors-map.svg" width="860">
 </p>
 
-The report keeps the numerical data behind the combined view:
-
 ```python
-from eled import (
-    CalcDescriptorReport, DrawDescriptorMap, PlotFragmentSummary,
-    PlotFragmentInteractions,
-)
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from eled import XTBCalculator, CalcDescriptorReport, DrawDescriptorMap
 
-report = CalcDescriptorReport(
-    mol,
-    result,
-    recordId="ethanol",
-    fragments={"ethyl": [0, 1, 3, 4, 5, 6, 7], "hydroxyl": [2, 8]},
-)
+mol = Chem.AddHs(Chem.MolFromSmiles("Nc1ccc([N+](=O)[O-])cc1"))
+AllChem.EmbedMolecule(mol, randomSeed=42)
+AllChem.MMFFOptimizeMolecule(mol)
 
-molecule_svg = DrawDescriptorMap(mol, report, atomField="q_e")
-fragment_svg = PlotFragmentSummary(report, field="q_e")
-network_svg = PlotFragmentInteractions(report)
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
+report = CalcDescriptorReport(mol, result, recordId="4-nitroaniline")
+
+charge_svg = DrawDescriptorMap(mol, report, atomField="q_e")
+bond_svg = DrawDescriptorMap(mol, report, bondField="wbo")
 ```
 
 ## Density and orbital analysis

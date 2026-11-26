@@ -89,36 +89,38 @@ def _lerp_rgb(start, end, t):
     return tuple(a + (b - a) * t for a, b in zip(start, end))
 
 
+_DIV_NEG = (0.89, 0.44, 0.39)
+_DIV_MID = (0.97, 0.98, 0.99)
+_DIV_POS = (0.36, 0.62, 0.87)
+_SEQ_LOW = (0.93, 0.96, 0.99)
+_SEQ_HIGH = (0.28, 0.58, 0.85)
+
+
 def _value_rgb(value, vmin, vmax, *, diverging):
-    neutral = (0.95, 0.97, 0.99)
-    neg = (0.92, 0.56, 0.52)
-    pos = (0.48, 0.70, 0.93)
     if diverging:
         span = max(abs(vmin), abs(vmax)) or 1.0
         ratio = max(-1.0, min(1.0, value / span))
-        return _lerp_rgb(neutral, pos, ratio) if ratio >= 0 else _lerp_rgb(neutral, neg, -ratio)
-    low = (0.93, 0.96, 1.0)
-    high = (0.42, 0.67, 0.91)
+        return _lerp_rgb(_DIV_MID, _DIV_POS, ratio) if ratio >= 0 else _lerp_rgb(_DIV_MID, _DIV_NEG, -ratio)
     span = (vmax - vmin) if vmax > vmin else (abs(vmax) or 1.0)
     ratio = (value - vmin) / span if vmax > vmin else (value / span)
-    return _lerp_rgb(low, high, ratio)
+    return _lerp_rgb(_SEQ_LOW, _SEQ_HIGH, ratio)
 
 
-def _pastel_rgb(rgb, factor=0.52):
+def _pastel_rgb(rgb, factor=0.55):
     return _lerp_rgb(rgb, (1.0, 1.0, 1.0), factor)
 
 
 _SVG_SERIES = tuple(_svg_color(rgb) for rgb in _COLORS[:3])
 _SVG_STYLE = '''<style>
-.eled-viz-bg { fill: #fbfcfe; }
+.eled-viz-bg { fill: #ffffff; }
 .eled-viz-text { fill: #172033; font-family: system-ui, -apple-system, sans-serif; }
 .eled-viz-sub { fill: #526174; font-family: system-ui, -apple-system, sans-serif; }
-.eled-viz-muted { stroke: #718096; }
+.eled-viz-muted { stroke: #94a3b8; }
 @media (prefers-color-scheme: dark) {
-  .eled-viz-bg { fill: #111827; }
+  .eled-viz-bg { fill: #0f172a; }
   .eled-viz-text { fill: #f8fafc; }
   .eled-viz-sub { fill: #94a3b8; }
-  .eled-viz-muted { stroke: #94a3b8; }
+  .eled-viz-muted { stroke: #64748b; }
 }
 </style>'''
 
@@ -492,34 +494,38 @@ def _is_diverging_field(field, values):
 
 def _format_value(value, field, valueFormat):
     if valueFormat is not None:
-        return format(value, valueFormat)
-    if _is_diverging_field(field, (value,)):
-        return f'{value:+.2f}'
-    return f'{value:.2f}'
+        formatted = format(value, valueFormat)
+    elif _is_diverging_field(field, (value,)):
+        formatted = f'{value:+.2f}'
+    else:
+        formatted = f'{value:.2f}'
+    if formatted.startswith('-') and set(formatted[1:]) <= {'0', '.'}:
+        return ('+' + formatted[1:]) if (valueFormat is None and _is_diverging_field(field, (value,))) else formatted[1:]
+    return formatted
 
 
 def _append_colorbar(svg, *, width, height, label, unit, vmin, vmax, diverging, fmt):
-    bar_h = 38
+    bar_h = 42
     total_h = height + bar_h
     grad_id = 'eled-colorbar-grad'
     if diverging:
         bound = max(abs(vmin), abs(vmax)) or 1.0
         left_val, mid_val, right_val = -bound, 0.0, bound
         stops = (
-            '<stop offset="0%" stop-color="#d64f45"/>'
-            '<stop offset="50%" stop-color="#f0f5fa"/>'
-            '<stop offset="100%" stop-color="#2e73c7"/>'
+            f'<stop offset="0%" stop-color="{_svg_color(_DIV_NEG)}"/>'
+            f'<stop offset="50%" stop-color="{_svg_color(_DIV_MID)}"/>'
+            f'<stop offset="100%" stop-color="{_svg_color(_DIV_POS)}"/>'
         )
     else:
         left_val, right_val = vmin, vmax
         mid_val = (vmin + vmax) / 2.0
         stops = (
-            '<stop offset="0%" stop-color="#ebf2fc"/>'
-            '<stop offset="100%" stop-color="#216bb8"/>'
+            f'<stop offset="0%" stop-color="{_svg_color(_SEQ_LOW)}"/>'
+            f'<stop offset="100%" stop-color="{_svg_color(_SEQ_HIGH)}"/>'
         )
-    bar_w = max(120, min(220, int(width * 0.42)))
-    bar_x = (width - bar_w) / 2.0
-    bar_y = height + 8
+    bar_w = max(130, min(200, int(width * 0.44)))
+    bar_x = width - bar_w - 16
+    bar_y = height + 10
     caption = escape(f'{label} ({unit})' if unit and unit != 'dimensionless' else label)
     left_txt = escape(format(left_val, fmt))
     mid_txt = escape(format(mid_val, fmt))
@@ -527,11 +533,12 @@ def _append_colorbar(svg, *, width, height, label, unit, vmin, vmax, diverging, 
     legend = (
         f'<defs><linearGradient id="{grad_id}" x1="0%" y1="0%" x2="100%" y2="0%">{stops}</linearGradient></defs>'
         f'<rect x="0" y="{height}" width="{width}" height="{bar_h}" fill="#ffffff"/>'
-        f'<text x="12" y="{bar_y + 13}" font-family="system-ui, sans-serif" font-size="11" fill="#475569">{caption}</text>'
-        f'<rect x="{bar_x:.1f}" y="{bar_y}" width="{bar_w}" height="10" rx="3" fill="url(#{grad_id})" stroke="#cbd5e1" stroke-width="0.6"/>'
-        f'<text x="{bar_x:.1f}" y="{bar_y + 23}" font-family="system-ui, sans-serif" font-size="10" fill="#475569">{left_txt}</text>'
-        f'<text x="{bar_x + bar_w / 2:.1f}" y="{bar_y + 23}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#475569">{mid_txt}</text>'
-        f'<text x="{bar_x + bar_w:.1f}" y="{bar_y + 23}" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#475569">{right_txt}</text>'
+        f'<line x1="16" y1="{height}" x2="{width - 16}" y2="{height}" stroke="#e2e8f0" stroke-width="1"/>'
+        f'<text x="16" y="{bar_y + 13}" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="500" fill="#334155">{caption}</text>'
+        f'<rect x="{bar_x:.1f}" y="{bar_y}" width="{bar_w}" height="8" rx="4" fill="url(#{grad_id})" stroke="#cbd5e1" stroke-width="0.6"/>'
+        f'<text x="{bar_x:.1f}" y="{bar_y + 22}" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#64748b">{left_txt}</text>'
+        f'<text x="{bar_x + bar_w / 2:.1f}" y="{bar_y + 22}" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#64748b">{mid_txt}</text>'
+        f'<text x="{bar_x + bar_w:.1f}" y="{bar_y + 22}" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#64748b">{right_txt}</text>'
     )
     svg = svg.replace(f"height='{height}px'", f"height='{total_h}px'", 1)
     svg = svg.replace(f"viewBox='0 0 {width} {height}'", f"viewBox='0 0 {width} {total_h}'", 1)
@@ -647,15 +654,21 @@ def DrawDescriptorMap(
 
     drawer = rdMolDraw2D.MolDraw2DSVG(width, height)
     options = drawer.drawOptions()
-    font_size = max(10, min(18, int(min(width, height) / 18)))
+    font_size = max(11, min(16, int(min(width, height) / 17)))
     options.fixedFontSize = font_size
-    options.minFontSize = max(6, font_size - 3)
+    options.minFontSize = max(8, font_size - 3)
     options.maxFontSize = font_size
-    options.padding = 0.16
-    options.additionalAtomLabelPadding = 0.06
+    options.bondLineWidth = 1.8
+    options.padding = 0.14
+    options.additionalAtomLabelPadding = 0.08
     options.atomHighlightsAreCircles = True
+    options.highlightBondWidthMultiplier = 7
     options.addAtomIndices = False
-    options.annotationFontScale = 0.85
+    options.annotationFontScale = 0.78
+    options.setAnnotationColour((0.12, 0.16, 0.23))
+    if resolved_color == 'value':
+        options.useBWAtomPalette()
+    highlight_radii = {idx: 0.28 for idx in highlight_atoms}
 
     if labelStyle != 'none' and data['atom_field']:
         for row in data['atoms']:
@@ -690,6 +703,7 @@ def DrawDescriptorMap(
         highlightAtomColors=highlight_atom_colors,
         highlightBonds=highlight_bonds,
         highlightBondColors=highlight_bond_colors,
+        highlightAtomRadii=highlight_radii,
     )
     drawer.FinishDrawing()
     svg = _strip_xml_header(drawer.GetDrawingText())
