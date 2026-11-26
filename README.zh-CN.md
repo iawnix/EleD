@@ -59,7 +59,7 @@ print(values["xtb_energy_ha"])
 print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBResults` 可以重复使用（`XTBResult` 为兼容别名）。同一个结果可以继续生成描述符表、片段汇总、密度分析和报告，所有视图共享同一次已记录的引擎计算。如果只需要一步提取分子标量字典或注册到 RDKit 属性表，可使用 `CalcMolXTBDescriptors(mol)` 或 `RegisterRDKitProperties()`。
+`XTBResults` 可以重复使用。同一个结果可以继续生成描述符表、片段汇总、密度分析和报告，所有视图共享同一次已记录的引擎计算。如果只需要一步提取分子标量字典或注册到 RDKit 属性表，可使用 `CalcMolXTBDescriptors(mol)` 或 `RegisterRDKitProperties()`。
 
 ## 可以得到什么？
 

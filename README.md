@@ -59,7 +59,7 @@ print(values["xtb_energy_ha"])
 print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 ```
 
-`XTBResults` is reusable (`XTBResult` is an alias). The same result feeds descriptor tables, fragment summaries, density analysis and a report, with one recorded engine call. For single-call molecular tables or RDKit's property registry, use `CalcMolXTBDescriptors(mol)` or `RegisterRDKitProperties()`.
+`XTBResults` is reusable. The same result feeds descriptor tables, fragment summaries, density analysis and a report, with one recorded engine call. For single-call molecular tables or RDKit's property registry, use `CalcMolXTBDescriptors(mol)` or `RegisterRDKitProperties()`.
 
 ## What you get
 

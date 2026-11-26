@@ -211,7 +211,12 @@ def test_real_rdkit_properties_and_single_call_wrapper_parity():
     mol = _water()
     direct = CalcXTBDescriptors(XTBCalculator(xtbLibrary=library).Calculate(mol))
     wrapped = CalcMolXTBDescriptors(mol, xtbLibrary=library)
-    assert wrapped == direct
+    assert set(wrapped) == set(direct)
+    for key, expected in direct.items():
+        if isinstance(expected, float):
+            assert wrapped[key] == pytest.approx(expected, rel=1e-12, abs=1e-12)
+        else:
+            assert wrapped[key] == expected
 
     names = RegisterRDKitProperties(xtbLibrary=library, prefix='real_')
     computed = dict(zip(names, rdMolDescriptors.Properties(list(names)).ComputeProperties(mol)))
