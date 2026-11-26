@@ -53,6 +53,27 @@ Historical embedding findings and the
 reason for rejecting direct replacement remain in the
 [nonregression report](embedding-nonregression.md).
 
+## 0.12 delivery status
+
+- Aligned all public Python classes, methods, parameters and result attributes
+  with RDKit `PascalCase`/`camelCase` conventions (`XTBResults`,
+  `XTBCalculator.Calculate`, `XTBOptions`, `XTBCache`, descriptor, reactivity,
+  local-geometry, conformer, batch and visualization APIs), while preserving
+  compact unit-suffixed lowercase `snake_case` feature column names.
+- Added RDKit ecosystem bridges: `CalcMolXTBDescriptors`,
+  `RegisterRDKitProperties` (`rdMolDescriptors.Properties` via
+  `Descriptors.PropertyFunctor` with per-conformer single-point deduplication),
+  and `AnnotateMol(..., privateProps=True)`.
+- Implemented native C++ `RDKit::XTBTools::calcCM5Charges` and decoupled
+  `Wrap.cpp` option/ESP validation from Python business helpers.
+- Upgraded `DrawDescriptorMap` and fragment visualizations for fragment-free
+  reports, direct `XTBResults` input, bond descriptors, continuous colormaps,
+  implicit-H-preserving `RemoveHs` mapping and provenance checks.
+- Completed local `0.12.0` release verification (618 extended-engine tests,
+  410 pure-Python tests, C++ CTest, all 10 examples, optimization/Fukui CLI
+  checks, and isolated pure/compiled wheel checks); see
+  [0.12.0 validation](validation/0.12.0/README.md).
+
 ## 0.11 delivery status
 
 - Completed the two QM8 evaluations and a 256-molecule QM9 dipole comparison.

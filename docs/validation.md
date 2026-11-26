@@ -1,7 +1,27 @@
-# Local validation — 2026-11-05
+# Local validation — 2026-11-26
 
 
-## Current scope: 0.10 checked geometry preparation
+## Current scope: 0.12 RDKit interface alignment and visualization
+
+EleD `0.12.0` unifies all public Python classes, methods, parameters and result
+attributes on RDKit `PascalCase`/`camelCase` conventions (`XTBResults`,
+`XTBCalculator.Calculate`, `confId`, `keepOverlap`, etc.), adds
+`CalcMolXTBDescriptors`, `RegisterRDKitProperties` and `AnnotateMol(..., privateProps=True)`,
+moves CM5 calculation and option/ESP validation natively into C++ `rdXTBTools`,
+and upgrades `DrawDescriptorMap` with fragment-free continuous colormaps, bond
+overlays, implicit-H preservation and provenance checks.
+
+The [0.12.0 evidence](validation/0.12.0/README.md) records **618 passed, 12 skipped**
+in the full extended-engine suite (`.eled/runtime` with `ELED_REQUIRE_RDXTB=1`,
+`ELED_EXPECT_BASIS=1`, `ELED_EXPECT_NATIVE_GFN0=1`), **410 passed, 11 skipped**
+in the pure-Python suite (`.runtime-env`), **1/1 passed** for standalone C++
+CTest (`rdXTBTools/core`), **10/10 passed** across all `examples/` scripts,
+passing CLI optimization and `--vfukui` comparisons, and passing outside-checkout
+fresh-venv checks for both pure and compiled `0.12.0` wheels (GFN2 with overlap
+and reactivity, GFN0 with overlap, and inherited venv without library overrides).
+Remote GitHub CI runs must be checked separately on GitHub.
+
+## 0.10 checked geometry preparation
 
 [`PrepareConformers`](geometry-preparation.md) adds deterministic bounded RDKit
 retries, supported coordinate-derived stereo checks, converged force-field
