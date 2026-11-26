@@ -105,6 +105,8 @@ def test_explicit_hydrogens_are_hidden_from_map_by_default():
                                  includeHydrogens=True)
     assert "class='atom-8'" not in compact
     assert "class='atom-8'" in complete
+    # Removing explicit hydrogens must restore implicit H on heteroatoms (OH, not bare O)
+    assert compact.count("class='atom-2'") >= 3
 
 
 def test_visual_data_rejects_overlapping_fragments():

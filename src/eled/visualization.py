@@ -90,18 +90,22 @@ def _lerp_rgb(start, end, t):
 
 
 def _value_rgb(value, vmin, vmax, *, diverging):
-    neutral = (0.94, 0.96, 0.98)
-    neg = (0.84, 0.31, 0.27)
-    pos = (0.18, 0.45, 0.78)
+    neutral = (0.95, 0.97, 0.99)
+    neg = (0.92, 0.56, 0.52)
+    pos = (0.48, 0.70, 0.93)
     if diverging:
         span = max(abs(vmin), abs(vmax)) or 1.0
         ratio = max(-1.0, min(1.0, value / span))
         return _lerp_rgb(neutral, pos, ratio) if ratio >= 0 else _lerp_rgb(neutral, neg, -ratio)
-    low = (0.92, 0.95, 0.99)
-    high = (0.13, 0.42, 0.72)
+    low = (0.93, 0.96, 1.0)
+    high = (0.42, 0.67, 0.91)
     span = (vmax - vmin) if vmax > vmin else (abs(vmax) or 1.0)
     ratio = (value - vmin) / span if vmax > vmin else (value / span)
     return _lerp_rgb(low, high, ratio)
+
+
+def _pastel_rgb(rgb, factor=0.52):
+    return _lerp_rgb(rgb, (1.0, 1.0, 1.0), factor)
 
 
 _SVG_SERIES = tuple(_svg_color(rgb) for rgb in _COLORS[:3])
@@ -453,7 +457,11 @@ def _prepare_draw_mol(mol, *, includeHydrogens):
     if includeHydrogens:
         draw_mol = work
     else:
-        draw_mol = Chem.RemoveHs(work, sanitize=False)
+        try:
+            draw_mol = Chem.RemoveHs(work, sanitize=True)
+        except Exception:
+            draw_mol = Chem.RemoveHs(work, sanitize=False)
+            draw_mol.UpdatePropertyCache(strict=False)
 
     original_to_draw = {}
     for atom in draw_mol.GetAtoms():
@@ -596,7 +604,7 @@ def DrawDescriptorMap(
     colorbar_spec = None
 
     if resolved_color == 'fragment':
-        colors = {record['name']: _COLORS[index % len(_COLORS)] for index, record in enumerate(records)}
+        colors = {record['name']: _pastel_rgb(_COLORS[index % len(_COLORS)]) for index, record in enumerate(records)}
         for orig_idx, name in assignments.items():
             draw_idx = original_to_draw.get(orig_idx)
             if name is not None and draw_idx is not None:
@@ -643,11 +651,11 @@ def DrawDescriptorMap(
     options.fixedFontSize = font_size
     options.minFontSize = max(6, font_size - 3)
     options.maxFontSize = font_size
-    options.padding = 0.14
+    options.padding = 0.16
     options.additionalAtomLabelPadding = 0.06
     options.atomHighlightsAreCircles = True
     options.addAtomIndices = False
-    options.annotationFontScale = 0.72
+    options.annotationFontScale = 0.85
 
     if labelStyle != 'none' and data['atom_field']:
         for row in data['atoms']:
