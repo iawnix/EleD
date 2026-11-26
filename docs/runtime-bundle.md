@@ -1,4 +1,6 @@
-# Offline Linux runtime bundle (0.11)
+# Offline Linux runtime bundle
+
+[English](runtime-bundle.md) | [中文](zh-CN/runtime-bundle.md)
 
 The bundle contains the matched RDKit/Python runtime, compiled `rdXTBTools`,
 extended libxtb, parameter files and its separate native dependency prefix.
@@ -38,8 +40,10 @@ their own linked application.
 
 ## Build the bundle
 
-First create and verify a complete source installation. In a separate packaging
-environment, install the build-only tools:
+First create and verify a complete wheel-based source installation (the builder
+verifies before packing that `eled` is installed inside `runtime`, not as an
+editable checkout, and that `runtime/lib/libxtb.so` is selected). In a separate
+packaging environment, install the build-only tools:
 
 ```bash
 python -m pip install --require-hashes -r tools/distribution-requirements.txt

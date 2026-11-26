@@ -1,9 +1,9 @@
 include CMakeLists.txt environment*.yml
 include CHANGELOG.md README.zh-CN.md
 recursive-include .github/workflows *.yml
-recursive-include locks *.txt *.json *.md
+recursive-include locks *.txt *.md
 recursive-include cpp *.h *.cpp *.cmake.in
-recursive-include docs *.md *.json *.diff *.log
+recursive-include docs *.md *.json *.diff *.log *.svg
 recursive-include docs/validation *.gz
 recursive-include docs/research *.gz
 recursive-include examples *.py

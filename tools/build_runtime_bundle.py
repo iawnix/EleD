@@ -51,8 +51,21 @@ def main():
     for key in ('PYTHONPATH','PYTHONHOME','XTB_LIBRARY','XTBPATH','XTB_PREFIX','LD_LIBRARY_PATH','LD_PRELOAD'):
         env.pop(key, None)
     env.update(OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
-    subprocess.run([runtime/'bin/python', '-I', '-m', 'eled', 'doctor',
-                    '--check', 'compiled', '--keep-overlap'], env=env, check=True)
+    doctor = subprocess.run([runtime/'bin/python', '-I', '-m', 'eled', 'doctor',
+                    '--check', 'compiled', '--keep-overlap', '--json'],
+                    env=env, check=True, capture_output=True, text=True)
+    doctor_report = json.loads(doctor.stdout)
+    package_path = Path(doctor_report['package_path']).resolve()
+    if not package_path.is_relative_to(runtime):
+        raise ValueError(
+            f'runtime imports eled from outside the prefix ({package_path}); '
+            'install the compiled wheel into runtime (not an editable checkout) before bundling'
+        )
+    selected_engine = doctor_report['check']['engine']
+    selected_lib = Path(selected_engine.get('path', selected_engine.get('library'))).resolve()
+    if selected_lib != (runtime/'lib/libxtb.so').resolve():
+        raise ValueError(f'runtime selected external libxtb ({selected_lib}) instead of {runtime/"lib/libxtb.so"}')
+    eled_version = doctor_report.get('version')
     args.output.mkdir(parents=True)
     # Archives can be large. Keep conda-pack's staging on the output filesystem,
     # rather than consuming a separate /tmp memory-filesystem quota.
@@ -81,6 +94,7 @@ def main():
             if '.git' not in path.relative_to(source).parts and path.is_file():
                 archive.add(path, arcname='xtb/'+str(path.relative_to(source)))
     manifest = {'schema_version': 1, 'platform': 'linux-x86_64',
+        'eled_version': eled_version,
         'prefixes': {'runtime': str(runtime), 'toolchain': str(toolchain)},
         'original_library_sha256': library_hash,
         'extended_xtb': {'files': engine_hashes, 'build_manifest_sha256': digest(runtime/'share/xtb/eled/build.json')},

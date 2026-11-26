@@ -13,6 +13,7 @@ Validated locally on 2026-11-26 on Linux x86-64 / Python 3.11 / RDKit 2026.09.1 
 | Clean sdist + pure wheel (`eled-0.12.0-py3-none-any.whl`) outside-checkout venv verification | Passed |
 | Clean sdist + compiled wheel (`eled-0.12.0-cp311-cp311-linux_x86_64.whl`) outside-checkout venv verification (`GFN2-xTB` native/compiled + overlap + reactivity; `GFN0-xTB` native/compiled + overlap) | Passed |
 | Inherited `--system-site-packages` venv without `XTB_LIBRARY`/`XTBPATH` overrides (`native` and `compiled`) | Passed (`-5.0703716808 Hartree` water parity) |
+| Offline Linux runtime bundle build (`tools/build_runtime_bundle.py`) and relocated offline install (`tools/install_bundle.py`, GFN0/1/2 × native/compiled + `ldd` + isolated `parallel_descriptors.py` & 35 worker/SCC/RDKit/visualization tests) | Passed (1.1 GB bundle, 35 passed in relocated runtime) |
 
 ## Scope of 0.12.0 changes verified
 
