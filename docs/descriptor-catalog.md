@@ -30,7 +30,11 @@ The naming rules keep feature columns short while retaining their meaning:
 | Molecular | `CalcXTBDescriptors`, `CalcMolXTBDescriptors`, `RegisterRDKitProperties` | Energy, frontier energies, dipole, charge and Wiberg summaries | 0 for `CalcXTBDescriptors`; 1 single point for single-step wrappers |
 | Atom/bond topology | `CalcXTBAtomDescriptors`, `CalcXTBBondDescriptors` | Engine charges, incident Wiberg sums and RDKit-bond Wiberg orders | 0 |
 | Orbital density | `CalcOrbitalPopulations`, `CalcShellPopulations`, `CalcDensityMatrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keepOverlap=True` |
-| Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcMayerBondDescriptors` | Degeneracy-invariant HOMO/LUMO localization and signed bond decompositions | 0; closed-shell Mayer only |
+| Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcMayerBondDescriptors`, `CalcBondOverlapDescriptors` | Degeneracy-invariant HOMO/LUMO localization, Mayer orders, COOP/ECOHP and bond polarity | 0; requires `keepOverlap=True` |
+| Orbital & LMO analysis | `CalcOrbitalWeightedFukui`, `CalcAtomicOrbitalEnergies`, `CalcLocalizedOrbitals` | Single-point orbital-weighted Fukui, condensed ALIE/PDOS and Pipek–Mezey LMOs | 0; requires `keepOverlap=True` |
+| ESP surface & EPN | `GenerateESPSurfaceGrid`, `CalcESPSurfaceDescriptors`, `CalcNuclearESP` | Politzer–Murray vdW-shell ESP statistics and exact nuclear ESP (EPN) | 0 (`CalcESPSurfaceDescriptors` requires sampled ESP) |
+| Extended properties | `CalcEnergyDecomposition`, `CalcMultipoleDescriptors`, `CalcPolarizabilityDescriptors` | Energy decomposition, Fermi levels, CAMM multipoles and D4 polarizability/C6/C8 | 0; properties ABI v1 |
+| Solvation & thermochemistry | `CalcSolvationDescriptors`, `CalcVibrationalThermochemistry` | Matched ALPB/GBSA solvation shifts and finite-difference RRHO/qRRHO thermochemistry | 2 single points (`CalcSolvationDescriptors`); `1 + 6N` gradient single points (`CalcVibrationalThermochemistry`) |
 | Reactivity | `CalcReactivityDescriptors`, `RunReactivity` | Vertical ΔSCF IP/EA, Fukui and local conceptual-DFT indices | 0 for `CalcReactivityDescriptors`; 3 single points for `RunReactivity` |
 
 Every value has four pieces of meaning:
@@ -65,12 +69,20 @@ The stable feature groups for the EAS study are:
   model inputs by default.
 
 `DescriptorStatus()` exposes the maturity labels used by the project:
-`recommended` is suitable for a first validation model, `diagnostic` records
-calculation or protocol sensitivity, and `exploratory` is retained for testing
-new hypotheses. Mayer bond order, signed frontier-bond overlap, π projections,
-and the local nucleophilicity proxy are exploratory. Their values are still
-fully specified and missing values are explicit; the label only says that the
-repository has not yet shown stable predictive utility for them.
+`recommended` is suitable for a first validation model (including core electronic
+fields, Politzer–Murray ESP surface statistics, EPN, D4 polarizability/C6/C8,
+energy decomposition, ALPB/GBSA solvation shifts, and harmonic thermochemistry),
+`diagnostic` records calculation or protocol sensitivity (conformer/method/temperature
+deltas, Fermi levels, and direct solvation polarization decomposition), and
+`exploratory` is retained for testing new hypotheses (Mayer bond order, signed
+frontier-bond overlap, π projections, local nucleophilicity proxy, orbital-weighted
+Fukui, condensed ALIE/PDOS, COOP/ECOHP/bond polarity, Pipek–Mezey LMOs, and CAMM
+atomic/molecular multipoles). `DescriptorCatalog()` organizes all definitions under
+`molecular`, `atom`, `fragment`, `bond`, `density`, `reactivity`, `local_geometry`,
+`esp_surface`, `localized_orbitals`, `properties`, `solvation`, `thermochemistry`,
+and `diagnostic`. Their values are still fully specified and missing values are
+explicit; the label only says whether the repository has established stable
+predictive utility for them.
 
 Frontier centroid separation remains a method-defined ground-state proxy and
 should not be described as an excited-state observable. GFN0 shell populations

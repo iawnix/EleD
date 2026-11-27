@@ -34,8 +34,11 @@ def _run_xtb(
     maxIterations: int = 250,
     accuracy: float = 1.0,
     electronicTemperature: float = 300.0,
+    solvent: str | None = None,
+    solvationModel: str = "alpb",
+    solvationGrid: int | None = None,
 ) -> XTBResults:
-    """Run one gas-phase single point for ``XTBCalculator``."""
+    """Run one single point (gas-phase or implicit-solvent) for ``XTBCalculator``."""
     opts = XTBOptions(
         confId=confId,
         method=method,
@@ -48,6 +51,9 @@ def _run_xtb(
         maxIterations=maxIterations,
         accuracy=accuracy,
         electronicTemperature=electronicTemperature,
+        solvent=solvent,
+        solvationModel=solvationModel,
+        solvationGrid=solvationGrid,
     )
     _xyz_from_mol(mol, confId)
     charge, unpaired = _effective_charge_uhf(mol, charge, numUnpairedElectrons)
@@ -64,6 +70,9 @@ def _run_xtb(
         maxIterations=opts.maxIterations,
         accuracy=opts.accuracy,
         electronicTemperature=opts.electronicTemperature,
+        solvent=opts.solvent,
+        solvationModel=opts.solvationModel,
+        solvationGrid=opts.solvationGrid,
     )
 
 

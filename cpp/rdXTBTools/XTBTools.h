@@ -21,6 +21,9 @@ struct XTBOptions {
   int maxIterations = 250;
   double accuracy = 1.0;
   double electronicTemperature = 300.0;
+  std::string solvent;             // empty disables solvation (gas phase)
+  std::string solvationModel = "alpb"; // "alpb" or "gbsa" when solvent is nonempty
+  int solvationGrid = 230;         // Lebedev angular grid size when solvent is nonempty
 };
 
 // Atomic quantities follow ROMol atom order. Energies and matrix meanings are
@@ -73,6 +76,46 @@ struct XTBResults {
   std::vector<double> overlapMatrix;
   std::vector<int> aoAtomMap, aoShellMap, shellAtomMap, shellAngularMomenta;
   std::vector<double> orbitalCoefficients;   // row-major [AO][MO], optional
+
+  // Implicit solvation provenance (empty solvent means gas phase).
+  std::string solvent;
+  std::string solvationModel;
+  int solvationGrid = 0;
+
+  // Extended properties ABI v1 (all atomic units; NaN/empty when unavailable).
+  bool propertiesExportVerified = false;
+  int energyDecompositionFlags = 0;
+  double electronicEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double repulsionEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double electrostaticEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double anisotropicElectrostaticEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double anisotropicXCEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double dispersionEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double halogenBondEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double solvationEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double solvationBornEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double solvationSASAEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double solvationHBEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double solvationShiftEnergyHartree = std::numeric_limits<double>::quiet_NaN();
+  double fermiLevelAlphaHartree = std::numeric_limits<double>::quiet_NaN();
+  double fermiLevelBetaHartree = std::numeric_limits<double>::quiet_NaN();
+  double fermiLevelAlphaEV = std::numeric_limits<double>::quiet_NaN();
+  double fermiLevelBetaEV = std::numeric_limits<double>::quiet_NaN();
+
+  bool polarizabilityAvailable = false;
+  double molecularPolarizabilityAU = std::numeric_limits<double>::quiet_NaN(); // Bohr^3
+  double molecularC6AU = std::numeric_limits<double>::quiet_NaN();             // Hartree*Bohr^6
+  double molecularC8AU = std::numeric_limits<double>::quiet_NaN();             // Hartree*Bohr^8
+  std::vector<double> atomicPolarizabilitiesAU; // [atom], Bohr^3
+  std::vector<double> atomicC6AU;               // [atom], Hartree*Bohr^6
+
+  bool multipolesAvailable = false;
+  std::vector<double> atomicDipolesAU;          // row-major [atom][3], e*Bohr
+  std::vector<double> atomicQuadrupolesAU;      // row-major [atom][6] (xx,xy,yy,xz,yz,zz), e*Bohr^2
+  std::vector<double> molecularQuadrupoleAU;    // [6] (xx,xy,yy,xz,yz,zz), e*Bohr^2
+
+  bool nuclearESPAvailable = false;
+  std::vector<double> nuclearESPAU;             // [atom], Hartree/e
 };
 
 // Gas-phase single point. Invalid molecular input/options throw

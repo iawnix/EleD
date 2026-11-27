@@ -137,7 +137,79 @@ int main() {
     require(recovered.size() == 3 && recovered.back().success &&
             recovered.back().initialization == "independent", "Independent initialization recovery failed");
     require(mol.getNumAtoms() == 3 && mol.getConformer(7).getAtomPos(1).x == .758, "Input molecule changed");
-    std::cout << "C++ GFN2, GFN0 guard/state, SCF failure recovery, and serialization passed\n";
+    // Extended properties ABI & implicit solvation checks.
+    require(before.propertiesExportVerified, "Extended properties ABI was not verified");
+    require(before.energyDecompositionFlags != 0 &&
+            std::isfinite(before.electronicEnergyHartree) &&
+            std::isfinite(before.repulsionEnergyHartree) &&
+            std::isfinite(before.anisotropicElectrostaticEnergyHartree) &&
+            std::isfinite(before.anisotropicXCEnergyHartree) &&
+            !std::isfinite(before.halogenBondEnergyHartree) &&
+            !std::isfinite(before.solvationEnergyHartree) &&
+            std::isfinite(before.fermiLevelAlphaHartree) &&
+            std::abs((before.electronicEnergyHartree + before.repulsionEnergyHartree) -
+                     before.totalEnergyHartree) < 1e-10,
+            "GFN2 energy decomposition failed");
+    require(before.polarizabilityAvailable && before.molecularPolarizabilityAU > 0.0 &&
+            before.atomicPolarizabilitiesAU.size() == 3 && before.atomicC6AU.size() == 3,
+            "GFN2 polarizability missing");
+    require(std::abs(before.atomicPolarizabilitiesAU[0] + before.atomicPolarizabilitiesAU[1] +
+                     before.atomicPolarizabilitiesAU[2] - before.molecularPolarizabilityAU) < 1e-10,
+            "GFN2 atomic polarizability sum mismatch");
+    require(before.multipolesAvailable && before.atomicDipolesAU.size() == 9 &&
+            before.atomicQuadrupolesAU.size() == 18 && before.molecularQuadrupoleAU.size() == 6,
+            "GFN2 multipoles missing");
+    require(std::abs(before.molecularQuadrupoleAU[0] + before.molecularQuadrupoleAU[2] +
+                     before.molecularQuadrupoleAU[5]) < 1e-12,
+            "Molecular quadrupole is not traceless");
+    require(before.nuclearESPAvailable && before.nuclearESPAU.size() == 3 &&
+            before.nuclearESPAU[0] < before.nuclearESPAU[1] &&
+            std::abs(before.nuclearESPAU[1] - before.nuclearESPAU[2]) < 1e-10,
+            "GFN2 nuclear ESP failed symmetry/ordering check");
+    // GFN1: multipoles available, polarizability unavailable, halogenBond available, AES NaN.
+    RDKit::XTBTools::XTBOptions gfn1Opts;
+    gfn1Opts.confId = 7;
+    gfn1Opts.method = "GFN1-xTB";
+    RDKit::XTBTools::XTBResults gfn1Res;
+    require(RDKit::XTBTools::runMol(mol, gfn1Res, gfn1Opts), "GFN1 calculation failed");
+    require(!gfn1Res.polarizabilityAvailable && gfn1Res.atomicPolarizabilitiesAU.empty() &&
+            !std::isfinite(gfn1Res.molecularPolarizabilityAU), "GFN1 should not expose D4 polarizability");
+    require(gfn1Res.multipolesAvailable && gfn1Res.nuclearESPAvailable &&
+            std::isfinite(gfn1Res.halogenBondEnergyHartree) &&
+            !std::isfinite(gfn1Res.anisotropicElectrostaticEnergyHartree),
+            "GFN1 property availability mismatch");
+    // GFN0: polarizability available, multipoles unavailable, nuclear ESP available.
+    RDKit::XTBTools::XTBOptions gfn0Opts;
+    gfn0Opts.confId = 7;
+    gfn0Opts.method = "GFN0-xTB";
+    RDKit::XTBTools::XTBResults gfn0Res;
+    require(RDKit::XTBTools::runMol(mol, gfn0Res, gfn0Opts), "GFN0 calculation failed");
+    require(gfn0Res.polarizabilityAvailable && !gfn0Res.multipolesAvailable &&
+            gfn0Res.nuclearESPAvailable, "GFN0 property availability mismatch");
+    // Implicit solvation (ALPB water) + invalid solvation option guards.
+    RDKit::XTBTools::XTBOptions solvOpts;
+    solvOpts.confId = 7;
+    solvOpts.solvent = "water";
+    solvOpts.solvationModel = "alpb";
+    solvOpts.solvationGrid = 230;
+    RDKit::XTBTools::XTBResults solvRes;
+    require(RDKit::XTBTools::runMol(mol, solvRes, solvOpts), "ALPB water single point failed");
+    require(solvRes.solvent == "water" && solvRes.solvationModel == "alpb" && solvRes.solvationGrid == 230,
+            "Solvation provenance mismatch");
+    require(std::isfinite(solvRes.solvationEnergyHartree) && solvRes.solvationEnergyHartree < 0.0 &&
+            std::isfinite(solvRes.solvationBornEnergyHartree) &&
+            std::abs(solvRes.solvationEnergyHartree -
+                     (solvRes.solvationBornEnergyHartree + solvRes.solvationSASAEnergyHartree +
+                      solvRes.solvationHBEnergyHartree + solvRes.solvationShiftEnergyHartree)) < 1e-10,
+            "ALPB solvation energy decomposition mismatch");
+    bool badSolvRejected = false;
+    try {
+      auto badOpts = solvOpts;
+      badOpts.solvationModel = "invalid_model";
+      RDKit::XTBTools::runMol(mol, intermediate, badOpts);
+    } catch (const std::invalid_argument &) { badSolvRejected = true; }
+    require(badSolvRejected, "Invalid solvationModel was not rejected");
+    std::cout << "C++ GFN2, GFN0 guard/state, properties ABI, solvation, SCF failure recovery, and serialization passed\n";
     return 0;
   } catch (const std::exception &error) {
     std::cerr << error.what() << '\n';

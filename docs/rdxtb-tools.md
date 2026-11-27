@@ -102,6 +102,11 @@ if eht_ok:
 | Bond orders | `GetWibergBondOrders()`, dimensionless, `[atom,atom]` | Not the EHT overlap population matrix |
 | MO coefficients | `GetOrbitalCoefficients()`, `[AO,MO]` | Optional; xTB basis ordering, not EHT basis ordering |
 | Overlap / maps | `GetOverlapMatrix()`, `GetAOAtomMap()`, `GetAOShellMap()`, `GetShellAtomMap()`, `GetShellAngularMomenta()` | Optional native basis data; not EHT matrices |
+| Energy decomposition & Fermi | `energyDecompositionAvailable`, `electronicEnergyHartree`, `repulsionEnergyHartree`, `electrostaticEnergyHartree`, `anisotropicElectrostaticEnergyHartree`, `anisotropicXCEnergyHartree`, `dispersionEnergyHartree`, `halogenBondEnergyHartree`, `solvationEnergyHartree` (+ Born/SASA/HB/shift), `fermiLevelAlphaHartree`/`EV`, `fermiLevelBetaHartree`/`EV` | `None` when inapplicable to method, gas phase, or `electronicTemperature <= 0.1 K` |
+| D4 polarizability & dispersion | `polarizabilityAvailable`, `molecularPolarizabilityAU` (Bohr³), `molecularC6AU` (Ha·Bohr⁶), `molecularC8AU` (Ha·Bohr⁸), `GetAtomicPolarizabilities()`, `GetAtomicC6()` | GFN2 and GFN0 only; unavailable for GFN1 (DFT-D3) |
+| CAMM multipoles | `multipolesAvailable`, `GetAtomicDipoles()` (e·Bohr `[atom,3]`), `GetAtomicQuadrupoles()` (e·Bohr² `[atom,6]`), `GetMolecularQuadrupole()` (e·Bohr² `[6]`) | Traceless `(xx,xy,yy,xz,yz,zz)`; GFN2/GFN1 only (unavailable for GFN0) |
+| Nuclear ESP (EPN) | `nuclearESPAvailable`, `GetNuclearESP()` (Hartree/e `[atom]`) | Exact valence electronic + other-nuclei potential omitting self-nuclear $Z_A/r_{iA}$ |
+| Implicit solvation provenance | `solvent`, `solvationModel`, `solvationGrid` | `None` in gas phase; `"alpb"` or `"gbsa"` when `solvent` is set |
 | Modeled electron count | `numElectrons`, rounded sum of occupations | Valence/model electrons; water has 8 |
 | Total electron count | `numTotalElectrons`, sum of nuclear charges minus charge | Includes core electrons; water has 10 |
 
@@ -119,7 +124,8 @@ RunMol(mol, confId=-1, method="GFN2-xTB", charge=None,
        numUnpairedElectrons=None, keepOrbitalCoefficients=False,
        xtbLibrary="", parameterDirectory="", maxIterations=250,
        accuracy=1.0, electronicTemperature=300.0, keepOverlap=False,
-       espPointsAngstrom=None)
+       espPointsAngstrom=None, solvent=None, solvationModel="alpb",
+       solvationGrid=None)
 ```
 
 `confId` is an RDKit conformer **ID**, not its position in the conformer list;
@@ -128,9 +134,14 @@ finite and marked as 3D. Use `Chem.AddHs` to expand all hydrogen counts into
 atoms. Charge and unpaired electrons default to RDKit formal charges and
 radical counts, with electron-count/parity validation. Electronic temperature
 is in kelvin; accuracy is xTB's dimensionless numerical accuracy setting.
-The C++ module scope is gas-phase single points, with no solvent option or
-optimizer method. The Python package exposes xTB gradient optimization through
-`OptimizeXTB`, while `rdXTBTools` supplies the underlying single-point data.
+`solvent` defaults to `None` (gas phase); passing a nonempty solvent name enables
+xTB implicit solvation via `solvationModel` (`"alpb"` or `"gbsa"`) and optional
+Lebedev `solvationGrid` (`None` uses xTB's default 230-point grid; standalone
+C++ `RDKit::XTBTools::XTBOptions` uses `""` and `0`). The C++ module
+scope is single-point evaluation with no built-in optimizer method; the Python
+package exposes xTB gradient optimization through `OptimizeXTB` and harmonic
+thermochemistry through `CalcVibrationalThermochemistry`, while `rdXTBTools`
+supplies the underlying single-point data.
 
 Parameter discovery checks `parameterDirectory` first, then colon-separated
 `XTBPATH`, then the selected library's `share/xtb`. An explicit directory must

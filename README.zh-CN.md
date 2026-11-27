@@ -54,11 +54,13 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | 层级 | 示例 | 主要入口 |
 | --- | --- | --- |
 | 分子级 | 能量、HOMO/LUMO、能隙、偶极矩、电荷统计、`rdMolDescriptors.Properties` | `CalcXTBDescriptors`、`CalcMolXTBDescriptors`、`RegisterRDKitProperties` |
-| 原子级 | xTB 电荷、Wiberg 总和、Fukui 函数和局部反应性 | `CalcXTBAtomDescriptors`、`RunReactivity` |
-| [静电势与拟合电荷](docs/zh-CN/esp-api.md) | 静电势采样、带约束的 ESP 和单阶段 RESP 电荷 | `GenerateESPGrid`、`CalcESP`、`FitESPCharges`、`FitRESPCharges` |
-| 键级 | Wiberg/Mayer 键级、前线轨道键贡献 | `CalcXTBBondDescriptors`、`CalcMayerBondDescriptors`、`CalcFrontierBondDescriptors` |
-| 密度 | Mulliken/Löwdin shell 布居、密度矩阵、π 布居和 π 键级 | `CalcDensityMatrix`、`CalcShellPopulations`、`CalcPiDescriptors` |
+| 扩展性质 | 能量分解、费米能级、D4 极化率/C6/C8、CAMM 原子与分子多极矩、精确原子核静电势（EPN） | `CalcEnergyDecomposition`、`CalcPolarizabilityDescriptors`、`CalcMultipoleDescriptors`、`CalcNuclearESP` |
+| 原子级 | xTB/CM5 电荷、Wiberg 总和、ΔSCF 与轨道加权 Fukui、凝聚态 ALIE 与 PDOS | `CalcXTBAtomDescriptors`、`RunReactivity`、`CalcOrbitalWeightedFukui`、`CalcAtomicOrbitalEnergies` |
+| [静电势、表面与电荷](docs/zh-CN/esp-api.md) | 静电势采样、Politzer–Murray 范德华壳层表面统计、ESP/单阶段 RESP 拟合电荷 | `GenerateESPGrid`、`GenerateESPSurfaceGrid`、`CalcESP`、`CalcESPSurfaceDescriptors`、`FitESPCharges`、`FitRESPCharges` |
+| 键级 | Wiberg/Mayer 键级、前线键重叠、COOP/ECOHP 与键极性 | `CalcXTBBondDescriptors`、`CalcMayerBondDescriptors`、`CalcFrontierBondDescriptors`、`CalcBondOverlapDescriptors` |
+| 密度与局域轨道 | Mulliken/Löwdin shell 布居、密度矩阵、π 描述符、Pipek–Mezey 局域轨道（LMO） | `CalcDensityMatrix`、`CalcShellPopulations`、`CalcPiDescriptors`、`CalcLocalizedOrbitals` |
 | 前线轨道 | 简并 HOMO/LUMO 组、参与度、质心和键分解 | `CalcFrontierDescriptors`、`CalcFrontierBondDescriptors` |
+| 溶剂化与热化学 | ALPB/GBSA 隐式溶剂化位移、谐振频率、红外强度与 RRHO/qRRHO 热化学 | `CalcSolvationDescriptors`、`CalcVibrationalThermochemistry` |
 | 构象 | 均值、标准差、范围以及可选的电子能加权 | `RunConformerAnalysis` |
 | 报告 | 来源、单位、质量标记、缺失原因以及 JSONL/CSV 导出 | `CalcDescriptorReport`、`ExportDescriptorReports` |
 
@@ -160,7 +162,7 @@ python -m eled doctor --check compiled --method GFN2-xTB
 
 ## 项目边界
 
-EleD 提供围绕 RDKit 分子的基态、气相电子描述符和固定几何 ΔSCF 反应性分析。前线轨道描述符对应基态计算；溶剂模型和激发态求解器属于下游扩展。
+EleD 提供围绕 RDKit 分子的基态电子描述符、固定几何 ΔSCF 与轨道加权反应性、可选的 ALPB/GBSA 隐式溶剂化以及谐振 RRHO/qRRHO 热化学分析。前线轨道描述符对应基态计算；激发态求解器和周期性体系不在项目范围内。
 
 YAeHMOP/EHT 适配器作为独立的 RDKit 对照路径保留；EleD 描述符协议使用扩展版 xTB 后端。
 

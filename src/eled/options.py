@@ -11,6 +11,36 @@ from typing import Any, Mapping
 from .input import _method_flag
 
 
+_VALID_SOLVATION_MODELS = frozenset({'alpb', 'gbsa'})
+_VALID_SOLVATION_GRIDS = frozenset({
+    6, 14, 26, 38, 50, 74, 86, 110, 146, 170, 194, 230, 266, 302, 350, 434,
+    590, 770, 974, 1202, 1454, 1730, 2030, 2354, 2702, 3074, 3470, 3890,
+    4334, 4802, 5294, 5810,
+})
+
+
+def _validate_solvation_settings(solvent=None, solvationModel='alpb', solvationGrid=None):
+    """Validate optional implicit solvation settings without mutating gas-phase defaults."""
+    if solvent is not None:
+        if not isinstance(solvent, str) or not solvent.strip():
+            raise ValueError('solvent must be a nonempty solvent name string or None')
+        solvent = solvent.strip()
+    if not isinstance(solvationModel, str) or not solvationModel.strip():
+        raise ValueError("solvationModel must be 'alpb' or 'gbsa'")
+    model = solvationModel.strip().lower()
+    if model not in _VALID_SOLVATION_MODELS:
+        raise ValueError("solvationModel must be 'alpb' or 'gbsa'")
+    if solvationGrid is not None:
+        if isinstance(solvationGrid, bool) or not isinstance(solvationGrid, Integral):
+            raise ValueError('solvationGrid must be an integer Lebedev grid size or None')
+        grid = int(solvationGrid)
+        if grid not in _VALID_SOLVATION_GRIDS:
+            raise ValueError('solvationGrid must be a valid xTB Lebedev grid size (e.g. 110, 230, 302, 434)')
+    else:
+        grid = None
+    return solvent, model, grid
+
+
 def _validate_calculation_settings(maxIterations=250, accuracy=1.0, electronicTemperature=300.0) -> dict[str, Any]:
     """Validate values before calling C; record xTB's minimum temperature."""
     if (isinstance(maxIterations, bool) or not isinstance(maxIterations, Integral)
@@ -44,6 +74,9 @@ class XTBOptions:
     accuracy: float = 1.0
     electronicTemperature: float = 300.0
     espPointsAngstrom: tuple[tuple[float, float, float], ...] = ()
+    solvent: str | None = None
+    solvationModel: str = 'alpb'
+    solvationGrid: int | None = None
 
     def __post_init__(self) -> None:
         from .esp_input import _normalize_esp_points
@@ -55,6 +88,12 @@ class XTBOptions:
         object.__setattr__(self, 'maxIterations', settings['max_iterations'])
         object.__setattr__(self, 'accuracy', settings['accuracy'])
         object.__setattr__(self, 'electronicTemperature', settings['electronic_temperature'])
+        solvent, solv_model, solv_grid = _validate_solvation_settings(
+            self.solvent, self.solvationModel, self.solvationGrid
+        )
+        object.__setattr__(self, 'solvent', solvent)
+        object.__setattr__(self, 'solvationModel', solv_model)
+        object.__setattr__(self, 'solvationGrid', solv_grid)
         object.__setattr__(self, 'method', _method_flag(self.method)[0])
         object.__setattr__(self, 'backend', self.backend.strip().lower())
         if self.method == 'GFN-FF':
@@ -70,6 +109,11 @@ class XTBOptions:
         """Return JSON-compatible options for ``XTBCalculator`` and batches."""
         values = asdict(self)
         values['espPointsAngstrom'] = [list(row) for row in self.espPointsAngstrom]
+        # Preserve gas-phase cache keys and serialization when solvation is unset.
+        if self.solvent is None and self.solvationModel == 'alpb' and self.solvationGrid is None:
+            values.pop('solvent', None)
+            values.pop('solvationModel', None)
+            values.pop('solvationGrid', None)
         return values
 
     @classmethod

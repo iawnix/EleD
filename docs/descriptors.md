@@ -23,6 +23,16 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcOrbitalPopulations(result, scheme="lowdin", orbIdx=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
 | `CalcFrontierDescriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
 | `CalcDensityDescriptors(mol, result, mciRings=None)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond, π and optional MCI descriptors | Same-calculation C/S/maps; `keepOverlap=True` |
+| `CalcOrbitalWeightedFukui(result, *, deltaEV=0.5, scheme="lowdin", occupationThreshold=1e-7)` | Single-point orbital-weighted Fukui (`f_w_plus`, `f_w_minus`, `f_w_radical`, `dual_w`) | Same-calculation basis (`keepOverlap=True`) |
+| `CalcAtomicOrbitalEnergies(result, *, scheme="lowdin", occupationThreshold=1e-7, windowEV=2.0)` | Atomic `occ_n_e`, `vir_n`, `occ_e_mean_ev` (negative condensed ALIE proxy), `vir_e_mean_ev`, frontier-weighted energies and PDOS windows | Same-calculation basis (`keepOverlap=True`) |
+| `CalcBondOverlapDescriptors(mol, result, *, occupationThreshold=1e-7)` | Per-bond `coop_e`, `ecohp_ev` and Mulliken/CM5 bond polarity (`delta_q_e`, `signed_delta_q_e`, `q_prod_e2`, `*_cm5_*`) | Same-calculation basis (`keepOverlap=True`) + matching molecule |
+| `CalcLocalizedOrbitals(mol, result, *, scheme="lowdin", occupationThreshold=1.5, maxIterations=200, tolerance=1e-8)` | Pipek–Mezey LMOs (`lone_pair`, `bond`, `delocalized`), rotated Fock energies, centroids and per-atom lone-pair/bond counts | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
+| `CalcEnergyDecomposition(result)` | Energy terms (`e_elec_ha`…`e_xb_ha`, `g_solv_ha` + sub-terms) and Fermi levels (`fermi_alpha_ha`/`ev`, `fermi_beta_ha`/`ev`) | Native or compiled `XTBResults` from extended properties ABI v1 |
+| `CalcMultipoleDescriptors(result, *, mol=None)` | CAMM atomic dipoles/traceless quadrupoles and molecular traceless quadrupole with rotational invariants | GFN2/GFN1 `XTBResults` (GFN0 returns `available=False`) |
+| `CalcPolarizabilityDescriptors(result, *, mol=None)` | D4 molecular `mol_pol_bohr3`, `mol_c6_ha_bohr6`, `mol_c8_ha_bohr8` and atomic `alpha_bohr3`, `c6_aa_ha_bohr6` | GFN2/GFN0 `XTBResults` (GFN1 DFT-D3 returns `available=False`) |
+| `CalcNuclearESP(result, *, mol=None)` | Exact valence electronic + other-nuclei electrostatic potential at nuclei (`epn_au`, `epn_kcalmol`) | Native or compiled `XTBResults` from extended properties ABI v1 |
+| `CalcSolvationDescriptors(mol, solvent, *, solvationModel="alpb", solvationGrid=None, ...)` | Matched gas vs ALPB/GBSA `delta_g_solv_*`, direct `g_solv`, polarization energy, dipole/HOMO/LUMO/charge shifts | Explicit-H 3D RDKit `Mol`; runs 2 single points |
+| `CalcVibrationalThermochemistry(mol, *, temperatureK=298.15, pressureAtm=1.0, rotorCutoffCm1=100.0, symmetryNumber=1, ...)` | Harmonic frequencies (cm⁻¹), IR intensities (km/mol), rotational constants and RRHO/qRRHO ZPE/U/H/S/G | Explicit-H 3D RDKit `Mol`; central-difference Hessian of `GetGradient()` |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned
 molecule snapshot. Both Python result types support bond mapping, annotation and
@@ -279,3 +289,101 @@ near-degenerate HOMO/LUMO projectors and signed Mulliken overlap populations.
 semantics are included in each section. See [density-descriptors](density-descriptors.md)
 for formulas, units and applicability. The scope and literature
 positioning audit is in [literature-density-ml-audit](literature-density-ml-audit.md).
+
+## Orbital-weighted reactivity, ALIE/PDOS, COOP/ECOHP and Pipek–Mezey LMOs
+
+From one retained calculation (`keepOverlap=True`), EleD computes orbital-weighted
+reactivity, atomic orbital energy / PDOS statistics, bond overlap populations,
+and Pipek–Mezey localized molecular orbitals without additional engine calls:
+
+```python
+from eled import (
+    XTBCalculator, CalcOrbitalWeightedFukui, CalcAtomicOrbitalEnergies,
+    CalcBondOverlapDescriptors, CalcLocalizedOrbitals,
+)
+
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
+owf = CalcOrbitalWeightedFukui(result, deltaEV=0.5, scheme="lowdin")
+aoe = CalcAtomicOrbitalEnergies(result, scheme="lowdin", windowEV=2.0)
+bond_ovlp = CalcBondOverlapDescriptors(mol, result)
+lmo = CalcLocalizedOrbitals(mol, result, scheme="lowdin")
+```
+
+- `CalcOrbitalWeightedFukui` evaluates Pino-Rios / Martínez-Araya Gaussian-weighted
+  `f_w_plus`, `f_w_minus`, `f_w_radical` and `dual_w` centered at $\mu = (\mathrm{HOMO}+\mathrm{LUMO})/2$
+  with exact sum rules ($\sum f_w^+ = \sum f_w^- = 1$, $\sum \Delta f_w = 0$).
+- `CalcAtomicOrbitalEnergies` reports per-atom occupied/virtual populations
+  (`occ_n_e`, `vir_n`), mean occupied orbital energy `occ_e_mean_ev` (the negative
+  of the condensed ALIE proxy: $\mathrm{ALIE}_A = -\bar{\varepsilon}_{\mathrm{occ},A}$),
+  `vir_e_mean_ev`, Gaussian frontier-weighted energies, and PDOS windows
+  (`pdos_homo_win_e` in e, `pdos_lumo_win` dimensionless).
+- `CalcBondOverlapDescriptors` evaluates per-RDKit-bond `coop_e` (positive bonding),
+  `ecohp_ev` (negative bonding, eigenvalue-weighted $\mathrm{Tr}(W_{AB}S_{BA})$),
+  and engine/CM5 bond polarity (`delta_q_e`, `signed_delta_q_e`, `q_prod_e2`,
+  `delta_cm5_q_e`, `signed_delta_cm5_q_e`, `cm5_q_prod_e2`; CM5 entries are `None`
+  for GFN0).
+- `CalcLocalizedOrbitals` maximizes the Pipek–Mezey functional via 2×2 Jacobi
+  rotations (`"lowdin"` or symmetrized `"mulliken"`), classifying orbitals into
+  `"lone_pair"`, `"bond"`, and `"delocalized"` with rotated Fock energies
+  (`lmo_energy_ev`), centroids (`centroid_a`), and per-atom `n_lone_pairs`,
+  `n_localized_bonds`, and `max_lone_pair_energy_ev`. Open-shell, unknown-spin,
+  or fractional-occupation results are explicitly withheld (`None` + `missing`).
+
+## Extended `libxtb` properties (energy decomposition, multipoles, polarizability, EPN)
+
+Every successful GFN0/1/2 single point under the extended properties ABI v1
+populates energy decomposition, Fermi levels, nuclear ESP, D4 polarizabilities
+(GFN2/GFN0), and CAMM multipoles (GFN2/GFN1) on both native `XTBResults` and
+compiled `rdXTBTools.XTBResults`:
+
+```python
+from eled import (
+    XTBCalculator, CalcEnergyDecomposition, CalcMultipoleDescriptors,
+    CalcPolarizabilityDescriptors, CalcNuclearESP,
+)
+
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
+decomp = CalcEnergyDecomposition(result)
+multipoles = CalcMultipoleDescriptors(result, mol=mol)
+pol = CalcPolarizabilityDescriptors(result, mol=mol)
+epn = CalcNuclearESP(result, mol=mol)
+```
+
+Method-inapplicable quantities are never encoded as zero: `e_aes_ha`/`e_axc_ha`
+are `None` for GFN0/1, `e_xb_ha` is `None` for GFN2, `g_solv_ha` is `None` in gas
+phase, Fermi levels are `None` when `electronicTemperature <= 0.1 K`, multipoles
+return `available=False` for GFN0, and D4 polarizability/C6/C8 returns
+`available=False` for GFN1 (which uses DFT-D3).
+`CalcFiniteFieldPolarizability(mol, *, options=None, fieldAU=0.001)` explicitly
+raises `DescriptorUnavailableError` because `libxtb` 6.7.1 without `tblite`/PTB
+does not expose an external electric field operator for GFN0/1/2 (and point-charge
+embedding couples only to monopole shell charges); use analytical D4
+`CalcPolarizabilityDescriptors(result)` instead.
+
+## Implicit solvation (ALPB/GBSA) and vibrational thermochemistry
+
+`XTBOptions`, `XTBCalculator`, `RunXTBBatch`, and `rdXTBTools.RunMol` accept
+optional `solvent` (default `None` for gas phase, preserving gas-phase cache
+keys), `solvationModel` (`"alpb"` or `"gbsa"`), and `solvationGrid` (Lebedev
+grid size). `CalcSolvationDescriptors` runs matched gas-phase and solvated single
+points at fixed geometry; `CalcVibrationalThermochemistry` computes the Cartesian
+Hessian and dipole derivatives by central finite differences of analytical
+`GetGradient()`:
+
+```python
+from eled import CalcSolvationDescriptors, CalcVibrationalThermochemistry
+
+solv = CalcSolvationDescriptors(mol, "water", method="GFN2-xTB", solvationModel="alpb")
+thermo = CalcVibrationalThermochemistry(
+    mol, method="GFN2-xTB", temperatureK=298.15, pressureAtm=1.0, symmetryNumber=1
+)
+```
+
+`CalcSolvationDescriptors` reports `delta_g_solv_ha`/`kcalmol`, direct `g_solv_direct_ha`,
+`solute_polarization_energy_ha`, Born/SASA/HB/shift sub-terms (GFN1/2), dipole
+shifts, HOMO/LUMO/gap shifts, and per-atom charge shifts (`delta_q_e`, `delta_cm5_q_e`).
+`CalcVibrationalThermochemistry` reports harmonic `frequencies_cm1`, `ir_intensities_km_mol`,
+`rotational_constants_cm1`, ZPE, thermal corrections, entropy, and Gibbs free energy
+using RRHO (`rotorCutoffCm1=0`) or Grimme qRRHO (`rotorCutoffCm1=100.0` default).
+Non-stationary geometries (large gradients or imaginary frequencies) are explicitly
+flagged via `is_stationary_point=False` and `warnings`.

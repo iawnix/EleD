@@ -192,7 +192,7 @@ def test_removed_backends_fail_before_calculation(backend, monkeypatch):
 
 @pytest.mark.parametrize('option,value', [
     ('xtb_path', '/bin/xtb'), ('keep_files', True), ('timeout', 30),
-    ('optimize', True), ('solvent', 'water'),
+    ('optimize', True), ('solvation_model', 'alpb'),
     ('conf_id', 0), ('uhf', 1), ('keep_overlap', True),
 ])
 def test_removed_options_are_not_silently_ignored(option, value):

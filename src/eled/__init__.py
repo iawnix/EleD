@@ -38,6 +38,11 @@ from .errors import (
     XTBWorkerError,
 )
 from .esp import CalcESP, ESPChargeFit, FitESPCharges, FitRESPCharges, GenerateESPGrid
+from .esp_descriptors import (
+    CalcESPSurfaceDescriptors,
+    ESPSurfaceGrid,
+    GenerateESPSurfaceGrid,
+)
 from .geometry import ConformerGenerationResult, PrepareConformers
 from .local_geometry import (
     AnalyzeLocalGeometry,
@@ -48,11 +53,24 @@ from .local_geometry import (
     CalcSterimol,
     RunLocalGeometryBatch,
 )
+from .localized_orbitals import CalcLocalizedOrbitals
 from .mapping import AnnotateMol
 from .optimization import OptimizeXTB, XTBOptimizationResult
 from .options import XTBOptions
+from .orbital_descriptors import (
+    CalcAtomicOrbitalEnergies,
+    CalcBondOverlapDescriptors,
+    CalcOrbitalWeightedFukui,
+)
 from .persistence import ReactivityCheckpoint, XTBDiskCache
 from .populations import CalcFrontierDescriptors, CalcOrbitalPopulations
+from .properties import (
+    CalcEnergyDecomposition,
+    CalcFiniteFieldPolarizability,
+    CalcMultipoleDescriptors,
+    CalcNuclearESP,
+    CalcPolarizabilityDescriptors,
+)
 from .rdkit_descriptors import CalcMolXTBDescriptors, RegisterRDKitProperties
 from .reactivity import CalcReactivityDescriptors, ChargeStateCalculationError, RunReactivity
 from .reactivity_batch import ReactivityJob, RunReactivityBatch
@@ -66,6 +84,8 @@ from .reports import (
     RunDescriptorBatch,
 )
 from .selections import NormalizeSelections, SelectionSet
+from .solvation import CalcSolvationDescriptors
+from .thermochemistry import CalcVibrationalThermochemistry
 from .visualization import (
     BuildFragmentVisualData,
     DrawDescriptorMap,
@@ -143,6 +163,20 @@ __all__ = [
     "FitESPCharges",
     "FitRESPCharges",
     "ESPChargeFit",
+    "ESPSurfaceGrid",
+    "GenerateESPSurfaceGrid",
+    "CalcESPSurfaceDescriptors",
+    "CalcOrbitalWeightedFukui",
+    "CalcAtomicOrbitalEnergies",
+    "CalcBondOverlapDescriptors",
+    "CalcLocalizedOrbitals",
+    "CalcEnergyDecomposition",
+    "CalcMultipoleDescriptors",
+    "CalcNuclearESP",
+    "CalcPolarizabilityDescriptors",
+    "CalcFiniteFieldPolarizability",
+    "CalcSolvationDescriptors",
+    "CalcVibrationalThermochemistry",
     "CalcSterimol",
     "CalcBuriedVolume",
     "CalcPlaneDescriptors",

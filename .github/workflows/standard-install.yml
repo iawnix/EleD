@@ -46,7 +46,7 @@ jobs:
           .eled/runtime/bin/python tools/check_wheel.py .eled/artifacts/build-*/compiled/*.whl --kind compiled --library "$PWD/.eled/runtime/lib/libxtb.so" --check native --check compiled --method GFN0-xTB --keep-overlap --output .eled/installed-wheel.json
       - uses: actions/upload-artifact@v4
         with:
-          name: standard-native-0.12.0
+          name: standard-native-0.13.0
           include-hidden-files: true
           path: |
             .eled/installation.json

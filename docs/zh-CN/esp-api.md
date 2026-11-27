@@ -104,6 +104,53 @@ QM 层级/采样网格或经过验证的力场电荷。可以分别分析多个�
 和自动化学等价识别不在此接口范围内。基组密度、几何、采样和惩罚都会影响电荷；
 解释结果前应检查残差及条件数。
 
+## Politzer–Murray 表面静电势描述符
+
+`GenerateESPSurfaceGrid` 和 `CalcESPSurfaceDescriptors` 直接消费已有采样结果，
+计算分子级与原子级 Politzer–Murray 静电势表面统计量，不再重复调用 xTB：
+
+```python
+from eled import XTBCalculator, GenerateESPSurfaceGrid, CalcESPSurfaceDescriptors
+
+grid = GenerateESPSurfaceGrid(mol, scales=(1.4,), pointsPerAtom=100)
+result = XTBCalculator(method="GFN2-xTB").Calculate(
+    mol, espPointsAngstrom=grid.pointsAngstrom
+)
+surface = CalcESPSurfaceDescriptors(mol, result, surfaceGrid=grid)
+print(surface["v_min_au"], surface["v_max_au"], surface["pi_esp_au"], surface["nu"])
+print(surface["atoms"][0]["v_mean_au"], surface["atoms"][0]["sigma2_au2"])
+```
+
+- `GenerateESPSurfaceGrid(mol, confId=-1, *, scales=(1.4,), pointsPerAtom=100)`
+  基于按 `scales` 缩放的 RDKit 周期表范德华半径生成暴露的 Fibonacci 球面点，返回不可变的
+  `ESPSurfaceGrid`（含 Å 坐标 `pointsAngstrom`、原始 RDKit 原子归属 `atomIndices` 与
+  Å² 面积权重 `areaWeightsAngstrom2`）。该网格是显式的缩放范德华壳层表面，
+  **不是** 0.001 a.u. 量子力学电子密度等值面。
+- `CalcESPSurfaceDescriptors(mol, result, *, atomIndices=None, weights=None, surfaceGrid=None, includeKcalMol=True)`
+  返回分子级 `v_min_au`、`v_max_au`、`v_mean_au`、`v_pos_mean_au`、`v_neg_mean_au`、
+  `v_pos_frac`、`v_neg_frac`、`pi_esp_au`、`sigma2_pos_au2`、`sigma2_neg_au2`、
+  `sigma2_tot_au2`、`nu`、`nu_sigma2_au2` 及原子级 `v_min_au`、`v_max_au`、`v_mean_au`、
+  `v_pos_mean_au`、`v_neg_mean_au`、`sigma2_au2`（`includeKcalMol=True` 时附带 kcal/mol
+  与 (kcal/mol)² 换算字段）。单符号表面或完全包埋原子返回 `None` 及显式 `missing` 原因，不填充零值。
+
+## 原子核处精确静电势（EPN）
+
+扩展性质 C ABI v1 导出 `xtb_rdkit_getNuclearESP`，在每个原子核位置计算价电子与其余原子核的
+精确静电势 $V_N$，严格去除奇异自核项 $Z_A / r_{iA}$：
+
+```python
+from eled import XTBCalculator, CalcNuclearESP
+
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
+epn = CalcNuclearESP(result, mol=mol)
+print(epn["epn_min_au"], epn["atoms"][0]["epn_au"], epn["atoms"][0]["epn_kcalmol"])
+```
+
+`CalcNuclearESP(result, *, mol=None)` 同时支持原生 `XTBResults` 和编译版
+`rdXTBTools.XTBResults`（`result.GetNuclearESP()`），保持原始 RDKit 原子顺序，输出
+Hartree/e（`epn_au`）与 kcal/(mol·e)（`epn_kcalmol`），在刚体变换与原子重排下保持不变，
+并与球面极限 $\lim_{\mathbf{r}\to\mathbf{R}_A}(V_{\mathrm{ESP}}(\mathbf{r}) - Z_A / |\mathbf{r}-\mathbf{R}_A|)$ 一致。
+
 ## C 接口
 
 ```c

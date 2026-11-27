@@ -54,11 +54,13 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | Layer | Examples | Main entry points |
 | --- | --- | --- |
 | Molecular | energy, HOMO/LUMO, gap, dipole, charge statistics, `rdMolDescriptors.Properties` | `CalcXTBDescriptors`, `CalcMolXTBDescriptors`, `RegisterRDKitProperties` |
-| Atomic | xTB charge, Wiberg sum, Fukui and local reactivity | `CalcXTBAtomDescriptors`, `RunReactivity` |
-| [ESP and fitted charges](docs/esp-api.md) | sampled electrostatic potential, constrained ESP and single-stage RESP charges | `GenerateESPGrid`, `CalcESP`, `FitESPCharges`, `FitRESPCharges` |
-| Bond | Wiberg and Mayer bond orders, frontier-bond contributions | `CalcXTBBondDescriptors`, `CalcMayerBondDescriptors`, `CalcFrontierBondDescriptors` |
-| Density | Mulliken/Löwdin shell populations, density matrix, π population and π bond order | `CalcDensityMatrix`, `CalcShellPopulations`, `CalcPiDescriptors` |
+| Extended properties | energy decomposition, Fermi levels, D4 polarizability/C6/C8, CAMM atomic & molecular multipoles, exact nuclear ESP (EPN) | `CalcEnergyDecomposition`, `CalcPolarizabilityDescriptors`, `CalcMultipoleDescriptors`, `CalcNuclearESP` |
+| Atomic | xTB/CM5 charges, Wiberg sum, ΔSCF & orbital-weighted Fukui, condensed ALIE & PDOS | `CalcXTBAtomDescriptors`, `RunReactivity`, `CalcOrbitalWeightedFukui`, `CalcAtomicOrbitalEnergies` |
+| [ESP, surfaces & charges](docs/esp-api.md) | sampled ESP, Politzer–Murray vdW-shell surface statistics, constrained ESP & single-stage RESP charges | `GenerateESPGrid`, `GenerateESPSurfaceGrid`, `CalcESP`, `CalcESPSurfaceDescriptors`, `FitESPCharges`, `FitRESPCharges` |
+| Bond | Wiberg/Mayer bond orders, frontier-bond overlap, COOP/ECOHP & bond polarity | `CalcXTBBondDescriptors`, `CalcMayerBondDescriptors`, `CalcFrontierBondDescriptors`, `CalcBondOverlapDescriptors` |
+| Density & LMOs | Mulliken/Löwdin shell populations, density matrix, π descriptors, Pipek–Mezey localized orbitals | `CalcDensityMatrix`, `CalcShellPopulations`, `CalcPiDescriptors`, `CalcLocalizedOrbitals` |
 | Frontier orbitals | degenerate HOMO/LUMO groups, participation, centroids and bond decomposition | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors` |
+| Solvation & thermochemistry | ALPB/GBSA implicit solvation shifts, harmonic frequencies, IR intensities & RRHO/qRRHO thermochemistry | `CalcSolvationDescriptors`, `CalcVibrationalThermochemistry` |
 | Conformers | mean, standard deviation, range and optional electronic-energy weighting | `RunConformerAnalysis` |
 | Reports | provenance, units, quality flags, missing-value reasons and JSONL/CSV export | `CalcDescriptorReport`, `ExportDescriptorReports` |
 
@@ -161,7 +163,7 @@ archives that an external study can consume.
 
 ## Scope
 
-EleD provides ground-state, gas-phase electronic descriptors and fixed-geometry ΔSCF reactivity built around RDKit molecules. Frontier-orbital descriptors describe the ground-state calculation. Solvent models and excited-state solvers belong to downstream extensions.
+EleD provides ground-state electronic descriptors, fixed-geometry ΔSCF and orbital-weighted reactivity, optional ALPB/GBSA implicit solvation, and harmonic RRHO/qRRHO vibrational thermochemistry built around RDKit molecules. Frontier-orbital descriptors describe the ground-state calculation; excited-state solvers and periodic solids remain outside scope.
 
 The YAeHMOP/EHT adapter remains available as an independent RDKit comparison path. EleD's descriptor protocol uses the extended xTB backend.
 

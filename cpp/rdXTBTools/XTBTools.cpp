@@ -38,6 +38,10 @@ constexpr const char *d4PatchSHA256 =
     "2f503f401c410b1456824efe906b89d5f932e8a8f9c63f817669a259db04c859";
 constexpr const char *basisPatchSHA256 = "3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c";
 constexpr const char *scfPatchSHA256 = "d8db37846002ebc19ed6808356cbd83304cc1608915e69956c1a7afc174d18fd";
+constexpr const char *propertiesPatchSHA256 = "56ea1fab2c624e37f851ce3d59d11d73d1a9abd6f9553c5464983c36c07ff817";
+constexpr std::array<int, 32> validSolvationGrids = {
+    6, 14, 26, 38, 50, 74, 86, 110, 146, 170, 194, 230, 266, 302, 350, 434,
+    590, 770, 974, 1202, 1454, 1730, 2030, 2354, 2702, 3074, 3470, 3890, 4334, 4802, 5294, 5810};
 std::mutex calculationMutex;
 
 std::string sha256(const fs::path &path) {
@@ -78,6 +82,11 @@ struct API {
   int (*getESP)(xtb_TEnvironment, xtb_TResults, int, const double *, int, double *) = nullptr;
   int (*getSCFAPIVersion)() = nullptr;
   int (*getSCFDiagnostics)(xtb_TEnvironment, xtb_TResults, int *, double *) = nullptr;
+  int (*getPropertiesAPIVersion)() = nullptr;
+  int (*getEnergyDecomposition)(xtb_TEnvironment, xtb_TResults, int *, int, double *) = nullptr;
+  int (*getPolarizability)(xtb_TEnvironment, xtb_TResults, int, double *, double *, double *) = nullptr;
+  int (*getMultipoles)(xtb_TEnvironment, xtb_TResults, int, double *, double *, double *) = nullptr;
+  int (*getNuclearESP)(xtb_TEnvironment, xtb_TResults, int, double *) = nullptr;
   void (*setKeepOverlap)(xtb_TEnvironment, xtb_TResults, bool) = nullptr;
   void (*getBasisSize)(xtb_TEnvironment, xtb_TResults, int *) = nullptr;
   void (*getOverlap)(xtb_TEnvironment, xtb_TResults, int, double *) = nullptr;
@@ -89,6 +98,7 @@ struct API {
   XTB_FUNCTION(newMolecule); XTB_FUNCTION(delMolecule);
   XTB_FUNCTION(newCalculator); XTB_FUNCTION(delCalculator);
   XTB_FUNCTION(loadGFN0xTB); XTB_FUNCTION(loadGFN1xTB); XTB_FUNCTION(loadGFN2xTB);
+  XTB_FUNCTION(setSolvent); XTB_FUNCTION(releaseSolvent);
   XTB_FUNCTION(setMaxIter); XTB_FUNCTION(setAccuracy); XTB_FUNCTION(setElectronicTemp);
   XTB_FUNCTION(newResults); XTB_FUNCTION(copyResults); XTB_FUNCTION(delResults); XTB_FUNCTION(singlepoint);
   XTB_FUNCTION(getEnergy); XTB_FUNCTION(getNao); XTB_FUNCTION(getDipole);
@@ -119,6 +129,7 @@ struct API {
     BIND(setVerbosity); BIND(newMolecule); BIND(delMolecule);
     BIND(newCalculator); BIND(delCalculator);
     BIND(loadGFN0xTB); BIND(loadGFN1xTB); BIND(loadGFN2xTB);
+    BIND(setSolvent); BIND(releaseSolvent);
     BIND(setMaxIter); BIND(setAccuracy); BIND(setElectronicTemp);
     BIND(newResults); BIND(copyResults); BIND(delResults); BIND(singlepoint);
     BIND(getEnergy); BIND(getNao); BIND(getDipole); BIND(getGradient);
@@ -130,6 +141,8 @@ struct API {
     OPTIONAL(getOverlap); OPTIONAL(getBasisMap);
     OPTIONAL(getESPAPIVersion); OPTIONAL(setKeepESP); OPTIONAL(getESP);
     OPTIONAL(getSCFAPIVersion); OPTIONAL(getSCFDiagnostics);
+    OPTIONAL(getPropertiesAPIVersion); OPTIONAL(getEnergyDecomposition);
+    OPTIONAL(getPolarizability); OPTIONAL(getMultipoles); OPTIONAL(getNuclearESP);
 #undef OPTIONAL
   }
   void check(xtb_TEnvironment env, const char *operation) const {
@@ -229,6 +242,46 @@ bool verifyESP(const API &api) {
   } catch (const std::exception &) { return false; }
 }
 
+bool verifyProperties(const API &api) {
+  if (!api.getPropertiesAPIVersion || !api.getEnergyDecomposition ||
+      !api.getPolarizability || !api.getMultipoles || !api.getNuclearESP)
+    return false;
+  try {
+    const auto prefix = fs::path(api.path).parent_path().parent_path();
+    boost::property_tree::ptree record;
+    boost::property_tree::read_json((prefix / "share/xtb/eled/build.json").string(), record);
+    std::string commit;
+    return verifyGFN0(api, commit) && record.get<int>("capabilities.properties_api", 0) == 1 &&
+      record.get<int>("source.properties_extension.api_version", 0) == 1 &&
+      record.get<std::string>("source.properties_extension.patch_sha256", "") == propertiesPatchSHA256 &&
+      api.getPropertiesAPIVersion() == 1;
+  } catch (const std::exception &) { return false; }
+}
+
+std::string trimString(const std::string &value) {
+  size_t start = 0;
+  while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start]))) ++start;
+  size_t end = value.size();
+  while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1]))) --end;
+  return value.substr(start, end - start);
+}
+
+std::string normalizeSolvationModel(const std::string &model) {
+  std::string out;
+  for (unsigned char c : trimString(model)) out += static_cast<char>(std::tolower(c));
+  if (out.empty()) out = "alpb";
+  if (out != "alpb" && out != "gbsa")
+    throw std::invalid_argument("solvationModel must be 'alpb' or 'gbsa'");
+  return out;
+}
+
+int validateSolvationGrid(int grid) {
+  if (grid == 0) return 230;
+  if (std::find(validSolvationGrids.begin(), validSolvationGrids.end(), grid) == validSolvationGrids.end())
+    throw std::invalid_argument("solvationGrid must be a valid xTB Lebedev grid size (e.g. 110, 230, 302, 434)");
+  return grid;
+}
+
 std::string parameterFile(const API &api, const XTBOptions &options, int method) {
   const std::string filename = "param_gfn" + std::to_string(method) + "-xtb.txt";
   std::vector<fs::path> roots;
@@ -298,6 +351,16 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
   if (options.maxIterations < 1 || !std::isfinite(options.accuracy) || (options.accuracy < 1e-4 || options.accuracy > 1e3) ||
       !std::isfinite(options.electronicTemperature) || options.electronicTemperature < 0)
     throw std::invalid_argument("Invalid iteration limit, accuracy, or electronic temperature");
+  const std::string solvModel = normalizeSolvationModel(options.solvationModel);
+  const int solvGrid = validateSolvationGrid(options.solvationGrid);
+  const std::string solventTrimmed = trimString(options.solvent);
+  if (!options.solvent.empty() && solventTrimmed.empty())
+    throw std::invalid_argument("solvent must be a nonempty solvent name or empty for gas phase");
+  if (!solventTrimmed.empty()) {
+    result.solvent = solventTrimmed;
+    result.solvationModel = solvModel;
+    result.solvationGrid = solvGrid;
+  }
   const Conformer *conf = nullptr;
   try { conf = &mol.getConformer(options.confId); }
   catch (const std::exception &) { throw std::invalid_argument("Conformer ID does not exist"); }
@@ -353,6 +416,7 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
   result.apiVersion = api.version;
   result.gfn0StateFixVerified = verifyGFN0(api, result.sourceCommit);
   result.basisExportVerified = verifyBasis(api);
+  result.propertiesExportVerified = verifyProperties(api);
   if (method == 0 && !result.gfn0StateFixVerified)
     throw std::invalid_argument("Native GFN0 requires a verified patched xTB build; run tools/build_patched_xtb.sh");
   if (!result.basisExportVerified || !verifyDiagnostics(api))
@@ -379,6 +443,13 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
     auto loader = method == 0 ? api.loadGFN0xTB : method == 1 ? api.loadGFN1xTB : api.loadGFN2xTB;
     loader(h.env, h.mol, h.calc, result.parameterFile.empty() ? nullptr : result.parameterFile.data());
     api.check(h.env, "Parameter loading");
+    if (!result.solvent.empty()) {
+      std::string solvArg = result.solvent;
+      std::string modelArg = result.solvationModel;
+      int gridArg = result.solvationGrid;
+      api.setSolvent(h.env, h.calc, solvArg.data(), nullptr, nullptr, &gridArg, modelArg.data());
+      api.check(h.env, "Solvation setup");
+    }
     api.setMaxIter(h.env, h.calc, options.maxIterations);
     api.setAccuracy(h.env, h.calc, options.accuracy);
     api.setElectronicTemp(h.env, h.calc, options.electronicTemperature);
@@ -475,6 +546,66 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       requireFinite(values, "ESP");
       result.espPointsAngstrom = options.espPointsAngstrom;
       result.espValuesAU = std::move(values);
+    }
+    if (result.propertiesExportVerified) {
+      int eFlags = 0;
+      std::array<double, 15> eVals{};
+      if (api.getEnergyDecomposition(h.env, h.res, &eFlags, static_cast<int>(eVals.size()), eVals.data())) {
+        result.energyDecompositionFlags = eFlags;
+        if (eFlags & 2) result.electronicEnergyHartree = eVals[1];
+        if (eFlags & 4) result.repulsionEnergyHartree = eVals[2];
+        if (eFlags & 8) result.electrostaticEnergyHartree = eVals[3];
+        if (eFlags & 16) result.anisotropicElectrostaticEnergyHartree = eVals[4];
+        if (eFlags & 32) result.anisotropicXCEnergyHartree = eVals[5];
+        if (eFlags & 64) result.dispersionEnergyHartree = eVals[6];
+        if (eFlags & 128) result.halogenBondEnergyHartree = eVals[7];
+        if (eFlags & 256) result.solvationEnergyHartree = eVals[8];
+        if (eFlags & 512) {
+          result.fermiLevelAlphaHartree = eVals[9];
+          result.fermiLevelBetaHartree = eVals[10];
+          result.fermiLevelAlphaEV = eVals[9] * hartreeToEV;
+          result.fermiLevelBetaEV = eVals[10] * hartreeToEV;
+        }
+        if (eFlags & 1024) {
+          result.solvationBornEnergyHartree = eVals[11];
+          result.solvationSASAEnergyHartree = eVals[12];
+          result.solvationHBEnergyHartree = eVals[13];
+          result.solvationShiftEnergyHartree = eVals[14];
+        }
+      }
+      std::array<double, 3> molPol{};
+      std::vector<double> alphaAtom(n), c6Atom(n);
+      if (api.getPolarizability(h.env, h.res, n, molPol.data(), alphaAtom.data(), c6Atom.data())) {
+        requireFinite(alphaAtom, "atomic polarizabilities");
+        requireFinite(c6Atom, "atomic C6");
+        if (!std::isfinite(molPol[0]) || !std::isfinite(molPol[1]) || !std::isfinite(molPol[2]))
+          throw EngineError("Nonfinite molecular polarizability");
+        result.polarizabilityAvailable = true;
+        result.molecularPolarizabilityAU = molPol[0];
+        result.molecularC6AU = molPol[1];
+        result.molecularC8AU = molPol[2];
+        result.atomicPolarizabilitiesAU = std::move(alphaAtom);
+        result.atomicC6AU = std::move(c6Atom);
+      }
+      std::vector<double> dipAtom(static_cast<size_t>(3) * n);
+      std::vector<double> qpAtom(static_cast<size_t>(6) * n);
+      std::vector<double> molQp(6);
+      if (api.getMultipoles(h.env, h.res, n, dipAtom.data(), qpAtom.data(), molQp.data())) {
+        requireFinite(dipAtom, "atomic dipoles");
+        requireFinite(qpAtom, "atomic quadrupoles");
+        requireFinite(molQp, "molecular quadrupole");
+        result.multipolesAvailable = true;
+        result.atomicDipolesAU = std::move(dipAtom);
+        result.atomicQuadrupolesAU = std::move(qpAtom);
+        result.molecularQuadrupoleAU = std::move(molQp);
+      }
+      std::vector<double> nuclearESP(n);
+      const int epnOk = api.getNuclearESP(h.env, h.res, n, nuclearESP.data());
+      api.check(h.env, "Nuclear ESP evaluation");
+      if (!epnOk) throw EngineError("Nuclear ESP evaluation failed without a diagnostic");
+      requireFinite(nuclearESP, "nuclear ESP");
+      result.nuclearESPAvailable = true;
+      result.nuclearESPAU = std::move(nuclearESP);
     }
     api.check(h.env, "Result extraction");
     requireFinite(result.gradientHartreePerBohr, "gradient");

@@ -121,6 +121,60 @@ joint multi-conformer fitting and automatic chemical equivalences are outside
 this interface. Finite-basis density, geometry, sampling and restraints affect
 the fitted charges; inspect residuals and conditioning before interpreting them.
 
+## Politzer–Murray surface ESP descriptors
+
+`GenerateESPSurfaceGrid` and `CalcESPSurfaceDescriptors` compute molecular and
+per-atom Politzer–Murray electrostatic-surface statistics from sampled ESP
+results without invoking xTB again:
+
+```python
+from eled import XTBCalculator, GenerateESPSurfaceGrid, CalcESPSurfaceDescriptors
+
+grid = GenerateESPSurfaceGrid(mol, scales=(1.4,), pointsPerAtom=100)
+result = XTBCalculator(method="GFN2-xTB").Calculate(
+    mol, espPointsAngstrom=grid.pointsAngstrom
+)
+surface = CalcESPSurfaceDescriptors(mol, result, surfaceGrid=grid)
+print(surface["v_min_au"], surface["v_max_au"], surface["pi_esp_au"], surface["nu"])
+print(surface["atoms"][0]["v_mean_au"], surface["atoms"][0]["sigma2_au2"])
+```
+
+- `GenerateESPSurfaceGrid(mol, confId=-1, *, scales=(1.4,), pointsPerAtom=100)`
+  builds exposed Fibonacci spheres around RDKit periodic-table van der Waals
+  radii scaled by `scales`, returning an immutable `ESPSurfaceGrid` with
+  `pointsAngstrom` (Å), `atomIndices` (original RDKit atom order), and
+  `areaWeightsAngstrom2` (Å²). This is an explicit scaled vdW shell surface,
+  **not** a 0.001 a.u. quantum-mechanical electron-density isosurface.
+- `CalcESPSurfaceDescriptors(mol, result, *, atomIndices=None, weights=None, surfaceGrid=None, includeKcalMol=True)`
+  reports molecular `v_min_au`, `v_max_au`, `v_mean_au`, `v_pos_mean_au`,
+  `v_neg_mean_au`, `v_pos_frac`, `v_neg_frac`, `pi_esp_au`, `sigma2_pos_au2`,
+  `sigma2_neg_au2`, `sigma2_tot_au2`, `nu`, `nu_sigma2_au2` and per-atom
+  `v_min_au`, `v_max_au`, `v_mean_au`, `v_pos_mean_au`, `v_neg_mean_au`,
+  `sigma2_au2` (plus kcal/mol and (kcal/mol)² counterparts when
+  `includeKcalMol=True`). Single-sign surfaces or buried atoms return `None`
+  with explicit `missing` reasons rather than zero.
+
+## Exact electrostatic potential at nuclei (EPN)
+
+The extended properties C ABI v1 also exports `xtb_rdkit_getNuclearESP`,
+evaluating the exact valence electronic plus other-nuclei electrostatic
+potential $V_N$ at each nuclear position while omitting the singular
+self-nuclear term $Z_A / r_{iA}$:
+
+```python
+from eled import XTBCalculator, CalcNuclearESP
+
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
+epn = CalcNuclearESP(result, mol=mol)
+print(epn["epn_min_au"], epn["atoms"][0]["epn_au"], epn["atoms"][0]["epn_kcalmol"])
+```
+
+`CalcNuclearESP(result, *, mol=None)` accepts native `XTBResults` and compiled
+`rdXTBTools.XTBResults` (`result.GetNuclearESP()`), preserves original RDKit
+atom order, and reports both Hartree/e (`epn_au`) and kcal/(mol·e)
+(`epn_kcalmol`). Values are rigid-motion and atom-permutation invariant and
+match $\lim_{\mathbf{r}\to\mathbf{R}_A}\bigl(V_{\mathrm{ESP}}(\mathbf{r}) - Z_A / |\mathbf{r}-\mathbf{R}_A|\bigr)$.
+
 ## C interface
 
 ```c

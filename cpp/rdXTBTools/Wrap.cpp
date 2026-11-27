@@ -1,5 +1,6 @@
 #define PY_ARRAY_UNIQUE_SYMBOL rdxtb_array_API
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#define BOOST_PYTHON_MAX_ARITY 20
 #include <boost/python.hpp>
 #include <numpy/arrayobject.h>
 #include <RDGeneral/versions.h>
@@ -126,6 +127,94 @@ MAP_GETTER(shellAtoms, shellAtomMap)
 MAP_GETTER(shellL, shellAngularMomenta)
 #undef MAP_GETTER
 bool hasOverlap(const XTBResults &r) { return r.success && !r.overlapMatrix.empty(); }
+bool hasEnergyDecomp(const XTBResults &r) { return r.success && r.energyDecompositionFlags != 0; }
+bool hasPolarizability(const XTBResults &r) { return r.success && r.polarizabilityAvailable; }
+bool hasMultipoles(const XTBResults &r) { return r.success && r.multipolesAvailable; }
+bool hasNuclearESP(const XTBResults &r) { return r.success && r.nuclearESPAvailable; }
+
+py::object optionalDouble(const XTBResults &r, double value) {
+  requireSuccess(r);
+  return std::isfinite(value) ? py::object(value) : py::object();
+}
+py::object getSolvent(const XTBResults &r) {
+  return r.solvent.empty() ? py::object() : py::object(r.solvent);
+}
+py::object getSolvationModel(const XTBResults &r) {
+  return r.solvationModel.empty() ? py::object() : py::object(r.solvationModel);
+}
+py::object getSolvationGrid(const XTBResults &r) {
+  return r.solvent.empty() ? py::object() : py::object(r.solvationGrid);
+}
+
+#define OPT_DOUBLE_GETTER(name, field) \
+py::object name(const XTBResults &r) { return optionalDouble(r, r.field); }
+OPT_DOUBLE_GETTER(eElec, electronicEnergyHartree)
+OPT_DOUBLE_GETTER(eRep, repulsionEnergyHartree)
+OPT_DOUBLE_GETTER(eES, electrostaticEnergyHartree)
+OPT_DOUBLE_GETTER(eAES, anisotropicElectrostaticEnergyHartree)
+OPT_DOUBLE_GETTER(eAXC, anisotropicXCEnergyHartree)
+OPT_DOUBLE_GETTER(eDisp, dispersionEnergyHartree)
+OPT_DOUBLE_GETTER(eXB, halogenBondEnergyHartree)
+OPT_DOUBLE_GETTER(gSolv, solvationEnergyHartree)
+OPT_DOUBLE_GETTER(gBorn, solvationBornEnergyHartree)
+OPT_DOUBLE_GETTER(gSASA, solvationSASAEnergyHartree)
+OPT_DOUBLE_GETTER(gHB, solvationHBEnergyHartree)
+OPT_DOUBLE_GETTER(gShift, solvationShiftEnergyHartree)
+OPT_DOUBLE_GETTER(efaHa, fermiLevelAlphaHartree)
+OPT_DOUBLE_GETTER(efbHa, fermiLevelBetaHartree)
+OPT_DOUBLE_GETTER(efaEV, fermiLevelAlphaEV)
+OPT_DOUBLE_GETTER(efbEV, fermiLevelBetaEV)
+OPT_DOUBLE_GETTER(molPol, molecularPolarizabilityAU)
+OPT_DOUBLE_GETTER(molC6, molecularC6AU)
+OPT_DOUBLE_GETTER(molC8, molecularC8AU)
+#undef OPT_DOUBLE_GETTER
+
+py::object atomicPolarizabilities(const XTBResults &r) {
+  requireSuccess(r);
+  if (!r.polarizabilityAvailable || r.atomicPolarizabilitiesAU.size() != r.numAtoms)
+    throw std::invalid_argument("D4 polarizabilities are unavailable for this calculation");
+  return array(r.atomicPolarizabilitiesAU, {r.numAtoms});
+}
+py::object atomicC6(const XTBResults &r) {
+  requireSuccess(r);
+  if (!r.polarizabilityAvailable || r.atomicC6AU.size() != r.numAtoms)
+    throw std::invalid_argument("D4 atomic C6 coefficients are unavailable for this calculation");
+  return array(r.atomicC6AU, {r.numAtoms});
+}
+py::object atomicDipoles(const XTBResults &r) {
+  requireSuccess(r);
+  if (!r.multipolesAvailable || r.atomicDipolesAU.size() != static_cast<size_t>(3) * r.numAtoms)
+    throw std::invalid_argument("Atomic dipoles are unavailable for this calculation");
+  return array(r.atomicDipolesAU, {r.numAtoms, 3});
+}
+py::object atomicQuadrupoles(const XTBResults &r) {
+  requireSuccess(r);
+  if (!r.multipolesAvailable || r.atomicQuadrupolesAU.size() != static_cast<size_t>(6) * r.numAtoms)
+    throw std::invalid_argument("Atomic quadrupoles are unavailable for this calculation");
+  return array(r.atomicQuadrupolesAU, {r.numAtoms, 6});
+}
+py::object molecularQuadrupole(const XTBResults &r) {
+  requireSuccess(r);
+  if (!r.multipolesAvailable || r.molecularQuadrupoleAU.size() != 6)
+    throw std::invalid_argument("Molecular quadrupole is unavailable for this calculation");
+  return array(r.molecularQuadrupoleAU, {6});
+}
+py::object nuclearESP(const XTBResults &r) {
+  requireSuccess(r);
+  if (!r.nuclearESPAvailable || r.nuclearESPAU.size() != r.numAtoms)
+    throw std::invalid_argument("Nuclear ESP is unavailable for this calculation");
+  return array(r.nuclearESPAU, {r.numAtoms});
+}
+
+std::string parseOptionalSolvent(const py::object &value) {
+  if (value.is_none()) return {};
+  if (!PyUnicode_Check(value.ptr()))
+    throw std::invalid_argument("solvent must be a string or None");
+  std::string text = py::extract<std::string>(value);
+  if (text.find_first_not_of(" \t\r\n") == std::string::npos)
+    throw std::invalid_argument("solvent must be a nonempty solvent name or None");
+  return text;
+}
 
 double totalEnergy(const XTBResults &r) {
   requireSuccess(r); return r.totalEnergyHartree;
@@ -219,7 +308,8 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
               const py::object &charge, const py::object &unpaired, bool keepCoefficients,
               const std::string &library, const std::string &parameterDirectory,
               const py::object &maxIterations, const py::object &accuracy,
-              const py::object &electronicTemperature, bool keepOverlap, const py::object &espPointsAngstrom) {
+              const py::object &electronicTemperature, bool keepOverlap, const py::object &espPointsAngstrom,
+              const py::object &solvent, const std::string &solvationModel, const py::object &solvationGrid) {
   XTBOptions options;
   options.confId = confId;
   options.method = method;
@@ -228,6 +318,10 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.keepOrbitalCoefficients = keepCoefficients;
   options.keepOverlap = keepOverlap;
   options.espPointsAngstrom = readESPPoints(espPointsAngstrom);
+  options.solvent = parseOptionalSolvent(solvent);
+  options.solvationModel = solvationModel;
+  auto gridOpt = optionalInteger(solvationGrid, "solvationGrid");
+  options.solvationGrid = gridOpt ? *gridOpt : 230;
   // Use the active Python runtime when eled is installed; an explicit path
   // remains authoritative, and standalone C++/Python fallback is preserved.
   if (library.empty()) {
@@ -276,6 +370,12 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   options.libraryPath = libObj.is_none() ? std::string() : std::string(py::extract<std::string>(libObj));
   options.keepOverlap = py::extract<bool>(config.attr("keepOverlap"));
   options.espPointsAngstrom = readESPPoints(config.attr("espPointsAngstrom"));
+  if (PyObject_HasAttrString(config.ptr(), "solvent")) {
+    options.solvent = parseOptionalSolvent(config.attr("solvent"));
+    options.solvationModel = py::extract<std::string>(config.attr("solvationModel"));
+    auto gridOpt = optionalInteger(config.attr("solvationGrid"), "solvationGrid");
+    options.solvationGrid = gridOpt ? *gridOpt : 230;
+  }
   applySettings(options, py::object(config.attr("maxIterations")),
                 py::object(config.attr("accuracy")),
                 py::object(config.attr("electronicTemperature")));
@@ -377,7 +477,46 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .def("GetDipole", dipole, "Copy of dipole in e*Bohr, [x,y,z].")
       .def("GetGradient", gradient, "Copy of nuclear gradient in Hartree/Bohr, [atom,xyz].")
       .def("GetWibergBondOrders", bondOrders, "Copy of dimensionless Wiberg bond orders, [atom,atom].")
-      .def("GetOrbitalCoefficients", coefficients, "Copy of optional MO coefficients, [AO,MO].");
+      .def("GetOrbitalCoefficients", coefficients, "Copy of optional MO coefficients, [AO,MO].")
+      .add_property("solvent", getSolvent)
+      .add_property("solvationModel", getSolvationModel)
+      .add_property("solvationGrid", getSolvationGrid)
+      .def_readonly("propertiesExportVerified", &XTBResults::propertiesExportVerified)
+      .add_property("energyDecompositionAvailable", hasEnergyDecomp)
+      .add_property("polarizabilityAvailable", hasPolarizability)
+      .add_property("multipolesAvailable", hasMultipoles)
+      .add_property("nuclearESPAvailable", hasNuclearESP)
+      .add_property("electronicEnergyHartree", eElec)
+      .add_property("repulsionEnergyHartree", eRep)
+      .add_property("electrostaticEnergyHartree", eES)
+      .add_property("anisotropicElectrostaticEnergyHartree", eAES)
+      .add_property("anisotropicXCEnergyHartree", eAXC)
+      .add_property("dispersionEnergyHartree", eDisp)
+      .add_property("halogenBondEnergyHartree", eXB)
+      .add_property("solvationEnergyHartree", gSolv)
+      .add_property("solvationBornEnergyHartree", gBorn)
+      .add_property("solvationSASAEnergyHartree", gSASA)
+      .add_property("solvationHBEnergyHartree", gHB)
+      .add_property("solvationShiftEnergyHartree", gShift)
+      .add_property("fermiLevelAlphaHartree", efaHa)
+      .add_property("fermiLevelBetaHartree", efbHa)
+      .add_property("fermiLevelAlphaEV", efaEV)
+      .add_property("fermiLevelBetaEV", efbEV)
+      .add_property("molecularPolarizabilityAU", molPol)
+      .add_property("molecularC6AU", molC6)
+      .add_property("molecularC8AU", molC8)
+      .def("GetAtomicPolarizabilities", atomicPolarizabilities,
+           "Copy of D4 atomic static dipole polarizabilities in Bohr^3, [atom].")
+      .def("GetAtomicC6", atomicC6,
+           "Copy of D4 homoatomic dispersion coefficients C6_AA in Hartree*Bohr^6, [atom].")
+      .def("GetAtomicDipoles", atomicDipoles,
+           "Copy of CAMM atomic dipoles in e*Bohr, [atom,3].")
+      .def("GetAtomicQuadrupoles", atomicQuadrupoles,
+           "Copy of traceless CAMM atomic quadrupoles in e*Bohr^2 (xx,xy,yy,xz,yz,zz), [atom,6].")
+      .def("GetMolecularQuadrupole", molecularQuadrupole,
+           "Copy of traceless molecular quadrupole in e*Bohr^2 (xx,xy,yy,xz,yz,zz), [6].")
+      .def("GetNuclearESP", nuclearESP,
+           "Copy of exact electrostatic potential at nuclei (EPN, V_N) in Hartree/e, [atom].");
 
   py::def("_RunChargeStates", runStates);
   py::def("RunMol", run,
@@ -386,7 +525,8 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
            py::arg("keepOrbitalCoefficients") = false, py::arg("xtbLibrary") = "",
            py::arg("parameterDirectory") = "", py::arg("maxIterations") = 250,
            py::arg("accuracy") = 1.0, py::arg("electronicTemperature") = 300.0, py::arg("keepOverlap") = false,
-           py::arg("espPointsAngstrom") = py::object()),
+           py::arg("espPointsAngstrom") = py::object(), py::arg("solvent") = py::object(),
+           py::arg("solvationModel") = "alpb", py::arg("solvationGrid") = py::object()),
           "Run a gas-phase xTB single point on an explicit-H 3D RDKit molecule. "
           "Returns (success, XTBResults). xTB failures return False and errorMessage; "
           "numerical getters then raise RuntimeError. Invalid input raises ValueError; "

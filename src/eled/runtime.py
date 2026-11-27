@@ -78,6 +78,7 @@ def _native_diagnostics_build(path):
 
 
 _ESP_EXPORT_PATCH = 'aca69861eaf5e25b5437553c1a7f3c6117091c7abc3e6b3ab900109f50b70cd0'
+_PROPERTIES_EXPORT_PATCH = '56ea1fab2c624e37f851ce3d59d11d73d1a9abd6f9553c5464983c36c07ff817'
 
 
 def _native_esp_build(path):
@@ -90,6 +91,20 @@ def _native_esp_build(path):
         extension = data['source']['esp_extension']
         return (data['capabilities']['esp_api'] == extension['api_version'] == 1
                 and extension['patch_sha256'] == _ESP_EXPORT_PATCH)
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
+def _native_properties_build(path):
+    """Verify extended-properties ABI identity for the selected binary."""
+    try:
+        if not _native_gfn0_build(path):
+            return False
+        record = Path(path).resolve().parent.parent/'share/xtb/eled/build.json'
+        data = json.loads(record.read_text())
+        extension = data['source']['properties_extension']
+        return (data['capabilities']['properties_api'] == extension['api_version'] == 1
+                and extension['patch_sha256'] == _PROPERTIES_EXPORT_PATCH)
     except (OSError, ValueError, KeyError, TypeError):
         return False
 
@@ -216,6 +231,7 @@ def _engine_identity(backend: str, path: str) -> dict:
         identity['native_gfn0'] = _native_gfn0_build(path)
         identity['orbital_basis'] = _native_basis_build(path)
         identity['scf_diagnostics'] = _native_diagnostics_build(path)
+        identity['properties_api'] = _native_properties_build(path)
         identity['extended'] = _extended_libxtb_build(path)
     return identity
 

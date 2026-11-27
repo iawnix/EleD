@@ -12,9 +12,15 @@ from typing import Any, Sequence
 from ..charges import CHARGE_MODEL_CM5, _calc_cm5_charges, _charge_model_for_method
 from ..errors import DescriptorUnavailableError, XTBEnvironmentError, XTBNativeNotFoundError, XTBRunError
 from ..input import _effective_charge_uhf, _input_metadata, _method_flag, _xyz_from_mol
-from ..options import _validate_calculation_settings
+from ..options import _validate_calculation_settings, _validate_solvation_settings
 from ..result import XTBResults, _frontier_energies
-from ..runtime import _engine_identity, _find_xtb_library, _parameter_file, _require_extended_libxtb
+from ..runtime import (
+    _engine_identity,
+    _find_xtb_library,
+    _native_properties_build,
+    _parameter_file,
+    _require_extended_libxtb,
+)
 
 HARTREE_TO_EV = 27.211386245988
 ANGSTROM_TO_BOHR = 1.8897261254578281
@@ -78,6 +84,20 @@ class _NativeXTB:
         self.set_max_iterations = self._bind('xtb_setMaxIter', None, [h, h, ctypes.c_int])
         self.set_accuracy = self._bind('xtb_setAccuracy', None, [h, h, ctypes.c_double])
         self.set_temperature = self._bind('xtb_setElectronicTemp', None, [h, h, ctypes.c_double])
+        self.set_solvent = self._bind(
+            'xtb_setSolvent',
+            None,
+            [
+                h,
+                h,
+                ctypes.c_char_p,
+                ctypes.POINTER(ctypes.c_int),
+                ctypes.POINTER(ctypes.c_double),
+                ctypes.POINTER(ctypes.c_int),
+                ctypes.c_char_p,
+            ],
+        )
+        self.release_solvent = self._bind('xtb_releaseSolvent', None, [h, h])
         self.new_results = self._bind("xtb_newResults", h, [])
         self.copy_results = self._bind("xtb_copyResults", h, [h])
         self.del_results = self._bind("xtb_delResults", None, [ctypes.POINTER(h)])
@@ -137,6 +157,84 @@ class _NativeXTB:
         if not ok:
             raise XTBEnvironmentError('native ESP evaluation failed without a diagnostic')
         return dict(espPointsAngstrom=points, espValuesAU=tuple(values))
+
+    def bind_properties_api(self):
+        if not _native_properties_build(self.library):
+            raise DescriptorUnavailableError(
+                'extended properties require the verified properties extension; rebuild libxtb'
+            )
+        h, i, d = self._handle, ctypes.c_int, ctypes.c_double
+        if self._bind('xtb_rdkit_getPropertiesAPIVersion', i, [])() != 1:
+            raise DescriptorUnavailableError('unsupported native properties API')
+        self.get_energy_decomposition = self._bind(
+            'xtb_rdkit_getEnergyDecomposition', i, [h, h, ctypes.POINTER(i), i, ctypes.POINTER(d)]
+        )
+        self.get_polarizability = self._bind(
+            'xtb_rdkit_getPolarizability',
+            i,
+            [h, h, i, ctypes.POINTER(d), ctypes.POINTER(d), ctypes.POINTER(d)],
+        )
+        self.get_multipoles = self._bind(
+            'xtb_rdkit_getMultipoles',
+            i,
+            [h, h, i, ctypes.POINTER(d), ctypes.POINTER(d), ctypes.POINTER(d)],
+        )
+        self.get_nuclear_esp = self._bind(
+            'xtb_rdkit_getNuclearESP', i, [h, h, i, ctypes.POINTER(d)]
+        )
+
+    def properties_data(self, environment, results, natoms):
+        out: dict[str, Any] = {}
+        flags = ctypes.c_int(0)
+        evals = (ctypes.c_double * 15)()
+        if self.get_energy_decomposition(environment, results, ctypes.byref(flags), 15, evals):
+            f = int(flags.value)
+            out['energyDecompositionFlags'] = f
+            out['electronicEnergyHartree'] = float(evals[1]) if (f & 2) else None
+            out['repulsionEnergyHartree'] = float(evals[2]) if (f & 4) else None
+            out['electrostaticEnergyHartree'] = float(evals[3]) if (f & 8) else None
+            out['anisotropicElectrostaticEnergyHartree'] = float(evals[4]) if (f & 16) else None
+            out['anisotropicXCEnergyHartree'] = float(evals[5]) if (f & 32) else None
+            out['dispersionEnergyHartree'] = float(evals[6]) if (f & 64) else None
+            out['halogenBondEnergyHartree'] = float(evals[7]) if (f & 128) else None
+            out['solvationEnergyHartree'] = float(evals[8]) if (f & 256) else None
+            if f & 512:
+                out['fermiLevelAlphaHartree'] = float(evals[9])
+                out['fermiLevelBetaHartree'] = float(evals[10])
+                out['fermiLevelAlphaEV'] = float(evals[9] * HARTREE_TO_EV)
+                out['fermiLevelBetaEV'] = float(evals[10] * HARTREE_TO_EV)
+            if f & 1024:
+                out['solvationBornEnergyHartree'] = float(evals[11])
+                out['solvationSASAEnergyHartree'] = float(evals[12])
+                out['solvationHBEnergyHartree'] = float(evals[13])
+                out['solvationShiftEnergyHartree'] = float(evals[14])
+        mol_pol = (ctypes.c_double * 3)()
+        alpha_atom = (ctypes.c_double * natoms)()
+        c6_atom = (ctypes.c_double * natoms)()
+        if self.get_polarizability(environment, results, natoms, mol_pol, alpha_atom, c6_atom):
+            out['molecularPolarizabilityAU'] = float(mol_pol[0])
+            out['molecularC6AU'] = float(mol_pol[1])
+            out['molecularC8AU'] = float(mol_pol[2])
+            out['atomicPolarizabilitiesAU'] = tuple(float(v) for v in alpha_atom)
+            out['atomicC6AU'] = tuple(float(v) for v in c6_atom)
+        dip_atom = (ctypes.c_double * (3 * natoms))()
+        qp_atom = (ctypes.c_double * (6 * natoms))()
+        mol_qp = (ctypes.c_double * 6)()
+        if self.get_multipoles(environment, results, natoms, dip_atom, qp_atom, mol_qp):
+            out['atomicDipolesAU'] = tuple(
+                tuple(float(dip_atom[3 * i + k]) for k in range(3)) for i in range(natoms)
+            )
+            out['atomicQuadrupolesAU'] = tuple(
+                tuple(float(qp_atom[6 * i + k]) for k in range(6)) for i in range(natoms)
+            )
+            out['molecularQuadrupoleAU'] = tuple(float(v) for v in mol_qp)
+        nuclear_esp = (ctypes.c_double * natoms)()
+        epn_ok = self.get_nuclear_esp(environment, results, natoms, nuclear_esp)
+        self.check(environment, 'nuclear ESP evaluation')
+        if not epn_ok:
+            raise XTBEnvironmentError('native nuclear ESP evaluation failed without a diagnostic')
+        out['nuclearESPAU'] = tuple(float(v) for v in nuclear_esp)
+        return out
 
     def basis_data(self, environment, results, natoms, nao):
         sizes = (ctypes.c_int * 3)()
@@ -207,6 +305,9 @@ def _run_xtb_native(
     maxIterations: int = 250,
     accuracy: float = 1.0,
     electronicTemperature: float = 300.0,
+    solvent: str | None = None,
+    solvationModel: str = "alpb",
+    solvationGrid: int | None = None,
     _restart=None,
     _save_restart=None,
     _return_gradient=False,
@@ -216,6 +317,10 @@ def _run_xtb_native(
     from ..esp_input import _normalize_esp_points
     espPointsAngstrom = _normalize_esp_points(espPointsAngstrom)
     settings = _validate_calculation_settings(maxIterations, accuracy, electronicTemperature)
+    solvent_val, solv_model, solv_grid = _validate_solvation_settings(
+        solvent, solvationModel, solvationGrid
+    )
+    eff_solv_grid = (230 if solv_grid is None else solv_grid) if solvent_val is not None else None
     mol = Chem.Mol(mol)  # Own the exact geometry/topology while ctypes releases the GIL.
     if not isinstance(keepOverlap, bool):
         raise ValueError('keepOverlap must be a bool')
@@ -288,6 +393,18 @@ def _run_xtb_native(
         parameter_path = os.fsencode(parameter['path']) if parameter else None
         getattr(library, loader_name)(environment, molecule, calculator, parameter_path)
         library.check(environment, "parameter loading")
+        if solvent_val is not None:
+            grid_arg = ctypes.c_int(eff_solv_grid)
+            library.set_solvent(
+                environment,
+                calculator,
+                solvent_val.encode('utf-8'),
+                None,
+                None,
+                ctypes.byref(grid_arg),
+                solv_model.encode('utf-8'),
+            )
+            library.check(environment, "solvation setup")
         library.set_max_iterations(environment, calculator, settings['max_iterations'])
         library.set_accuracy(environment, calculator, settings['accuracy'])
         library.set_temperature(environment, calculator, settings['electronic_temperature'])
@@ -334,6 +451,10 @@ def _run_xtb_native(
         homo, lumo = _frontier_energies(energies_ev, occupation_values)
         esp = library.esp_data(environment, results, espPointsAngstrom) if espPointsAngstrom else {}
         basis = library.basis_data(environment, results, natoms, nao.value) if keepOverlap else {}
+        props = {}
+        if _native_properties_build(library.library):
+            library.bind_properties_api()
+            props = library.properties_data(environment, results, natoms)
         from ..runtime import _native_diagnostics_build
         from ..scf import scf_record
         scf = scf_record(method_name)
@@ -366,6 +487,10 @@ def _run_xtb_native(
         return XTBResults(
             **esp,
             **basis,
+            **props,
+            solvent=solvent_val,
+            solvationModel=(solv_model if solvent_val is not None else None),
+            solvationGrid=eff_solv_grid,
             gradientHartreePerBohr=grad_rows,
             method=method_name,
             version=engine["version"],
@@ -408,7 +533,12 @@ def _run_xtb_native(
                 'scf': scf,
                 'initialization': 'reference' if _restart else 'independent',
                 'optimize': False,
-                'solvent': None,
+                'solvent': (
+                    None
+                    if solvent_val is None
+                    else {'solvent': solvent_val, 'model': solv_model, 'grid': eff_solv_grid}
+                ),
+                **({'properties_api': 1} if props else {}),
                 'engine': engine,
                 'parameter_file': parameter,
                 'native_api_version': int(library.get_api_version()),
@@ -456,8 +586,11 @@ def run_xtb_native(
     maxIterations=250,
     accuracy=1.0,
     electronicTemperature=300.0,
+    solvent=None,
+    solvationModel='alpb',
+    solvationGrid=None,
 ):
-    """Run an independently initialized gas-phase libxtb single point."""
+    """Run an independently initialized libxtb single point."""
     return _run_xtb_native(
         mol,
         confId=confId,
@@ -470,6 +603,9 @@ def run_xtb_native(
         maxIterations=maxIterations,
         accuracy=accuracy,
         electronicTemperature=electronicTemperature,
+        solvent=solvent,
+        solvationModel=solvationModel,
+        solvationGrid=solvationGrid,
     )
 
 

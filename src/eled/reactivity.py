@@ -170,6 +170,7 @@ def CalcReactivityDescriptors(
             meta.get('engine', {}).get('sha256'),
             (meta.get('parameter_file') or {}).get('sha256'),
             meta.get('calculation_settings'),
+            meta.get('solvent'),
         )
 
     states = {}

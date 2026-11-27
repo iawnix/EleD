@@ -1,5 +1,20 @@
 # Changes
 
+## 0.13.0 — Extended libxtb properties ABI, surface ESP, orbital/LMO analysis, implicit solvation and thermochemistry
+
+- **Tier 1 — ESP surface & single-point orbital/bond descriptors**:
+  - Added `ESPSurfaceGrid`, `GenerateESPSurfaceGrid` (exposed scaled RDKit vdW Fibonacci shells with atom ownership and area weights), and `CalcESPSurfaceDescriptors` (Politzer–Murray molecular and per-atom `v_min_au`, `v_max_au`, `v_mean_au`, `v_pos_mean_au`, `v_neg_mean_au`, `v_pos_frac`, `v_neg_frac`, `pi_esp_au`, `sigma2_pos_au2`, `sigma2_neg_au2`, `sigma2_tot_au2`, `nu`, `nu_sigma2_au2`, per-atom `sigma2_au2`, plus optional kcal/mol counterparts).
+  - Added `CalcOrbitalWeightedFukui` (Pino-Rios / Martínez-Araya orbital-weighted `f_w_plus`, `f_w_minus`, `f_w_radical`, `dual_w` from one retained calculation), `CalcAtomicOrbitalEnergies` (atomic `occ_n_e`, `vir_n`, `occ_e_mean_ev` = negative condensed ALIE proxy, `vir_e_mean_ev`, frontier-weighted energies, and HOMO/LUMO PDOS windows), and `CalcBondOverlapDescriptors` (bond `coop_e`, `ecohp_ev`, and Mulliken/CM5 polarity descriptors `delta_q_e`, `signed_delta_q_e`, `q_prod_e2`, `delta_cm5_q_e`, `signed_delta_cm5_q_e`, `cm5_q_prod_e2`).
+- **Tier 2 — Extended `libxtb` properties C ABI v1 & C++/Python parity**:
+  - Added reviewed patch `tools/diagnostics/xtb_properties_export.patch` and ABI verification script `tools/diagnostics/verify_properties.py` exporting `xtb_rdkit_getPropertiesAPIVersion`, `xtb_rdkit_getEnergyDecomposition`, `xtb_rdkit_getPolarizability`, `xtb_rdkit_getMultipoles`, and `xtb_rdkit_getNuclearESP` (exact EPN omitting the singular self-nuclear $Z_A/r_{iA}$ term).
+  - Exposed all new properties, NumPy getters, and availability flags symmetrically in C++ `rdXTBTools` (`XTBResults`) and Python `XTBResults` / `native` backend, with full `ToDict`/`FromDict`, `XTBDiskCache`, and spawned-worker serialization parity.
+  - Added `CalcEnergyDecomposition`, `CalcMultipoleDescriptors` (rotational-invariant norms, eigenvalues, Frobenius norms, anisotropies), `CalcNuclearESP`, `CalcPolarizabilityDescriptors` (analytical D4 `mol_pol_bohr3`, `mol_c6_ha_bohr6`, `mol_c8_ha_bohr8`, atomic `alpha_bohr3` and `c6_aa_ha_bohr6`), and `CalcFiniteFieldPolarizability` (explicitly raising `DescriptorUnavailableError` documenting `libxtb` 6.7.1 C API scope).
+- **Tier 3 — Pipek–Mezey LMOs, ALPB/GBSA solvation and vibrational thermochemistry**:
+  - Added `CalcLocalizedOrbitals` (Pipek–Mezey 2×2 Jacobi localization in Löwdin and symmetrized Mulliken schemes with lone-pair/bond/delocalized classification, rotated Fock energies, centroids, and explicit open-shell/fractional withholding).
+  - Bound `xtb_setSolvent` via optional `solvent`, `solvationModel` (`"alpb"` / `"gbsa"`), and `solvationGrid` across `XTBOptions`, `XTBCalculator`, `RunXTBBatch`, `XTBCacheKey`, and `rdXTBTools.RunMol` (gas-phase defaults and cache keys preserved when `solvent=None`), and added `CalcSolvationDescriptors`.
+  - Added `CalcVibrationalThermochemistry` (central finite-difference Cartesian Hessian and dipole derivatives from analytical `GetGradient()`, harmonic frequencies, double-harmonic IR intensities, RRHO/qRRHO ZPE/U/H/S/G, linear/monoatomic handling, and explicit non-stationary geometry flagging).
+  - Updated `DescriptorCatalog()` and `DescriptorStatus()` with all new sections and maturity classifications.
+
 ## 0.12.0 — RDKit interface alignment, single-step wrappers and C++ CM5 parity
 
 Breaking pre-1.0 API alignment:

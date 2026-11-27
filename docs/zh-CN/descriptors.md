@@ -117,6 +117,83 @@ report = RunReactivity(mol, populationScheme="lowdin", returnErrors=True)
 `omega_loc_ev` 和 `n_loc_1ev`。该流程支持 GFN1/2，
 不自动搜索自旋态，也不进行电荷态几何优化。
 
+## 轨道加权反应性、ALIE/PDOS、COOP/ECOHP 与 Pipek–Mezey 局域轨道
+
+在同一次 `keepOverlap=True` 单点结果上，可直接提取以下单点轨道与键分析描述符，不再调用引擎：
+
+```python
+from eled import (
+    XTBCalculator, CalcOrbitalWeightedFukui, CalcAtomicOrbitalEnergies,
+    CalcBondOverlapDescriptors, CalcLocalizedOrbitals,
+)
+
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
+owf = CalcOrbitalWeightedFukui(result, deltaEV=0.5, scheme="lowdin")
+aoe = CalcAtomicOrbitalEnergies(result, scheme="lowdin", windowEV=2.0)
+bond_ovlp = CalcBondOverlapDescriptors(mol, result)
+lmo = CalcLocalizedOrbitals(mol, result, scheme="lowdin")
+```
+
+- `CalcOrbitalWeightedFukui` 计算以 $\mu = (\mathrm{HOMO}+\mathrm{LUMO})/2$ 为中心的高斯轨道加权
+  `f_w_plus`、`f_w_minus`、`f_w_radical` 和 `dual_w`（精确满足求和规则）。
+- `CalcAtomicOrbitalEnergies` 返回原子占据/虚轨道布居（`occ_n_e`、`vir_n`）、平均占据轨道能
+  `occ_e_mean_ev`（凝聚态 ALIE 代理量的相反数：$\mathrm{ALIE}_A = -\bar{\varepsilon}_{\mathrm{occ},A}$）、
+  `vir_e_mean_ev`、前线高斯加权轨道能以及 HOMO/LUMO PDOS 窗口（`pdos_homo_win_e`、`pdos_lumo_win`）。
+- `CalcBondOverlapDescriptors` 为每条 RDKit 键计算 `coop_e`（成键为正）、`ecohp_ev`（成键稳定化为负）
+  以及引擎/CM5 键极性（`delta_q_e`、`signed_delta_q_e`、`q_prod_e2` 及对应 `*_cm5_*` 字段；GFN0 的 CM5 字段为 `None`）。
+- `CalcLocalizedOrbitals` 使用 2×2 Jacobi 旋转执行 Pipek–Mezey 局域化（`"lowdin"` 或对称化 `"mulliken"`），
+  输出 `lone_pair`/`bond`/`delocalized` 分类、旋转 Fock 对角能 `lmo_energy_ev`、质心 `centroid_a`
+  以及原子孤对数 `n_lone_pairs`、局域键数 `n_localized_bonds` 和最高孤对能 `max_lone_pair_energy_ev`；
+  开壳层、未知自旋或分数占据体系显式返回 `None` 及 `missing` 原因。
+
+## 扩展 `libxtb` 性质（能量分解、多极矩、极化率与原子核静电势）
+
+扩展性质 ABI v1 在每次成功的 GFN0/1/2 单点计算中自动导出能量分解、费米能级、原子核静电势（EPN）、
+D4 极化率（GFN2/GFN0）与 CAMM 多极矩（GFN2/GFN1），原生与编译 `rdXTBTools` 结果完全等价：
+
+```python
+from eled import (
+    XTBCalculator, CalcEnergyDecomposition, CalcMultipoleDescriptors,
+    CalcPolarizabilityDescriptors, CalcNuclearESP,
+)
+
+result = XTBCalculator(method="GFN2-xTB").Calculate(mol)
+decomp = CalcEnergyDecomposition(result)
+multipoles = CalcMultipoleDescriptors(result, mol=mol)
+pol = CalcPolarizabilityDescriptors(result, mol=mol)
+epn = CalcNuclearESP(result, mol=mol)
+```
+
+不适用的方法项绝不填零：GFN0/1 的 `e_aes_ha`/`e_axc_ha` 为 `None`，GFN2 的 `e_xb_ha` 为 `None`，
+气相的 `g_solv_ha` 为 `None`，`electronicTemperature <= 0.1 K` 时费米能级为 `None`，
+GFN0 的多极矩返回 `available=False`，GFN1（使用 DFT-D3）的 D4 极化率/C6/C8 返回 `available=False`。
+`CalcFiniteFieldPolarizability(mol, *, options=None, fieldAU=0.001)` 显式抛出
+`DescriptorUnavailableError`，说明 `libxtb` 6.7.1（未启用 `tblite`/PTB）不支持 GFN0/1/2 的外电场响应，
+应使用解析 D4 的 `CalcPolarizabilityDescriptors(result)`。
+
+## 隐式溶剂化（ALPB/GBSA）与振动热化学
+
+`XTBOptions`、`XTBCalculator`、`RunXTBBatch` 和 `rdXTBTools.RunMol` 均支持可选的
+`solvent`（默认 `None` 保持气相行为与缓存键不变）、`solvationModel`（`"alpb"` 或 `"gbsa"`）和
+`solvationGrid`。`CalcSolvationDescriptors` 在固定几何下运行配对的气相与溶剂单点；
+`CalcVibrationalThermochemistry` 通过解析梯度 `GetGradient()` 的中心有限差分计算笛卡尔 Hessian 与偶极导数：
+
+```python
+from eled import CalcSolvationDescriptors, CalcVibrationalThermochemistry
+
+solv = CalcSolvationDescriptors(mol, "water", method="GFN2-xTB", solvationModel="alpb")
+thermo = CalcVibrationalThermochemistry(
+    mol, method="GFN2-xTB", temperatureK=298.15, pressureAtm=1.0, symmetryNumber=1
+)
+```
+
+`CalcSolvationDescriptors` 返回 `delta_g_solv_ha`/`kcalmol`、直接溶剂能 `g_solv_direct_ha`、
+溶质极化能 `solute_polarization_energy_ha`、Born/SASA/HB/shift 分项（GFN1/2）、偶极与前线能级位移
+以及原子电荷位移（`delta_q_e`、`delta_cm5_q_e`）。`CalcVibrationalThermochemistry` 返回谐振频率
+`frequencies_cm1`、红外强度 `ir_intensities_km_mol`、转动常数 `rotational_constants_cm1` 及
+RRHO（`rotorCutoffCm1=0`）或 Grimme qRRHO（默认 `rotorCutoffCm1=100.0`）的 ZPE/U/H/S/G，
+并通过 `is_stationary_point=False` 和 `warnings` 明确标记非驻点几何或虚频。
+
 ## 缺失值和不变性
 
 `None` 表示不可用或定义域不满足，不能当成零。报告中的 `missing` 字段会

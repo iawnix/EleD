@@ -69,6 +69,42 @@ class XTBResults:
     espPointsAngstrom: tuple[tuple[float, ...], ...] = ()
     espValuesAU: tuple[float, ...] = ()
 
+    # Implicit solvation provenance (None when gas phase).
+    solvent: str | None = None
+    solvationModel: str | None = None
+    solvationGrid: int | None = None
+
+    # Extended properties ABI v1 (None / empty tuple when unavailable).
+    energyDecompositionFlags: int = 0
+    electronicEnergyHartree: float | None = None
+    repulsionEnergyHartree: float | None = None
+    electrostaticEnergyHartree: float | None = None
+    anisotropicElectrostaticEnergyHartree: float | None = None
+    anisotropicXCEnergyHartree: float | None = None
+    dispersionEnergyHartree: float | None = None
+    halogenBondEnergyHartree: float | None = None
+    solvationEnergyHartree: float | None = None
+    solvationBornEnergyHartree: float | None = None
+    solvationSASAEnergyHartree: float | None = None
+    solvationHBEnergyHartree: float | None = None
+    solvationShiftEnergyHartree: float | None = None
+    fermiLevelAlphaHartree: float | None = None
+    fermiLevelBetaHartree: float | None = None
+    fermiLevelAlphaEV: float | None = None
+    fermiLevelBetaEV: float | None = None
+
+    molecularPolarizabilityAU: float | None = None
+    molecularC6AU: float | None = None
+    molecularC8AU: float | None = None
+    atomicPolarizabilitiesAU: tuple[float, ...] = ()
+    atomicC6AU: tuple[float, ...] = ()
+
+    atomicDipolesAU: tuple[tuple[float, ...], ...] = ()
+    atomicQuadrupolesAU: tuple[tuple[float, ...], ...] = ()
+    molecularQuadrupoleAU: tuple[float, ...] = ()
+
+    nuclearESPAU: tuple[float, ...] = ()
+
     def __post_init__(self) -> None:
         if self.chargeModel == "unknown":
             model = {
@@ -110,6 +146,27 @@ class XTBResults:
     @property
     def espSampled(self) -> bool:
         return self.success and bool(self.espValuesAU)
+
+    @property
+    def energyDecompositionAvailable(self) -> bool:
+        return self.success and bool(self.energyDecompositionFlags)
+
+    @property
+    def polarizabilityAvailable(self) -> bool:
+        return self.success and self.molecularPolarizabilityAU is not None and bool(self.atomicPolarizabilitiesAU)
+
+    @property
+    def multipolesAvailable(self) -> bool:
+        return (
+            self.success
+            and bool(self.atomicDipolesAU)
+            and bool(self.atomicQuadrupolesAU)
+            and len(self.molecularQuadrupoleAU) == 6
+        )
+
+    @property
+    def nuclearESPAvailable(self) -> bool:
+        return self.success and bool(self.nuclearESPAU)
 
     @property
     def homoEV(self) -> float | None:
@@ -232,6 +289,48 @@ class XTBResults:
         if not len(self.espValuesAU):
             raise ValueError("ESP was not sampled; pass espPointsAngstrom")
         return np.array(self.espValuesAU, dtype=float, copy=True)
+
+    def GetAtomicPolarizabilities(self) -> np.ndarray:
+        """Copy of D4 atomic static dipole polarizabilities in Bohr^3, [atom]."""
+        self._require_success()
+        if not len(self.atomicPolarizabilitiesAU):
+            raise ValueError("D4 polarizabilities are unavailable for this calculation")
+        return np.array(self.atomicPolarizabilitiesAU, dtype=float, copy=True)
+
+    def GetAtomicC6(self) -> np.ndarray:
+        """Copy of D4 homoatomic dispersion coefficients C6_AA in Hartree*Bohr^6, [atom]."""
+        self._require_success()
+        if not len(self.atomicC6AU):
+            raise ValueError("D4 atomic C6 coefficients are unavailable for this calculation")
+        return np.array(self.atomicC6AU, dtype=float, copy=True)
+
+    def GetAtomicDipoles(self) -> np.ndarray:
+        """Copy of CAMM atomic dipoles in e*Bohr, [atom, 3]."""
+        self._require_success()
+        if not len(self.atomicDipolesAU):
+            raise ValueError("Atomic dipoles are unavailable for this calculation")
+        return np.array(self.atomicDipolesAU, dtype=float, copy=True)
+
+    def GetAtomicQuadrupoles(self) -> np.ndarray:
+        """Copy of traceless CAMM atomic quadrupoles in e*Bohr^2 (xx,xy,yy,xz,yz,zz), [atom, 6]."""
+        self._require_success()
+        if not len(self.atomicQuadrupolesAU):
+            raise ValueError("Atomic quadrupoles are unavailable for this calculation")
+        return np.array(self.atomicQuadrupolesAU, dtype=float, copy=True)
+
+    def GetMolecularQuadrupole(self) -> np.ndarray:
+        """Copy of traceless molecular quadrupole in e*Bohr^2 (xx,xy,yy,xz,yz,zz), [6]."""
+        self._require_success()
+        if len(self.molecularQuadrupoleAU) != 6:
+            raise ValueError("Molecular quadrupole is unavailable for this calculation")
+        return np.array(self.molecularQuadrupoleAU, dtype=float, copy=True)
+
+    def GetNuclearESP(self) -> np.ndarray:
+        """Copy of exact electrostatic potential at nuclei (EPN, V_N) in Hartree/e, [atom]."""
+        self._require_success()
+        if not len(self.nuclearESPAU):
+            raise ValueError("Nuclear ESP is unavailable for this calculation")
+        return np.array(self.nuclearESPAU, dtype=float, copy=True)
 
     def ToDict(self) -> dict[str, Any]:
         """Return a JSON-serializable dictionary of owned result fields."""
