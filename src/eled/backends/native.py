@@ -18,6 +18,7 @@ from ..runtime import (
     _engine_identity,
     _find_xtb_library,
     _native_properties_build,
+    _native_realspace_build,
     _parameter_file,
     _require_extended_libxtb,
 )
@@ -157,6 +158,61 @@ class _NativeXTB:
         if not ok:
             raise XTBEnvironmentError('native ESP evaluation failed without a diagnostic')
         return dict(espPointsAngstrom=points, espValuesAU=tuple(values))
+
+    def bind_realspace_api(self):
+        if not _native_realspace_build(self.library):
+            raise DescriptorUnavailableError(
+                'real-space evaluation requires the verified realspace extension; rebuild libxtb'
+            )
+        h, i, d = self._handle, ctypes.c_int, ctypes.c_double
+        if self._bind('xtb_rdkit_getRealSpaceAPIVersion', i, [])() != 1:
+            raise DescriptorUnavailableError('unsupported native real-space API')
+        self.eval_realspace = self._bind(
+            'xtb_rdkit_evalRealSpace',
+            i,
+            [
+                h,
+                h,
+                i,
+                ctypes.POINTER(d),
+                d,
+                d,
+                ctypes.POINTER(d),
+                ctypes.POINTER(d),
+                ctypes.POINTER(d),
+                ctypes.POINTER(d),
+            ],
+        )
+
+    def realspace_data(self, environment, results, points, occ_threshold=1e-7, lea_window_ev=0.0):
+        count = len(points)
+        xyz = (ctypes.c_double * (3 * count))(*(v * ANGSTROM_TO_BOHR for row in points for v in row))
+        density = (ctypes.c_double * count)()
+        alie = (ctypes.c_double * count)()
+        vir_density = (ctypes.c_double * count)()
+        lea = (ctypes.c_double * count)()
+        ok = self.eval_realspace(
+            environment,
+            results,
+            count,
+            xyz,
+            float(occ_threshold),
+            float(lea_window_ev),
+            density,
+            alie,
+            vir_density,
+            lea,
+        )
+        self.check(environment, 'real-space evaluation')
+        if not ok:
+            raise XTBEnvironmentError('native real-space evaluation failed without a diagnostic')
+        return dict(
+            realSpacePointsAngstrom=points,
+            realSpaceDensityAU=tuple(float(v) for v in density),
+            realSpaceALIEEV=tuple(float(v) for v in alie),
+            realSpaceVirtualDensityAU=tuple(float(v) for v in vir_density),
+            realSpaceLEAEV=tuple(float(v) for v in lea),
+        )
 
     def bind_properties_api(self):
         if not _native_properties_build(self.library):
@@ -302,6 +358,9 @@ def _run_xtb_native(
     xtbLibrary: str | os.PathLike[str] | None = None,
     keepOverlap: bool = False,
     espPointsAngstrom=(),
+    realSpacePointsAngstrom=(),
+    realSpaceOccupationThreshold: float = 1e-7,
+    realSpaceLEAWindowEV: float = 0.0,
     maxIterations: int = 250,
     accuracy: float = 1.0,
     electronicTemperature: float = 300.0,
@@ -311,11 +370,24 @@ def _run_xtb_native(
     _restart=None,
     _save_restart=None,
     _return_gradient=False,
+    _keep_esp_for_hook: bool = False,
+    _post_singlepoint_hook=None,
 ) -> XTBResults:
     """Run a single point through a shared ``libxtb`` C API library."""
+    import math
+    from numbers import Real
     from rdkit import Chem
     from ..esp_input import _normalize_esp_points
     espPointsAngstrom = _normalize_esp_points(espPointsAngstrom)
+    realSpacePointsAngstrom = _normalize_esp_points(realSpacePointsAngstrom)
+    for label, val in (
+        ('realSpaceOccupationThreshold', realSpaceOccupationThreshold),
+        ('realSpaceLEAWindowEV', realSpaceLEAWindowEV),
+    ):
+        if isinstance(val, bool) or not isinstance(val, Real) or not math.isfinite(val) or val < 0:
+            raise ValueError(f'{label} must be a finite nonnegative real number')
+    realSpaceOccupationThreshold = float(realSpaceOccupationThreshold)
+    realSpaceLEAWindowEV = float(realSpaceLEAWindowEV)
     settings = _validate_calculation_settings(maxIterations, accuracy, electronicTemperature)
     solvent_val, solv_model, solv_grid = _validate_solvation_settings(
         solvent, solvationModel, solvationGrid
@@ -332,8 +404,11 @@ def _run_xtb_native(
     library = _NativeXTB(_find_xtb_library(xtbLibrary))
     _require_extended_libxtb(library.library)
     engine = _engine_identity('native', library.library)
-    if espPointsAngstrom:
+    need_esp = bool(espPointsAngstrom) or bool(_keep_esp_for_hook)
+    if need_esp:
         library.bind_esp_api()
+    if realSpacePointsAngstrom:
+        library.bind_realspace_api()
     if keepOverlap:
         if not engine['orbital_basis']:
             raise DescriptorUnavailableError(
@@ -417,7 +492,7 @@ def _run_xtb_native(
         if keepOverlap:
             library.set_keep_overlap(environment, results, True)
             library.check(environment, "basis retention setup")
-        if espPointsAngstrom:
+        if need_esp:
             library.set_keep_esp(environment, results, True)
             library.check(environment, "ESP retention setup")
         library.singlepoint(environment, molecule, calculator, results)
@@ -450,6 +525,24 @@ def _run_xtb_native(
         occupation_values = tuple(float(value) for value in occupations)
         homo, lumo = _frontier_energies(energies_ev, occupation_values)
         esp = library.esp_data(environment, results, espPointsAngstrom) if espPointsAngstrom else {}
+        realspace = (
+            library.realspace_data(
+                environment,
+                results,
+                realSpacePointsAngstrom,
+                occ_threshold=realSpaceOccupationThreshold,
+                lea_window_ev=realSpaceLEAWindowEV,
+            )
+            if realSpacePointsAngstrom
+            else {}
+        )
+        if _post_singlepoint_hook is not None:
+            hook_out = _post_singlepoint_hook(library, environment, results, natoms, nao.value)
+            if isinstance(hook_out, dict):
+                if 'esp' in hook_out:
+                    esp = hook_out['esp']
+                if 'realspace' in hook_out:
+                    realspace = hook_out['realspace']
         basis = library.basis_data(environment, results, natoms, nao.value) if keepOverlap else {}
         props = {}
         if _native_properties_build(library.library):
@@ -486,6 +579,7 @@ def _run_xtb_native(
         )
         return XTBResults(
             **esp,
+            **realspace,
             **basis,
             **props,
             solvent=solvent_val,
@@ -558,6 +652,23 @@ def _run_xtb_native(
                     if esp
                     else {}
                 ),
+                **(
+                    {
+                        'realspace': {
+                            'api_version': 1,
+                            'density_unit': 'e/bohr^3',
+                            'alie_unit': 'eV',
+                            'virtual_density_unit': '1/bohr^3',
+                            'lea_unit': 'eV',
+                            'coordinate_unit': 'angstrom',
+                            'occupation_threshold': realSpaceOccupationThreshold,
+                            'lea_window_ev': realSpaceLEAWindowEV,
+                            'source': 'native_cartesian_gto',
+                        }
+                    }
+                    if realspace
+                    else {}
+                ),
                 'overlap_source': 'same libxtb calculation' if keepOverlap else None,
                 **(
                     {'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
@@ -583,6 +694,9 @@ def run_xtb_native(
     xtbLibrary=None,
     keepOverlap=False,
     espPointsAngstrom=(),
+    realSpacePointsAngstrom=(),
+    realSpaceOccupationThreshold=1e-7,
+    realSpaceLEAWindowEV=0.0,
     maxIterations=250,
     accuracy=1.0,
     electronicTemperature=300.0,
@@ -600,6 +714,9 @@ def run_xtb_native(
         xtbLibrary=xtbLibrary,
         keepOverlap=keepOverlap,
         espPointsAngstrom=espPointsAngstrom,
+        realSpacePointsAngstrom=realSpacePointsAngstrom,
+        realSpaceOccupationThreshold=realSpaceOccupationThreshold,
+        realSpaceLEAWindowEV=realSpaceLEAWindowEV,
         maxIterations=maxIterations,
         accuracy=accuracy,
         electronicTemperature=electronicTemperature,

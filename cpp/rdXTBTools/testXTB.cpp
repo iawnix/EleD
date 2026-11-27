@@ -209,7 +209,28 @@ int main() {
       RDKit::XTBTools::runMol(mol, intermediate, badOpts);
     } catch (const std::invalid_argument &) { badSolvRejected = true; }
     require(badSolvRejected, "Invalid solvationModel was not rejected");
-    std::cout << "C++ GFN2, GFN0 guard/state, properties ABI, solvation, SCF failure recovery, and serialization passed\n";
+    // Real-space wavefunction ABI checks.
+    require(before.realSpaceExportVerified, "Real-space ABI was not verified");
+    RDKit::XTBTools::XTBOptions rsOpts;
+    rsOpts.confId = 7;
+    rsOpts.realSpacePointsAngstrom = {0.0, 0.0, 1.0, 0.5, 0.3, 0.2};
+    RDKit::XTBTools::XTBResults rsRes;
+    require(RDKit::XTBTools::runMol(mol, rsRes, rsOpts), "Real-space sampling failed");
+    require(rsRes.realSpaceDensityAU.size() == 2 && rsRes.realSpaceALIEEV.size() == 2 &&
+            rsRes.realSpaceVirtualDensityAU.size() == 2 && rsRes.realSpaceLEAEV.size() == 2,
+            "Real-space output dimensions incorrect");
+    require(rsRes.realSpaceDensityAU[0] > 0.0 && rsRes.realSpaceDensityAU[1] > 0.0 &&
+            rsRes.realSpaceALIEEV[0] > 5.0 && rsRes.realSpaceALIEEV[1] > 5.0 &&
+            rsRes.realSpaceVirtualDensityAU[0] >= 0.0,
+            "Real-space density/ALIE values out of physical range");
+    bool badRsRejected = false;
+    try {
+      auto badRs = rsOpts;
+      badRs.realSpaceOccupationThreshold = -0.1;
+      RDKit::XTBTools::runMol(mol, intermediate, badRs);
+    } catch (const std::invalid_argument &) { badRsRejected = true; }
+    require(badRsRejected, "Negative realSpaceOccupationThreshold was not rejected");
+    std::cout << "C++ GFN2, GFN0 guard/state, properties ABI, real-space ABI, solvation, SCF failure recovery, and serialization passed\n";
     return 0;
   } catch (const std::exception &error) {
     std::cerr << error.what() << '\n';

@@ -25,6 +25,7 @@ from .electronic_descriptors import (
     CalcXTBBondDescriptors,
     CalcXTBFragmentDescriptors,
 )
+from .electric_field import CalcBondElectricField, CalcBondElectricFieldFromESP
 from .errors import (
     DescriptorUnavailableError,
     XTBCacheError,
@@ -41,6 +42,7 @@ from .esp_descriptors import (
     ESPSurfaceGrid,
     GenerateESPSurfaceGrid,
 )
+from .fod import CalcFODFromResult, RunFOD
 from .geometry import ConformerGenerationResult, PrepareConformers
 from .local_geometry import (
     AnalyzeLocalGeometry,
@@ -58,6 +60,7 @@ from .options import XTBOptions
 from .orbital_descriptors import (
     CalcAtomicOrbitalEnergies,
     CalcBondOverlapDescriptors,
+    CalcLinearResponseMatrix,
     CalcOrbitalWeightedFukui,
 )
 from .persistence import ReactivityCheckpoint, XTBDiskCache
@@ -71,6 +74,11 @@ from .properties import (
 from .rdkit_descriptors import CalcMolXTBDescriptors, RegisterRDKitProperties
 from .reactivity import CalcReactivityDescriptors, ChargeStateCalculationError, RunReactivity
 from .reactivity_batch import ReactivityJob, RunReactivityBatch
+from .realspace import (
+    CalcDensityIsosurface,
+    CalcRealSpaceProperties,
+    CalcRealSpaceSurfaceDescriptors,
+)
 from .reports import (
     DESCRIPTOR_VERSION,
     AssessDescriptorQuality,
@@ -161,7 +169,15 @@ __all__ = [
     "CalcOrbitalWeightedFukui",
     "CalcAtomicOrbitalEnergies",
     "CalcBondOverlapDescriptors",
+    "CalcLinearResponseMatrix",
     "CalcLocalizedOrbitals",
+    "CalcFODFromResult",
+    "RunFOD",
+    "CalcBondElectricField",
+    "CalcBondElectricFieldFromESP",
+    "CalcRealSpaceProperties",
+    "CalcRealSpaceSurfaceDescriptors",
+    "CalcDensityIsosurface",
     "CalcEnergyDecomposition",
     "CalcMultipoleDescriptors",
     "CalcNuclearESP",

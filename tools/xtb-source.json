@@ -2,7 +2,7 @@
   "repository": "https://github.com/grimme-lab/xtb.git",
   "commit": "33fe381adde775c4992610c0f90d8914b7572bb5",
   "upstream_version": "6.7.1",
-  "description": "Pinned upstream GFN0 repair with basis export, SCC diagnostics, in-memory ESP and extended properties",
+  "description": "Pinned upstream GFN0 repair with basis export, SCC diagnostics, in-memory ESP, extended properties and real-space wavefunction",
   "basis_extension": {
     "api_version": 1,
     "patch": "diagnostics/xtb_basis_export.patch",
@@ -59,6 +59,16 @@
       "src/peeq_module.f90": "0a371fc82c21de0b2385e023236de400f07d1dbf3deb2fc73f06ff30a347b4fd",
       "src/api/results.f90": "a6986d39ce54ac25fc9f35a3ffc78e254df749a982b32b15271da02db05f2225",
       "src/api/interface.f90": "4177fe488327a3f78a456a64a3a2fc20214a1ab71fd3ac09707d1ede4b22603d"
+    }
+  },
+  "realspace_extension": {
+    "api_version": 1,
+    "patch": "diagnostics/xtb_realspace_export.patch",
+    "patch_sha256": "4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74",
+    "patched_files": {
+      "include/xtb.h": "b1f8ae59b8ee92c7681ea83812464e5f509e2cabeb6d6c09bc311c66c87c7a2d",
+      "src/api/results.f90": "5115bcaa435a87f508b8583a27f26eea36f29168dcdd2fd6e9482764d8ee82e9",
+      "src/api/interface.f90": "9e7c0eb5811f537c815b5ad049b58422e79ffb2eaf1aa7659e45e1c69fdf70bb"
     }
   }
 }

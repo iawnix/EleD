@@ -1,5 +1,20 @@
 # Changes
 
+## 0.14.0 — Real-space wavefunction ABI (density/ALIE/LEA & 0.001 a.u. isosurface), Grimme FOD, higher-order CDFT, linear response matrix, and bond electric fields
+
+- **Real-space wavefunction ABI v1 & 0.001 a.u. isosurface (`eled.realspace`)**:
+  - Added reviewed patch `tools/diagnostics/xtb_realspace_export.patch` and ABI verifier `tools/diagnostics/verify_realspace.py` exporting `xtb_rdkit_getRealSpaceAPIVersion` and `xtb_rdkit_evalRealSpace` (exact BLAS-accelerated Cartesian GTO evaluation of valence density $\rho(\mathbf{r})$ in `e/Bohr^3`, Average Local Ionization Energy $\mathrm{ALIE}(\mathbf{r})$ in `eV`, virtual density in `1/Bohr^3`, and Local Electron Affinity $\mathrm{LEA}(\mathbf{r})$ in `eV` at arbitrary 3D points without extra SCF calls).
+  - Exposed symmetric `realSpacePointsAngstrom`, `realSpaceOccupationThreshold`, `realSpaceLEAWindowEV` options and `realSpaceSampled` / `GetRealSpace*()` NumPy getters across `XTBOptions`, `XTBResults`, `native` backend, and C++ `rdXTBTools` (verified by CTest and Python parity tests).
+  - Added `CalcRealSpaceProperties(result)` (pure analysis; points below `densityCutoffAU` return `None` rather than zero), `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` (area-weighted molecular and per-atom surface ALIE/LEA statistics), and `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` (Voronoi-partitioned batched radial bisection in **one** native `libxtb` SCF returning molecular volume, surface area, sphericity, `electron_density_isosurface` grid, and optional isosurface ESP and ALIE/LEA surface descriptors).
+- **Grimme FOD static-correlation descriptors (`eled.fod`)**:
+  - Added `CalcFODFromResult(result, *, scheme="lowdin", electronicTemperature=None)` and `RunFOD(mol, *, electronicTemperature=5000.0, scheme="lowdin", ...)` implementing Grimme & Hansen's spin-resolved Fermi–Dirac smearing and `fodenmak` FOD weights (`n_fod_e`, `fermi_alpha_ev`, `fermi_beta_ev`, `orbital_fod_e`, per-atom `fod_pop_e` and `s/p/d` shell breakdown), matching `xtb --fod --etemp 5000` across both `native` and `compiled` interfaces.
+- **Higher-order Conceptual DFT & atom-condensed linear response**:
+  - Extended `CalcReactivityDescriptors` and `RunReactivity` (`REACTIVITY_PROTOCOL_VERSION = "2.2"`) with Gázquez electrodonating/electroaccepting powers (`omega_minus_ev`, `omega_plus_ev`), local `omega_minus_loc_ev`, `omega_plus_loc_ev`, multiphilic `delta_omega_loc_ev`, and local hyper-softness `s2_loc_1ev2` ($S^2 \Delta f_A$), explicitly returning `None` + `missing` when hardness $\eta \le 10^{-8}$.
+  - Added `CalcLinearResponseMatrix(result, *, scheme="lowdin", ...)` computing the closed-shell independent-particle atom-condensed linear response matrix $\chi_{AB}^{\text{IP}}$ (`chi_e_per_ev`, `chi_e_per_ha`, per-atom `chi_diag_e_per_ev`, `atomic_softness_e_per_ev`, `nonlocal_coupling_e_per_ev`) with exact zero-sum rule verification and explicit withholding for open-shell, unknown-spin, fractional-occupation, or degenerate-gap states.
+- **Bond-aligned local electric fields (`eled.electric_field`)**:
+  - Added `CalcBondElectricField(mol, *, stepAngstrom=1e-3, ...)` and pure-analysis `CalcBondElectricFieldFromESP(mol, result, ...)` evaluating $\mathbf{E}(\mathbf{r}_{\text{mid}}) = -\nabla V(\mathbf{r}_{\text{mid}})$ via 6-point central finite differences of `libxtb` in-memory ESP at all RDKit bond midpoints in one batched single-point call (`e_parallel_au`/`mv_cm`, `e_perp_au`/`mv_cm`, `e_norm_au`/`mv_cm`, `e_vec_au`; `1 a.u. = 5142.2067476326 MV/cm`).
+- **Catalog**: Updated `DescriptorCatalog()` (14 sections: adding `fod` and `realspace`, plus new `atom`, `bond`, and `reactivity` fields) and `DescriptorStatus()`.
+
 ## 0.13.0 — Extended libxtb properties ABI, surface ESP, orbital/LMO analysis, implicit solvation and thermochemistry
 
 - **Tier 1 — ESP surface & single-point orbital/bond descriptors**:

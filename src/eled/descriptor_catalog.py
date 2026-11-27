@@ -38,6 +38,10 @@ _CATALOG = {
         's_loc_1ev': {'definition': 'global softness times f_plus', 'unit': '1/eV', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and f_plus', 'missing': 'hardness undefined or charge state failed'},
         'omega_loc_ev': {'definition': 'global electrophilicity times f_plus', 'unit': 'eV', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and f_plus', 'missing': 'electrophilicity undefined or charge state failed'},
         'n_loc_1ev': {'definition': 'softness-scaled f_minus proxy; no absolute nucleophilicity reference assumed', 'unit': '1/eV', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and f_minus', 'missing': 'softness undefined or charge state failed'},
+        'omega_minus_loc_ev / omega_plus_loc_ev / delta_omega_loc_ev': {'definition': 'local electrodonating power (omega_minus * f_minus), local electroaccepting power (omega_plus * f_plus), and multiphilic difference (omega_plus_loc - omega_minus_loc)', 'unit': 'eV', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and condensed Fukui indices', 'missing': 'hardness nonpositive or charge state failed'},
+        's2_loc_1ev2': {'definition': 'local hyper-softness S^2 * dual = s_1ev^2 * (f_plus - f_minus)', 'unit': '1/eV^2', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and dual descriptor', 'missing': 'hardness nonpositive or charge state failed'},
+        'fod_pop_e / fod_s_e / fod_p_e / fod_d_e': {'definition': 'Grimme atomic and s/p/d shell fractional occupation number weighted electron density (FOD) static-correlation populations', 'unit': 'e', 'invariance': 'rigid-motion, AO permutation, MO phase and degenerate subspace rotation invariant; preserves RDKit atom order', 'requires': 'retained overlap basis (keepOverlap=True) and finite electronic temperature', 'missing': 'atoms empty with overlap_basis_not_retained when keepOverlap=False'},
+        'chi_diag_e_per_ev / atomic_softness_e_per_ev / nonlocal_coupling_e_per_ev': {'definition': 'diagonal independent-particle atom-condensed linear response chi_AA (<= 0), atomic softness -chi_AA (>= 0), and nonlocal coupling sum_{B!=A} |chi_AB|', 'unit': 'e/eV (also chi_diag_e_per_ha in e/Hartree)', 'invariance': 'rigid-motion, AO permutation, MO phase and degenerate subspace rotation invariant; preserves RDKit atom order', 'requires': 'closed-shell integer-occupied retained basis (keepOverlap=True) with positive HOMO-LUMO gap', 'missing': 'withheld for open-shell, unknown spin, fractional occupation or degenerate gap'},
         'f_w_plus/f_w_minus/f_w_radical/dual_w': {'definition': 'Pino-Rios / Martinez-Araya orbital-weighted condensed Fukui indices from a single retained calculation', 'unit': 'dimensionless', 'invariance': 'AO permutation, MO phase, degenerate subspace rotation and rigid-motion invariant', 'requires': 'retained overlap, MO coefficients, AO-atom map, and frontier orbitals', 'missing': 'HOMO or LUMO unavailable'},
         'occ_n_e / vir_n': {'definition': 'sum of occupied / virtual atomic orbital populations (Lowdin or Mulliken)', 'unit': 'e (occ_n_e), dimensionless (vir_n)', 'invariance': 'AO permutation, MO phase and rigid-motion invariant', 'requires': 'retained overlap, MO coefficients and AO-atom map', 'missing': 'occupied or virtual subspace unavailable'},
         'occ_e_mean_ev / vir_e_mean_ev': {'definition': 'population-weighted mean occupied (negative condensed ALIE proxy: ALIE_A = -occ_e_mean_ev) and virtual atomic orbital energies', 'unit': 'eV', 'invariance': 'AO permutation, MO phase, degenerate subspace rotation and rigid-motion invariant', 'requires': 'retained basis and nonzero occupied/virtual atom weight', 'missing': 'subspace absent or zero atomic population weight'},
@@ -63,6 +67,7 @@ _CATALOG = {
         'ecohp_ev': {'definition': 'eigenvalue-weighted bond overlap stabilization proxy Tr(W_AB S_BA) (negative bonding, positive antibonding)', 'unit': 'eV', 'invariance': 'AO permutation, MO phase, degenerate subspace rotation, bond reversal and rigid-motion invariant', 'requires': 'retained overlap, MO coefficients, AO-atom map and occupied orbitals', 'missing': 'no occupied orbitals under threshold or basis missing'},
         'delta_q_e / signed_delta_q_e / q_prod_e2': {'definition': 'absolute bond charge difference, signed difference q(begin)-q(end), and charge product from engine atomic charges', 'unit': 'e / e / e^2', 'invariance': 'delta_q_e and q_prod_e2 are bond-reversal and rigid-motion invariant; signed_delta_q_e antisymmetrizes on bond reversal', 'requires': 'atomic charges and RDKit bond list', 'missing': 'charges not returned'},
         'delta_cm5_q_e / signed_delta_cm5_q_e / cm5_q_prod_e2': {'definition': 'bond polarity descriptors computed from CM5 charges', 'unit': 'e / e / e^2', 'invariance': 'same as engine-charge bond polarity descriptors', 'requires': 'GFN1/2 CM5 charges', 'missing': 'cm5_unavailable_for_gfn0 or missing CM5 charges'},
+        'e_parallel_au / e_parallel_mv_cm / e_perp_au / e_norm_au / e_vec_au': {'definition': 'bond-midpoint local electric field E = -grad V from 6-point central finite differences of libxtb ESP, projected onto the RDKit bond vector (1 a.u. = 5142.2067476326 MV/cm)', 'unit': 'Hartree/(e*Bohr) and MV/cm', 'invariance': 'e_norm and e_perp are rigid-motion and bond-reversal invariant; e_parallel antisymmetrizes on bond reversal; preserves RDKit bond order', 'requires': 'ESP extension ABI v1 and 3D conformer with bonds', 'missing': 'bonds empty with molecule_has_no_bonds when molecule has 0 bonds'},
     },
     'density': {
         'density_matrix': {'definition': 'spin-summed AO density P = C diag(n) C.T', 'unit': 'basis-dependent; trace(P S) is e', 'invariance': 'matrix transforms with AO basis; trace with S and MO phase are invariant', 'requires': 'same-calculation C, S and occupations', 'missing': 'overlap/basis extension unavailable'},
@@ -80,7 +85,21 @@ _CATALOG = {
         'eta_ev': {'definition': 'conceptual-DFT hardness, (IP-EA)/2', 'unit': 'eV', 'invariance': 'same as vertical IP/EA', 'requires': 'vertical IP and EA', 'missing': 'required charge state failed'},
         's_1ev': {'definition': 'global softness, 1/(IP-EA)', 'unit': '1/eV', 'invariance': 'same as vertical IP/EA', 'requires': 'positive hardness', 'missing': 'hardness nonpositive or unavailable'},
         'omega_ev': {'definition': 'global electrophilicity, mu^2/(2 hardness)', 'unit': 'eV', 'invariance': 'same as vertical IP/EA', 'requires': 'positive hardness', 'missing': 'hardness nonpositive or unavailable'},
+        'omega_minus_ev / omega_plus_ev': {'definition': 'Gazquez electrodonating power (3*IP+EA)^2/(16*(IP-EA)) and electroaccepting power (IP+3*EA)^2/(16*(IP-EA))', 'unit': 'eV', 'invariance': 'same as vertical IP/EA', 'requires': 'positive hardness', 'missing': 'hardness nonpositive or unavailable'},
         'f_plus/f_minus/f_radical/dual': {'definition': 'condensed finite-difference Fukui indices per atom', 'unit': 'dimensionless', 'invariance': 'fixed atom indexing and geometry; rigid-motion invariant', 'requires': 'compatible Q, Q+1 and Q-1 results', 'missing': 'required charge state failed'},
+        'chi_e_per_ev / chi_e_per_ha': {'definition': 'independent-particle atom-condensed linear response matrix chi_AB = -4 sum_{i in occ, a in vir} Q^A_{ia} Q^B_{ia} / (eps_a - eps_i) with exact zero row/column sums', 'unit': 'e/eV (chi_e_per_ev), e/Hartree (chi_e_per_ha)', 'invariance': 'rigid-motion, AO permutation, MO phase and degenerate subspace rotation invariant', 'requires': 'closed-shell integer-occupied retained basis (keepOverlap=True) with positive HOMO-LUMO gap', 'missing': 'withheld with explicit missing reason for open-shell, unknown spin, fractional occupation or degenerate gap'},
+    },
+    'fod': {
+        'n_fod_e': {'definition': 'Grimme total fractional occupation number weighted electron density static-correlation index N_FOD = sum_i f_FOD,i (matching xtb --fod)', 'unit': 'e', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies, electron/spin counts and finite electronic temperature (default 5000 K in RunFOD)', 'missing': 'never missing on valid completion; 0.0 at T = 0 K'},
+        'fermi_alpha_ev / fermi_beta_ev': {'definition': 'spin-resolved Fermi-Dirac chemical potentials solved at the FOD electronic temperature', 'unit': 'eV', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies and spin-channel electron counts', 'missing': 'never missing on valid completion'},
+        'orbital_fod_e': {'definition': 'per-MO spin-summed Grimme FOD weights (1 - f for eps <= E_F, f for eps > E_F)', 'unit': 'e', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies and finite electronic temperature', 'missing': 'never missing on valid completion'},
+    },
+    'realspace': {
+        'density_au / vir_density_au': {'definition': 'exact Cartesian GTO valence electron density rho(r) and virtual orbital density evaluated via libxtb realspace ABI v1', 'unit': 'e/Bohr^3 (density_au), 1/Bohr^3 (vir_density_au)', 'invariance': 'rigid-motion invariant when points co-transform, MO phase and degenerate subspace invariant', 'requires': 'libxtb realspace extension ABI v1 and realSpacePointsAngstrom', 'missing': 'DescriptorUnavailableError if realSpacePointsAngstrom was not supplied'},
+        'alie_ev / lea_ev': {'definition': 'exact real-space Average Local Ionization Energy ALIE(r) and Local Electron Affinity LEA(r) at sampled 3D points', 'unit': 'eV', 'invariance': 'same as density_au', 'requires': 'libxtb realspace extension ABI v1 and density > densityCutoffAU', 'missing': 'None when density (or virtual density) <= densityCutoffAU; never zero-filled'},
+        'alie_min_ev / alie_max_ev / alie_mean_ev / alie_sigma2_ev2 / alie_pi_ev': {'definition': 'area-weighted molecular and per-atom surface ALIE statistics on a vdW or 0.001 a.u. density isosurface grid', 'unit': 'eV (and eV^2 for sigma2)', 'invariance': 'rigid-motion and point-permutation invariant when surface grid co-transforms; preserves RDKit atom order', 'requires': 'sampled real-space properties on a surface grid', 'missing': 'None with density_below_cutoff or no_surface_points_assigned'},
+        'lea_min_ev / lea_max_ev / lea_mean_ev / lea_sigma2_ev2 / lea_pi_ev': {'definition': 'area-weighted molecular and per-atom surface LEA statistics on a vdW or 0.001 a.u. density isosurface grid', 'unit': 'eV (and eV^2 for sigma2)', 'invariance': 'same as surface ALIE statistics', 'requires': 'sampled real-space properties with virtual orbitals and virtual density > densityCutoffAU', 'missing': 'None with virtual_density_below_cutoff or no_surface_points_assigned'},
+        'volume_a3 / volume_bohr3 / area_a2 / area_bohr2 / sphericity': {'definition': 'molecular volume, surface area and sphericity of the exact electron-density isosurface (default 0.001 e/Bohr^3) computed via Voronoi-partitioned batched radial bisection in one xTB SCF', 'unit': 'Angstrom^3 / Bohr^3 / Angstrom^2 / Bohr^2 / dimensionless', 'invariance': 'translation invariant and rotation invariant up to finite Fibonacci angular mesh discretization', 'requires': 'libxtb realspace extension ABI v1 (and ESP ABI v1 when includeESP=True)', 'missing': 'raises ValueError if isovalue cannot be bracketed'},
     },
     'local_geometry': {
         'l_a / b1_a / b5_a': {'definition': 'Sterimol axial extent plus recorded correction and minimum/maximum transverse sphere-envelope support', 'unit': 'angstrom', 'invariance': 'rigid-motion invariant up to the reported B1 angular error bound', 'requires': '3D conformer, directed bonded axis, selected atoms and radii', 'missing': 'invalid axis or radii raise ValueError'},
@@ -135,6 +154,15 @@ _STATUS = {
         'omega_loc_ev',
         'ip_v_ev', 'ea_v_ev', 'mu_ev',
         'chi_ev', 'eta_ev', 's_1ev', 'omega_ev',
+        'omega_minus_ev / omega_plus_ev',
+        'omega_minus_loc_ev / omega_plus_loc_ev / delta_omega_loc_ev',
+        's2_loc_1ev2',
+        'n_fod_e', 'fod_pop_e / fod_s_e / fod_p_e / fod_d_e',
+        'density_au / vir_density_au', 'alie_ev / lea_ev',
+        'alie_min_ev / alie_max_ev / alie_mean_ev / alie_sigma2_ev2 / alie_pi_ev',
+        'lea_min_ev / lea_max_ev / lea_mean_ev / lea_sigma2_ev2 / lea_pi_ev',
+        'volume_a3 / volume_bohr3 / area_a2 / area_bohr2 / sphericity',
+        'e_parallel_au / e_parallel_mv_cm / e_perp_au / e_norm_au / e_vec_au',
         'v_min_au / v_max_au / v_mean_au', 'v_pos_mean_au / v_neg_mean_au',
         'v_pos_frac / v_neg_frac', 'pi_esp_au',
         'sigma2_pos_au2 / sigma2_neg_au2 / sigma2_tot_au2', 'nu / nu_sigma2_au2', 'sigma2_au2',
@@ -152,6 +180,7 @@ _STATUS = {
     'diagnostic': {
         'xtb_n_*', 'xtb_*_idx', 'xtb_occ_cut',
         'fermi_alpha_ha / fermi_beta_ha / fermi_alpha_ev / fermi_beta_ev',
+        'fermi_alpha_ev / fermi_beta_ev', 'orbital_fod_e',
         'g_solv_direct_ha / solute_polarization_energy_ha',
     },
     'exploratory': {
@@ -170,6 +199,8 @@ _STATUS = {
         'dip_ebohr / dip_norm_ebohr / dip_norm_debye',
         'quad_ebohr2 / quad_frobenius_ebohr2 / quad_anisotropy_ebohr2',
         'mol_quadrupole_ebohr2 / mol_quadrupole_frobenius_ebohr2 / mol_quadrupole_anisotropy_ebohr2',
+        'chi_e_per_ev / chi_e_per_ha',
+        'chi_diag_e_per_ev / atomic_softness_e_per_ev / nonlocal_coupling_e_per_ev',
     },
 }
 

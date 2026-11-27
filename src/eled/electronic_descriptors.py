@@ -121,8 +121,27 @@ def _as_result(result) -> XTBResults:
             'coordinate_unit': 'angstrom',
             'source': 'native_density',
         }
+    realspace = {}
+    if getattr(result, 'realSpaceSampled', False):
+        realspace = dict(
+            realSpacePointsAngstrom=tuple(map(tuple, result.GetRealSpacePoints())),
+            realSpaceDensityAU=tuple(map(float, result.GetRealSpaceDensity())),
+            realSpaceALIEEV=tuple(map(float, result.GetRealSpaceALIE())),
+            realSpaceVirtualDensityAU=tuple(map(float, result.GetRealSpaceVirtualDensity())),
+            realSpaceLEAEV=tuple(map(float, result.GetRealSpaceLEA())),
+        )
+        metadata['realspace'] = {
+            'api_version': 1,
+            'density_unit': 'e/bohr^3',
+            'alie_unit': 'eV',
+            'virtual_density_unit': '1/bohr^3',
+            'lea_unit': 'eV',
+            'coordinate_unit': 'angstrom',
+            'source': 'native_cartesian_gto',
+        }
     return XTBResults(
         **esp,
+        **realspace,
         **basis,
         gradientHartreePerBohr=grad_rows,
         method=result.method,

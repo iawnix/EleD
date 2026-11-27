@@ -105,10 +105,32 @@ report = RunReactivity(mol, populationScheme="lowdin", returnErrors=True)
 ```
 
 固定几何计算 Q、Q+1、Q−1，得到 `ip_v_ev`、`ea_v_ev`、
-`mu_ev`、`chi_ev`、`eta_ev`、`s_1ev`、`omega_ev`，以及原子级
-`f_plus`、`f_minus`、`f_radical`、`dual`，以及 `s_loc_1ev`、
-`omega_loc_ev` 和 `n_loc_1ev`。该流程支持 GFN1/2，
+`mu_ev`、`chi_ev`、`eta_ev`、`s_1ev`、`omega_ev`、Gázquez 给/受电子能力
+`omega_minus_ev`/`omega_plus_ev`，以及原子级
+`f_plus`、`f_minus`、`f_radical`、`dual`、`s_loc_1ev`、
+`omega_loc_ev`、`n_loc_1ev`、`omega_minus_loc_ev`、`omega_plus_loc_ev`、
+`delta_omega_loc_ev` 和局域超软度 `s2_loc_1ev2`。该流程支持 GFN1/2，
 不自动搜索自旋态，也不进行电荷态几何优化。
+
+## Grimme FOD 静态关联、凝聚线性响应矩阵与键中点局域电场
+
+```python
+from eled import (
+    RunFOD, CalcFODFromResult, CalcLinearResponseMatrix,
+    CalcBondElectricField, CalcDensityIsosurface,
+    CalcRealSpaceProperties, CalcRealSpaceSurfaceDescriptors,
+)
+
+fod = RunFOD(mol, electronicTemperature=5000.0)         # 与 xtb --fod --etemp 5000 对齐
+chi = CalcLinearResponseMatrix(result, scheme="lowdin") # 单点闭壳层线性响应矩阵 chi_AB
+ef = CalcBondElectricField(mol, stepAngstrom=1e-3)      # 单次 SCF 批量计算所有键中点局域电场
+iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 单次 SCF 精确 0.001 a.u. 等值面 + ESP/ALIE/LEA
+```
+
+- `RunFOD` / `CalcFODFromResult` 实现 Grimme–Hansen 有限温 Fermi–Dirac 分数占据电子密度（FOD）诊断，返回 `n_fod_e`、自旋分辨费米能级 `fermi_alpha_ev`/`fermi_beta_ev`、每轨道 `orbital_fod_e` 以及原子与 `s/p/d` 壳层 `fod_pop_e`/`fod_s_e`/`fod_p_e`/`fod_d_e`。
+- `CalcLinearResponseMatrix` 在 `keepOverlap=True` 的闭壳层单点结果上计算独立粒子原子凝聚线性响应矩阵 $\chi_{AB}^{\mathrm{IP}}$（`chi_e_per_ev`、`chi_e_per_ha`、对角 `chi_diag_e_per_ev`、`atomic_softness_e_per_ev`、`nonlocal_coupling_e_per_ev`），精确满足 $\sum_B \chi_{AB} = 0$，并对开壳层、未知自旋、分数占据或零能隙体系显式返回 `available=False` 与 `missing` 原因。
+- `CalcBondElectricField` / `CalcBondElectricFieldFromESP` 在单次 `libxtb` 单点计算中对全部 RDKit 键中点构造 6 点中心有限差分模板求取 $\mathbf{E} = -\nabla V$，输出键向投影 `e_parallel_au`/`e_parallel_mv_cm`、垂直分量 `e_perp_au`/`mv_cm`、模长 `e_norm_au`/`mv_cm` 及三维向量 `e_vec_au`（`1 a.u. = 5142.2067476326 MV/cm`）。
+- `CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors` 与 `CalcDensityIsosurface` 通过扩展版 `libxtb` 的 `realspace_extension` ABI v1 在内存中精确求值笛卡尔 GTO 价电子密度 $\rho(\mathbf{r})$、实空间平均局域电离能 $\mathrm{ALIE}(\mathbf{r})$、虚轨道密度和局域电子亲和能 $\mathrm{LEA}(\mathbf{r})$，并在单次 SCF 内给出精确 `0.001 a.u.` 等值面的分子体积、表面积、球度以及表面 ESP/ALIE/LEA 统计；低于 `densityCutoffAU` 的点显式返回 `None`，绝不填零。
 
 ## 轨道加权反应性、ALIE/PDOS、COOP/ECOHP 与 Pipek–Mezey 局域轨道
 

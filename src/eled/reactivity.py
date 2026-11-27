@@ -34,9 +34,11 @@ REACTIVITY_UNITS = {
     'eta_ev': 'eV',
     's_1ev': '1/eV',
     'omega_ev': 'eV',
+    'omega_minus_ev': 'eV',
+    'omega_plus_ev': 'eV',
 }
 
-REACTIVITY_PROTOCOL_VERSION = '2.1'
+REACTIVITY_PROTOCOL_VERSION = '2.2'
 
 
 class ChargeStateCalculationError(XTBRunError):
@@ -85,9 +87,15 @@ def _empty_report(recordId, scheme, states):
             'hardness': '(IP-EA)/2',
             'softness': '1/(IP-EA)',
             'electrophilicity': 'mu^2/(2*hardness)',
+            'electrodonating_power': '(3*IP+EA)^2/(16*(IP-EA))',
+            'electroaccepting_power': '(IP+3*EA)^2/(16*(IP-EA))',
             'f_plus': 'population(N+1)-population(N)',
             'f_minus': 'population(N)-population(N-1)',
             'dual': 'f_plus-f_minus',
+            'omega_minus_loc_ev': 'omega_minus_ev*f_minus',
+            'omega_plus_loc_ev': 'omega_plus_ev*f_plus',
+            'delta_omega_loc_ev': 'omega_plus_ev*f_plus-omega_minus_ev*f_minus',
+            's2_loc_1ev2': 's_1ev^2*dual',
             'spin_search': False,
         },
         'states': states,
@@ -105,6 +113,10 @@ def _empty_report(recordId, scheme, states):
             's_loc_1ev': '1/eV',
             'omega_loc_ev': 'eV',
             'n_loc_1ev': '1/eV',
+            'omega_minus_loc_ev': 'eV',
+            'omega_plus_loc_ev': 'eV',
+            'delta_omega_loc_ev': 'eV',
+            's2_loc_1ev2': '1/eV^2',
         },
         'atom_invariance': 'atom index and molecular geometry fixed; values invariant to rigid translation/rotation',
         'atom_missing_semantics': (
@@ -221,14 +233,24 @@ def CalcReactivityDescriptors(
     values = report['values']
     values.update(ip_v_ev=ip, ea_v_ev=ea, mu_ev=mu, chi_ev=-mu, eta_ev=eta)
     if eta > 1e-8:
-        values.update(s_1ev=1 / (2 * eta), omega_ev=mu * mu / (2 * eta))
+        values.update(
+            s_1ev=1 / (2 * eta),
+            omega_ev=mu * mu / (2 * eta),
+            omega_minus_ev=((3 * ip + ea) ** 2) / (32 * eta),
+            omega_plus_ev=((ip + 3 * ea) ** 2) / (32 * eta),
+        )
     else:
         flags.append({
             'code': 'nonpositive_or_tiny_hardness',
             'severity': 'warning',
             'detail': 'Reciprocal hardness descriptors are undefined or numerically unstable.',
         })
-        report['missing'].update(s_1ev='nonpositive_or_tiny_hardness', omega_ev='nonpositive_or_tiny_hardness')
+        report['missing'].update(
+            s_1ev='nonpositive_or_tiny_hardness',
+            omega_ev='nonpositive_or_tiny_hardness',
+            omega_minus_ev='nonpositive_or_tiny_hardness',
+            omega_plus_ev='nonpositive_or_tiny_hardness',
+        )
     if ea < 0:
         flags.append({
             'code': 'negative_vertical_ea',
@@ -265,8 +287,13 @@ def CalcReactivityDescriptors(
         raise ValueError('condensed Fukui sums violate electron conservation')
     softness = values.get('s_1ev')
     electrophilicity = values.get('omega_ev')
+    omega_minus = values.get('omega_minus_ev')
+    omega_plus = values.get('omega_plus_ev')
+    softness_sq = softness * softness if softness is not None else None
     atoms = []
     for i in range(len(plus)):
+        om_loc = float(omega_minus * minus[i]) if omega_minus is not None else None
+        op_loc = float(omega_plus * plus[i]) if omega_plus is not None else None
         atoms.append({
             'atom_index': i,
             'f_plus': float(plus[i]),
@@ -276,6 +303,10 @@ def CalcReactivityDescriptors(
             's_loc_1ev': float(softness * plus[i]) if softness is not None else None,
             'omega_loc_ev': float(electrophilicity * plus[i]) if electrophilicity is not None else None,
             'n_loc_1ev': float(softness * minus[i]) if softness is not None else None,
+            'omega_minus_loc_ev': om_loc,
+            'omega_plus_loc_ev': op_loc,
+            'delta_omega_loc_ev': float(op_loc - om_loc) if (op_loc is not None and om_loc is not None) else None,
+            's2_loc_1ev2': float(softness_sq * dual[i]) if softness_sq is not None else None,
         })
     report['atoms'] = atoms
     report['fragments'] = {
@@ -288,6 +319,14 @@ def CalcReactivityDescriptors(
             's_loc_1ev': float(softness * plus[indices].sum()) if softness is not None else None,
             'omega_loc_ev': float(electrophilicity * plus[indices].sum()) if electrophilicity is not None else None,
             'n_loc_1ev': float(softness * minus[indices].sum()) if softness is not None else None,
+            'omega_minus_loc_ev': float(omega_minus * minus[indices].sum()) if omega_minus is not None else None,
+            'omega_plus_loc_ev': float(omega_plus * plus[indices].sum()) if omega_plus is not None else None,
+            'delta_omega_loc_ev': (
+                float(omega_plus * plus[indices].sum() - omega_minus * minus[indices].sum())
+                if (omega_plus is not None and omega_minus is not None)
+                else None
+            ),
+            's2_loc_1ev2': float(softness_sq * dual[indices].sum()) if softness_sq is not None else None,
         }
         for name, indices in groups.items()
     }
@@ -301,6 +340,14 @@ def CalcReactivityDescriptors(
             's_loc_1ev': float(softness * plus[list(indices)].sum()) if softness is not None else None,
             'omega_loc_ev': float(electrophilicity * plus[list(indices)].sum()) if electrophilicity is not None else None,
             'n_loc_1ev': float(softness * minus[list(indices)].sum()) if softness is not None else None,
+            'omega_minus_loc_ev': float(omega_minus * minus[list(indices)].sum()) if omega_minus is not None else None,
+            'omega_plus_loc_ev': float(omega_plus * plus[list(indices)].sum()) if omega_plus is not None else None,
+            'delta_omega_loc_ev': (
+                float(omega_plus * plus[list(indices)].sum() - omega_minus * minus[list(indices)].sum())
+                if (omega_plus is not None and omega_minus is not None)
+                else None
+            ),
+            's2_loc_1ev2': float(softness_sq * dual[list(indices)].sum()) if softness_sq is not None else None,
         }
         for name, indices in sites.items()
     }

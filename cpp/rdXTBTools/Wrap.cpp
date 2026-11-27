@@ -1,6 +1,6 @@
 #define PY_ARRAY_UNIQUE_SYMBOL rdxtb_array_API
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#define BOOST_PYTHON_MAX_ARITY 20
+#define BOOST_PYTHON_MAX_ARITY 24
 #include <boost/python.hpp>
 #include <numpy/arrayobject.h>
 #include <RDGeneral/versions.h>
@@ -76,6 +76,37 @@ std::vector<double> readESPPoints(const py::object &value) {
   return output;
 }
 bool hasESP(const XTBResults &r) { return r.success && !r.espValuesAU.empty(); }
+bool hasRealSpace(const XTBResults &r) { return r.success && !r.realSpaceDensityAU.empty(); }
+py::object realSpacePoints(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.realSpaceDensityAU.empty())
+    throw std::invalid_argument("Real-space properties were not sampled; pass realSpacePointsAngstrom");
+  return array(r.realSpacePointsAngstrom, {static_cast<npy_intp>(r.realSpaceDensityAU.size()), 3});
+}
+py::object realSpaceDensity(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.realSpaceDensityAU.empty())
+    throw std::invalid_argument("Real-space properties were not sampled; pass realSpacePointsAngstrom");
+  return array(r.realSpaceDensityAU, {static_cast<npy_intp>(r.realSpaceDensityAU.size())});
+}
+py::object realSpaceALIE(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.realSpaceALIEEV.empty())
+    throw std::invalid_argument("Real-space properties were not sampled; pass realSpacePointsAngstrom");
+  return array(r.realSpaceALIEEV, {static_cast<npy_intp>(r.realSpaceALIEEV.size())});
+}
+py::object realSpaceVirtualDensity(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.realSpaceVirtualDensityAU.empty())
+    throw std::invalid_argument("Real-space properties were not sampled; pass realSpacePointsAngstrom");
+  return array(r.realSpaceVirtualDensityAU, {static_cast<npy_intp>(r.realSpaceVirtualDensityAU.size())});
+}
+py::object realSpaceLEA(const XTBResults &r) {
+  requireSuccess(r);
+  if (r.realSpaceLEAEV.empty())
+    throw std::invalid_argument("Real-space properties were not sampled; pass realSpacePointsAngstrom");
+  return array(r.realSpaceLEAEV, {static_cast<npy_intp>(r.realSpaceLEAEV.size())});
+}
 py::object cm5Charges(const XTBResults &r) {
   requireSuccess(r);
   if (r.chargeModel != "xtb_scc_mulliken" || r.cm5Charges.size() != r.numAtoms)
@@ -309,7 +340,9 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
               const std::string &library, const std::string &parameterDirectory,
               const py::object &maxIterations, const py::object &accuracy,
               const py::object &electronicTemperature, bool keepOverlap, const py::object &espPointsAngstrom,
-              const py::object &solvent, const std::string &solvationModel, const py::object &solvationGrid) {
+              const py::object &solvent, const std::string &solvationModel, const py::object &solvationGrid,
+              const py::object &realSpacePointsAngstrom, const py::object &realSpaceOccupationThreshold,
+              const py::object &realSpaceLEAWindowEV) {
   XTBOptions options;
   options.confId = confId;
   options.method = method;
@@ -318,6 +351,13 @@ py::tuple run(const RDKit::ROMol &mol, int confId, const std::string &method,
   options.keepOrbitalCoefficients = keepCoefficients;
   options.keepOverlap = keepOverlap;
   options.espPointsAngstrom = readESPPoints(espPointsAngstrom);
+  options.realSpacePointsAngstrom = readESPPoints(realSpacePointsAngstrom);
+  options.realSpaceOccupationThreshold = parseReal(
+      realSpaceOccupationThreshold, "realSpaceOccupationThreshold must be a finite real number");
+  options.realSpaceLEAWindowEV = parseReal(
+      realSpaceLEAWindowEV, "realSpaceLEAWindowEV must be a finite real number");
+  if (options.realSpaceOccupationThreshold < 0.0 || options.realSpaceLEAWindowEV < 0.0)
+    throw std::invalid_argument("realSpaceOccupationThreshold and realSpaceLEAWindowEV must be nonnegative");
   options.solvent = parseOptionalSolvent(solvent);
   options.solvationModel = solvationModel;
   auto gridOpt = optionalInteger(solvationGrid, "solvationGrid");
@@ -370,6 +410,15 @@ py::list runStates(const RDKit::ROMol &mol, const py::object &config,
   options.libraryPath = libObj.is_none() ? std::string() : std::string(py::extract<std::string>(libObj));
   options.keepOverlap = py::extract<bool>(config.attr("keepOverlap"));
   options.espPointsAngstrom = readESPPoints(config.attr("espPointsAngstrom"));
+  if (PyObject_HasAttrString(config.ptr(), "realSpacePointsAngstrom")) {
+    options.realSpacePointsAngstrom = readESPPoints(config.attr("realSpacePointsAngstrom"));
+    options.realSpaceOccupationThreshold = parseReal(
+        py::object(config.attr("realSpaceOccupationThreshold")),
+        "realSpaceOccupationThreshold must be a finite real number");
+    options.realSpaceLEAWindowEV = parseReal(
+        py::object(config.attr("realSpaceLEAWindowEV")),
+        "realSpaceLEAWindowEV must be a finite real number");
+  }
   if (PyObject_HasAttrString(config.ptr(), "solvent")) {
     options.solvent = parseOptionalSolvent(config.attr("solvent"));
     options.solvationModel = py::extract<std::string>(config.attr("solvationModel"));
@@ -466,6 +515,13 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .add_property("espSampled", hasESP)
       .def("GetESPPoints", espPoints, "Copy of ESP points in Angstrom, [point,xyz].")
       .def("GetESPValues", espValues, "Copy of ESP in Hartree/e, [point].")
+      .def_readonly("realSpaceExportVerified", &XTBResults::realSpaceExportVerified)
+      .add_property("realSpaceSampled", hasRealSpace)
+      .def("GetRealSpacePoints", realSpacePoints, "Copy of real-space points in Angstrom, [point,xyz].")
+      .def("GetRealSpaceDensity", realSpaceDensity, "Copy of valence electron density in e/Bohr^3, [point].")
+      .def("GetRealSpaceALIE", realSpaceALIE, "Copy of Average Local Ionization Energy in eV, [point].")
+      .def("GetRealSpaceVirtualDensity", realSpaceVirtualDensity, "Copy of virtual orbital density in 1/Bohr^3, [point].")
+      .def("GetRealSpaceLEA", realSpaceLEA, "Copy of Local Electron Affinity in eV, [point].")
       .def("GetAtomicCharges", charges,
            "Copy of xTB atomic charges in elementary-charge units, [atom]. "
            "GFN1/2: converged SCC Mulliken charges; GFN0: PEEQ/EEQ charges; never CM5.")
@@ -526,7 +582,10 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
            py::arg("parameterDirectory") = "", py::arg("maxIterations") = 250,
            py::arg("accuracy") = 1.0, py::arg("electronicTemperature") = 300.0, py::arg("keepOverlap") = false,
            py::arg("espPointsAngstrom") = py::object(), py::arg("solvent") = py::object(),
-           py::arg("solvationModel") = "alpb", py::arg("solvationGrid") = py::object()),
+           py::arg("solvationModel") = "alpb", py::arg("solvationGrid") = py::object(),
+           py::arg("realSpacePointsAngstrom") = py::object(),
+           py::arg("realSpaceOccupationThreshold") = 1e-7,
+           py::arg("realSpaceLEAWindowEV") = 0.0),
           "Run a gas-phase xTB single point on an explicit-H 3D RDKit molecule. "
           "Returns (success, XTBResults). xTB failures return False and errorMessage; "
           "numerical getters then raise RuntimeError. Invalid input raises ValueError; "

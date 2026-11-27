@@ -237,6 +237,39 @@ Validation covers points at molecular-surface distances. At extreme distances
 warnings while returning finite values. This extension retains that behavior;
 finite output alone does not certify accuracy in that regime.
 
+## Real-space wavefunction ABI (`density`, `ALIE`, `LEA`) and `0.001 a.u.` isosurface
+
+EleD 0.14.0 adds a reviewed real-space wavefunction ABI (`tools/diagnostics/xtb_realspace_export.patch`,
+`xtb_rdkit_getRealSpaceAPIVersion` and `xtb_rdkit_evalRealSpace`) evaluating exact
+Cartesian GTO valence electron density $\rho(\mathbf{r})$ (`e/Bohr^3`), Average Local
+Ionization Energy $\mathrm{ALIE}(\mathbf{r})$ (`eV`), virtual orbital density (`1/Bohr^3`),
+and Local Electron Affinity $\mathrm{LEA}(\mathbf{r})$ (`eV`) at arbitrary 3D points without
+extra SCF calls:
+
+```python
+from eled import (
+    XTBCalculator, GenerateESPSurfaceGrid,
+    CalcRealSpaceProperties, CalcRealSpaceSurfaceDescriptors, CalcDensityIsosurface,
+)
+
+grid = GenerateESPSurfaceGrid(mol, scales=(1.4,), pointsPerAtom=100)
+res = XTBCalculator(method="GFN2-xTB").Calculate(mol, realSpacePointsAngstrom=grid.pointsAngstrom)
+rs_props = CalcRealSpaceProperties(res)
+rs_surface = CalcRealSpaceSurfaceDescriptors(mol, res, surfaceGrid=grid)
+
+# Exact 0.001 e/Bohr^3 electron-density isosurface (single SCF):
+iso = CalcDensityIsosurface(mol, isovalueAU=0.001, pointsPerAtom=120, includeESP=True, includeALIE=True)
+print(iso["volume_a3"], iso["area_a2"], iso["sphericity"])
+print(iso["esp_surface"]["v_min_au"], iso["realspace_surface"]["alie_min_ev"])
+```
+
+Points where $\rho(\mathbf{r}) \le \texttt{densityCutoffAU}$ (default `1e-18`) return
+`None` for `alie_ev` (and analogously for `lea_ev` when virtual density is below cutoff);
+undefined values are never zero-filled. `CalcDensityIsosurface` uses Voronoi-partitioned
+batched radial bisection inside one native `libxtb` single point to locate the exact
+`isovalueAU` isosurface and compute volume, area, sphericity, and optional isosurface ESP
+and ALIE/LEA surface statistics.
+
 ## Build and verification
 
 Reuse the fixed runtime and toolchain from the standard installation:

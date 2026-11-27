@@ -33,6 +33,10 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcNuclearESP(result, *, mol=None)` | Exact valence electronic + other-nuclei electrostatic potential at nuclei (`epn_au`, `epn_kcalmol`) | Native or compiled `XTBResults` from extended properties ABI v1 |
 | `CalcSolvationDescriptors(mol, solvent, *, solvationModel="alpb", solvationGrid=None, ...)` | Matched gas vs ALPB/GBSA `delta_g_solv_*`, direct `g_solv`, polarization energy, dipole/HOMO/LUMO/charge shifts | Explicit-H 3D RDKit `Mol`; runs 2 single points |
 | `CalcVibrationalThermochemistry(mol, *, temperatureK=298.15, pressureAtm=1.0, rotorCutoffCm1=100.0, symmetryNumber=1, ...)` | Harmonic frequencies (cm⁻¹), IR intensities (km/mol), rotational constants and RRHO/qRRHO ZPE/U/H/S/G | Explicit-H 3D RDKit `Mol`; central-difference Hessian of `GetGradient()` |
+| `CalcFODFromResult(result, *, scheme="lowdin", electronicTemperature=None)` / `RunFOD(mol, *, electronicTemperature=5000.0, ...)` | Grimme FOD static-correlation index (`n_fod_e`), spin-resolved Fermi levels, orbital FOD weights and atomic/shell `fod_pop_e` (`s/p/d`) | Retained result (`keepOverlap=True` for atomic/shell FOD) or explicit-H 3D `Mol` (1 SCF) |
+| `CalcLinearResponseMatrix(result, *, scheme="lowdin", ...)` | Closed-shell independent-particle atom-condensed linear response $\chi_{AB}^{\mathrm{IP}}$ (`chi_e_per_ev`, `chi_e_per_ha`, per-atom softness & nonlocal coupling) | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
+| `CalcBondElectricField(mol, *, stepAngstrom=1e-3, ...)` / `CalcBondElectricFieldFromESP(mol, result, ...)` | Bond-midpoint electric field $\mathbf{E}=-\nabla V$ projected along every RDKit bond (`e_parallel_*`, `e_perp_*`, `e_norm_*`, `e_vec_au`) | Explicit-H 3D `Mol` (1 batched ESP SCF) or matching stencil result |
+| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v1 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned
 molecule snapshot. Both Python result types support bond mapping, annotation and
@@ -381,3 +385,45 @@ shifts, HOMO/LUMO/gap shifts, and per-atom charge shifts (`delta_q_e`, `delta_cm
 using RRHO (`rotorCutoffCm1=0`) or Grimme qRRHO (`rotorCutoffCm1=100.0` default).
 Non-stationary geometries (large gradients or imaginary frequencies) are explicitly
 flagged via `is_stationary_point=False` and `warnings`.
+
+## Grimme FOD, condensed linear response, bond electric fields and real-space `0.001 a.u.` isosurfaces
+
+```python
+from eled import (
+    RunFOD, CalcFODFromResult, CalcLinearResponseMatrix,
+    CalcBondElectricField, CalcDensityIsosurface,
+    CalcRealSpaceProperties, CalcRealSpaceSurfaceDescriptors,
+)
+
+fod = RunFOD(mol, electronicTemperature=5000.0)         # matches xtb --fod --etemp 5000
+chi = CalcLinearResponseMatrix(result, scheme="lowdin") # closed-shell chi_AB (e/eV, e/Ha)
+ef = CalcBondElectricField(mol, stepAngstrom=1e-3)      # 1 batched ESP SCF for all bonds
+iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 1 SCF exact 0.001 a.u. isosurface
+```
+
+- `RunFOD` and `CalcFODFromResult` implement Grimme & Hansen's spin-resolved Fermi–Dirac
+  fractional occupation number weighted electron density (FOD) diagnostic, returning
+  `n_fod_e`, `fermi_alpha_ev`/`fermi_beta_ev`, `orbital_fod_e`, and per-atom `fod_pop_e`
+  with `fod_s_e`/`fod_p_e`/`fod_d_e` shell breakdown when `keepOverlap=True`.
+- `CalcReactivityDescriptors` / `RunReactivity` (`protocol_version = "2.2"`) also report
+  Gázquez electrodonating/electroaccepting powers (`omega_minus_ev`, `omega_plus_ev`),
+  local `omega_minus_loc_ev`/`omega_plus_loc_ev`, multiphilic `delta_omega_loc_ev`, and
+  local hyper-softness `s2_loc_1ev2` ($S^2 \Delta f_A$), explicitly returning `None` +
+  `missing` whenever hardness $\eta \le 10^{-8}$.
+- `CalcLinearResponseMatrix` evaluates the closed-shell independent-particle atom-condensed
+  linear response matrix $\chi_{AB}^{\mathrm{IP}} = -4\sum_{i\in\mathrm{occ},a\in\mathrm{vir}} Q^A_{ia} Q^B_{ia}/(\varepsilon_a - \varepsilon_i)$
+  with exact electron-conservation row/column sum verification ($\sum_B \chi_{AB} = 0$) and
+  explicit withholding (`available=False`, `missing`) for open-shell, unknown-spin,
+  fractional-occupation, or degenerate-gap systems.
+- `CalcBondElectricField` / `CalcBondElectricFieldFromESP` evaluate $\mathbf{E}(\mathbf{r}_{\mathrm{mid}}) = -\nabla V(\mathbf{r}_{\mathrm{mid}})$
+  by 6-point central finite differences of `libxtb` in-memory ESP at every RDKit bond midpoint
+  in one batched single point (`e_parallel_au`/`mv_cm`, `e_perp_au`/`mv_cm`, `e_norm_au`/`mv_cm`,
+  `e_vec_au`; `1 a.u. = 5142.2067476326 MV/cm`).
+- `CalcRealSpaceProperties`, `CalcRealSpaceSurfaceDescriptors`, and `CalcDensityIsosurface`
+  use the reviewed `realspace_extension` ABI v1 in `libxtb` to evaluate exact Cartesian GTO
+  valence electron density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})$,
+  virtual density, and $\mathrm{LEA}(\mathbf{r})$ without additional SCF calls. Points below
+  `densityCutoffAU` return `None` rather than zero. `CalcDensityIsosurface` locates the exact
+  `0.001 a.u.` isosurface in one SCF via Voronoi-partitioned batched radial bisection and
+  returns molecular volume, surface area, sphericity, surface grid, and optional isosurface
+  Politzer–Murray ESP and ALIE/LEA surface statistics.

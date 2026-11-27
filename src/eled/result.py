@@ -69,6 +69,13 @@ class XTBResults:
     espPointsAngstrom: tuple[tuple[float, ...], ...] = ()
     espValuesAU: tuple[float, ...] = ()
 
+    # Sampled real-space wavefunction properties (density, ALIE, virtual density, LEA).
+    realSpacePointsAngstrom: tuple[tuple[float, ...], ...] = ()
+    realSpaceDensityAU: tuple[float, ...] = ()
+    realSpaceALIEEV: tuple[float, ...] = ()
+    realSpaceVirtualDensityAU: tuple[float, ...] = ()
+    realSpaceLEAEV: tuple[float, ...] = ()
+
     # Implicit solvation provenance (None when gas phase).
     solvent: str | None = None
     solvationModel: str | None = None
@@ -146,6 +153,10 @@ class XTBResults:
     @property
     def espSampled(self) -> bool:
         return self.success and bool(self.espValuesAU)
+
+    @property
+    def realSpaceSampled(self) -> bool:
+        return self.success and bool(self.realSpaceDensityAU)
 
     @property
     def energyDecompositionAvailable(self) -> bool:
@@ -289,6 +300,41 @@ class XTBResults:
         if not len(self.espValuesAU):
             raise ValueError("ESP was not sampled; pass espPointsAngstrom")
         return np.array(self.espValuesAU, dtype=float, copy=True)
+
+    def GetRealSpacePoints(self) -> np.ndarray:
+        """Copy of real-space sampling points in Angstrom, [point, xyz]."""
+        self._require_success()
+        if not len(self.realSpaceDensityAU) or not len(self.realSpacePointsAngstrom):
+            raise ValueError("Real-space properties were not sampled; pass realSpacePointsAngstrom")
+        return np.array(self.realSpacePointsAngstrom, dtype=float, copy=True)
+
+    def GetRealSpaceDensity(self) -> np.ndarray:
+        """Copy of sampled valence electron density in e/Bohr^3, [point]."""
+        self._require_success()
+        if not len(self.realSpaceDensityAU):
+            raise ValueError("Real-space properties were not sampled; pass realSpacePointsAngstrom")
+        return np.array(self.realSpaceDensityAU, dtype=float, copy=True)
+
+    def GetRealSpaceALIE(self) -> np.ndarray:
+        """Copy of sampled Average Local Ionization Energy in eV, [point]."""
+        self._require_success()
+        if not len(self.realSpaceALIEEV):
+            raise ValueError("Real-space properties were not sampled; pass realSpacePointsAngstrom")
+        return np.array(self.realSpaceALIEEV, dtype=float, copy=True)
+
+    def GetRealSpaceVirtualDensity(self) -> np.ndarray:
+        """Copy of sampled virtual orbital density in 1/Bohr^3, [point]."""
+        self._require_success()
+        if not len(self.realSpaceVirtualDensityAU):
+            raise ValueError("Real-space properties were not sampled; pass realSpacePointsAngstrom")
+        return np.array(self.realSpaceVirtualDensityAU, dtype=float, copy=True)
+
+    def GetRealSpaceLEA(self) -> np.ndarray:
+        """Copy of sampled Local Electron Affinity in eV, [point]."""
+        self._require_success()
+        if not len(self.realSpaceLEAEV):
+            raise ValueError("Real-space properties were not sampled; pass realSpacePointsAngstrom")
+        return np.array(self.realSpaceLEAEV, dtype=float, copy=True)
 
     def GetAtomicPolarizabilities(self) -> np.ndarray:
         """Copy of D4 atomic static dipole polarizabilities in Bohr^3, [atom]."""

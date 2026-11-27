@@ -74,6 +74,9 @@ class XTBOptions:
     accuracy: float = 1.0
     electronicTemperature: float = 300.0
     espPointsAngstrom: tuple[tuple[float, float, float], ...] = ()
+    realSpacePointsAngstrom: tuple[tuple[float, float, float], ...] = ()
+    realSpaceOccupationThreshold: float = 1e-7
+    realSpaceLEAWindowEV: float = 0.0
     solvent: str | None = None
     solvationModel: str = 'alpb'
     solvationGrid: int | None = None
@@ -84,6 +87,19 @@ class XTBOptions:
             raise ValueError('confId must be an integer')
         object.__setattr__(self, 'confId', int(self.confId))
         object.__setattr__(self, 'espPointsAngstrom', _normalize_esp_points(self.espPointsAngstrom))
+        object.__setattr__(
+            self,
+            'realSpacePointsAngstrom',
+            _normalize_esp_points(self.realSpacePointsAngstrom),
+        )
+        for label, attr in (
+            ('realSpaceOccupationThreshold', 'realSpaceOccupationThreshold'),
+            ('realSpaceLEAWindowEV', 'realSpaceLEAWindowEV'),
+        ):
+            val = getattr(self, attr)
+            if isinstance(val, bool) or not isinstance(val, Real) or not math.isfinite(val) or val < 0:
+                raise ValueError(f'{label} must be a finite nonnegative real number')
+            object.__setattr__(self, attr, float(val))
         settings = _validate_calculation_settings(self.maxIterations, self.accuracy, self.electronicTemperature)
         object.__setattr__(self, 'maxIterations', settings['max_iterations'])
         object.__setattr__(self, 'accuracy', settings['accuracy'])
@@ -109,6 +125,16 @@ class XTBOptions:
         """Return JSON-compatible options for ``XTBCalculator`` and batches."""
         values = asdict(self)
         values['espPointsAngstrom'] = [list(row) for row in self.espPointsAngstrom]
+        values['realSpacePointsAngstrom'] = [list(row) for row in self.realSpacePointsAngstrom]
+        # Preserve existing cache keys and serialization when real-space sampling is unset.
+        if (
+            not self.realSpacePointsAngstrom
+            and self.realSpaceOccupationThreshold == 1e-7
+            and self.realSpaceLEAWindowEV == 0.0
+        ):
+            values.pop('realSpacePointsAngstrom', None)
+            values.pop('realSpaceOccupationThreshold', None)
+            values.pop('realSpaceLEAWindowEV', None)
         # Preserve gas-phase cache keys and serialization when solvation is unset.
         if self.solvent is None and self.solvationModel == 'alpb' and self.solvationGrid is None:
             values.pop('solvent', None)

@@ -97,6 +97,7 @@ if eht_ok:
 | Atomic charges | `GetAtomicCharges()`, elementary charge, `[atom]` | **GFN1/2:** converged SCC Mulliken charge (`chargeModel == "xtb_scc_mulliken"`); **GFN0:** PEEQ/EEQ (`"gfn0_eeq"`) |
 | CM5 charges | `GetCM5Charges()`, elementary charge, `[atom]` | Geometry-dependent correction to GFN1/2 SCC Mulliken charges; requires GFN1/2 SCC charges and calculation geometry |
 | Sampled ESP | `GetESPPoints()` (Angstrom `[point,xyz]`), `GetESPValues()` (Hartree/e `[point]`) | Pass `espPointsAngstrom` to `RunMol`; `espSampled` reports availability. Shared [ESP/RESP fits](esp-api.md) accept this result |
+| Sampled real-space properties | `realSpaceExportVerified`, `realSpaceSampled`, `GetRealSpacePoints()` (Angstrom `[point,xyz]`), `GetRealSpaceDensity()` (`e/Bohr^3`), `GetRealSpaceALIE()` (`eV`), `GetRealSpaceVirtualDensity()` (`1/Bohr^3`), `GetRealSpaceLEA()` (`eV`) | Pass `realSpacePointsAngstrom`, `realSpaceOccupationThreshold`, `realSpaceLEAWindowEV` to `RunMol`; shared `CalcRealSpaceProperties` and `CalcRealSpaceSurfaceDescriptors` accept this result |
 | Dipole | `GetDipole()`, e·Bohr, `[x,y,z]` | Origin-dependent for charged molecules; uses supplied coordinates |
 | Nuclear gradient | `GetGradient()`, Hartree/Bohr, `[atom,xyz]` | Used by `OptimizeXTB`; it is not an excited-state gradient |
 | Bond orders | `GetWibergBondOrders()`, dimensionless, `[atom,atom]` | Not the EHT overlap population matrix |
@@ -125,7 +126,8 @@ RunMol(mol, confId=-1, method="GFN2-xTB", charge=None,
        xtbLibrary="", parameterDirectory="", maxIterations=250,
        accuracy=1.0, electronicTemperature=300.0, keepOverlap=False,
        espPointsAngstrom=None, solvent=None, solvationModel="alpb",
-       solvationGrid=None)
+       solvationGrid=None, realSpacePointsAngstrom=None,
+       realSpaceOccupationThreshold=1e-7, realSpaceLEAWindowEV=0.0)
 ```
 
 `confId` is an RDKit conformer **ID**, not its position in the conformer list;

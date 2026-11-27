@@ -1,0 +1,289 @@
+diff --git a/include/xtb.h b/include/xtb.h
+--- a/include/xtb.h
++++ b/include/xtb.h
+@@ -400,6 +400,23 @@
+ extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getNuclearESP(
+     xtb_TEnvironment, xtb_TResults, int natoms, double* output);
+ 
++/* EleD real-space wavefunction ABI v1; upstream API version remains unchanged.
++ * Evaluates exact Cartesian GTO valence electron density rho(r) (e/Bohr^3),
++ * Average Local Ionization Energy ALIE(r) (eV), virtual density (1/Bohr^3),
++ * and Local Electron Affinity LEA(r) (eV) at arbitrary 3D points (Bohr) from
++ * an existing nonperiodic GFN0/1/2 singlepoint snapshot without new SCF calls.
++ * points: contiguous [npoints][3] in Bohr. Outputs: [npoints] doubles each.
++ * occ_threshold >= 0 separates occupied (f > thr) and virtual (f <= thr) MOs.
++ * lea_window_ev == 0 includes all valence virtual MOs; > 0 restricts virtual
++ * MOs to [LUMO, LUMO + lea_window_ev]. Returns 1 on success, 0 on error
++ * (environment diagnostic set, output buffers untouched).
++ */
++extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getRealSpaceAPIVersion(void);
++extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_evalRealSpace(
++    xtb_TEnvironment, xtb_TResults, int npoints, const double* points,
++    double occ_threshold, double lea_window_ev,
++    double* density, double* alie_ev, double* vir_density, double* lea_ev);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/api/results.f90 b/src/api/results.f90
+--- a/src/api/results.f90
++++ b/src/api/results.f90
+@@ -24,6 +24,7 @@
+    use xtb_api_utils
+    use xtb_type_basisset, only: TBasisset
+    use xtb_dtrafo, only: sao2cao
++   use xtb_mctc_blas, only: blas_gemm
+    use esp, only: esp_points, esp_nuclear
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    use xtb_type_restart
+@@ -35,6 +36,7 @@
+    public :: rdkit_esp_version, rdkit_keep_esp, rdkit_get_esp
+    public :: rdkit_properties_version, rdkit_get_energy_decomposition, &
+       & rdkit_get_polarizability, rdkit_get_multipoles, rdkit_get_nuclear_esp
++   public :: rdkit_realspace_version, rdkit_eval_realspace
+    public :: PropsResult
+    public :: VResults
+    public :: newResults_api, delResults_api, getEnergy_api, getGradient_api, &
+@@ -64,7 +66,7 @@
+       real(wp) :: molecular_quadrupole(6) = 0.0_wp
+       logical :: has_nuclear_esp = .false.
+       type(TBasisset) :: basis
+-      real(wp), allocatable :: xyz(:, :), z(:), occ(:), c_sao(:, :)
++      real(wp), allocatable :: xyz(:, :), z(:), occ(:), emo(:), c_sao(:, :)
+    end type PropsResult
+ 
+    !> Void pointer to wavefunction and result objects
+@@ -887,4 +889,222 @@
+    ok = 1
+ end function
+ 
++! Real-space wavefunction evaluation ABI v1 (density, ALIE, virtual density, LEA).
++function rdkit_realspace_version() result(version) bind(C, name="xtb_rdkit_getRealSpaceAPIVersion")
++   integer(c_int) :: version
++   version = 1
++end function
++
++subroutine eval_realspace_kernel(nmo, nbf, xyz, occ, emo, C_cao, basis, np, points, &
++      & occ_thr, lea_win, density, alie_ev, vir_density, lea_ev, invalid_lao)
++   type(TBasisset), intent(in) :: basis
++   integer, intent(in) :: nmo, nbf, np
++   real(wp), intent(in) :: xyz(3, *), occ(nmo), emo(nmo), C_cao(nbf, nmo)
++   real(wp), intent(in) :: points(3, np), occ_thr, lea_win
++   real(wp), intent(out) :: density(np), alie_ev(np), vir_density(np), lea_ev(np)
++   logical, intent(out) :: invalid_lao
++
++   real(wp), allocatable :: chi(:, :), psi(:, :)
++   integer, allocatable :: primstart(:)
++   logical, allocatable :: is_occ(:), is_vir(:)
++   integer :: i, k, m, p_idx, ip, iat, lao
++   real(wp) :: dx, dy, dz, r2, ar2, rad, ang, lumo_ev
++   real(wp) :: rho, alie_num, vrho, lea_num, p2, unocc
++   logical :: has_lumo
++
++   invalid_lao = .false.
++   allocate(primstart(nbf))
++   ip = 0
++   do i = 1, nbf
++      primstart(i) = ip
++      ip = ip + basis%nprim(i)
++      lao = basis%lao(i)
++      if (lao < 1 .or. lao > 10) then
++         invalid_lao = .true.
++         return
++      end if
++   end do
++
++   allocate(chi(nbf, np), psi(nmo, np))
++   do k = 1, np
++      do i = 1, nbf
++         iat = basis%aoat(i)
++         dx = points(1, k) - xyz(1, iat)
++         dy = points(2, k) - xyz(2, iat)
++         dz = points(3, k) - xyz(3, iat)
++         r2 = dx*dx + dy*dy + dz*dz
++         ip = primstart(i)
++         rad = 0.0_wp
++         do p_idx = 1, basis%nprim(i)
++            ar2 = basis%alp(ip + p_idx) * r2
++            if (ar2 < 50.0_wp) then
++               rad = rad + basis%cont(ip + p_idx) * exp(-ar2)
++            end if
++         end do
++         select case(basis%lao(i))
++         case(1)
++            ang = 1.0_wp
++         case(2)
++            ang = dx
++         case(3)
++            ang = dy
++         case(4)
++            ang = dz
++         case(5)
++            ang = dx*dx
++         case(6)
++            ang = dy*dy
++         case(7)
++            ang = dz*dz
++         case(8)
++            ang = dx*dy
++         case(9)
++            ang = dx*dz
++         case(10)
++            ang = dy*dz
++         case default
++            ang = 0.0_wp
++         end select
++         chi(i, k) = ang * rad
++      end do
++   end do
++
++   call blas_gemm('T', 'N', nmo, np, nbf, 1.0_wp, C_cao, nbf, chi, nbf, 0.0_wp, psi, nmo)
++
++   allocate(is_occ(nmo), is_vir(nmo))
++   has_lumo = .false.
++   lumo_ev = 0.0_wp
++   do m = 1, nmo
++      is_occ(m) = (occ(m) > occ_thr)
++      is_vir(m) = .false.
++      if (.not.is_occ(m) .and. .not.has_lumo) then
++         has_lumo = .true.
++         lumo_ev = emo(m)
++      end if
++   end do
++   do m = 1, nmo
++      if (.not.is_occ(m)) then
++         if (lea_win <= 0.0_wp) then
++            is_vir(m) = .true.
++         else if (has_lumo .and. emo(m) <= lumo_ev + lea_win + 1.0e-12_wp) then
++            is_vir(m) = .true.
++         end if
++      end if
++   end do
++
++   do k = 1, np
++      rho = 0.0_wp
++      alie_num = 0.0_wp
++      vrho = 0.0_wp
++      lea_num = 0.0_wp
++      do m = 1, nmo
++         p2 = psi(m, k) * psi(m, k)
++         if (is_occ(m)) then
++            rho = rho + occ(m) * p2
++            alie_num = alie_num + occ(m) * (-emo(m)) * p2
++         else if (is_vir(m)) then
++            unocc = max(0.0_wp, 2.0_wp - occ(m))
++            vrho = vrho + unocc * p2
++            lea_num = lea_num + unocc * (-emo(m)) * p2
++         end if
++      end do
++      density(k) = rho
++      if (rho > 1.0e-30_wp) then
++         alie_ev(k) = alie_num / rho
++      else
++         alie_ev(k) = 0.0_wp
++      end if
++      vir_density(k) = vrho
++      if (vrho > 1.0e-30_wp) then
++         lea_ev(k) = lea_num / vrho
++      else
++         lea_ev(k) = 0.0_wp
++      end if
++   end do
++end subroutine
++
++function rdkit_eval_realspace(venv, vres, count, points_ptr, occ_thr, lea_win, &
++      & density_ptr, alie_ptr, vir_density_ptr, lea_ptr) result(ok) &
++      & bind(C, name="xtb_rdkit_evalRealSpace")
++   type(c_ptr), value :: venv, vres, points_ptr
++   type(c_ptr), value :: density_ptr, alie_ptr, vir_density_ptr, lea_ptr
++   integer(c_int), value :: count
++   real(c_double), value :: occ_thr, lea_win
++   integer(c_int) :: ok
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   real(c_double), pointer :: points(:, :), d_out(:), a_out(:), vd_out(:), l_out(:)
++   real(wp), allocatable :: d_tmp(:), a_tmp(:), vd_tmp(:), l_tmp(:), coefficients(:, :)
++   logical :: invalid_lao
++   ok = 0
++   if (.not.c_associated(venv)) return
++   call c_f_pointer(venv, env)
++   call checkGlobalEnv
++   if (.not.c_associated(vres)) then
++      call env%ptr%error("Results object is not allocated", "rdkit_realspace")
++      return
++   end if
++   call c_f_pointer(vres, res)
++   if (.not.allocated(res%props)) then
++      call env%ptr%error("Real-space snapshot unavailable", "rdkit_realspace")
++      return
++   end if
++   if (.not.res%props%has_nuclear_esp .or. .not.allocated(res%props%emo)) then
++      call env%ptr%error("Real-space wavefunction unavailable for this calculation", "rdkit_realspace")
++      return
++   end if
++   if (count <= 0 .or. .not.c_associated(points_ptr) .or. &
++       & .not.c_associated(density_ptr) .or. .not.c_associated(alie_ptr) .or. &
++       & .not.c_associated(vir_density_ptr) .or. .not.c_associated(lea_ptr)) then
++      call env%ptr%error("Real-space point count or buffer pointer invalid", "rdkit_realspace")
++      return
++   end if
++   if (.not.ieee_is_finite(occ_thr) .or. occ_thr < 0.0_wp .or. &
++       & .not.ieee_is_finite(lea_win) .or. lea_win < 0.0_wp) then
++      call env%ptr%error("Real-space thresholds must be finite and nonnegative", "rdkit_realspace")
++      return
++   end if
++   call c_f_pointer(points_ptr, points, [3, count])
++   if (.not.all(ieee_is_finite(points))) then
++      call env%ptr%error("Real-space points must be finite", "rdkit_realspace")
++      return
++   end if
++   allocate(d_tmp(count), a_tmp(count), vd_tmp(count), l_tmp(count))
++   associate(p => res%props)
++      if (allocated(res%esp)) then
++         call eval_realspace_kernel(p%basis%nao, p%basis%nbf, p%xyz, p%occ, p%emo, &
++            & res%esp%coefficients, p%basis, count, points, occ_thr, lea_win, &
++            & d_tmp, a_tmp, vd_tmp, l_tmp, invalid_lao)
++      else
++         allocate(coefficients(p%basis%nbf, p%basis%nao))
++         if (p%basis%nbf == p%basis%nao) then
++            coefficients = p%c_sao
++         else
++            call sao2cao(p%basis%nao, p%c_sao, p%basis%nbf, coefficients, p%basis)
++         end if
++         call eval_realspace_kernel(p%basis%nao, p%basis%nbf, p%xyz, p%occ, p%emo, &
++            & coefficients, p%basis, count, points, occ_thr, lea_win, &
++            & d_tmp, a_tmp, vd_tmp, l_tmp, invalid_lao)
++      end if
++   end associate
++   if (invalid_lao) then
++      call env%ptr%error("Real-space evaluation supports s/p/d Cartesian basis functions only", "rdkit_realspace")
++      return
++   end if
++   if (.not.all(ieee_is_finite(d_tmp)) .or. .not.all(ieee_is_finite(a_tmp)) .or. &
++       & .not.all(ieee_is_finite(vd_tmp)) .or. .not.all(ieee_is_finite(l_tmp))) then
++      call env%ptr%error("Real-space evaluation produced nonfinite values", "rdkit_realspace")
++      return
++   end if
++   call c_f_pointer(density_ptr, d_out, [count])
++   call c_f_pointer(alie_ptr, a_out, [count])
++   call c_f_pointer(vir_density_ptr, vd_out, [count])
++   call c_f_pointer(lea_ptr, l_out, [count])
++   d_out = d_tmp
++   a_out = a_tmp
++   vd_out = vd_tmp
++   l_out = l_tmp
++   ok = 1
++end function
++
+ end module xtb_api_results
+diff --git a/src/api/interface.f90 b/src/api/interface.f90
+--- a/src/api/interface.f90
++++ b/src/api/interface.f90
+@@ -236,6 +236,7 @@
+                res%props%xyz = mol%ptr%xyz
+                res%props%z = mol%ptr%z
+                res%props%occ = res%chk%wfn%focc
++               res%props%emo = res%chk%wfn%emo
+                res%props%c_sao = res%chk%wfn%C
+             end if
+          end if

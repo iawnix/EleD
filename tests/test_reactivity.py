@@ -35,10 +35,18 @@ def test_vertical_formulas_fukui_signs_and_fragment_conservation():
     mol,r=states(); report=CalcReactivityDescriptors(mol,*r,fragments={'O':[0],'H':[1,2]})
     assert report['values']==pytest.approx({'ip_v_ev':10.,'ea_v_ev':2.,
         'mu_ev':-6.,'chi_ev':6.,'eta_ev':4.,
-        's_1ev':.125,'omega_ev':4.5})
+        's_1ev':.125,'omega_ev':4.5,
+        'omega_minus_ev':8.,'omega_plus_ev':2.})
+    assert report['values']['omega_minus_ev'] - report['values']['omega_plus_ev'] == pytest.approx(report['values']['chi_ev'])
     np.testing.assert_allclose([a['f_plus'] for a in report['atoms']],[.2,.4,.4])
     np.testing.assert_allclose([a['f_minus'] for a in report['atoms']],[.3,.35,.35])
     np.testing.assert_allclose([a['dual'] for a in report['atoms']],[-.1,.05,.05])
+    np.testing.assert_allclose([a['omega_minus_loc_ev'] for a in report['atoms']],[2.4,2.8,2.8])
+    np.testing.assert_allclose([a['omega_plus_loc_ev'] for a in report['atoms']],[.4,.8,.8])
+    np.testing.assert_allclose([a['delta_omega_loc_ev'] for a in report['atoms']],[-2.0,-2.0,-2.0])
+    np.testing.assert_allclose([a['s2_loc_1ev2'] for a in report['atoms']],[-0.1/64.,0.05/64.,0.05/64.])
+    assert sum(a['delta_omega_loc_ev'] for a in report['atoms']) == pytest.approx(report['values']['mu_ev'])
+    assert sum(a['s2_loc_1ev2'] for a in report['atoms']) == pytest.approx(0.0)
     assert sum(v['f_plus'] for v in report['fragments'].values())==pytest.approx(1)
     assert sum(v['dual'] for v in report['fragments'].values())==pytest.approx(0)
     assert report['quality']['spin_states_verified_as_ground_states'] is False
@@ -61,6 +69,11 @@ def test_negative_ea_is_retained_and_nonpositive_hardness_not_divided():
     assert report['values']['eta_ev']==pytest.approx(-1)
     assert report['values']['s_1ev'] is None
     assert report['values']['omega_ev'] is None
+    assert report['values']['omega_minus_ev'] is None
+    assert report['values']['omega_plus_ev'] is None
+    assert all(a['omega_minus_loc_ev'] is None and a['omega_plus_loc_ev'] is None
+               and a['delta_omega_loc_ev'] is None and a['s2_loc_1ev2'] is None
+               for a in report['atoms'])
 
 
 @pytest.mark.parametrize('damage',['geometry','charge','method','engine','parameters','settings','electron','conservation'])
@@ -157,5 +170,5 @@ def test_default_protocol_uses_300k_reference_copies_and_records_version():
     _,configs,interface,initialization=calculate.call_args.args
     assert all(v.electronicTemperature==300. for v in configs)
     assert initialization=='reference' and interface=='native'
-    assert report['analysis_settings']['protocol_version']=='2.1'
+    assert report['analysis_settings']['protocol_version']=='2.2'
     assert report['analysis_settings']['initialization']=='reference'

@@ -573,3 +573,191 @@ def CalcBondOverlapDescriptors(
     }
     json.dumps(output, allow_nan=False)
     return output
+
+
+_HARTREE_TO_EV = 27.211386245988
+
+
+def CalcLinearResponseMatrix(
+    result,
+    *,
+    scheme: str = "lowdin",
+    occupationThreshold: float = 1e-7,
+    gapToleranceEV: float = 1e-6,
+    occupationTolerance: float = 1e-4,
+):
+    """Independent-particle atom-condensed linear response matrix chi_AB (e/eV, e/Ha).
+
+    Evaluates the closed-shell Kohn-Sham / independent-particle linear response
+    kernel condensed onto atoms (Geerlings et al., *Chem. Soc. Rev.* 2014, 43,
+    4989):
+
+        chi_AB^IP = -4 * sum_{i in occ} sum_{a in vir} (Q^A_{ia} * Q^B_{ia}) / (eps_a - eps_i)
+
+    where ``Q^A_{ia}`` is the atom-resolved transition overlap matrix in either
+    the symmetric orthogonalized Lowdin basis (default, ``Q^A_{ia} = sum_{mu in A}
+    C_tilde_{mu,i} C_tilde_{mu,a}``) or symmetrized Mulliken partitioning
+    (``Q^A_{ia} = 0.5 * sum_{mu in A} (C_{mu,i} (SC)_{mu,a} + (SC)_{mu,i} C_{mu,a})``).
+
+    Properties:
+    - Symmetric and negative semi-definite (``chi_AA <= 0``).
+    - Exact electron-conservation sum rule: ``sum_B chi_AB = 0`` for every atom ``A``.
+    - Explicitly withheld (``available=False``, ``None`` fields, explicit ``missing``
+      reason) for open-shell, unknown-spin, fractionally occupied, or tiny/zero-gap
+      calculations. Never invokes xTB.
+    """
+    result = _as_result(result)
+    scheme = _validate_scheme(scheme)
+    gap_tol = _validate_positive(gapToleranceEV, "gapToleranceEV")
+    occ_tol = _validate_positive(occupationTolerance, "occupationTolerance")
+    energies, occupations, occupied, virtual, c, s, ao_atom, ortho_err = _overlap_basis(
+        result, occupationThreshold=occupationThreshold
+    )
+    natoms = int(result.metadata.get("atom_count", len(result.atomicCharges)))
+
+    uhf = result.numUnpairedElectrons
+    if uhf is None:
+        uhf = result.metadata.get("uhf")
+
+    withheld_reason: str | None = None
+    if uhf is None:
+        withheld_reason = "unknown_spin_state"
+    elif int(uhf) != 0:
+        withheld_reason = "open_shell_not_supported"
+    elif np.any((occupations > occ_tol) & (np.abs(occupations - 2.0) > occ_tol)):
+        withheld_reason = "fractional_occupation_not_supported"
+    elif not len(occupied):
+        withheld_reason = "no_occupied_orbitals"
+    elif not len(virtual):
+        withheld_reason = "no_virtual_orbitals"
+    else:
+        gap_ev = float(energies[virtual[0]] - energies[occupied[-1]])
+        if gap_ev <= gap_tol:
+            withheld_reason = "degenerate_homo_lumo_gap"
+
+    units = {
+        "chi_e_per_ev": "e/eV",
+        "chi_e_per_ha": "e/Hartree",
+        "sum_rule_max_error_e_per_ev": "e/eV",
+        "homo_lumo_gap_ev": "eV",
+        "chi_diag_e_per_ev": "e/eV",
+        "chi_diag_e_per_ha": "e/Hartree",
+        "atomic_softness_e_per_ev": "e/eV",
+        "nonlocal_coupling_e_per_ev": "e/eV",
+    }
+
+    if withheld_reason is not None:
+        missing = {
+            "chi_e_per_ev": withheld_reason,
+            "chi_e_per_ha": withheld_reason,
+            "sum_rule_max_error_e_per_ev": withheld_reason,
+            "atoms": withheld_reason,
+        }
+        output = {
+            "available": False,
+            "scheme": scheme,
+            "chi_e_per_ev": None,
+            "chi_e_per_ha": None,
+            "sum_rule_max_error_e_per_ev": None,
+            "homo_lumo_gap_ev": (
+                float(energies[virtual[0]] - energies[occupied[-1]])
+                if (len(occupied) and len(virtual))
+                else None
+            ),
+            "n_occupied": int(len(occupied)),
+            "n_virtual": int(len(virtual)),
+            "orthonormality_error": ortho_err,
+            "atoms": [],
+            "analysis_settings": {
+                "method": "independent_particle_condensed_linear_response",
+                "reference": "Geerlings et al., Chem. Soc. Rev. 2014, 43, 4989",
+                "scheme": scheme,
+                "occupation_threshold": float(occupationThreshold),
+                "gap_tolerance_ev": gap_tol,
+                "occupation_tolerance": occ_tol,
+                "definition": "chi_AB = -4 * sum_{i in occ, a in vir} Q^A_{ia} Q^B_{ia} / (eps_a - eps_i)",
+                "coupled_response": False,
+            },
+            "units": units,
+            "invariance": (
+                "invariant to rigid translation/rotation, AO permutation, MO phase, "
+                "and degenerate occupied/virtual subspace rotations; preserves original atom order"
+            ),
+            "missing": missing,
+        }
+        json.dumps(output, allow_nan=False)
+        return output
+
+    c_occ = c[:, occupied]
+    c_vir = c[:, virtual]
+    n_occ = len(occupied)
+    n_vir = len(virtual)
+    de_ev = energies[virtual][None, :] - energies[occupied][:, None]
+    inv_de_flat = (1.0 / de_ev).ravel()
+
+    q_flat = np.zeros((natoms, n_occ * n_vir), dtype=float)
+    if scheme == "lowdin":
+        eigvals, eigvecs = np.linalg.eigh(s)
+        s_half = (eigvecs * np.sqrt(eigvals)) @ eigvecs.T
+        ct_occ = s_half @ c_occ
+        ct_vir = s_half @ c_vir
+        for a in range(natoms):
+            idx = np.flatnonzero(ao_atom == a)
+            q_flat[a] = (ct_occ[idx].T @ ct_vir[idx]).ravel()
+    else:
+        sc_occ = s @ c_occ
+        sc_vir = s @ c_vir
+        for a in range(natoms):
+            idx = np.flatnonzero(ao_atom == a)
+            q_block = 0.5 * (c_occ[idx].T @ sc_vir[idx] + sc_occ[idx].T @ c_vir[idx])
+            q_flat[a] = q_block.ravel()
+
+    chi_ev = -4.0 * ((q_flat * inv_de_flat[None, :]) @ q_flat.T)
+    chi_ev = 0.5 * (chi_ev + chi_ev.T)
+    chi_ha = chi_ev * _HARTREE_TO_EV
+    sum_rule_err = float(np.max(np.abs(np.sum(chi_ev, axis=1))))
+
+    atoms = []
+    for a in range(natoms):
+        diag_ev = float(chi_ev[a, a])
+        diag_ha = float(chi_ha[a, a])
+        off_abs = float(np.sum(np.abs(chi_ev[a])) - abs(diag_ev))
+        atoms.append({
+            "atom_index": int(a),
+            "chi_diag_e_per_ev": diag_ev,
+            "chi_diag_e_per_ha": diag_ha,
+            "atomic_softness_e_per_ev": float(-diag_ev),
+            "nonlocal_coupling_e_per_ev": off_abs,
+            "missing": {},
+        })
+
+    output = {
+        "available": True,
+        "scheme": scheme,
+        "chi_e_per_ev": chi_ev.tolist(),
+        "chi_e_per_ha": chi_ha.tolist(),
+        "sum_rule_max_error_e_per_ev": sum_rule_err,
+        "homo_lumo_gap_ev": float(energies[virtual[0]] - energies[occupied[-1]]),
+        "n_occupied": int(n_occ),
+        "n_virtual": int(n_vir),
+        "orthonormality_error": ortho_err,
+        "atoms": atoms,
+        "analysis_settings": {
+            "method": "independent_particle_condensed_linear_response",
+            "reference": "Geerlings et al., Chem. Soc. Rev. 2014, 43, 4989",
+            "scheme": scheme,
+            "occupation_threshold": float(occupationThreshold),
+            "gap_tolerance_ev": gap_tol,
+            "occupation_tolerance": occ_tol,
+            "definition": "chi_AB = -4 * sum_{i in occ, a in vir} Q^A_{ia} Q^B_{ia} / (eps_a - eps_i)",
+            "coupled_response": False,
+        },
+        "units": units,
+        "invariance": (
+            "invariant to rigid translation/rotation, AO permutation, MO phase, "
+            "and degenerate occupied/virtual subspace rotations; preserves original atom order"
+        ),
+        "missing": {},
+    }
+    json.dumps(output, allow_nan=False)
+    return output

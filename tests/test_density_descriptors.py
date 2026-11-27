@@ -190,9 +190,11 @@ def test_descriptor_catalog_and_scalar_units_are_explicit():
     catalog = DescriptorCatalog()
     assert set(catalog) == {
         'molecular', 'atom', 'fragment', 'bond', 'density', 'reactivity',
-        'local_geometry', 'esp_surface', 'localized_orbitals', 'properties',
-        'solvation', 'thermochemistry',
+        'fod', 'realspace', 'local_geometry', 'esp_surface', 'localized_orbitals',
+        'properties', 'solvation', 'thermochemistry',
     }
+    assert catalog['fod']['n_fod_e']['unit'] == 'e'
+    assert catalog['realspace']['alie_ev / lea_ev']['unit'] == 'eV'
     assert 'mbo' not in catalog['bond']
     assert 'eht_*' not in catalog['molecular']
     assert catalog['bond']['wbo']['unit'] == 'dimensionless'

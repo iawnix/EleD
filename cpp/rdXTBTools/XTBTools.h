@@ -16,6 +16,9 @@ struct XTBOptions {
   bool keepOrbitalCoefficients = false;
   bool keepOverlap = false;
   std::vector<double> espPointsAngstrom; // row-major [point][xyz]; empty disables sampling
+  std::vector<double> realSpacePointsAngstrom; // row-major [point][xyz]; empty disables sampling
+  double realSpaceOccupationThreshold = 1e-7;
+  double realSpaceLEAWindowEV = 0.0;
   std::string libraryPath;
   std::string parameterDirectory;
   int maxIterations = 250;
@@ -116,6 +119,14 @@ struct XTBResults {
 
   bool nuclearESPAvailable = false;
   std::vector<double> nuclearESPAU;             // [atom], Hartree/e
+
+  // Real-space wavefunction ABI v1 (exact Cartesian GTO evaluation).
+  bool realSpaceExportVerified = false;
+  std::vector<double> realSpacePointsAngstrom;    // row-major [point][xyz], Angstrom
+  std::vector<double> realSpaceDensityAU;         // [point], e/Bohr^3
+  std::vector<double> realSpaceALIEEV;            // [point], eV
+  std::vector<double> realSpaceVirtualDensityAU;  // [point], 1/Bohr^3
+  std::vector<double> realSpaceLEAEV;             // [point], eV
 };
 
 // Gas-phase single point. Invalid molecular input/options throw

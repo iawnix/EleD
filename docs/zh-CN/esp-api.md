@@ -205,6 +205,36 @@ GFN-FF 和周期体系不生成 ESP 快照。
 例程可能打印收敛警告，同时仍返回有限数值。本扩展保留该行为；此时返回有限值
 本身不能证明结果精度。
 
+## 实空间波函数 ABI（密度、ALIE、LEA）与 `0.001 a.u.` 等值面
+
+EleD 0.14.0 新增经过审查的实空间波函数 ABI（`tools/diagnostics/xtb_realspace_export.patch`，
+导出 `xtb_rdkit_getRealSpaceAPIVersion` 与 `xtb_rdkit_evalRealSpace`），可在不增加 SCF
+的前提下对任意三维点精确求值笛卡尔 GTO 价电子密度 $\rho(\mathbf{r})$（`e/Bohr^3`）、
+平均局域电离能 $\mathrm{ALIE}(\mathbf{r})$（`eV`）、虚轨道密度（`1/Bohr^3`）与局域电子亲和能
+$\mathrm{LEA}(\mathbf{r})$（`eV`）：
+
+```python
+from eled import (
+    XTBCalculator, GenerateESPSurfaceGrid,
+    CalcRealSpaceProperties, CalcRealSpaceSurfaceDescriptors, CalcDensityIsosurface,
+)
+
+grid = GenerateESPSurfaceGrid(mol, scales=(1.4,), pointsPerAtom=100)
+res = XTBCalculator(method="GFN2-xTB").Calculate(mol, realSpacePointsAngstrom=grid.pointsAngstrom)
+rs_props = CalcRealSpaceProperties(res)
+rs_surface = CalcRealSpaceSurfaceDescriptors(mol, res, surfaceGrid=grid)
+
+# 单次 SCF 精确求取 0.001 e/Bohr^3 电子密度等值面：
+iso = CalcDensityIsosurface(mol, isovalueAU=0.001, pointsPerAtom=120, includeESP=True, includeALIE=True)
+print(iso["volume_a3"], iso["area_a2"], iso["sphericity"])
+print(iso["esp_surface"]["v_min_au"], iso["realspace_surface"]["alie_min_ev"])
+```
+
+当某点电子密度（或虚轨道密度）$\le \texttt{densityCutoffAU}$（默认 `1e-18`）时，
+`alie_ev`（或 `lea_ev`）返回 `None`，绝不填零。`CalcDensityIsosurface` 在单次原生
+`libxtb` 单点计算中通过 Voronoi 分区批量径向二分求取精确等值面，并计算体积、表面积、
+球度以及等值面上的 Politzer–Murray ESP 和 ALIE/LEA 表面统计量。
+
 ## 构建和验证
 
 复用标准安装中的固定运行时和工具链：

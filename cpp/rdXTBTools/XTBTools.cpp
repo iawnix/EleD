@@ -39,6 +39,7 @@ constexpr const char *d4PatchSHA256 =
 constexpr const char *basisPatchSHA256 = "3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c";
 constexpr const char *scfPatchSHA256 = "d8db37846002ebc19ed6808356cbd83304cc1608915e69956c1a7afc174d18fd";
 constexpr const char *propertiesPatchSHA256 = "56ea1fab2c624e37f851ce3d59d11d73d1a9abd6f9553c5464983c36c07ff817";
+constexpr const char *realSpacePatchSHA256 = "4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74";
 constexpr std::array<int, 32> validSolvationGrids = {
     6, 14, 26, 38, 50, 74, 86, 110, 146, 170, 194, 230, 266, 302, 350, 434,
     590, 770, 974, 1202, 1454, 1730, 2030, 2354, 2702, 3074, 3470, 3890, 4334, 4802, 5294, 5810};
@@ -87,6 +88,9 @@ struct API {
   int (*getPolarizability)(xtb_TEnvironment, xtb_TResults, int, double *, double *, double *) = nullptr;
   int (*getMultipoles)(xtb_TEnvironment, xtb_TResults, int, double *, double *, double *) = nullptr;
   int (*getNuclearESP)(xtb_TEnvironment, xtb_TResults, int, double *) = nullptr;
+  int (*getRealSpaceAPIVersion)() = nullptr;
+  int (*evalRealSpace)(xtb_TEnvironment, xtb_TResults, int, const double *, double, double,
+                       double *, double *, double *, double *) = nullptr;
   void (*setKeepOverlap)(xtb_TEnvironment, xtb_TResults, bool) = nullptr;
   void (*getBasisSize)(xtb_TEnvironment, xtb_TResults, int *) = nullptr;
   void (*getOverlap)(xtb_TEnvironment, xtb_TResults, int, double *) = nullptr;
@@ -143,6 +147,7 @@ struct API {
     OPTIONAL(getSCFAPIVersion); OPTIONAL(getSCFDiagnostics);
     OPTIONAL(getPropertiesAPIVersion); OPTIONAL(getEnergyDecomposition);
     OPTIONAL(getPolarizability); OPTIONAL(getMultipoles); OPTIONAL(getNuclearESP);
+    OPTIONAL(getRealSpaceAPIVersion); OPTIONAL(evalRealSpace);
 #undef OPTIONAL
   }
   void check(xtb_TEnvironment env, const char *operation) const {
@@ -258,6 +263,20 @@ bool verifyProperties(const API &api) {
   } catch (const std::exception &) { return false; }
 }
 
+bool verifyRealSpace(const API &api) {
+  if (!api.getRealSpaceAPIVersion || !api.evalRealSpace) return false;
+  try {
+    const auto prefix = fs::path(api.path).parent_path().parent_path();
+    boost::property_tree::ptree record;
+    boost::property_tree::read_json((prefix / "share/xtb/eled/build.json").string(), record);
+    std::string commit;
+    return verifyGFN0(api, commit) && record.get<int>("capabilities.realspace_api", 0) == 1 &&
+      record.get<int>("source.realspace_extension.api_version", 0) == 1 &&
+      record.get<std::string>("source.realspace_extension.patch_sha256", "") == realSpacePatchSHA256 &&
+      api.getRealSpaceAPIVersion() == 1;
+  } catch (const std::exception &) { return false; }
+}
+
 std::string trimString(const std::string &value) {
   size_t start = 0;
   while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start]))) ++start;
@@ -343,6 +362,14 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       !std::all_of(options.espPointsAngstrom.begin(), options.espPointsAngstrom.end(),
                    [](double v) { return std::isfinite(v); }))
     throw std::invalid_argument("ESP points must be finite [npoints,3] Angstrom coordinates");
+  if (options.realSpacePointsAngstrom.size() % 3 || options.realSpacePointsAngstrom.size()/3 >
+      static_cast<size_t>(std::numeric_limits<int>::max()) ||
+      !std::all_of(options.realSpacePointsAngstrom.begin(), options.realSpacePointsAngstrom.end(),
+                   [](double v) { return std::isfinite(v); }))
+    throw std::invalid_argument("Real-space points must be finite [npoints,3] Angstrom coordinates");
+  if (!std::isfinite(options.realSpaceOccupationThreshold) || options.realSpaceOccupationThreshold < 0.0 ||
+      !std::isfinite(options.realSpaceLEAWindowEV) || options.realSpaceLEAWindowEV < 0.0)
+    throw std::invalid_argument("Real-space occupation threshold and LEA window must be finite and nonnegative");
   if (!mol.getNumAtoms()) throw std::invalid_argument("Molecule must contain atoms");
   if (mol.getNumAtoms() > static_cast<unsigned int>(std::numeric_limits<int>::max()))
     throw std::invalid_argument("Too many atoms for the xTB C API");
@@ -417,6 +444,7 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
   result.gfn0StateFixVerified = verifyGFN0(api, result.sourceCommit);
   result.basisExportVerified = verifyBasis(api);
   result.propertiesExportVerified = verifyProperties(api);
+  result.realSpaceExportVerified = verifyRealSpace(api);
   if (method == 0 && !result.gfn0StateFixVerified)
     throw std::invalid_argument("Native GFN0 requires a verified patched xTB build; run tools/build_patched_xtb.sh");
   if (!result.basisExportVerified || !verifyDiagnostics(api))
@@ -425,6 +453,8 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       "run tools/install_native.py or tools/build_patched_xtb.py");
   if (!options.espPointsAngstrom.empty() && !verifyESP(api))
     throw std::invalid_argument("ESP requires the verified ESP extension; rebuild libxtb");
+  if (!options.realSpacePointsAngstrom.empty() && !result.realSpaceExportVerified)
+    throw std::invalid_argument("Real-space evaluation requires the verified realspace extension; rebuild libxtb");
   result.parameterFile = parameterFile(api, options, method);
   if (!result.parameterFile.empty()) result.parameterSHA256 = sha256(result.parameterFile);
   Handles h(api);
@@ -546,6 +576,27 @@ static bool runMolImpl(const ROMol &mol, XTBResults &result, const XTBOptions &o
       requireFinite(values, "ESP");
       result.espPointsAngstrom = options.espPointsAngstrom;
       result.espValuesAU = std::move(values);
+    }
+    if (!options.realSpacePointsAngstrom.empty()) {
+      const int count = static_cast<int>(options.realSpacePointsAngstrom.size() / 3);
+      auto points = options.realSpacePointsAngstrom;
+      for (auto &v : points) v *= angstromToBohr;
+      std::vector<double> density(count), alie(count), virDensity(count), lea(count);
+      const int ok = api.evalRealSpace(
+          h.env, h.res, count, points.data(),
+          options.realSpaceOccupationThreshold, options.realSpaceLEAWindowEV,
+          density.data(), alie.data(), virDensity.data(), lea.data());
+      api.check(h.env, "Real-space evaluation");
+      if (!ok) throw EngineError("Real-space evaluation failed without a diagnostic");
+      requireFinite(density, "real-space density");
+      requireFinite(alie, "real-space ALIE");
+      requireFinite(virDensity, "real-space virtual density");
+      requireFinite(lea, "real-space LEA");
+      result.realSpacePointsAngstrom = options.realSpacePointsAngstrom;
+      result.realSpaceDensityAU = std::move(density);
+      result.realSpaceALIEEV = std::move(alie);
+      result.realSpaceVirtualDensityAU = std::move(virDensity);
+      result.realSpaceLEAEV = std::move(lea);
     }
     if (result.propertiesExportVerified) {
       int eFlags = 0;

@@ -31,11 +31,11 @@ The naming rules keep feature columns short while retaining their meaning:
 | Atom/bond topology | `CalcXTBAtomDescriptors`, `CalcXTBBondDescriptors` | Engine charges, incident Wiberg sums and RDKit-bond Wiberg orders | 0 |
 | Orbital density | `CalcOrbitalPopulations`, `CalcShellPopulations`, `CalcDensityMatrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keepOverlap=True` |
 | Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcBondOverlapDescriptors` | Degeneracy-invariant HOMO/LUMO localization, frontier overlap, COOP/ECOHP and bond polarity | 0; requires `keepOverlap=True` |
-| Orbital & LMO analysis | `CalcOrbitalWeightedFukui`, `CalcAtomicOrbitalEnergies`, `CalcLocalizedOrbitals` | Single-point orbital-weighted Fukui, condensed ALIE/PDOS and Pipek–Mezey LMOs | 0; requires `keepOverlap=True` |
-| ESP surface & EPN | `GenerateESPSurfaceGrid`, `CalcESPSurfaceDescriptors`, `CalcNuclearESP` | Politzer–Murray vdW-shell ESP statistics and exact nuclear ESP (EPN) | 0 (`CalcESPSurfaceDescriptors` requires sampled ESP) |
+| Orbital & LMO analysis | `CalcOrbitalWeightedFukui`, `CalcAtomicOrbitalEnergies`, `CalcLocalizedOrbitals`, `CalcLinearResponseMatrix`, `CalcFODFromResult` / `RunFOD` | Single-point orbital-weighted Fukui, condensed ALIE/PDOS, Pipek–Mezey LMOs, linear response matrix $\chi_{AB}$ and Grimme FOD static correlation | 0 for result analyzers (`keepOverlap=True`); 1 single point for `RunFOD` |
+| ESP, real-space & EPN | `GenerateESPSurfaceGrid`, `CalcESPSurfaceDescriptors`, `CalcRealSpaceProperties`, `CalcRealSpaceSurfaceDescriptors`, `CalcDensityIsosurface`, `CalcNuclearESP`, `CalcBondElectricField` | Politzer–Murray vdW-shell & exact `0.001 a.u.` isosurface ESP/ALIE/LEA/volume/area, exact nuclear ESP (EPN), and bond-midpoint electric fields | 0 for pure analyzers; 1 single point for `CalcDensityIsosurface` and `CalcBondElectricField` |
 | Extended properties | `CalcEnergyDecomposition`, `CalcMultipoleDescriptors`, `CalcPolarizabilityDescriptors` | Energy decomposition, Fermi levels, CAMM multipoles and D4 polarizability/C6/C8 | 0; properties ABI v1 |
 | Solvation & thermochemistry | `CalcSolvationDescriptors`, `CalcVibrationalThermochemistry` | Matched ALPB/GBSA solvation shifts and finite-difference RRHO/qRRHO thermochemistry | 2 single points (`CalcSolvationDescriptors`); `1 + 6N` gradient single points (`CalcVibrationalThermochemistry`) |
-| Reactivity | `CalcReactivityDescriptors`, `RunReactivity` | Vertical ΔSCF IP/EA, Fukui and local conceptual-DFT indices | 0 for `CalcReactivityDescriptors`; 3 single points for `RunReactivity` |
+| Reactivity | `CalcReactivityDescriptors`, `RunReactivity` | Vertical ΔSCF IP/EA, Gázquez $\omega^\pm$, Fukui, local hyper-softness $S^2\Delta f$ and conceptual-DFT indices | 0 for `CalcReactivityDescriptors`; 3 single points for `RunReactivity` |
 
 Every value has four pieces of meaning:
 
@@ -72,18 +72,22 @@ The stable feature groups for the EAS study are:
 
 `DescriptorStatus()` exposes the maturity labels used by the project:
 `recommended` is suitable for a first validation model (including core electronic
-fields, Politzer–Murray ESP surface statistics, EPN, D4 polarizability/C6/C8,
-energy decomposition, ALPB/GBSA solvation shifts, and harmonic thermochemistry),
+fields, higher-order conceptual DFT $\omega^\pm$/$S^2\Delta f$, Grimme FOD,
+real-space density/ALIE/LEA and `0.001 a.u.` isosurface geometry/surfaces,
+bond-aligned electric fields, Politzer–Murray ESP surface statistics, EPN, D4
+polarizability/C6/C8, energy decomposition, ALPB/GBSA solvation shifts, and
+harmonic thermochemistry),
 `diagnostic` marks single-point diagnostic fields (orbital indices/counts,
-occupation thresholds, Fermi levels, and direct solvation polarization
-decomposition), and
+occupation thresholds, Fermi levels, orbital FOD weights, and direct solvation
+polarization decomposition), and
 `exploratory` is retained for testing new hypotheses (signed
 frontier-bond overlap, π projections, local nucleophilicity proxy, orbital-weighted
-Fukui, condensed ALIE/PDOS, COOP/ECOHP/bond polarity, Pipek–Mezey LMOs, and CAMM
+Fukui, condensed ALIE/PDOS, COOP/ECOHP/bond polarity, Pipek–Mezey LMOs,
+condensed linear response matrix $\chi_{AB}$, and CAMM
 atomic/molecular multipoles). `DescriptorCatalog()` organizes all definitions under
-12 sections: `molecular`, `atom`, `fragment`, `bond`, `density`, `reactivity`,
-`local_geometry`, `esp_surface`, `localized_orbitals`, `properties`, `solvation`,
-and `thermochemistry`. Their values are still fully specified and missing values are
+14 sections: `molecular`, `atom`, `fragment`, `bond`, `density`, `reactivity`,
+`fod`, `realspace`, `local_geometry`, `esp_surface`, `localized_orbitals`,
+`properties`, `solvation`, and `thermochemistry`. Their values are still fully specified and missing values are
 explicit; the label only says whether the repository has established stable
 predictive utility for them.
 
