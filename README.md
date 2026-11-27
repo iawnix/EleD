@@ -20,23 +20,13 @@
 
 EleD is an RDKit extension for electronic-structure descriptors. The RDKit molecule stays at the center: atom and bond indices, conformers, fragments and annotations remain connected while EleD runs the project's extended `libxtb` backend and turns one calculation into several analysis views.
 
+<p align="center">
+  <img alt="EleD overview: RDKit molecule through extended libxtb to electronic maps, orbitals, reactivity and reports" src="docs/assets/eled-overview.svg" width="880">
+</p>
+
 ## Why EleD?
 
 RDKit is excellent at representing molecular structure. xTB is excellent at producing fast approximate electronic structure. EleD joins those two layers in a reusable API so that one calculation can be inspected at molecular, atomic, bond, fragment, density and reactivity levels while preserving the original RDKit indexing.
-
-The core flow is simple:
-
-```text
-RDKit Mol + 3D conformer
-        │
-        ▼
-  XTBCalculator  ──►  extended libxtb (GFN0 / GFN1 / GFN2)
-        │
-        ├── molecular, atomic and bond descriptors
-        ├── density and frontier-orbital analysis
-        ├── fixed-geometry ΔSCF reactivity
-        └── versioned reports, CSV/JSONL and SVG views
-```
 
 ## A five-minute calculation
 

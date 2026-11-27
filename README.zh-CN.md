@@ -20,23 +20,13 @@
 
 EleD 是 RDKit 的电子结构描述符扩展。RDKit 分子对象始终是中心：原子和键编号、构象、片段以及注释会贯穿 EleD 的项目扩展版 `libxtb` 计算，并连接到分子级、原子级、键级、密度和反应性分析。
 
+<p align="center">
+  <img alt="EleD 总览：从 RDKit 分子经扩展版 libxtb 生成电子分布图、轨道密度、反应性与结构化报告" src="docs/assets/eled-overview.svg" width="880">
+</p>
+
 ## EleD 解决什么问题？
 
 RDKit 擅长表示分子结构，xTB 擅长快速给出近似电子结构。EleD 将这两层连接起来，使一次计算能够在多个层级上复用，同时保留原始 RDKit 原子编号和键编号。
-
-核心流程如下：
-
-```text
-RDKit Mol + 三维构象
-        │
-        ▼
-  XTBCalculator  ──►  扩展版 libxtb（GFN0 / GFN1 / GFN2）
-        │
-        ├── 分子、原子和键描述符
-        ├── 密度和前线轨道分析
-        ├── 固定几何的 ΔSCF 反应性
-        └── 版本化报告、CSV/JSONL 和 SVG 视图
-```
 
 ## 五分钟示例
 
