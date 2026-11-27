@@ -1,14 +1,12 @@
 """Regression cases from the descriptor audit, with nonorthogonal densities."""
 from dataclasses import replace
-from copy import deepcopy
 
 import numpy as np
 import pytest
 from rdkit import Chem
 
 from eled import (XTBResults, CalcPiDescriptors, CalcDescriptorReport,
-                  CalcMayerBondDescriptors, CalcFrontierBondDescriptors,
-                  DescriptorSensitivity)
+                  CalcMayerBondDescriptors, CalcFrontierBondDescriptors)
 from eled.basis import _native_p_directions
 from eled.input import _input_metadata, _xyz_from_mol
 from eled.options import _validate_calculation_settings
@@ -137,27 +135,6 @@ def test_report_forwards_all_frontier_group_parameters_and_propagates_invalid_ma
     with pytest.raises(ValueError,match='shell map'): CalcDescriptorReport(mol,bad)
 
 
-@pytest.mark.parametrize('change',['geometry','charge','engine','method','settings','analysis','temperature'])
-def test_sensitivity_rejects_unmatched_comparisons(change):
-    mol,r=pi_system(); a=CalcDescriptorReport(mol,r); b=deepcopy(a)
-    if change=='geometry':b['provenance']['geometry_sha256']='other'
-    elif change=='charge':b['provenance']['charge']=1
-    elif change=='engine':b['provenance']['engine']['sha256']='other'
-    elif change=='method':b['values']['xtb_method']='GFN1-xTB'
-    elif change=='settings':b['provenance']['calculation_settings']['accuracy']=.1
-    elif change=='analysis':b['analysis_settings']['degeneracyEV']=.5
-    # Unchanged 300 K report supplied as 1000 K must also fail.
-    with pytest.raises(ValueError):DescriptorSensitivity(a,temperature1000=b)
-
-
-def test_sensitivity_includes_atom_and_bond_fields():
-    mol,r=pi_system(); a=CalcDescriptorReport(mol,r)
-    b=CalcDescriptorReport(mol,replace(r,method='GFN1-xTB'))
-    out=DescriptorSensitivity(a,gfn1=b,gfn2=a)
-    assert out['atoms']['0']['shell_populations.mul_p_e']['gfn12_delta']==pytest.approx(0.)
-    assert out['bonds']['0']['frontier_bonds.homo.mul_ovlp_e']['gfn12_delta']==pytest.approx(0.)
-
-
 def test_degenerate_rotations_preserve_density_and_frontier_bonds():
     mol, r = pi_system()
     occ = (2.,)*18 + (0.,)*6
@@ -229,18 +206,6 @@ def test_real_density_interface_parity_and_pi_rotation(method,smiles):
                 for key in fields:
                     if x[key] is None: assert y[key] is None
                     else: assert x[key]==pytest.approx(y[key],abs=2e-6)
-
-
-def test_matched_temperature_sensitivity_has_units_and_invariant_fields_only():
-    mol,r=pi_system(); a=CalcDescriptorReport(mol,r)
-    b=CalcDescriptorReport(mol,replace(r,totalEnergyHartree=-.9,
-        metadata={**r.metadata,'calculation_settings':_validate_calculation_settings(electronicTemperature=1000.)}))
-    out=DescriptorSensitivity(a,temperature300=a,temperature1000=b)
-    assert out['values']['xtb_energy_ha']['et300_1000_delta']==pytest.approx(.1)
-    assert out['units']['xtb_energy_ha']=='Hartree'
-    assert out['atom_units']['pi.pi_n_e']=='e'
-    assert out['bond_units']['pi.pi_bo']=='dimensionless'
-    assert not any(k in out['values'] for k in ['xtb_dip_x_ebohr','homo_cx_a','xtb_homo_idx'])
 
 
 def test_unavailable_frontier_group_preserves_bond_rows():

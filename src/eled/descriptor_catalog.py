@@ -125,11 +125,6 @@ _CATALOG = {
         'frequencies_cm1 / ir_intensities_km_mol / rotational_constants_cm1': {'definition': 'harmonic vibrational frequencies (negative for imaginary modes), double-harmonic IR intensities from dipole derivatives, and principal rotational constants', 'unit': 'cm^-1 / km/mol / cm^-1', 'invariance': 'rigid-motion and atom-permutation invariant', 'requires': 'central finite-difference Hessian from analytical GetGradient()', 'missing': 'empty lists for monoatomic systems (0 vibrational modes)'},
         'zpe_ha / thermal_energy_correction_ha / thermal_enthalpy_correction_ha / entropy_j_mol_k / gibbs_correction_ha / total_gibbs_free_energy_ha': {'definition': 'ideal-gas RRHO or Grimme qRRHO zero-point energy, thermal corrections, molar entropy and total Gibbs free energy (with kcal/mol counterparts)', 'unit': 'Hartree / J/(mol*K) / kcal/mol', 'invariance': 'rigid-motion and atom-permutation invariant', 'requires': 'harmonic frequency analysis; non-stationary geometries are explicitly flagged via is_stationary_point and warnings', 'missing': 'never missing on valid completion; imaginary modes excluded from vibrational sums and flagged'},
     },
-    'diagnostic': {
-        'conformer_dispersion': {'definition': 'population standard deviation across supplied conformers', 'unit': 'descriptor-specific', 'invariance': 'independent of conformer ordering', 'requires': 'at least one valid conformer report; a single conformer gives zero spread', 'missing': 'no valid conformers'},
-        'gfn12_delta': {'definition': 'absolute difference between method reports', 'unit': 'descriptor-specific', 'invariance': 'same atom/bond indexing and geometry protocol', 'requires': 'both method reports', 'missing': 'one method report or value missing'},
-        'et300_1000_delta': {'definition': 'absolute difference under electronic temperature perturbation', 'unit': 'descriptor-specific', 'invariance': 'same geometry and method', 'requires': 'both temperature reports', 'missing': 'one temperature report or value missing'},
-    },
 }
 
 _STATUS = {
@@ -158,8 +153,6 @@ _STATUS = {
     },
     'diagnostic': {
         'xtb_n_*', 'xtb_*_idx', 'xtb_occ_cut',
-        'conformer_dispersion', 'gfn12_delta',
-        'et300_1000_delta',
         'fermi_alpha_ha / fermi_beta_ha / fermi_alpha_ev / fermi_beta_ev',
         'g_solv_direct_ha / solute_polarization_energy_ha',
     },

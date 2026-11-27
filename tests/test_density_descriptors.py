@@ -11,7 +11,6 @@ from eled import (
     DescriptorCatalog, DescriptorColumns, CalcDescriptorReport,
 )
 from eled.input import _input_metadata, _xyz_from_mol
-from eled.reports import DescriptorSensitivity
 
 
 def result():
@@ -139,23 +138,13 @@ def test_pi_missing_is_explicit_for_result_without_matching_p_map():
     assert report['missing']
 
 
-def test_sensitivity_keeps_missing_comparisons_explicit():
-    from test_descriptor_reports import sample
-    from eled import CalcDescriptorReport
-    mol, r = sample()
-    r = replace(r, metadata={**r.metadata, 'engine': {'sha256': 'fixture'}})
-    reference = CalcDescriptorReport(mol, r, includeOrbitals=False)
-    other = CalcDescriptorReport(mol, replace(r, method='GFN1-xTB', totalEnergyHartree=-1.5), includeOrbitals=False)
-    d = DescriptorSensitivity(reference, gfn1=other, gfn2=reference)
-    assert d['values']['xtb_energy_ha']['conformer_dispersion'] is None
-    assert d['values']['xtb_energy_ha']['gfn12_delta'] == .5
-    assert d['values']['xtb_energy_ha']['et300_1000_delta'] is None
-    assert d['values']['xtb_energy_ha']['missing']['electronic_temperature']
-
-
 def test_descriptor_catalog_and_scalar_units_are_explicit():
     catalog = DescriptorCatalog()
-    assert {'molecular', 'atom', 'bond', 'density', 'reactivity', 'diagnostic'} <= set(catalog)
+    assert set(catalog) == {
+        'molecular', 'atom', 'fragment', 'bond', 'density', 'reactivity',
+        'local_geometry', 'esp_surface', 'localized_orbitals', 'properties',
+        'solvation', 'thermochemistry',
+    }
     assert catalog['bond']['mbo']['unit'] == 'dimensionless'
     assert catalog['atom']['pi_n_e']['unit'] == 'e'
     assert catalog['atom']['mul_s_e']['unit'] == 'e'

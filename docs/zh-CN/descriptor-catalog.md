@@ -20,19 +20,18 @@
 
 ## 诊断字段
 
-诊断字段用于记录可靠性，不默认作为模型输入：
+诊断字段用于记录单点计算状态与拆解信息，不默认作为模型输入：
 
 - 前线轨道索引、占据阈值和电子/轨道计数；
-- 费米能级与直接溶剂能/溶质极化能拆解；
-- 构象离散度；
-- GFN1 与 GFN2 的差异；
-- 300 K 与 1000 K 电子温度差异。
+- 费米能级与直接溶剂能/溶质极化能拆解。
+
+构象系综统计由 `RunConformerAnalysis` 提供，单点守恒与 SCC 质量检查由 `AssessDescriptorQuality` 提供，二者作为独立分析/质控工具，不再列为描述符大类。
 
 ## 探索性字段
 
 Mayer 键级、带符号的前线键重叠、π 布居、π 键级、局部亲核性代理量、轨道加权 Fukui、凝聚态 ALIE/PDOS、COOP/ECOHP/键极性、Pipek–Mezey 局域轨道（`localized_orbitals`）及 CAMM 原子/分子多极矩属于探索性字段。它们定义完整，但目前尚未证明在跨骨架任务中具有稳定预测增益。
 
-`DescriptorCatalog()` 的顶层区段包括 `molecular`、`atom`、`fragment`、`bond`、`density`、`reactivity`、`local_geometry`、`esp_surface`、`localized_orbitals`、`properties`、`solvation`、`thermochemistry` 与 `diagnostic`。
+`DescriptorCatalog()` 的顶层区段共 12 类：`molecular`、`atom`、`fragment`、`bond`、`density`、`reactivity`、`local_geometry`、`esp_surface`、`localized_orbitals`、`properties`、`solvation` 与 `thermochemistry`。
 
 ## 单位和缺失值
 

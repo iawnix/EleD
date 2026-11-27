@@ -214,20 +214,3 @@ def test_weighted_missing_failed_and_underflow_are_distinct():
     assert out['n_valid']==1 and out['n_missing']==1 and out['n_failed']==1
     assert out['weight_sum']==0 and out['mean'] is None
     assert out['missing_reason']=='no_positive_weight_for_available_values'
-
-
-def test_sensitivity_requires_matched_per_feature_conformer_coverage(synthetic):
-    from copy import deepcopy
-    from eled import DescriptorSensitivity
-    mol,_=synthetic
-    a=RunConformerAnalysis(mol,columns=['xtb_homo_ev'])
-    b=deepcopy(a); b['calculation_provenance']['method']='GFN1-xTB'
-    baseline=DescriptorSensitivity(a,gfn1=b,gfn2=a)
-    assert baseline['values']['xtb_homo_ev']['gfn12_delta']==0.
-    assert baseline['atoms']['0']['atoms.q_e']['gfn12_delta']==0.
-    # Same number of valid points, different geometries: comparing means is invalid.
-    a['reports'][0]['atoms'][0]['q_e']=None
-    b['reports'][1]['atoms'][0]['q_e']=None
-    output=DescriptorSensitivity(a,gfn1=b,gfn2=a)['atoms']['0']['atoms.q_e']
-    assert output['gfn12_delta'] is None
-    assert output['missing_reasons']['gfn1_vs_gfn2']=='unmatched_conformer_coverage'

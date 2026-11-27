@@ -137,21 +137,3 @@ ethylene and furan also exercise π invariance under rigid motion.
 The density analyses follow Mulliken (1955), Löwdin (1950) and Mayer (1983).
 Definitions and units are available programmatically from `DescriptorCatalog()`;
 [literature positioning](literature-density-ml-audit.md) is documented separately.
-
-## Sensitivity diagnostics
-
-`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature300=...,
-temperature1000=...)` consumes existing single-point or conformer reports.
-It reports conformer standard deviation, absolute GFN1/GFN2 differences and
-absolute 300 K/1000 K electronic-temperature differences, without recalculation.
-
-Comparisons require matching atom order, geometries, charge/spin, engine,
-analysis settings and failed-conformer masks. Method comparisons retain the
-same numerical settings; temperature comparisons retain the same method and
-parameters. A field whose valid conformer subset differs receives `None` with
-`unmatched_conformer_coverage`. Missing comparisons remain explicit.
-
-Outputs include molecular `values`, indexed `atoms`/`bonds`, and `units`,
-`atom_units`, `bond_units`. Cartesian coordinates/dipoles, orbital indices and
-charged-molecule dipole norms are excluded. These diagnostics describe protocol
-sensitivity; they are not combined into a confidence score.

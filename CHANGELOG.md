@@ -14,6 +14,8 @@
   - Bound `xtb_setSolvent` via optional `solvent`, `solvationModel` (`"alpb"` / `"gbsa"`), and `solvationGrid` across `XTBOptions`, `XTBCalculator`, `RunXTBBatch`, `XTBCacheKey`, and `rdXTBTools.RunMol` (gas-phase defaults and cache keys preserved when `solvent=None`), and added `CalcSolvationDescriptors`.
   - Added `CalcVibrationalThermochemistry` (central finite-difference Cartesian Hessian and dipole derivatives from analytical `GetGradient()`, harmonic frequencies, double-harmonic IR intensities, RRHO/qRRHO ZPE/U/H/S/G, linear/monoatomic handling, and explicit non-stationary geometry flagging).
   - Updated `DescriptorCatalog()` and `DescriptorStatus()` with all new sections and maturity classifications.
+- **API & catalog cleanup**:
+  - Removed the hardcoded `DescriptorSensitivity` protocol-comparison helper (`gfn12_delta`, `et300_1000_delta`) and the `diagnostic` pseudo-descriptor section from `DescriptorCatalog()` (now 12 physical/electronic descriptor sections), while retaining `RunConformerAnalysis` (conformer statistics & dispersion) and `AssessDescriptorQuality` (single-point conservation and SCC quality checks).
 
 ## 0.12.0 — RDKit interface alignment, single-step wrappers and C++ CM5 parity
 

@@ -64,23 +64,26 @@ The stable feature groups for the EAS study are:
   atom-level Fukui/local indices. They require three matched GFN1/2 charge
   states at the same geometry, so they are a separate analysis rather than
   part of the ordinary single-point feature vector.
-- **Diagnostics**: conformer mean/std/min/max, GFN1-vs-GFN2 differences and
-  electronic-temperature differences. These describe reliability and are not
-  model inputs by default.
+- **Conformer & quality tools**: `RunConformerAnalysis` summarizes
+  conformer `mean`/`std`/`min`/`max`/`range` (plus optional electronic-energy
+  Boltzmann weighting), and `AssessDescriptorQuality` checks charge/electron
+  conservation, fractional occupations and SCC diagnostics. These are workflow
+  QC tools rather than a separate descriptor section.
 
 `DescriptorStatus()` exposes the maturity labels used by the project:
 `recommended` is suitable for a first validation model (including core electronic
 fields, Politzer–Murray ESP surface statistics, EPN, D4 polarizability/C6/C8,
 energy decomposition, ALPB/GBSA solvation shifts, and harmonic thermochemistry),
-`diagnostic` records calculation or protocol sensitivity (conformer/method/temperature
-deltas, Fermi levels, and direct solvation polarization decomposition), and
+`diagnostic` marks single-point diagnostic fields (orbital indices/counts,
+occupation thresholds, Fermi levels, and direct solvation polarization
+decomposition), and
 `exploratory` is retained for testing new hypotheses (Mayer bond order, signed
 frontier-bond overlap, π projections, local nucleophilicity proxy, orbital-weighted
 Fukui, condensed ALIE/PDOS, COOP/ECOHP/bond polarity, Pipek–Mezey LMOs, and CAMM
 atomic/molecular multipoles). `DescriptorCatalog()` organizes all definitions under
-`molecular`, `atom`, `fragment`, `bond`, `density`, `reactivity`, `local_geometry`,
-`esp_surface`, `localized_orbitals`, `properties`, `solvation`, `thermochemistry`,
-and `diagnostic`. Their values are still fully specified and missing values are
+12 sections: `molecular`, `atom`, `fragment`, `bond`, `density`, `reactivity`,
+`local_geometry`, `esp_surface`, `localized_orbitals`, `properties`, `solvation`,
+and `thermochemistry`. Their values are still fully specified and missing values are
 explicit; the label only says whether the repository has established stable
 predictive utility for them.
 

@@ -6,8 +6,7 @@ import pytest
 from rdkit import Chem
 
 from eled import (CalcDescriptorReport, CalcDensityDescriptors, CalcPiDescriptors,
-                  DescriptorSensitivity, RunConformerAnalysis, RunDescriptorBatch,
-                  XTBRunError)
+                  RunConformerAnalysis, RunDescriptorBatch, XTBRunError)
 from eled.input import _input_metadata, _xyz_from_mol
 from test_descriptor_regressions import pi_system
 
@@ -96,17 +95,6 @@ def test_invalid_pi_options_rejected_before_engine_calls(monkeypatch, options):
                 lambda: RunDescriptorBatch([mol], **options),
                 lambda: RunConformerAnalysis(mol, **options)):
         with pytest.raises((ValueError, TypeError)): run()
-
-
-@pytest.mark.parametrize('options', [
-    {'piScheme': 'mulliken'}, {'piPlaneTolAngstrom': .05}, {'piRef': {0: 2.}},
-])
-def test_sensitivity_rejects_changed_pi_definition(options):
-    mol, result = pi_system()
-    reference = CalcDescriptorReport(mol, result)
-    changed = CalcDescriptorReport(mol, replace(result, method='GFN1-xTB'), **options)
-    with pytest.raises(ValueError, match='protocol'):
-        DescriptorSensitivity(reference, gfn1=changed, gfn2=reference)
 
 
 @pytest.mark.integration

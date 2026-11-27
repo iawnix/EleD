@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from rdkit import Chem
 from eled import (XTBOptions, PrepareConformers, RunConformerAnalysis,
-                       RunReactivity, DescriptorSensitivity)
+                       RunReactivity)
 from eled.eas import FrozenProtocolSHA256, LoadFrozenProtocol
 
 
@@ -103,9 +103,6 @@ def main(argv=None):
             item['analysis'] = primary
             item['analyses'] = {'gfn2_300K': primary, 'gfn1_300K': gfn1,
                                 'gfn2_1000K': hot, 'gfn2_reactivity_300K': reactivity}
-            item['sensitivity'] = DescriptorSensitivity(
-                primary, gfn1=gfn1, gfn2=primary,
-                temperature300=primary, temperature1000=hot)
             def _geometry_hashes(report):
                 return tuple(sorted(i.get('geometry_sha256') for i in report.get('inputs', [])
                                     if i.get('geometry_sha256')))

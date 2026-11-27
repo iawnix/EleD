@@ -223,14 +223,6 @@ def RunConformerAnalysis(
         'atom_units': _local_units(reports, atom_series),
         'bond_units': _local_units(reports, bond_series),
         'frontier_group_composition_changed': composition_changed,
-        'sensitivity': {
-            'conformer_dispersion': {k: v['std'] for k, v in statistics.items()},
-            'gfn1_vs_gfn2': {'status': 'not_requested', 'reason': 'run two explicit analyses to compare methods'},
-            'electronic_temperature': {
-                'status': 'not_requested',
-                'reason': 'no second temperature calculation supplied',
-            },
-        },
         'boltzmann': (
             {
                 'enabled': True,

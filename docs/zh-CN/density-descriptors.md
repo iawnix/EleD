@@ -122,18 +122,3 @@ mul_ovlp_e(A,B) = 2 Σ[μ∈A,ν∈B] PGμν Sμν
 密度分析基于 Mulliken（1955）、Löwdin（1950）和 Mayer（1983）的定义。
 `DescriptorCatalog()` 提供机器可读的定义和单位；
 [文献定位](../literature-density-ml-audit.md) 单独记录。
-
-## 敏感性诊断
-
-`DescriptorSensitivity(reference, gfn1=..., gfn2=..., temperature300=...,
-temperature1000=...)` 读取已有的单点或构象报告，分别输出构象标准差、
-GFN1/GFN2 绝对差值和 300 K/1000 K 电子温度绝对差值，不重新计算。
-
-比较要求原子顺序、几何、电荷/自旋、引擎、分析设置及失败构象位置一致。
-方法比较保持数值设置相同；温度比较保持方法和参数相同。逐字段检查有效
-构象子集，覆盖不一致时返回 `None` 和 `unmatched_conformer_coverage`。
-未提供的比较保留明确缺失信息。
-
-输出包含分子级 `values`、按编号排列的 `atoms`/`bonds`，以及 `units`、
-`atom_units`、`bond_units`。不统计笛卡尔坐标/偶极分量、轨道索引和带电
-分子的偶极模长。这些量用于描述协议敏感性，不合成为单一可信度评分。

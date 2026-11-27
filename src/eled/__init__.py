@@ -79,7 +79,6 @@ from .reports import (
     AssessDescriptorQuality,
     CalcDescriptorReport,
     DescriptorColumns,
-    DescriptorSensitivity,
     ExportDescriptorReports,
     RunDescriptorBatch,
 )
@@ -139,7 +138,6 @@ __all__ = [
     "CalcDescriptorReport",
     "RunDescriptorBatch",
     "ExportDescriptorReports",
-    "DescriptorSensitivity",
     "DescriptorCatalog",
     "DescriptorStatus",
     "CalcReactivityDescriptors",

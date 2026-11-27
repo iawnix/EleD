@@ -55,10 +55,3 @@ w_i ∝ exp[−(E_i − E_min)/(k_B T)]
 权重下溢为零的有限观测仍计入有效数；如果该字段可用观测的总权重为零，
 加权结果为 `None`，原因是 `no_positive_weight_for_available_values`。
 单位与等权统计一致。
-
-## 方法和电子温度比较
-
-`DescriptorSensitivity` 从已有报告提取构象标准差、GFN1/GFN2 绝对差值，
-以及 300 K/1000 K 电子温度绝对差值。它核对有序几何和计算协议，并逐字段
-要求有效构象子集匹配，避免将不同子集的均值解释为方法差异。
-详细约定见[密度描述符](density-descriptors.md#敏感性诊断)。

@@ -141,8 +141,3 @@ each field. A finite observation with an underflowed zero weight still counts
 as valid; if all available values have zero mass, the weighted result is null
 with `no_positive_weight_for_available_values`. Weighted and equal-weight local
 statistics use the same unit maps.
-
-`DescriptorSensitivity` compares molecular and local statistics across matched
-method/temperature reports. It checks identical ordered geometries and protocol,
-then requires matching valid-conformer subsets for each compared field.
-See [density descriptors](density-descriptors.md#sensitivity-diagnostics).
