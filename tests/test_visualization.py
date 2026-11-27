@@ -158,10 +158,6 @@ def test_bond_field_and_nested_report_sections_resolution():
         'atoms': [{'atom_index': i, 'mul_p_e': 1.2 + 0.1 * i} for i in range(mol.GetNumAtoms())],
         'units': {'mul_p_e': 'e'},
     }
-    report['mayer_bonds'] = {
-        'bonds': [{'bond_index': b.GetIdx(), 'mbo': 0.95} for b in mol.GetBonds()],
-        'units': {'mbo': 'dimensionless'},
-    }
     report['pi'] = {
         'atoms': [{'atom_index': i, 'pi_q_e': -0.02 if i >= 4 else None} for i in range(mol.GetNumAtoms())],
         'bonds': [{'bond_index': b.GetIdx(), 'pi_bo': 0.35 if b.GetIdx() >= 4 else None} for b in mol.GetBonds()],
@@ -194,9 +190,9 @@ def test_bond_field_and_nested_report_sections_resolution():
     assert fb_data['bonds'][0]['value'] == pytest.approx(0.12)
     assert fb_data['bonds'][1]['value'] == pytest.approx(-0.08)
 
-    bond_svg = DrawDescriptorMap(mol, report, bondField='mbo', colorBy='value')
+    bond_svg = DrawDescriptorMap(mol, report, bondField='pi_bo', colorBy='value')
     assert '<svg' in bond_svg
-    assert 'Mayer bond order' in bond_svg
+    assert 'π bond order' in bond_svg
 
 
 def test_draw_descriptor_map_accepts_xtb_results_and_validates_provenance():

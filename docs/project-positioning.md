@@ -19,14 +19,12 @@ RDKit Mol / Conformer
         │
         ├── checked geometry preparation
         │
-        ├── XTBCalculator → XTBResults
-        │                         │
-        │                         ├── molecular/atom/bond descriptors
-        │                         ├── density and shell descriptors
-        │                         ├── fixed-geometry reactivity descriptors
-        │                         └── indexed RDKit annotations/reports
-        │
-        └── optional YAeHMOP comparison adapter (outside the core protocol)
+        └── XTBCalculator → XTBResults
+                                  │
+                                  ├── molecular/atom/bond descriptors
+                                  ├── density and shell descriptors
+                                  ├── fixed-geometry reactivity descriptors
+                                  └── indexed RDKit annotations/reports
 ```
 
 The public layers should remain independent:
@@ -40,9 +38,7 @@ The public layers should remain independent:
 4. **Descriptor layer** consumes a result without invoking an engine again.
 5. **Report layer** serializes units, missing reasons, quality flags and hashes.
 
-The YAeHMOP adapter only normalizes an existing RDKit interface for comparisons;
-it does not alter YAeHMOP and is excluded from the xTB descriptor catalog and
-research protocol. This separation lets RDKit users use basic charge and bond features without
+This separation lets RDKit users use basic charge and bond features without
 retaining a basis, while density and reactivity analyses request the additional
 capabilities explicitly.
 

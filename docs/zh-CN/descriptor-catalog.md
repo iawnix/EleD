@@ -29,7 +29,7 @@
 
 ## 探索性字段
 
-Mayer 键级、带符号的前线键重叠、π 布居、π 键级、局部亲核性代理量、轨道加权 Fukui、凝聚态 ALIE/PDOS、COOP/ECOHP/键极性、Pipek–Mezey 局域轨道（`localized_orbitals`）及 CAMM 原子/分子多极矩属于探索性字段。它们定义完整，但目前尚未证明在跨骨架任务中具有稳定预测增益。
+带符号的前线键重叠、π 布居、π 键级、局部亲核性代理量、轨道加权 Fukui、凝聚态 ALIE/PDOS、COOP/ECOHP/键极性、Pipek–Mezey 局域轨道（`localized_orbitals`）及 CAMM 原子/分子多极矩属于探索性字段。它们定义完整，但目前尚未证明在跨骨架任务中具有稳定预测增益。
 
 `DescriptorCatalog()` 的顶层区段共 12 类：`molecular`、`atom`、`fragment`、`bond`、`density`、`reactivity`、`local_geometry`、`esp_surface`、`localized_orbitals`、`properties`、`solvation` 与 `thermochemistry`。
 

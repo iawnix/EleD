@@ -20,7 +20,6 @@ from eled import (
 )
 from eled.properties import (
     CalcEnergyDecomposition,
-    CalcFiniteFieldPolarizability,
     CalcMultipoleDescriptors,
     CalcNuclearESP,
     CalcPolarizabilityDescriptors,
@@ -143,17 +142,17 @@ def test_synthetic_multipole_rotational_invariants_and_gfn0_missing():
     json.dumps(epn_miss, allow_nan=False)
 
 
-def test_synthetic_polarizability_gfn1_missing_and_finite_field_error():
+def test_synthetic_polarizability_gfn1_missing_and_finite_field_note():
+    import eled
     gfn1 = XTBResults(method='GFN1-xTB', totalEnergyHartree=-1.0, metadata={'calculation_status': 'success'})
     out = CalcPolarizabilityDescriptors(gfn1)
     assert out['available'] is False
     assert out['mol_pol_bohr3'] is None
     assert out['missing']['mol_pol_bohr3'] == 'not_computed_by_gfn1_d3_dispersion'
     assert out['finite_field_supported'] is False
+    assert 'Finite-field electronic polarizability' in out['finite_field_note']
+    assert not hasattr(eled, 'CalcFiniteFieldPolarizability')
     json.dumps(out, allow_nan=False)
-
-    with pytest.raises(DescriptorUnavailableError, match='Finite-field polarizability'):
-        CalcFiniteFieldPolarizability(_make_mol('O'))
 
 
 def test_synthetic_nuclear_esp_and_result_roundtrip():

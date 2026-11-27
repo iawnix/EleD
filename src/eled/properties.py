@@ -568,14 +568,3 @@ def CalcPolarizabilityDescriptors(result: Any, *, mol: Any = None) -> dict[str, 
         'invariance': 'rigid-motion invariant; atom-permutation invariant with remapped indices',
         'missing': missing,
     })
-
-
-def CalcFiniteFieldPolarizability(mol: Any, *, options: Any = None, fieldAU: float = 0.001) -> dict[str, Any]:
-    """Raise DescriptorUnavailableError explaining why libxtb 6.7.1 lacks GFN0/1/2 finite-field response."""
-    raise DescriptorUnavailableError(
-        'Finite-field polarizability is unavailable in libxtb 6.7.1 for GFN0/1/2-xTB '
-        '(external electric fields are not supported by the C API without tblite/PTB, and '
-        'point-charge embedding couples only to monopole shell charges, missing intra-atomic '
-        'and out-of-plane electronic polarization). Use CalcPolarizabilityDescriptors(result) '
-        'for analytical D4 molecular and atomic static polarizabilities.'
-    )

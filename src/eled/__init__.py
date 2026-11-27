@@ -15,12 +15,10 @@ from .density_descriptors import (
     CalcFrontierBondDescriptors,
     CalcMCI,
     CalcMCIDescriptors,
-    CalcMayerBondDescriptors,
     CalcPiDescriptors,
     CalcShellPopulations,
 )
 from .descriptor_catalog import DescriptorCatalog, DescriptorStatus
-from .descriptors import CalcEHTDescriptors, CalcOrbitalDescriptors
 from .electronic_descriptors import (
     CalcCM5Charges,
     CalcXTBAtomDescriptors,
@@ -66,7 +64,6 @@ from .persistence import ReactivityCheckpoint, XTBDiskCache
 from .populations import CalcFrontierDescriptors, CalcOrbitalPopulations
 from .properties import (
     CalcEnergyDecomposition,
-    CalcFiniteFieldPolarizability,
     CalcMultipoleDescriptors,
     CalcNuclearESP,
     CalcPolarizabilityDescriptors,
@@ -119,14 +116,11 @@ __all__ = [
     "CalcXTBBondDescriptors",
     "CalcXTBFragmentDescriptors",
     "CalcCM5Charges",
-    "CalcEHTDescriptors",
-    "CalcOrbitalDescriptors",
     "AnnotateMol",
     "CalcOrbitalPopulations",
     "CalcFrontierDescriptors",
     "CalcDensityMatrix",
     "CalcShellPopulations",
-    "CalcMayerBondDescriptors",
     "CalcFrontierBondDescriptors",
     "CalcPiDescriptors",
     "CalcDensityDescriptors",
@@ -172,7 +166,6 @@ __all__ = [
     "CalcMultipoleDescriptors",
     "CalcNuclearESP",
     "CalcPolarizabilityDescriptors",
-    "CalcFiniteFieldPolarizability",
     "CalcSolvationDescriptors",
     "CalcVibrationalThermochemistry",
     "CalcSterimol",

@@ -32,7 +32,6 @@ EleD 是基于 xTB 的 RDKit 电子结构描述符扩展。文档按实际使用
 - [C++ interface](rdxtb-tools.md)
 - [Native xTB backend](xtb-patched-build.md)
 - [Runtime bundle](runtime-bundle.md) · [离线运行时包](zh-CN/runtime-bundle.md)
-- [YAeHMOP/EHT comparison](eht-comparison.md) · [YAeHMOP/EHT 对照](zh-CN/eht-comparison.md)
 - [Project positioning](project-positioning.md) · [项目定位](zh-CN/project-positioning.md)
 
 ## Research and validation / 研究与验证

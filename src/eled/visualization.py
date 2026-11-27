@@ -38,7 +38,6 @@ _FIELD_LABELS = {
     'cm5_q_e': 'CM5 charge',
     'wbo_sum': 'Wiberg sum',
     'wbo': 'Wiberg bond order',
-    'mbo': 'Mayer bond order',
     'f_plus': 'Fukui f+',
     'f_minus': 'Fukui f−',
     'f_radical': 'Fukui f0',
@@ -156,7 +155,7 @@ def _resolve_unit(report, field):
             report.get('bond_units'),
             report.get('units'),
         ]
-        for section_name in ('shell_populations', 'mayer_bonds', 'frontier_bonds', 'pi'):
+        for section_name in ('shell_populations', 'frontier_bonds', 'pi'):
             section = report.get(section_name)
             if isinstance(section, Mapping):
                 unit_maps.append(section.get('units'))
@@ -361,10 +360,6 @@ def _resolve_bond_values(report, field, nbonds):
     candidate_maps = []
     if section_name in (None, 'bonds'):
         candidate_maps.append(_index_rows(report.get('bonds'), 'bond_index'))
-    if section_name in (None, 'mayer_bonds'):
-        mb = report.get('mayer_bonds')
-        if isinstance(mb, Mapping):
-            candidate_maps.append(_index_rows(mb.get('bonds'), 'bond_index'))
     if section_name in (None, 'pi'):
         pi = report.get('pi')
         if isinstance(pi, Mapping):

@@ -50,7 +50,7 @@ many = RunLocalGeometryBatch([mol], selections,
 | `CalcPlaneDescriptors(mol, atomIndices, otherAtomIndices=None)` | 一个或两个至少含三个原子的集合 | `plane_rms_a`、`plane_max_a`，可选 `centroid_distance_a`，Å；`plane_angle_deg`，度 |
 | `CalcHOMA(mol, ringAtomIndices)` | 有序环路径 | 无量纲 `homa` 和逐键 `length_a`，Å |
 | `CalcRingPuckering(mol, ringAtomIndices)` | 至少四元的有序环 | `q_total_a`、偶数环 `q_alternating_a`，Å；六元环 `theta_deg`；各模式的 `q_a` 和 `phi_deg` |
-| `CalcMCI(mol, result, ringAtomIndices)` | 有序环和保留的密度数据 | 无量纲 `mci`、原子块矩阵和定义 |
+| `CalcMCI(mol, result, ringAtomIndices)` | 有序环（3–9 元）和保留的闭壳层密度数据 | 无量纲 `mci` 与 `i_ring` |
 
 报告使用统一的 `schema_version=2`、`descriptor_version`、对应的 `report_type` 和
 `protocol_version='1.0'`，包含 `values`、`units`、`missing`、`selection`、
@@ -124,10 +124,11 @@ Inf. Comput. Sci. 1993, 33, 70–78。
 原因是 `unsupported_element_pair`，同时保留全部测量键长。
 HOMA 依赖几何准备和参考参数，反映芳香性的几何特征，需结合具体化学体系解释。
 
-`CalcMCI` 使用同一次计算保留的密度和重叠矩阵。Mulliken 方案从两个方向的
-`P*S` 原子块和取对称平均构造原子对矩阵，Löwdin 方案使用正交化密度。对 n 元环，
-报告首原子固定的所有环排列乘积之和，并乘以 `2^(n-2)`。环顺序、方案和原子对
-约定都写入结果，比较时需保持定义和电子结构方法一致。局部 `pi_bo` 是单键描述符，
+`CalcMCI` 使用同一次计算保留的闭壳层密度和重叠矩阵，按 Giambiagi–Bultinck
+定义对 `M = P*S`（Mulliken）或 `M = S^(1/2)*P*S^(1/2)`（Löwdin）执行 AO 子块矩阵
+连乘并求迹，计算 `i_ring` 与首原子固定的全部环排列之和 `mci = (1/4) * sum Tr(M_{A1,A2}...M_{An,A1})`。
+该矩阵迹收缩严格满足刚体旋转/平移、AO 正交/符号/置换、MO 相位以及环起点与方向不变性；
+开壳层或未知自旋体系显式返回 `None` 及 `missing` 原因。局部 `pi_bo` 是单键描述符，
 不能通过取平均得到 MCI。
 
 ## 多构象

@@ -57,7 +57,7 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | Extended properties | energy decomposition, Fermi levels, D4 polarizability/C6/C8, CAMM atomic & molecular multipoles, exact nuclear ESP (EPN) | `CalcEnergyDecomposition`, `CalcPolarizabilityDescriptors`, `CalcMultipoleDescriptors`, `CalcNuclearESP` |
 | Atomic | xTB/CM5 charges, Wiberg sum, ΔSCF & orbital-weighted Fukui, condensed ALIE & PDOS | `CalcXTBAtomDescriptors`, `RunReactivity`, `CalcOrbitalWeightedFukui`, `CalcAtomicOrbitalEnergies` |
 | [ESP, surfaces & charges](docs/esp-api.md) | sampled ESP, Politzer–Murray vdW-shell surface statistics, constrained ESP & single-stage RESP charges | `GenerateESPGrid`, `GenerateESPSurfaceGrid`, `CalcESP`, `CalcESPSurfaceDescriptors`, `FitESPCharges`, `FitRESPCharges` |
-| Bond | Wiberg/Mayer bond orders, frontier-bond overlap, COOP/ECOHP & bond polarity | `CalcXTBBondDescriptors`, `CalcMayerBondDescriptors`, `CalcFrontierBondDescriptors`, `CalcBondOverlapDescriptors` |
+| Bond | Wiberg bond orders, frontier-bond overlap, COOP/ECOHP & bond polarity | `CalcXTBBondDescriptors`, `CalcFrontierBondDescriptors`, `CalcBondOverlapDescriptors` |
 | Density & LMOs | Mulliken/Löwdin shell populations, density matrix, π descriptors, Pipek–Mezey localized orbitals | `CalcDensityMatrix`, `CalcShellPopulations`, `CalcPiDescriptors`, `CalcLocalizedOrbitals` |
 | Frontier orbitals | degenerate HOMO/LUMO groups, participation, centroids and bond decomposition | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors` |
 | Solvation & thermochemistry | ALPB/GBSA implicit solvation shifts, harmonic frequencies, IR intensities & RRHO/qRRHO thermochemistry | `CalcSolvationDescriptors`, `CalcVibrationalThermochemistry` |
@@ -95,8 +95,7 @@ Retain the overlap and basis mapping when the calculation needs density-derived 
 ```python
 from eled import (
     XTBCalculator, CalcOrbitalPopulations, CalcDensityMatrix,
-    CalcShellPopulations, CalcMayerBondDescriptors,
-    CalcFrontierBondDescriptors, CalcPiDescriptors,
+    CalcShellPopulations, CalcFrontierBondDescriptors, CalcPiDescriptors,
 )
 
 result = XTBCalculator(method="GFN2-xTB").Calculate(mol, keepOverlap=True)
@@ -105,7 +104,6 @@ mulliken = CalcOrbitalPopulations(result, scheme="mulliken")
 lowdin = CalcOrbitalPopulations(result, scheme="lowdin")
 density = CalcDensityMatrix(result)
 shells = CalcShellPopulations(result)
-mayer = CalcMayerBondDescriptors(mol, result)
 frontier_bonds = CalcFrontierBondDescriptors(mol, result)
 pi = CalcPiDescriptors(mol, result)
 ```
@@ -164,8 +162,6 @@ archives that an external study can consume.
 ## Scope
 
 EleD provides ground-state electronic descriptors, fixed-geometry ΔSCF and orbital-weighted reactivity, optional ALPB/GBSA implicit solvation, and harmonic RRHO/qRRHO vibrational thermochemistry built around RDKit molecules. Frontier-orbital descriptors describe the ground-state calculation; excited-state solvers and periodic solids remain outside scope.
-
-The YAeHMOP/EHT adapter remains available as an independent RDKit comparison path. EleD's descriptor protocol uses the extended xTB backend.
 
 ## Contributing and license
 

@@ -63,7 +63,7 @@ geometry reports as JSON or JSONL directly.
 | `CalcPlaneDescriptors(mol, atomIndices, otherAtomIndices=None)` | One or two atom sets, at least three atoms each | `plane_rms_a`, `plane_max_a`, optional `centroid_distance_a`, Angstrom; `plane_angle_deg`, degree |
 | `CalcHOMA(mol, ringAtomIndices)` | Ordered ring | `homa`, dimensionless; individual `bonds` with `length_a` |
 | `CalcRingPuckering(mol, ringAtomIndices)` | Ordered ring of at least four atoms | `q_total_a`, optional `q_alternating_a`, Angstrom; six-membered `theta_deg`; per-mode `q_a` and `phi_deg` |
-| `CalcMCI(mol, result, ringAtomIndices)` | Ordered ring and retained density | `mci`, dimensionless; atom-block matrix and definition |
+| `CalcMCI(mol, result, ringAtomIndices)` | Ordered ring (3–9 atoms) and retained closed-shell density | `mci` and `i_ring`, dimensionless |
 
 Selections explicitly include the hydrogen atoms to be counted. Steric functions
 use RDKit van der Waals radii with `radiusScale=1.0`. Pass `radiiAngstrom` as a
@@ -145,15 +145,15 @@ An unsupported pair makes the whole HOMA value missing with reason
 HOMA depends on the geometry preparation and parameter set. It provides a
 geometric measure of aromaticity, to be interpreted with the chemical system.
 
-`CalcMCI` uses the retained density and overlap data. It first builds an atom
-pair matrix from the symmetric average of the two directed atom-block sums of
-`P*S` for the Mulliken scheme, or the orthogonal density for the Löwdin scheme.
-For an n-member ring it reports `2^(n-2)` times the sum of products around all
-cyclic permutations with the first atom fixed. The ordered ring, scheme and
-pair convention are part of the result, so MCI values should be compared with
-the same convention and electronic method.
-The local `pi_bo` values describe individual bonds and are not averaged to make
-an MCI.
+`CalcMCI` uses the retained closed-shell density and overlap data. It evaluates
+the Giambiagi–Bultinck multicenter index (`mci`) and ring index (`i_ring`) via
+AO-block matrix multiplication and trace on `M = P*S` (Mulliken) or
+`M = S^(1/2)*P*S^(1/2)` (Löwdin): `mci = (1/4) * sum Tr(M_{A1,A2}...M_{An,A1})`
+over all fixed-first cyclic permutations. This contraction is strictly invariant
+to rigid 3D rotation/translation, AO orthogonal/sign/permutation transforms, MO
+phases, and ring start/direction. Open-shell or unknown-spin results return
+`None` with explicit `missing` reasons. The local `pi_bo` values describe
+individual bonds and are not averaged to make an MCI.
 
 ## Multiple conformers
 

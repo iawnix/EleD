@@ -8,14 +8,16 @@
 - **Tier 2 — Extended `libxtb` properties C ABI v1 & C++/Python parity**:
   - Added reviewed patch `tools/diagnostics/xtb_properties_export.patch` and ABI verification script `tools/diagnostics/verify_properties.py` exporting `xtb_rdkit_getPropertiesAPIVersion`, `xtb_rdkit_getEnergyDecomposition`, `xtb_rdkit_getPolarizability`, `xtb_rdkit_getMultipoles`, and `xtb_rdkit_getNuclearESP` (exact EPN omitting the singular self-nuclear $Z_A/r_{iA}$ term).
   - Exposed all new properties, NumPy getters, and availability flags symmetrically in C++ `rdXTBTools` (`XTBResults`) and Python `XTBResults` / `native` backend, with full `ToDict`/`FromDict`, `XTBDiskCache`, and spawned-worker serialization parity.
-  - Added `CalcEnergyDecomposition`, `CalcMultipoleDescriptors` (rotational-invariant norms, eigenvalues, Frobenius norms, anisotropies), `CalcNuclearESP`, `CalcPolarizabilityDescriptors` (analytical D4 `mol_pol_bohr3`, `mol_c6_ha_bohr6`, `mol_c8_ha_bohr8`, atomic `alpha_bohr3` and `c6_aa_ha_bohr6`), and `CalcFiniteFieldPolarizability` (explicitly raising `DescriptorUnavailableError` documenting `libxtb` 6.7.1 C API scope).
+  - Added `CalcEnergyDecomposition`, `CalcMultipoleDescriptors` (rotational-invariant norms, eigenvalues, Frobenius norms, anisotropies), `CalcNuclearESP`, and `CalcPolarizabilityDescriptors` (analytical D4 `mol_pol_bohr3`, `mol_c6_ha_bohr6`, `mol_c8_ha_bohr8`, atomic `alpha_bohr3` and `c6_aa_ha_bohr6`; finite-field polarizability remains out of scope for `libxtb` 6.7.1 without `tblite`/PTB).
 - **Tier 3 — Pipek–Mezey LMOs, ALPB/GBSA solvation and vibrational thermochemistry**:
   - Added `CalcLocalizedOrbitals` (Pipek–Mezey 2×2 Jacobi localization in Löwdin and symmetrized Mulliken schemes with lone-pair/bond/delocalized classification, rotated Fock energies, centroids, and explicit open-shell/fractional withholding).
   - Bound `xtb_setSolvent` via optional `solvent`, `solvationModel` (`"alpb"` / `"gbsa"`), and `solvationGrid` across `XTBOptions`, `XTBCalculator`, `RunXTBBatch`, `XTBCacheKey`, and `rdXTBTools.RunMol` (gas-phase defaults and cache keys preserved when `solvent=None`), and added `CalcSolvationDescriptors`.
   - Added `CalcVibrationalThermochemistry` (central finite-difference Cartesian Hessian and dipole derivatives from analytical `GetGradient()`, harmonic frequencies, double-harmonic IR intensities, RRHO/qRRHO ZPE/U/H/S/G, linear/monoatomic handling, and explicit non-stationary geometry flagging).
   - Updated `DescriptorCatalog()` and `DescriptorStatus()` with all new sections and maturity classifications.
-- **API & catalog cleanup**:
+- **API & catalog cleanup and `CalcMCI` fix**:
+  - Fixed `CalcMCI` to use the exact closed-shell Giambiagi–Bultinck AO-block matrix multiplication and trace (`mci` and `i_ring`, strictly invariant to rigid 3D motion, AO orthogonal/sign/permutation transforms, and ring start/direction) and explicitly withhold open-shell/unknown-spin systems (`None` + `missing`).
   - Removed the hardcoded `DescriptorSensitivity` protocol-comparison helper (`gfn12_delta`, `et300_1000_delta`) and the `diagnostic` pseudo-descriptor section from `DescriptorCatalog()` (now 12 physical/electronic descriptor sections), while retaining `RunConformerAnalysis` (conformer statistics & dispersion) and `AssessDescriptorQuality` (single-point conservation and SCC quality checks).
+  - Removed `CalcMayerBondDescriptors` (redundant with closed-shell xTB `wbo` and unavailable for open shells), the legacy YAeHMOP/EHT adapter module (`eled.descriptors`: `CalcEHTDescriptors`, `CalcOrbitalDescriptors`), and the always-raising `CalcFiniteFieldPolarizability` stub.
 
 ## 0.12.0 — RDKit interface alignment, single-step wrappers and C++ CM5 parity
 

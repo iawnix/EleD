@@ -316,13 +316,21 @@ def test_top_level_exports_catalog_and_serialization_roundtrip(tmp_path):
         'CalcMultipoleDescriptors',
         'CalcNuclearESP',
         'CalcPolarizabilityDescriptors',
-        'CalcFiniteFieldPolarizability',
         'CalcSolvationDescriptors',
         'CalcVibrationalThermochemistry',
     )
     for name in expected_exports:
         assert name in eled.__all__
         assert hasattr(eled, name)
+    for removed in (
+        'CalcFiniteFieldPolarizability',
+        'CalcMayerBondDescriptors',
+        'CalcEHTDescriptors',
+        'CalcOrbitalDescriptors',
+        'DescriptorSensitivity',
+    ):
+        assert removed not in eled.__all__
+        assert not hasattr(eled, removed)
     assert 'eas' not in eled.__all__
 
     catalog = DescriptorCatalog()

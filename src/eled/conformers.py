@@ -246,7 +246,7 @@ def _local_series(reports, failed, entity):
     sections = (
         ('atoms', 'shell_populations', 'pi')
         if entity == 'atoms'
-        else ('bonds', 'mayer_bonds', 'frontier_bonds', 'pi')
+        else ('bonds', 'frontier_bonds', 'pi')
     )
     index_key = 'atom_index' if entity == 'atoms' else 'bond_index'
     excluded = {'atom_index', 'bond_index', 'begin_atom_index', 'end_atom_index'}
@@ -280,7 +280,7 @@ def _local_units(reports, series):
         'bonds.wbo': 'dimensionless',
     }
     for report in reports:
-        for section in ('shell_populations', 'mayer_bonds', 'frontier_bonds', 'pi'):
+        for section in ('shell_populations', 'frontier_bonds', 'pi'):
             data = report.get(section) or {}
             for field, unit in data.get('units', {}).items():
                 labels = ('frontier_bonds.homo', 'frontier_bonds.lumo') if section == 'frontier_bonds' else (section,)

@@ -19,7 +19,6 @@ _CATALOG = {
         'homo_* / lumo_*': {'definition': 'statistics of the degeneracy-grouped HOMO or LUMO atom distribution', 'unit': 'field dependent (eV, count, dimensionless or Angstrom)', 'invariance': 'rigid-motion invariant except centroid components; invariant to phase and rotations inside the selected degenerate group', 'requires': 'retained overlap and orbital basis', 'missing': 'frontier group or basis unavailable'},
         'xtb_q_*_e': {'definition': 'summary statistics of engine atomic charges; exact model is recorded as charge_model in provenance (GFN1/2 SCC Mulliken, GFN0 PEEQ/EEQ)', 'unit': 'e', 'invariance': 'atom reordering invariant for aggregate statistics', 'requires': 'partial charges and charge_model provenance', 'missing': 'charges not returned'},
         'xtb_cm5_q_*_e': {'definition': 'summary statistics of CM5 charges derived from GFN1/2 SCC Mulliken charges with the xTB CM5 geometry correction', 'unit': 'e', 'invariance': 'atom reordering invariant for aggregate statistics', 'requires': 'GFN1/2 SCC charges and calculation geometry', 'missing': 'CM5 is undefined for GFN0/EEQ or missing geometry'},
-        'eht_*': {'definition': 'YAeHMOP scalar orbital features', 'unit': 'field suffix', 'invariance': 'molecule invariant at fixed input geometry', 'requires': 'RDKit rdEHTTools result', 'missing': 'EHT calculation failed'},
         'xtb_wbo_sum': {'definition': 'sum of all off-diagonal Wiberg pairs', 'unit': 'dimensionless', 'invariance': 'atom reordering invariant', 'requires': 'Wiberg matrix', 'missing': 'bond orders not returned'},
         'xtb_n_*': {'definition': 'reported orbital/electron/unpaired-electron count', 'unit': 'count', 'invariance': 'molecule invariant', 'requires': 'engine result', 'missing': 'engine did not return count'},
         'xtb_*_idx': {'definition': 'zero-based orbital index under the recorded occupation convention', 'unit': 'index', 'invariance': 'depends on the retained orbital ordering', 'requires': 'orbital energies and occupations', 'missing': 'frontier unavailable'},
@@ -58,7 +57,6 @@ _CATALOG = {
     },
     'bond': {
         'wbo': {'definition': 'xTB Wiberg bond order on an RDKit bond', 'unit': 'dimensionless', 'invariance': 'atom reordering invariant with remapped indices', 'requires': 'Wiberg matrix', 'missing': 'bond orders not returned'},
-        'mbo': {'definition': 'closed-shell Mayer order from P S products', 'unit': 'dimensionless', 'invariance': 'AO permutation and orbital phase invariant', 'requires': 'same-calculation P/S and closed-shell density', 'missing': 'open-shell spin density unavailable or basis missing'},
         'mul_ovlp_e': {'definition': 'signed Mulliken bond overlap of the one-electron-normalized HOMO/LUMO group projector', 'unit': 'e', 'invariance': 'frontier-group rotations and orbital phase invariant', 'requires': 'frontier group and same-calculation P/S', 'missing': 'no frontier group or basis missing'},
         'pi_bo': {'definition': 'closed-shell projected Mayer (Mulliken scheme) or squared orthogonal-density (Lowdin scheme) pi bond index', 'unit': 'dimensionless', 'invariance': 'rigid-motion and normal-sign invariant', 'requires': 'closed shell and two valid local p projections', 'missing': 'open/unknown spin state or missing endpoint projection'},
         'coop_e': {'definition': 'crystal orbital overlap population integrated over occupied MOs on an RDKit bond (positive bonding, negative antibonding)', 'unit': 'e', 'invariance': 'AO permutation, MO phase, degenerate subspace rotation, bond reversal and rigid-motion invariant', 'requires': 'retained overlap, MO coefficients, AO-atom map and occupied orbitals', 'missing': 'no occupied orbitals under threshold or basis missing'},
@@ -72,7 +70,7 @@ _CATALOG = {
         'n_e': {'definition': 'reported modeled electron count; occupation sum if absent', 'unit': 'e', 'invariance': 'AO and MO representation invariant', 'requires': 'retained density result', 'missing': 'basis data unavailable'},
         'n_err_e': {'definition': 'trace(P S) minus reported modeled electron count (occupation sum if absent)', 'unit': 'e', 'invariance': 'AO permutation invariant', 'requires': 'density matrix and occupations', 'missing': 'basis data unavailable'},
         'shell_err_e': {'definition': 'maximum shell-to-atom population sum discrepancy', 'unit': 'e', 'invariance': 'AO permutation invariant with maps', 'requires': 'shell map and density', 'missing': 'shell map unavailable'},
-        'mci': {'definition': 'density-based multicenter index over all fixed-first cyclic permutations of an ordered ring', 'unit': 'dimensionless', 'invariance': 'AO permutation and orbital phase invariant with maps; ring order selects the reported atom set', 'requires': 'same-calculation density, overlap and ordered bonded ring', 'missing': 'basis data unavailable or ring invalid'},
+        'mci': {'definition': 'closed-shell Giambiagi-Bultinck multicenter index (and i_ring) computed by AO-block matrix multiplication and trace over fixed-first cyclic permutations of an ordered ring', 'unit': 'dimensionless', 'invariance': 'rigid-motion, AO orthogonal/permutation/sign, MO phase and ring start/direction invariant', 'requires': 'same-calculation closed-shell density, overlap and ordered bonded ring (3..9 atoms)', 'missing': 'open-shell/unknown spin state, basis data unavailable, or ring invalid'},
     },
     'reactivity': {
         'ip_v_ev': {'definition': 'vertical ionization energy from E(Q+1)-E(Q)', 'unit': 'eV', 'invariance': 'rigid-motion invariant at fixed geometry', 'requires': 'successful Q and Q+1 GFN1/2 calculations', 'missing': 'required charge state failed'},
@@ -157,7 +155,7 @@ _STATUS = {
         'g_solv_direct_ha / solute_polarization_energy_ha',
     },
     'exploratory': {
-        'mbo', 'mul_ovlp_e', 'pi_n_e',
+        'mul_ovlp_e', 'pi_n_e',
         'pi_q_e', 'pi_bo', 'mci', 'n_loc_1ev',
         'f_w_plus/f_w_minus/f_w_radical/dual_w',
         'occ_n_e / vir_n', 'occ_e_mean_ev / vir_e_mean_ev',

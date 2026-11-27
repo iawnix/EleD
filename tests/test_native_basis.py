@@ -94,8 +94,8 @@ def test_all_methods_radicals_and_compiled_basis(method,smiles,library):
         [row['mul_s_e'] for row in compiled_density['shell_populations']['atoms']],
         [row['mul_s_e'] for row in py_density['shell_populations']['atoms']], atol=1e-8)
     np.testing.assert_allclose(
-        [row['mbo'] for row in compiled_density['mayer_bonds']['bonds'] if row['mbo'] is not None],
-        [row['mbo'] for row in py_density['mayer_bonds']['bonds'] if row['mbo'] is not None], atol=1e-8)
+        [row['mul_ovlp_e'] for row in compiled_density['frontier_bonds']['bonds'] if row['mul_ovlp_e'] is not None],
+        [row['mul_ovlp_e'] for row in py_density['frontier_bonds']['bonds'] if row['mul_ovlp_e'] is not None], atol=1e-8)
     f=CalcFrontierDescriptors(m,compiled)
     assert f['homo'] is not None
     assert CalcXTBBondDescriptors(m,compiled)

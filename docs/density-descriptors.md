@@ -55,18 +55,7 @@ For GFN1/2 the Mulliken reconstruction can be checked against engine charges.
 Löwdin charges are a different partition. GFN0's EEQ charges are a separate
 model quantity, so both reconstructed charge fields are `None` for GFN0.
 
-## Mayer and frontier-bond descriptors
-
-For a closed shell, the Mayer order on an RDKit bond A–B is
-
-```text
-mbo(A,B) = Σ[μ∈A,ν∈B] Mμν Mνμ
-```
-
-It is dimensionless and reported beside the engine's `wbo`. The pinned xTB
-closed-shell Wiberg implementation uses this same contraction; regression tests
-check agreement. This equality is specific to that convention. Unknown spin
-and open shells return `None` for `mbo`, since the result provides no spin density.
+## Frontier-bond overlap descriptors
 
 For each HOMO/LUMO group G, the frontier overlap descriptor uses
 

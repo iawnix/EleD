@@ -49,17 +49,7 @@ As、Se、Br、I；其他元素返回 `None` 和 `reference_valence_unavailable`
 GFN1/2 的 Mulliken 重建电荷可以与引擎电荷核对；Löwdin 电荷采用另一种分区。
 GFN0 的 EEQ 电荷来自不同模型，因此两个重建电荷字段均为 `None`。
 
-## Mayer 与前线轨道键描述符
-
-闭壳层 RDKit 键 A–B 的 Mayer 键级为：
-
-```text
-mbo(A,B) = Σ[μ∈A,ν∈B] Mμν Mνμ
-```
-
-单位为无量纲，与引擎的 `wbo` 并列输出。项目固定版本的 xTB 在闭壳层下
-使用同样的矩阵收缩计算 Wiberg，回归测试检查两者相等；该关系依赖这一
-具体实现约定。开壳层或自旋未知时，由于缺少自旋密度，`mbo` 为 `None`。
+## 前线轨道键重叠描述符
 
 对 HOMO/LUMO 轨道组 G，定义：
 

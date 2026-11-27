@@ -16,7 +16,6 @@ from .density_descriptors import (
     CalcDensityMatrix,
     CalcFrontierBondDescriptors,
     CalcMCIDescriptors,
-    CalcMayerBondDescriptors,
     CalcPiDescriptors,
     CalcShellPopulations,
     _pi_options,
@@ -202,7 +201,6 @@ def _base_report(recordId, columns, analysis):
         'frontier': None,
         'density': None,
         'shell_populations': None,
-        'mayer_bonds': None,
         'frontier_bonds': None,
         'pi': None,
         'mci': None,
@@ -339,7 +337,6 @@ def CalcDescriptorReport(
         for name, function in (
             ('density', CalcDensityMatrix),
             ('shell_populations', CalcShellPopulations),
-            ('mayer_bonds', lambda r: CalcMayerBondDescriptors(mol, r)),
             (
                 'frontier_bonds',
                 lambda r: CalcFrontierBondDescriptors(
@@ -381,7 +378,6 @@ def CalcDescriptorReport(
             frontier=reason,
             density=reason,
             shell_populations=reason,
-            mayer_bonds=reason,
             frontier_bonds=reason,
             pi=reason,
         )

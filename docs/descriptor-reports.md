@@ -79,7 +79,7 @@ the ordered scalar schema and units. Each report includes:
   explicit; nonnumeric identity fields have no physical unit.
 - `atoms`, `bonds`, `fragments`, `populations`, `frontier`: nested indexed data.
   Frontier sections retain the actual MO indices used for each group.
-- `density`, `shell_populations`, `mayer_bonds`, `frontier_bonds`, `pi`: zero-cost
+- `density`, `shell_populations`, `frontier_bonds`, `pi`: zero-cost
   sections derived from retained `P`, `S`, `C` and shell maps. Each section
   carries units, invariance and explicit missing-value reasons.
 - `analysis_settings`: thresholds, degeneracy tolerance and extraction controls.

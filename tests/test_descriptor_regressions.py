@@ -6,7 +6,7 @@ import pytest
 from rdkit import Chem
 
 from eled import (XTBResults, CalcPiDescriptors, CalcDescriptorReport,
-                  CalcMayerBondDescriptors, CalcFrontierBondDescriptors)
+                  CalcFrontierBondDescriptors)
 from eled.basis import _native_p_directions
 from eled.input import _input_metadata, _xyz_from_mol
 from eled.options import _validate_calculation_settings
@@ -113,7 +113,7 @@ def test_missing_component_metadata_never_guesses_cartesian_order():
     assert report['atoms'][0]['missing']['pi_n_e']=='p_component_directions_unavailable'
 
 
-@pytest.mark.parametrize('func',[CalcMayerBondDescriptors,CalcFrontierBondDescriptors,CalcPiDescriptors])
+@pytest.mark.parametrize('func',[CalcFrontierBondDescriptors,CalcPiDescriptors])
 def test_mapping_rejects_changed_order_geometry_and_absent_provenance(func):
     mol,r=pi_system()
     renumbered=Chem.RenumberAtoms(mol,[6,1,2,3,4,5,0,7,8,9,10,11])
@@ -148,8 +148,7 @@ def test_degenerate_rotations_preserve_density_and_frontier_bonds():
     changed = replace(r, orbitalCoefficients=tuple(map(tuple,np.asarray(r.orbitalCoefficients)@rotation)))
     for func, entity, fields in [(CalcPiDescriptors,'atoms',['pi_n_e','pi_q_e']),
                                 (CalcPiDescriptors,'bonds',['pi_bo']),
-                                (CalcFrontierBondDescriptors,'bonds',['mul_ovlp_e']),
-                                (CalcMayerBondDescriptors,'bonds',['mbo'])]:
+                                (CalcFrontierBondDescriptors,'bonds',['mul_ovlp_e'])]:
         for a,b in zip(func(mol,r)[entity],func(mol,changed)[entity]):
             for key in fields:
                 if a[key] is None: assert b[key] is None
@@ -190,13 +189,30 @@ def test_real_density_interface_parity_and_pi_rotation(method,smiles):
         assert a['shell_populations']['shell_err_e'][scheme]<1e-8
     for i,row in enumerate(a['shell_populations']['atoms']):
         if method!='gfn0': assert row['mul_qrec_e']==pytest.approx(result.atomicCharges[i],abs=1e-7)
-    # libxtb's closed-shell Wiberg implementation uses the same PS pair contraction.
-    for row in a['mayer_bonds']['bonds']: assert row['mbo']==pytest.approx(row['wbo'],abs=1e-7)
+    # libxtb's closed-shell Wiberg implementation equals the PS pair contraction Tr[(PS)_AB (PS)_BA].
+    p = np.asarray(a['density']['density_matrix'])
+    ps = p @ result.GetOverlapMatrix()
+    ao_atom = result.GetAOAtomMap()
+    wbo = result.GetWibergBondOrders()
+    for bond in mol.GetBonds():
+        ia = np.flatnonzero(ao_atom == bond.GetBeginAtomIdx())
+        ib = np.flatnonzero(ao_atom == bond.GetEndAtomIdx())
+        mbo_val = float(np.sum(ps[np.ix_(ia, ib)] * ps[np.ix_(ib, ia)].T))
+        assert mbo_val == pytest.approx(wbo[bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()], abs=1e-7)
     rotation,_=np.linalg.qr(np.random.default_rng(74).normal(size=(3,3)))
     moved=Chem.Mol(mol)
     for i,pos in enumerate(mol.GetConformer().GetPositions()):
         moved.GetConformer().SetAtomPosition(i,rotation@pos+[2.,-3.,7.])
     rotated=calculate_xtb(moved,method=method,keepOverlap=True,xtbLibrary=lib)
+    if smiles == 'c1ccccc1':
+        from eled import CalcMCI
+        ring = list(mol.GetRingInfo().AtomRings()[0])
+        for mci_scheme in ('mulliken', 'lowdin'):
+            mci_base = CalcMCI(mol, result, ring, scheme=mci_scheme)
+            mci_rot = CalcMCI(moved, rotated, ring, scheme=mci_scheme)
+            assert mci_base['mci'] == pytest.approx(mci_rot['mci'], abs=2e-6)
+            assert mci_base['i_ring'] == pytest.approx(mci_rot['i_ring'], abs=2e-6)
+            assert 0.04 < mci_base['mci'] < 0.09
     for scheme in ['mulliken','lowdin']:
         baseline=CalcPiDescriptors(mol,result,scheme=scheme)
         transformed=CalcPiDescriptors(moved,rotated,scheme=scheme)

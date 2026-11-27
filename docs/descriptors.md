@@ -139,19 +139,16 @@ All validation precedes in-place writes; geometry/topology changes are rejected.
 indices are retained. The same selection object can label electronic reaction
 sites and drive local geometry analysis.
 
-`CalcMCI(mol, result, ringAtomIndices, scheme='mulliken')` calculates a
-density-based multicenter index for an ordered ring. It uses atom-block sums of
-`P*S` or the Löwdin orthogonal density and the fixed-first cyclic permutation
-definition recorded in the result. The reported atom-pair block is the symmetric
-average of the two directed `P*S` blocks (the Löwdin block is already symmetric).
+`CalcMCI(mol, result, ringAtomIndices, scheme='mulliken')` calculates the
+closed-shell Giambiagi–Bultinck multicenter index (`mci`) and ring index
+(`i_ring`) for an ordered bonded ring (3–9 atoms) by AO-block matrix
+multiplication and trace on `P*S` (Mulliken) or `S^(1/2)*P*S^(1/2)` (Löwdin).
+It is strictly invariant to rigid 3D motion, AO orthogonal/sign/permutation
+transformations, MO phases, and ring start/direction. Open-shell or
+unknown-spin results return `None` with explicit `missing` reasons.
 `CalcMCIDescriptors` accepts a named mapping of rings. MCI requires retained
 same-calculation basis data. It is an exploratory density descriptor and is not
 obtained by averaging `pi_bo`.
-
-The optional YAeHMOP adapter follows the same compact convention. Its scalar
-fields are `eht_homo_ev`, `eht_lumo_ev`, `eht_gap_ev`, `eht_fermi_ev`,
-`eht_energy_ev`, `eht_n_orb` and `eht_n_e`; the `eht_` prefix distinguishes
-the RDKit EHT calculation from xTB fields.
 
 ## Obtain same-calculation basis data
 
@@ -269,7 +266,7 @@ matrices/populations. Benzene verifies degenerate frontier subspace invariance.
 The C ABI diagnostic also checks copies, disabled retention, invalid buffers,
 failed SCF, Hessian invalidation and recovery. No tblite or ASE is imported.
 
-## Shell, Mayer, frontier-bond and π descriptors
+## Shell, frontier-bond and π descriptors
 
 ```python
 from eled import CalcDensityDescriptors
@@ -280,9 +277,7 @@ density = CalcDensityDescriptors(mol, result)
 
 `CalcDensityMatrix` exposes `P`, `tr_ps_e` and the electron-conservation
 error. `CalcShellPopulations` reports Mulliken and Löwdin s/p/d electron
-counts, p/s ratios and shell rows. `CalcMayerBondDescriptors` places Mayer
-and Wiberg values beside each RDKit bond; open-shell Mayer entries are `None`
-with an explicit spin-density reason. `CalcFrontierBondDescriptors` uses
+counts, p/s ratios and shell rows. `CalcFrontierBondDescriptors` uses
 near-degenerate HOMO/LUMO projectors and signed Mulliken overlap populations.
 `CalcPiDescriptors` reports p-shell projection for aromatic/sp2 atoms and
 π-bond order where a local plane exists. Units, invariance and missing-value
@@ -354,11 +349,10 @@ are `None` for GFN0/1, `e_xb_ha` is `None` for GFN2, `g_solv_ha` is `None` in ga
 phase, Fermi levels are `None` when `electronicTemperature <= 0.1 K`, multipoles
 return `available=False` for GFN0, and D4 polarizability/C6/C8 returns
 `available=False` for GFN1 (which uses DFT-D3).
-`CalcFiniteFieldPolarizability(mol, *, options=None, fieldAU=0.001)` explicitly
-raises `DescriptorUnavailableError` because `libxtb` 6.7.1 without `tblite`/PTB
-does not expose an external electric field operator for GFN0/1/2 (and point-charge
-embedding couples only to monopole shell charges); use analytical D4
-`CalcPolarizabilityDescriptors(result)` instead.
+Finite-field electronic polarizability is outside scope for `libxtb` 6.7.1
+without `tblite`/PTB (external electric fields are not supported for GFN0/1/2
+and point-charge embedding couples only to monopole shell charges); use
+analytical D4 `CalcPolarizabilityDescriptors(result)` instead.
 
 ## Implicit solvation (ALPB/GBSA) and vibrational thermochemistry
 

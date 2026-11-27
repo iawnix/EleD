@@ -39,9 +39,9 @@ styled_svg = DrawDescriptorMap(
 支持的字段包括顶层原子字段（`q_e`、`cm5_q_e`、`wbo_sum`、`f_plus`、`f_minus`、
 `f_radical`、`dual`、`s_loc_1ev`、`omega_loc_ev`、`n_loc_1ev`）、前线/壳层/π 嵌套
 原子字段（`homo_population`、`lumo_population`、`mul_p_e`、`low_p_e`、`low_ps`、
-`pi_n_e`、`pi_q_e`）以及键级字段（`wbo`、`mbo`、`pi_bo`、
+`pi_n_e`、`pi_q_e`）以及键级字段（`wbo`、`pi_bo`、
 `frontier_bonds.homo.mul_ovlp_e`、`frontier_bonds.lumo.mul_ovlp_e`），同时也支持带区段
-前缀的路径写法（如 `pi.pi_q_e`、`mayer_bonds.mbo`）。当报告包含 `provenance` 时，
+前缀的路径写法（如 `pi.pi_q_e`、`pi.pi_bo`）。当报告包含 `provenance` 时，
 `BuildFragmentVisualData` 与 `DrawDescriptorMap` 会核对原子数和有序结构哈希。
 
 `colorBy` 控制着色模式：

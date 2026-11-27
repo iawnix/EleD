@@ -199,45 +199,6 @@ def _bond_atom_pairs(mol):
     return [(b.GetIdx(), b.GetBeginAtomIdx(), b.GetEndAtomIdx()) for b in mol.GetBonds()]
 
 
-def CalcMayerBondDescriptors(mol, result):
-    """Return Mayer and Wiberg orders for RDKit bonds.
-
-    xTB exposes a spin-summed density here. Mayer order is therefore withheld
-    for open-shell results instead of silently presenting a closed-shell proxy.
-    """
-    result = _as_result(result)
-    _validate_mapping(mol, result)
-    result, _, s, p, ps, _, atom, _, _, _, _ = _basis(result)
-    wbo = np.asarray(result.wibergBondOrders, dtype=float)
-    if wbo.shape != (mol.GetNumAtoms(), mol.GetNumAtoms()):
-        raise ValueError('Wiberg matrix does not match molecule')
-    unavailable = (
-        'spin_state_unknown'
-        if result.numUnpairedElectrons is None
-        else 'spin_density_unavailable_for_open_shell'
-        if result.numUnpairedElectrons
-        else None
-    )
-    rows = []
-    for index, a, b in _bond_atom_pairs(mol):
-        ia, ib = np.flatnonzero(atom == a), np.flatnonzero(atom == b)
-        value = None if unavailable else float(np.sum(ps[np.ix_(ia, ib)] * ps[np.ix_(ib, ia)].T))
-        rows.append({
-            'bond_index': index,
-            'begin_atom_index': a,
-            'end_atom_index': b,
-            'mbo': value,
-            'wbo': float(wbo[a, b]),
-            'missing': {'mbo': unavailable} if unavailable else {},
-        })
-    return {
-        'bonds': rows,
-        'units': {'mbo': 'dimensionless', 'wbo': 'dimensionless'},
-        'invariance': 'invariant to AO permutation and orbital phase',
-        'missing': {'mbo': unavailable} if unavailable else {},
-    }
-
-
 def CalcFrontierBondDescriptors(
     mol,
     result,
@@ -415,7 +376,16 @@ def CalcPiDescriptors(mol, result, *, scheme='lowdin', planeTolAngstrom=0.1, piR
 
 
 def CalcMCI(mol, result, ringAtomIndices, *, scheme='mulliken'):
-    """Calculate a density-based multicenter index for one ordered ring."""
+    """Calculate the closed-shell Giambiagi-Bultinck multicenter index (MCI) and I_ring.
+
+    Uses AO-block matrix multiplication and trace on ``M = P @ S`` (Mulliken) or
+    ``M = S^(1/2) @ P @ S^(1/2)`` (Löwdin), which is strictly invariant to rigid
+    3D rotations/translations, AO permutations/sign flips, MO phase/degenerate
+    occupied rotations, ring starting atom and ring direction.
+
+    Open-shell or unknown-spin results return ``None`` with explicit ``missing``
+    reasons instead of silently applying the closed-shell spin-summed identity.
+    """
     if scheme not in {'mulliken', 'lowdin'}:
         raise ValueError("scheme must be 'mulliken' or 'lowdin'")
     result = _as_result(result)
@@ -425,34 +395,63 @@ def CalcMCI(mol, result, ringAtomIndices, *, scheme='mulliken'):
     indices = _indices(ringAtomIndices, natoms, 'ringAtomIndices')
     if len(indices) < 3:
         raise ValueError('ringAtomIndices must contain at least three unique atom indices')
+    if len(indices) > 9:
+        raise ValueError('ringAtomIndices supports rings of at most nine atoms')
     for first, second in zip(indices, np.roll(indices, -1)):
         if mol.GetBondBetweenAtoms(int(first), int(second)) is None:
             raise ValueError('ringAtomIndices must form an ordered bonded closed path')
-    metric = ps if scheme == 'mulliken' else lowdin
-    pair = np.zeros((natoms, natoms), dtype=float)
-    for first in range(natoms):
-        first_rows = np.flatnonzero(atom == first)
-        for second in range(natoms):
-            second_rows = np.flatnonzero(atom == second)
-            pair[first, second] = float(metric[np.ix_(first_rows, second_rows)].sum())
-    pair = (pair + pair.T) / 2
     ring = tuple(map(int, indices))
-    value = 0.0
-    for tail in permutations(ring[1:]):
-        order = (ring[0],) + tail
-        product = 1.0
-        for first, second in zip(order, order[1:] + order[:1]):
-            product *= pair[first, second]
-        value += product
-    value *= 2 ** (len(ring) - 2)
+    definition = (
+        'Closed-shell Giambiagi-Bultinck multicenter index: '
+        'I_ring = (1/4) * (Tr(M_{A1,A2}...M_{An,A1}) + Tr(M_{A1,An}...M_{A2,A1})), '
+        'MCI = (1/4) * sum_{fixed-first perms} Tr(M_{A1,A2}...M_{An,A1}) '
+        'with M = P*S (mulliken) or S^(1/2)*P*S^(1/2) (lowdin)'
+    )
+    unavailable = (
+        'spin_state_unknown'
+        if result.numUnpairedElectrons is None
+        else 'spin_density_unavailable_for_open_shell'
+        if result.numUnpairedElectrons
+        else None
+    )
+    if unavailable is not None:
+        return {
+            'ring_atom_indices': list(ring),
+            'mci': None,
+            'i_ring': None,
+            'scheme': scheme,
+            'units': {'mci': 'dimensionless', 'i_ring': 'dimensionless'},
+            'definition': definition,
+            'missing': {'mci': unavailable, 'i_ring': unavailable},
+        }
+    metric = ps if scheme == 'mulliken' else lowdin
+    ao_by_atom = {a: np.flatnonzero(atom == a) for a in ring}
+    blocks = {
+        (first, second): metric[np.ix_(ao_by_atom[first], ao_by_atom[second])]
+        for first in ring
+        for second in ring
+        if first != second
+    }
+
+    def _cycle_trace(order):
+        mat = blocks[(order[0], order[1])]
+        for first, second in zip(order[1:-1], order[2:]):
+            mat = mat @ blocks[(first, second)]
+        return float(np.einsum('ij,ji->', mat, blocks[(order[-1], order[0])]))
+
+    forward_trace = _cycle_trace(ring)
+    reverse_order = (ring[0],) + ring[:0:-1]
+    reverse_trace = forward_trace if scheme == 'lowdin' else _cycle_trace(reverse_order)
+    i_ring = 0.25 * (forward_trace + reverse_trace)
+    total_trace = sum(_cycle_trace((ring[0],) + tail) for tail in permutations(ring[1:]))
+    mci = 0.25 * total_trace
     return {
         'ring_atom_indices': list(ring),
-        'mci': float(value),
-        'atom_pair_matrix': pair[np.ix_(ring, ring)].tolist(),
+        'mci': float(mci),
+        'i_ring': float(i_ring),
         'scheme': scheme,
-        'units': {'mci': 'dimensionless', 'atom_pair_matrix': 'dimensionless'},
-        'definition': '2^(n-2) times all fixed-first cyclic density products; atom-pair blocks are symmetrized',
-        'pair_convention': 'B_AB=(sum((P*S)_AB)+sum((P*S)_BA))/2; Löwdin uses the same symmetric block sum',
+        'units': {'mci': 'dimensionless', 'i_ring': 'dimensionless'},
+        'definition': definition,
         'missing': {},
     }
 
@@ -485,7 +484,6 @@ def CalcDensityDescriptors(
     out = {
         'density': CalcDensityMatrix(result),
         'shell_populations': CalcShellPopulations(result),
-        'mayer_bonds': CalcMayerBondDescriptors(mol, result),
     }
     if includeFrontierBonds:
         out['frontier_bonds'] = CalcFrontierBondDescriptors(mol, result)

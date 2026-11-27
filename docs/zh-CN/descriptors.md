@@ -51,11 +51,6 @@ CM5 缺失时，报告为 GFN0 记录 `cm5_unsupported_method`，为 GFN1/2 记�
 
 电荷数组沿用计算时的原子顺序。直接提取、Fukui 分析和报告都会检查电荷模型及原子数。缺少重叠矩阵、轨道系数或 AO 到原子的映射时，报告保留标量结果并记录轨道部分缺失。已提供的矩阵维度或原子索引有误时，接口报告输入错误。
 
-YAeHMOP 适配器也使用同一套短字段规则，字段为
-`eht_homo_ev`、`eht_lumo_ev`、`eht_gap_ev`、`eht_fermi_ev`、
-`eht_energy_ev`、`eht_n_orb` 和 `eht_n_e`。`eht_` 前缀表示这是 RDKit
-EHT 计算的结果。
-
 HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不是光学激发能。
 
 ## 密度和 shell 描述符
@@ -85,23 +80,21 @@ P = C · diag(occupation) · Cᵀ
 这些是基组相关的密度分区量，不是唯一的实验可观测量。GFN0 的 EEQ 电荷
 与 Mulliken/Löwdin 布居不是同一个定义。
 
-## 前线、Mayer 和 π 描述符
+## 前线与 π 描述符
 
 ```python
 from eled import (
-    CalcFrontierDescriptors, CalcMayerBondDescriptors,
+    CalcFrontierDescriptors,
     CalcFrontierBondDescriptors, CalcPiDescriptors,
 )
 
 frontier = CalcFrontierDescriptors(mol, result)
-mayer = CalcMayerBondDescriptors(mol, result)
 frontier_bonds = CalcFrontierBondDescriptors(mol, result)
 pi = CalcPiDescriptors(mol, result)
 ```
 
-这些接口提供简并轨道组布居、participation ratio、熵、Mayer 键级、带符号
-的 HOMO/LUMO 键重叠、π 电子数和 π 键级。Mayer 使用闭壳层的自旋求和密度；开壳层需要当前未提供的自旋密度。局部
-π 特征需要定义明确的局部平面法向。条件不满足时返回 `None` 和原因。
+这些接口提供简并轨道组布居、participation ratio、熵、带符号的 HOMO/LUMO
+键重叠、π 电子数和 π 键级。局部 π 特征需要定义明确的局部平面法向。条件不满足时返回 `None` 和原因。
 
 ## 反应性描述符
 
@@ -167,9 +160,9 @@ epn = CalcNuclearESP(result, mol=mol)
 不适用的方法项绝不填零：GFN0/1 的 `e_aes_ha`/`e_axc_ha` 为 `None`，GFN2 的 `e_xb_ha` 为 `None`，
 气相的 `g_solv_ha` 为 `None`，`electronicTemperature <= 0.1 K` 时费米能级为 `None`，
 GFN0 的多极矩返回 `available=False`，GFN1（使用 DFT-D3）的 D4 极化率/C6/C8 返回 `available=False`。
-`CalcFiniteFieldPolarizability(mol, *, options=None, fieldAU=0.001)` 显式抛出
-`DescriptorUnavailableError`，说明 `libxtb` 6.7.1（未启用 `tblite`/PTB）不支持 GFN0/1/2 的外电场响应，
-应使用解析 D4 的 `CalcPolarizabilityDescriptors(result)`。
+有限电场响应极化率不在 `libxtb` 6.7.1（未启用 `tblite`/PTB）的 GFN0/1/2 支持范围内
+（外点电荷仅耦合到单极壳层电荷，无法描述原子内与离平面极化），请直接使用解析 D4 的
+`CalcPolarizabilityDescriptors(result)`。
 
 ## 隐式溶剂化（ALPB/GBSA）与振动热化学
 

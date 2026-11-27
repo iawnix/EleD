@@ -44,9 +44,9 @@ Supported field names include top-level atomic fields (`q_e`, `cm5_q_e`,
 `wbo_sum`, `f_plus`, `f_minus`, `f_radical`, `dual`, `s_loc_1ev`,
 `omega_loc_ev`, `n_loc_1ev`), nested frontier/shell/π atomic fields
 (`homo_population`, `lumo_population`, `mul_p_e`, `low_p_e`, `low_ps`,
-`pi_n_e`, `pi_q_e`), and bond fields (`wbo`, `mbo`, `pi_bo`,
+`pi_n_e`, `pi_q_e`), and bond fields (`wbo`, `pi_bo`,
 `frontier_bonds.homo.mul_ovlp_e`, `frontier_bonds.lumo.mul_ovlp_e`). Dotted
-section paths (such as `pi.pi_q_e` or `mayer_bonds.mbo`) are also accepted.
+section paths (such as `pi.pi_q_e` or `pi.pi_bo`) are also accepted.
 When `report` includes provenance metadata, `BuildFragmentVisualData` and
 `DrawDescriptorMap` verify atom count and ordered structure hash against `mol`.
 

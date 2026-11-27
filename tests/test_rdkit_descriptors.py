@@ -11,9 +11,7 @@ from rdkit.Chem import AllChem, rdMolDescriptors
 import eled
 from eled import (
     AnnotateMol,
-    CalcEHTDescriptors,
     CalcMolXTBDescriptors,
-    CalcOrbitalDescriptors,
     CalcXTBDescriptors,
     RegisterRDKitProperties,
     XTBCache,
@@ -67,8 +65,8 @@ def test_top_level_namespace_exports_rdkit_helpers_and_excludes_eas_dataset_tool
     assert XTBResult is XTBResults
     assert callable(CalcMolXTBDescriptors)
     assert callable(RegisterRDKitProperties)
-    assert callable(CalcEHTDescriptors)
-    assert callable(CalcOrbitalDescriptors)
+    assert not hasattr(eled, 'CalcEHTDescriptors')
+    assert not hasattr(eled, 'CalcOrbitalDescriptors')
     for eas_name in (
         'NormalizeEASRecords',
         'AssignEASSplits',

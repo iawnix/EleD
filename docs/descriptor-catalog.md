@@ -30,7 +30,7 @@ The naming rules keep feature columns short while retaining their meaning:
 | Molecular | `CalcXTBDescriptors`, `CalcMolXTBDescriptors`, `RegisterRDKitProperties` | Energy, frontier energies, dipole, charge and Wiberg summaries | 0 for `CalcXTBDescriptors`; 1 single point for single-step wrappers |
 | Atom/bond topology | `CalcXTBAtomDescriptors`, `CalcXTBBondDescriptors` | Engine charges, incident Wiberg sums and RDKit-bond Wiberg orders | 0 |
 | Orbital density | `CalcOrbitalPopulations`, `CalcShellPopulations`, `CalcDensityMatrix` | Populations derived from the same `C`, `S`, AO and shell maps | 0; requires `keepOverlap=True` |
-| Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcMayerBondDescriptors`, `CalcBondOverlapDescriptors` | Degeneracy-invariant HOMO/LUMO localization, Mayer orders, COOP/ECOHP and bond polarity | 0; requires `keepOverlap=True` |
+| Frontier/bond | `CalcFrontierDescriptors`, `CalcFrontierBondDescriptors`, `CalcBondOverlapDescriptors` | Degeneracy-invariant HOMO/LUMO localization, frontier overlap, COOP/ECOHP and bond polarity | 0; requires `keepOverlap=True` |
 | Orbital & LMO analysis | `CalcOrbitalWeightedFukui`, `CalcAtomicOrbitalEnergies`, `CalcLocalizedOrbitals` | Single-point orbital-weighted Fukui, condensed ALIE/PDOS and Pipek–Mezey LMOs | 0; requires `keepOverlap=True` |
 | ESP surface & EPN | `GenerateESPSurfaceGrid`, `CalcESPSurfaceDescriptors`, `CalcNuclearESP` | Politzer–Murray vdW-shell ESP statistics and exact nuclear ESP (EPN) | 0 (`CalcESPSurfaceDescriptors` requires sampled ESP) |
 | Extended properties | `CalcEnergyDecomposition`, `CalcMultipoleDescriptors`, `CalcPolarizabilityDescriptors` | Energy decomposition, Fermi levels, CAMM multipoles and D4 polarizability/C6/C8 | 0; properties ABI v1 |
@@ -77,7 +77,7 @@ energy decomposition, ALPB/GBSA solvation shifts, and harmonic thermochemistry),
 `diagnostic` marks single-point diagnostic fields (orbital indices/counts,
 occupation thresholds, Fermi levels, and direct solvation polarization
 decomposition), and
-`exploratory` is retained for testing new hypotheses (Mayer bond order, signed
+`exploratory` is retained for testing new hypotheses (signed
 frontier-bond overlap, π projections, local nucleophilicity proxy, orbital-weighted
 Fukui, condensed ALIE/PDOS, COOP/ECOHP/bond polarity, Pipek–Mezey LMOs, and CAMM
 atomic/molecular multipoles). `DescriptorCatalog()` organizes all definitions under
