@@ -37,11 +37,6 @@ class XTBCalculator:
             raise TypeError(f'unknown XTBCalculator option(s): {names}')
         self._options = XTBOptions(**options)
 
-    @property
-    def options(self) -> XTBOptions:
-        """Return the immutable calculation settings owned by this object."""
-        return self._options
-
     def GetOptions(self) -> XTBOptions:
         """Return the immutable calculation settings owned by this object."""
         return self._options
@@ -60,9 +55,46 @@ class XTBCalculator:
         selected = replace(self._options, **overrides) if overrides else self._options
         return _run_xtb(mol, **selected.ToDict())
 
-    __call__ = Calculate
-
     def __repr__(self) -> str:
         settings = self._options.ToDict()
         settings.pop('xtbLibrary', None)
         return f'XTBCalculator({settings!r})'
+
+
+def _calculate(mol: Any, options: XTBOptions, interface: str = 'native') -> XTBResults:
+    """Run one single point through the native ctypes or compiled ``rdXTBTools`` interface.
+
+    This is the only place where the two interfaces are dispatched; both return
+    the same normalized :class:`XTBResults` (see ``_as_result``).
+    """
+    if interface == 'native':
+        return XTBCalculator(**options.ToDict()).Calculate(mol)
+    if interface != 'compiled':
+        raise ValueError("interface must be 'native' or 'compiled'")
+    from . import rdXTBTools
+    from .electronic_descriptors import _as_result
+    from .errors import XTBEnvironmentError, XTBRunError
+    ok, raw = rdXTBTools.RunMol(
+        mol,
+        confId=options.confId,
+        method=options.method,
+        charge=options.charge,
+        numUnpairedElectrons=options.numUnpairedElectrons,
+        keepOrbitalCoefficients=options.keepOverlap,
+        xtbLibrary=options.xtbLibrary or '',
+        maxIterations=options.maxIterations,
+        accuracy=options.accuracy,
+        electronicTemperature=options.electronicTemperature,
+        keepOverlap=options.keepOverlap,
+        espPointsAngstrom=options.espPointsAngstrom or None,
+        solvent=options.solvent,
+        solvationModel=options.solvationModel,
+        solvationGrid=options.solvationGrid,
+        realSpacePointsAngstrom=options.realSpacePointsAngstrom or None,
+        realSpaceOccupationThreshold=options.realSpaceOccupationThreshold,
+        realSpaceLEAWindowEV=options.realSpaceLEAWindowEV,
+    )
+    if not ok:
+        error_type = XTBRunError if raw.failureKind == 'calculation' else XTBEnvironmentError
+        raise error_type(raw.errorMessage)
+    return _as_result(raw)

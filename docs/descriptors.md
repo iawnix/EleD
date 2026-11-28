@@ -31,8 +31,8 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcMultipoleDescriptors(result, *, mol=None)` | CAMM atomic dipoles/traceless quadrupoles and molecular traceless quadrupole with rotational invariants | GFN2/GFN1 `XTBResults` (GFN0 returns `available=False`) |
 | `CalcPolarizabilityDescriptors(result, *, mol=None)` | D4 molecular `mol_pol_bohr3`, `mol_c6_ha_bohr6`, `mol_c8_ha_bohr8` and atomic `alpha_bohr3`, `c6_aa_ha_bohr6` | GFN2/GFN0 `XTBResults` (GFN1 DFT-D3 returns `available=False`) |
 | `CalcNuclearESP(result, *, mol=None)` | Exact valence electronic + other-nuclei electrostatic potential at nuclei (`epn_au`, `epn_kcalmol`) | Native or compiled `XTBResults` from extended properties ABI v1 |
-| `CalcSolvationDescriptors(mol, solvent, *, solvationModel="alpb", solvationGrid=None, ...)` | Matched gas vs ALPB/GBSA `delta_g_solv_*`, direct `g_solv`, polarization energy, dipole/HOMO/LUMO/charge shifts | Explicit-H 3D RDKit `Mol`; runs 2 single points |
-| `CalcVibrationalThermochemistry(mol, *, temperatureK=298.15, pressureAtm=1.0, rotorCutoffCm1=100.0, symmetryNumber=1, ...)` | Harmonic frequencies (cm⁻¹), IR intensities (km/mol), rotational constants and RRHO/qRRHO ZPE/U/H/S/G | Explicit-H 3D RDKit `Mol`; central-difference Hessian of `GetGradient()` |
+| `CalcSolvationDescriptors(mol, solvent, *, solvationModel="alpb", solvationGrid=None, options=None)` | Matched gas vs ALPB/GBSA `delta_g_solv_*`, direct `g_solv`, polarization energy, dipole/HOMO/LUMO/charge shifts | Explicit-H 3D RDKit `Mol`; runs 2 single points |
+| `CalcVibrationalThermochemistry(mol, *, options=None, temperatureK=298.15, pressureAtm=1.0, rotorCutoffCm1=100.0, symmetryNumber=1, ...)` | Harmonic frequencies (cm⁻¹), IR intensities (km/mol), rotational constants and RRHO/qRRHO ZPE/U/H/S/G | Explicit-H 3D RDKit `Mol`; central-difference Hessian of `GetGradient()` |
 | `CalcFODFromResult(result, *, scheme="lowdin", electronicTemperature=None)` / `RunFOD(mol, *, electronicTemperature=5000.0, ...)` | Grimme FOD static-correlation index (`n_fod_e`), spin-resolved Fermi levels, orbital FOD weights and atomic/shell `fod_pop_e` (`s/p/d`) | Retained result (`keepOverlap=True` for atomic/shell FOD) or explicit-H 3D `Mol` (1 SCF) |
 | `CalcLinearResponseMatrix(result, *, scheme="lowdin", ...)` | Closed-shell independent-particle atom-condensed linear response $\chi_{AB}^{\mathrm{IP}}$ (`chi_e_per_ev`, `chi_e_per_ha`, per-atom softness & nonlocal coupling) | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
 | `CalcBondElectricField(mol, *, stepAngstrom=1e-3, ...)` / `CalcBondElectricFieldFromESP(mol, result, ...)` | Bond-midpoint electric field $\mathbf{E}=-\nabla V$ projected along every RDKit bond (`e_parallel_*`, `e_perp_*`, `e_norm_*`, `e_vec_au`) | Explicit-H 3D `Mol` (1 batched ESP SCF) or matching stencil result |
@@ -378,11 +378,12 @@ Hessian and dipole derivatives by central finite differences of analytical
 `GetGradient()`:
 
 ```python
-from eled import CalcSolvationDescriptors, CalcVibrationalThermochemistry
+from eled import CalcSolvationDescriptors, CalcVibrationalThermochemistry, XTBOptions
 
-solv = CalcSolvationDescriptors(mol, "water", method="GFN2-xTB", solvationModel="alpb")
+options = XTBOptions(method="GFN2-xTB")  # single-point settings live only in XTBOptions
+solv = CalcSolvationDescriptors(mol, "water", solvationModel="alpb", options=options)
 thermo = CalcVibrationalThermochemistry(
-    mol, method="GFN2-xTB", temperatureK=298.15, pressureAtm=1.0, symmetryNumber=1
+    mol, temperatureK=298.15, pressureAtm=1.0, symmetryNumber=1, options=options
 )
 ```
 

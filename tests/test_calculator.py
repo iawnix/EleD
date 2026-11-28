@@ -6,8 +6,8 @@ from eled import XTBCalculator, XTBResults
 
 def test_calculator_owns_validated_options_and_repr():
     calculator = XTBCalculator(method='gfn1', electronicTemperature=300.)
-    assert calculator.options.method == 'GFN1-xTB'
-    assert calculator.GetOptions() == calculator.options
+    assert calculator.GetOptions().method == 'GFN1-xTB'
+    assert not hasattr(calculator, 'options') and not callable(calculator)
     assert 'GFN1-xTB' in repr(calculator)
 
 

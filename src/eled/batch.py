@@ -32,7 +32,7 @@ def _prepare(mol: Any, options: XTBOptions) -> tuple[XTBOptions, dict]:
 
 def _key(options: XTBOptions, metadata: dict) -> str:
     path = options.xtbLibrary
-    engine = _engine_identity(options.backend, path)
+    engine = _engine_identity('native', path)
     if engine['sha256'] is None:
         raise ValueError('caching needs an absolute xTB library path so its binary can be fingerprinted')
     values = options.ToDict()

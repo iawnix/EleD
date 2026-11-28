@@ -7,8 +7,8 @@ import math
 from typing import Any
 
 from .input import _geometry_hash, _ordered_structure_hash, _xyz_from_mol
+from .electronic_descriptors import CalcXTBDescriptors
 from .result import XTBResults
-from .xtb import CalcXTBDescriptors
 
 
 def _validate_mapping(mol: Any, result: XTBResults) -> None:

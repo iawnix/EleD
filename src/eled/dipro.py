@@ -29,7 +29,8 @@ from typing import Any
 import numpy as np
 
 from .electronic_descriptors import _as_result, _indices, _nonnegative
-from .fragment_eda import _extract_submol, _run_single
+from .calculator import _calculate
+from .fragment_eda import _extract_submol
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions
 from .orbital_descriptors import _overlap_basis
@@ -380,9 +381,9 @@ def CalcElectronicCoupling(
         espPointsAngstrom=(), realSpacePointsAngstrom=(),
     )
 
-    raw_ab = _run_single(snapshot, opts_ab, interface)
-    raw_a = _run_single(mol_a, opts_a, interface)
-    raw_b = _run_single(mol_b, opts_b, interface)
+    raw_ab = _calculate(snapshot, opts_ab, interface)
+    raw_a = _calculate(mol_a, opts_a, interface)
+    raw_b = _calculate(mol_b, opts_b, interface)
 
     report = CalcElectronicCouplingFromResults(
         snapshot,

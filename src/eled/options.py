@@ -68,7 +68,6 @@ class XTBOptions:
     charge: int | None = None
     numUnpairedElectrons: int | None = None
     xtbLibrary: str | os.PathLike | None = None
-    backend: str = 'native'
     keepOverlap: bool = False
     maxIterations: int = 250
     accuracy: float = 1.0
@@ -111,11 +110,8 @@ class XTBOptions:
         object.__setattr__(self, 'solvationModel', solv_model)
         object.__setattr__(self, 'solvationGrid', solv_grid)
         object.__setattr__(self, 'method', _method_flag(self.method)[0])
-        object.__setattr__(self, 'backend', self.backend.strip().lower())
         if self.method == 'GFN-FF':
             raise ValueError('GFN-FF has no molecular orbitals and is not supported by this descriptor API')
-        if self.backend != 'native':
-            raise ValueError("backend must be 'native'; CLI, auto and tblite backends have been removed")
         if not isinstance(self.keepOverlap, bool):
             raise ValueError('keepOverlap must be a bool')
         if self.xtbLibrary is not None:

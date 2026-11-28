@@ -17,7 +17,6 @@ from eled import (
     XTBCache,
     XTBCalculator,
     XTBNativeNotFoundError,
-    XTBResult,
     XTBResults,
 )
 from eled.input import _input_metadata, _xyz_from_mol
@@ -63,7 +62,7 @@ def _synthetic_water_result(mol):
 def test_top_level_namespace_exports_rdkit_helpers_and_excludes_dataset_tools():
     import importlib.util
     assert importlib.util.find_spec('eled.eas') is None
-    assert XTBResult is XTBResults
+    assert not hasattr(eled, 'XTBResult')
     assert callable(CalcMolXTBDescriptors)
     assert callable(RegisterRDKitProperties)
     assert not hasattr(eled, 'CalcEHTDescriptors')

@@ -355,7 +355,6 @@ def CalcDirectedSurfaceDescriptors(
             return {}
 
         opts_dict = selected.ToDict()
-        opts_dict.pop('backend', None)
         result = _run_xtb_native(
             snapshot, **opts_dict, _keep_esp_for_hook=True, _post_singlepoint_hook=_hook
         )

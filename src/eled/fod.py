@@ -28,14 +28,13 @@ from typing import Any
 
 import numpy as np
 
-from .calculator import XTBCalculator
+from .calculator import _calculate
 from .electronic_descriptors import (
     _as_result,
     _has_population_basis,
     _orbital_basis_arrays,
     _orbitals,
 )
-from .errors import XTBEnvironmentError, XTBRunError
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions
 from .populations import CalcOrbitalPopulations
@@ -346,31 +345,7 @@ def RunFOD(
         electronicTemperature=temp_k,
         keepOverlap=True,
     )
-    if interface == 'native':
-        result = XTBCalculator(**selected.ToDict()).Calculate(snapshot)
-    else:
-        from . import rdXTBTools
-
-        ok, raw = rdXTBTools.RunMol(
-            snapshot,
-            confId=selected.confId,
-            method=selected.method,
-            charge=selected.charge,
-            numUnpairedElectrons=selected.numUnpairedElectrons,
-            keepOrbitalCoefficients=True,
-            xtbLibrary=selected.xtbLibrary or '',
-            maxIterations=selected.maxIterations,
-            accuracy=selected.accuracy,
-            electronicTemperature=selected.electronicTemperature,
-            keepOverlap=True,
-            solvent=selected.solvent,
-            solvationModel=selected.solvationModel,
-            solvationGrid=selected.solvationGrid,
-        )
-        if not ok:
-            error_type = XTBRunError if raw.failureKind == 'calculation' else XTBEnvironmentError
-            raise error_type(raw.errorMessage)
-        result = raw
+    result = _calculate(snapshot, selected, interface)
 
     report = CalcFODFromResult(result, scheme=scheme, electronicTemperature=temp_k)
     report['analysis_settings']['interface'] = interface

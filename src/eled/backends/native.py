@@ -436,7 +436,6 @@ def _run_xtb_native(
     solvationGrid: int | None = None,
     _restart=None,
     _save_restart=None,
-    _return_gradient=False,
     _keep_esp_for_hook: bool = False,
     _post_singlepoint_hook=None,
 ) -> XTBResults:
@@ -566,14 +565,13 @@ def _run_xtb_native(
         library.check(environment, "single point")
 
         energy = ctypes.c_double()
-        gradient = (ctypes.c_double * (3 * natoms))() if _return_gradient else None
+        gradient = (ctypes.c_double * (3 * natoms))()
         dipole = (ctypes.c_double * 3)()
         charges = (ctypes.c_double * natoms)()
         bond_orders = (ctypes.c_double * (natoms * natoms))()
         nao = ctypes.c_int()
         library.get_energy(environment, results, ctypes.byref(energy))
-        if gradient is not None:
-            library.get_gradient(environment, results, gradient)
+        library.get_gradient(environment, results, gradient)
         library.get_dipole(environment, results, dipole)
         library.get_charges(environment, results, charges)
         library.get_bond_orders(environment, results, bond_orders)
@@ -583,10 +581,11 @@ def _run_xtb_native(
             raise XTBEnvironmentError("native xTB returned no orbital basis functions")
         orbital_energies = (ctypes.c_double * nao.value)()
         occupations = (ctypes.c_double * nao.value)()
-        coefficients = (ctypes.c_double * (nao.value * nao.value))()
+        coefficients = (ctypes.c_double * (nao.value * nao.value))() if keepOverlap else None
         library.get_orbital_eigenvalues(environment, results, orbital_energies)
         library.get_orbital_occupations(environment, results, occupations)
-        library.get_orbital_coefficients(environment, results, coefficients)
+        if coefficients is not None:
+            library.get_orbital_coefficients(environment, results, coefficients)
         library.check(environment, "orbital extraction")
         energies_ev = tuple(value * HARTREE_TO_EV for value in orbital_energies)
         occupation_values = tuple(float(value) for value in occupations)
@@ -636,13 +635,8 @@ def _run_xtb_native(
             if not saved:
                 raise XTBEnvironmentError('native xTB could not copy the reference wavefunction')
             _save_restart.append((library, saved))
-        grad_rows = (
-            tuple(
-                tuple(float(gradient[3 * row + axis]) for axis in range(3))
-                for row in range(natoms)
-            )
-            if gradient is not None
-            else ()
+        grad_rows = tuple(
+            tuple(float(gradient[3 * row + axis]) for axis in range(3)) for row in range(natoms)
         )
         return XTBResults(
             **esp,
@@ -681,9 +675,14 @@ def _run_xtb_native(
                 tuple(float(bond_orders[row * natoms + column]) for column in range(natoms))
                 for row in range(natoms)
             ),
-            orbitalCoefficients=tuple(
-                tuple(float(coefficients[column * nao.value + row]) for column in range(nao.value))
-                for row in range(nao.value)
+            # MO coefficients, like the overlap, are retained only on request.
+            orbitalCoefficients=(
+                tuple(
+                    tuple(float(coefficients[column * nao.value + row]) for column in range(nao.value))
+                    for row in range(nao.value)
+                )
+                if coefficients is not None
+                else ()
             ),
             backend="native",
             rawJSON={"native_api_version": int(library.get_api_version())},
@@ -691,6 +690,7 @@ def _run_xtb_native(
                 **_input_metadata(mol, confId, charge, unpaired, xyz),
                 'calculation_settings': settings,
                 'calculation_status': 'success',
+                'interface': 'native',
                 'scf': scf,
                 'initialization': 'reference' if _restart else 'independent',
                 'optimize': False,
@@ -737,11 +737,6 @@ def _run_xtb_native(
                     else {}
                 ),
                 'overlap_source': 'same libxtb calculation' if keepOverlap else None,
-                **(
-                    {'gradient_hartree_per_bohr': tuple(float(value) for value in gradient)}
-                    if gradient is not None
-                    else {}
-                ),
             },
         )
     finally:
@@ -800,7 +795,6 @@ def _native_charge_states(mol, configurations):
         try:
             for index, config in enumerate(configurations):
                 options = config.ToDict()
-                options.pop('backend')
                 yield _run_xtb_native(
                     mol,
                     **options,

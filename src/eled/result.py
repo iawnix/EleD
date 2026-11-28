@@ -231,11 +231,6 @@ class XTBResults:
             return lumo - homo
         return self.homoLumoGapEV
 
-    @property
-    def fermiEnergyEV(self) -> float | None:
-        """Use the occupied frontier energy as the discrete Fermi estimate."""
-        return self.homoEV
-
     def GetAtomicCharges(self) -> np.ndarray:
         """Copy of xTB atomic charges in elementary-charge units, [atom]."""
         self._require_success()
@@ -266,12 +261,9 @@ class XTBResults:
     def GetGradient(self) -> np.ndarray:
         """Copy of nuclear gradient in Hartree/Bohr, [atom, xyz]."""
         self._require_success()
-        if len(self.gradientHartreePerBohr):
-            return np.array(self.gradientHartreePerBohr, dtype=float, copy=True)
-        stored = self.metadata.get("gradient_hartree_per_bohr")
-        if stored is not None and len(stored):
-            return np.array(stored, dtype=float, copy=True).reshape(-1, 3)
-        raise ValueError("Gradient was not retained")
+        if not len(self.gradientHartreePerBohr):
+            raise ValueError("Gradient was not retained")
+        return np.array(self.gradientHartreePerBohr, dtype=float, copy=True)
 
     def GetWibergBondOrders(self) -> np.ndarray:
         """Copy of dimensionless Wiberg bond orders, [atom, atom]."""
@@ -429,6 +421,3 @@ class XTBResults:
             if item.name in payload and isinstance(item.default, tuple):
                 payload[item.name] = to_tuples(payload[item.name])
         return cls(**payload)
-
-
-XTBResult = XTBResults

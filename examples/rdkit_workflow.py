@@ -11,7 +11,7 @@ if AllChem.EmbedMolecule(mol, randomSeed=1) != 0:
     raise RuntimeError('could not generate the ethanol conformer')
 cache = XTBCache()
 single_step = CalcMolXTBDescriptors(mol, cache=cache)
-results = RunXTBBatch([mol, mol], cache=cache, options=XTBOptions(backend='native'))
+results = RunXTBBatch([mol, mol], cache=cache, options=XTBOptions())
 annotated = AnnotateMol(mol, results[0])
 print(json.dumps({
     'single_step_gap_ev': single_step['xtb_gap_ev'],

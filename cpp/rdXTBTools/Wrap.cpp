@@ -558,6 +558,7 @@ BOOST_PYTHON_MODULE(rdXTBTools) {
       .add_property("fermiLevelBetaHartree", efbHa)
       .add_property("fermiLevelAlphaEV", efaEV)
       .add_property("fermiLevelBetaEV", efbEV)
+      .def_readonly("energyDecompositionFlags", &XTBResults::energyDecompositionFlags)
       .add_property("molecularPolarizabilityAU", molPol)
       .add_property("molecularC6AU", molC6)
       .add_property("molecularC8AU", molC8)

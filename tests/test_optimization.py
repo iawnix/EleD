@@ -51,8 +51,7 @@ def test_line_search_handles_failed_trial_calculations(monkeypatch, mode):
         recovered = mode == 'recover' and call > 2
         return XTBResults(
             'GFN2-xTB', None, -1.1 if recovered else -1.0, None, 3, 8, 0,
-            metadata={'gradient_hartree_per_bohr':
-                      (0.0,) * 9 if recovered else (0.2, 0.0, 0.0) * 3},
+            gradientHartreePerBohr=((0.0, 0.0, 0.0),) * 3 if recovered else ((0.2, 0.0, 0.0),) * 3,
         )
 
     monkeypatch.setattr(optimization, '_run_xtb_native', run)

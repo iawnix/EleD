@@ -45,7 +45,6 @@ def test_nondefault_settings_match_compiled_and_are_recorded(library,method,temp
     np.testing.assert_allclose(a.orbitalEnergiesEV,b.GetOrbitalEnergies(),atol=1e-9,rtol=0)
     for field in ra['values']:
         va,vb=ra['values'][field],rb['values'][field]
-        if field=='xtb_backend': continue
         if va is None or isinstance(va,str): assert va==vb
         else: assert va==pytest.approx(vb,abs=1e-9)
     assert json.loads(json.dumps(ra,allow_nan=False))['quality']['calculation_status']=='success'

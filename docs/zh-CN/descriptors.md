@@ -214,11 +214,12 @@ GFN0 的多极矩返回 `available=False`，GFN1（使用 DFT-D3）的 D4 极化
 `CalcVibrationalThermochemistry` 通过解析梯度 `GetGradient()` 的中心有限差分计算笛卡尔 Hessian 与偶极导数：
 
 ```python
-from eled import CalcSolvationDescriptors, CalcVibrationalThermochemistry
+from eled import CalcSolvationDescriptors, CalcVibrationalThermochemistry, XTBOptions
 
-solv = CalcSolvationDescriptors(mol, "water", method="GFN2-xTB", solvationModel="alpb")
+options = XTBOptions(method="GFN2-xTB")  # single-point settings live only in XTBOptions
+solv = CalcSolvationDescriptors(mol, "water", solvationModel="alpb", options=options)
 thermo = CalcVibrationalThermochemistry(
-    mol, method="GFN2-xTB", temperatureK=298.15, pressureAtm=1.0, symmetryNumber=1
+    mol, temperatureK=298.15, pressureAtm=1.0, symmetryNumber=1, options=options
 )
 ```
 
