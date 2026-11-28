@@ -52,7 +52,7 @@ def test_numerical_agreement_units_and_mapping(method, smiles, library):
     ok, result = rdXTBTools.RunMol(mol, confId=7, method=method, xtbLibrary=library,
                                  keepOrbitalCoefficients=True)
     assert ok and result.success and result.errorMessage == ''
-    native = calculate_xtb(mol, confId=7, method=method, xtbLibrary=library)
+    native = calculate_xtb(mol, confId=7, method=method, xtbLibrary=library, keepOverlap=True)
     assert result.totalEnergyHartree == pytest.approx(native.totalEnergyHartree, abs=1e-10)
     np.testing.assert_allclose(result.GetOrbitalEnergies(), native.orbitalEnergiesEV, atol=2e-5, rtol=0)
     np.testing.assert_allclose(result.GetOrbitalOccupancies(), native.orbitalOccupancies, atol=2e-5, rtol=0)

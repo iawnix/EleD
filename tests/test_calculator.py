@@ -32,7 +32,7 @@ def test_calculator_forwards_rdkit_result_and_per_call_overrides(monkeypatch):
     assert captured['options']['confId'] == 2
     assert captured['options']['keepOverlap'] is True
     assert captured['options']['electronicTemperature'] == 300.
-    assert calculator(molecule, confId=5) is expected
+    assert calculator.Calculate(molecule, confId=5) is expected
     assert captured['options']['confId'] == 5
 
 
