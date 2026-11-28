@@ -88,7 +88,7 @@ def test_fixed_water_matches_archived_reference(library, no_executable):
 
 
 def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable):
-    from eled.backends.native import run_xtb_native
+    from eled.backends.native import _run_xtb_native
     mol = molecule('CCO')
     verified = _native_gfn0_build(library)
     expected = os.environ.get('ELED_EXPECT_NATIVE_GFN0')
@@ -101,10 +101,10 @@ def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable)
         assert gfn0.orbitalEnergiesEV
         assert gfn0.metadata['engine']['native_gfn0']['library_sha256'] == gfn0.metadata['engine']['sha256']
         calculate_xtb(molecule('CO'), method='gfn1', xtbLibrary=library)
-        run_xtb_native(molecule('O'), method='gfn0', xtbLibrary=library)
+        _run_xtb_native(molecule('O'), method='gfn0', xtbLibrary=library)
     else:
         with pytest.raises(ValueError, match='verified patched'):
-            run_xtb_native(mol, method='GFN0-xTB', xtbLibrary=library)
+            _run_xtb_native(mol, method='GFN0-xTB', xtbLibrary=library)
     after = calculate_xtb(mol, xtbLibrary=library)
     assert after.totalEnergyHartree == pytest.approx(before.totalEnergyHartree, abs=1e-10)
     np.testing.assert_allclose(after.orbitalEnergiesEV, before.orbitalEnergiesEV, atol=1e-8, rtol=0)
@@ -115,10 +115,10 @@ def test_gfn0_selection_does_not_contaminate_native_gfn2(library, no_executable)
 def test_native_batch_and_cache_without_executable(method, library, no_executable):
     if method == 'GFN0-xTB' and not _native_gfn0_build(library):
         pytest.skip('native GFN0 needs a verified patched installation')
-    from eled.backends.native import run_xtb_native
+    from eled.backends.native import _run_xtb_native
     mol = molecule('CCO')
     cache = XTBCache()
-    with patch('eled.xtb.run_xtb_native', wraps=run_xtb_native) as calculate:
+    with patch('eled.xtb._run_xtb_native', wraps=_run_xtb_native) as calculate:
         results = RunXTBBatch([mol, mol], method=method, cache=cache, xtbLibrary=library)
     assert calculate.call_count == 1
     assert len(cache) == 1

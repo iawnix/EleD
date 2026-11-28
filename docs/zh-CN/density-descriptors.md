@@ -15,6 +15,9 @@ pi = CalcPiDescriptors(mol, result, scheme="lowdin", planeTolAngstrom=0.1)
 原子和键沿用 RDKit 输入编号。接受 `mol` 的分析函数会核对拓扑、原子顺序和
 坐标。保留 overlap 后，`CalcDescriptorReport` 默认包含这些分析区段。
 
+基组数据不变时，各分析共享重叠矩阵分解和密度矩阵。输入数组或原子数改变后，
+重新校验并计算。缓存数组由 EleD 独立保存。AO/shell 映射必须是一维整数数组。
+
 ## 密度与 shell 布居
 
 对自旋求和的占据数定义：

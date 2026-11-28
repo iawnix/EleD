@@ -207,7 +207,7 @@ def test_bad_or_mismatched_basis_fails(basis, change):
 
 def test_missing_basis_has_no_implicit_fallback(simple, monkeypatch):
     def forbidden(*args, **kwargs): pytest.fail('descriptor extraction must not run a calculation')
-    monkeypatch.setattr('eled.xtb.run_xtb_native', forbidden)
+    monkeypatch.setattr('eled.xtb._run_xtb_native', forbidden)
     with pytest.raises(DescriptorUnavailableError, match='same-calculation'):
         CalcOrbitalPopulations(simple[1])
     assert XTBOptions(keepOverlap=True).ToDict()['keepOverlap'] is True

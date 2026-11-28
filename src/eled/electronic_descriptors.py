@@ -6,8 +6,12 @@ sums include all off-diagonal atom pairs, not just RDKit topology bonds.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
+from functools import cached_property
+import hashlib
 import json
 from numbers import Integral
+import weakref
 
 import numpy as np
 
@@ -15,7 +19,7 @@ from .charges import CHARGE_MODEL_SCC, _charge_model_for_method
 from .errors import DescriptorUnavailableError
 from .result import XTBResults, _aufbau_occupied_count
 
-AU_DIPOLE_TO_DEBYE = 2.541746473
+from .constants import AU_DIPOLE_TO_DEBYE
 
 
 _COMPILED_SCALAR_PROPERTIES = (
@@ -244,8 +248,6 @@ def _charges(result: XTBResults):
 
 
 def _cm5_charges(result: XTBResults):
-    if result.cm5Charges is None:
-        return np.empty(0)
     values = _finite(result.cm5Charges, 'CM5 charges', 1)
     if len(values):
         if result.method not in ('GFN1-xTB', 'GFN2-xTB') or result.chargeModel != CHARGE_MODEL_SCC:
@@ -282,6 +284,117 @@ def _orbital_basis_arrays(result: XTBResults, nOrbitals, nAtoms):
             or not np.array_equal(np.unique(mapping), np.arange(nAtoms))):
         raise ValueError('AO-to-atom mapping must cover every atom with valid integer indices')
     return coefficients, overlap, mapping
+
+
+# One tolerance for C^T S C = 1 across every same-basis analysis.
+ORTHONORMALITY_TOLERANCE = 1e-5
+
+
+@dataclass(frozen=True)
+class _OrbitalBasis:
+    """Validated same-calculation AO basis of one result, computed once."""
+
+    energies: np.ndarray
+    occupations: np.ndarray
+    occupied: np.ndarray
+    virtual: np.ndarray
+    coefficients: np.ndarray
+    overlap: np.ndarray
+    ao_atom: np.ndarray
+    natoms: int
+    overlap_half: np.ndarray
+    orthonormality_error: float
+
+    @cached_property
+    def density(self) -> np.ndarray:
+        """Spin-summed AO density P = C diag(n) C^T."""
+        return _readonly((self.coefficients * self.occupations[None, :]) @ self.coefficients.T)
+
+    @cached_property
+    def density_overlap(self) -> np.ndarray:
+        """Mulliken metric P S."""
+        return _readonly(self.density @ self.overlap)
+
+    @cached_property
+    def lowdin_density(self) -> np.ndarray:
+        """Lowdin metric S^(1/2) P S^(1/2)."""
+        return _readonly(self.overlap_half @ self.density @ self.overlap_half)
+
+
+def _readonly(array: np.ndarray) -> np.ndarray:
+    array.setflags(write=False)
+    return array
+
+
+_BASIS_CACHE: dict[int, tuple[weakref.ref, tuple, _OrbitalBasis]] = {}
+
+
+def _basis_signature(result):
+    """Track the contents of basis inputs, including mutable lists and arrays."""
+    digest = hashlib.sha256()
+    for values in (result.orbitalEnergiesEV, result.orbitalOccupancies,
+                   result.orbitalCoefficients, result.overlapMatrix, result.aoAtomMap):
+        array = np.asarray(values)
+        # Object-array bytes encode pointers, not the values they reference.
+        if array.dtype.hasobject:
+            return None
+        digest.update(repr((array.shape, array.dtype.str)).encode('ascii'))
+        digest.update(array.tobytes())
+    return (result.numAtoms, result.numOrbitals, result.numElectrons,
+            result.numUnpairedElectrons, digest.digest())
+
+
+def _orbital_basis(result: XTBResults) -> _OrbitalBasis:
+    """Reuse validated basis decompositions while the result's inputs are unchanged.
+
+    Every same-basis analysis (populations, density, Fukui, COOP, linear
+    response, FOD, localized orbitals) shares this: S is checked to be
+    positive definite, C to be S-orthonormal within
+    ``ORTHONORMALITY_TOLERANCE``, and S^(1/2) is built a single time.
+    """
+    if not _has_population_basis(result):
+        raise DescriptorUnavailableError(
+            'this analysis requires same-calculation overlap, coefficients and AO-to-atom mapping; '
+            'use XTBCalculator(...).Calculate(..., keepOverlap=True)'
+        )
+    key = id(result)
+    signature = _basis_signature(result)
+    cached = _BASIS_CACHE.get(key)
+    if (signature is not None and cached is not None
+            and cached[0]() is result and cached[1] == signature):
+        return cached[2]
+    _BASIS_CACHE.pop(key, None)
+    energies, occupations, occupied, virtual = _orbitals(result)
+    natoms = result.numAtoms
+    c, s, mapping = _orbital_basis_arrays(result, len(energies), natoms)
+    eig, vec = np.linalg.eigh(s)
+    if eig.min() <= max(1.0, eig.max()) * 1e-10:
+        raise ValueError('overlap must be positive definite and well conditioned')
+    metric = c.T @ s @ c
+    error = float(np.max(np.abs(metric - np.eye(len(energies)))))
+    if error > ORTHONORMALITY_TOLERANCE:
+        raise ValueError(f'coefficients are not S-orthonormal: error={error:g}')
+    basis = _OrbitalBasis(
+        energies=energies.copy(),
+        occupations=occupations.copy(),
+        occupied=occupied,
+        virtual=virtual,
+        coefficients=c.copy(),
+        overlap=s.copy(),
+        ao_atom=mapping.astype(int),
+        natoms=int(natoms),
+        overlap_half=(vec * np.sqrt(eig)) @ vec.T,
+        orthonormality_error=error,
+    )
+    for array in (basis.energies, basis.occupations, basis.occupied, basis.virtual, basis.coefficients,
+                  basis.overlap, basis.ao_atom, basis.overlap_half):
+        _readonly(array)  # shared across analyses
+    if signature is not None:
+        _BASIS_CACHE[key] = (
+            weakref.ref(result, lambda _ref, key=key: _BASIS_CACHE.pop(key, None)),
+            signature, basis,
+        )
+    return basis
 
 
 def _wbo(result: XTBResults, natoms):

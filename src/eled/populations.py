@@ -9,20 +9,15 @@ import numpy as np
 
 from .electronic_descriptors import (
     _as_result,
-    _charges,
     _fragments,
-    _has_population_basis,
     _indices,
     _nonnegative,
-    _orbital_basis_arrays,
+    _orbital_basis,
     _orbitals,
 )
-from .errors import DescriptorUnavailableError
 
 
-def CalcOrbitalPopulations(
-    result, *, orbIdx=None, scheme='lowdin', orthonormalityTolerance=1e-6
-):
+def CalcOrbitalPopulations(result, *, orbIdx=None, scheme='lowdin'):
     """Return atom-by-orbital fractions and occupation-weighted populations.
 
     Lowdin: sum ``|S^(1/2) C|^2`` on each atom (nonnegative).
@@ -33,41 +28,26 @@ def CalcOrbitalPopulations(
     result = _as_result(result)
     if scheme not in {'lowdin', 'mulliken'}:
         raise ValueError("scheme must be 'lowdin' or 'mulliken'")
-    _nonnegative(orthonormalityTolerance, 'orthonormalityTolerance')
-    if not _has_population_basis(result):
-        raise DescriptorUnavailableError(
-            'orbital populations require same-calculation overlap and AO-to-atom mapping; '
-            'use XTBCalculator(...).Calculate(..., keepOverlap=True).'
-        )
-    energies, occupations, _, _ = _orbitals(result)
-    n = len(energies)
-    natoms = len(_charges(result))
-    coefficients, overlap, mapping = _orbital_basis_arrays(result, n, natoms)
-    eigenvalues, eigenvectors = np.linalg.eigh(overlap)
-    if eigenvalues.min() <= max(1.0, eigenvalues.max()) * 1e-10:
-        raise ValueError('overlap must be positive definite and well conditioned')
-    metric = coefficients.T @ overlap @ coefficients
-    error = float(np.max(np.abs(metric - np.eye(n))))
-    if error > orthonormalityTolerance or np.any(np.diag(metric) <= 0):
-        raise ValueError(f'coefficients are not orthonormal in the supplied overlap: error={error:g}')
+    basis = _orbital_basis(result)
+    n = len(basis.energies)
     selected = np.arange(n) if orbIdx is None else _indices(orbIdx, n, 'orbIdx')
-    c = coefficients[:, selected]
+    c = basis.coefficients[:, selected]
+    sc = basis.overlap @ c
     if scheme == 'lowdin':
-        root = (eigenvectors * np.sqrt(eigenvalues)) @ eigenvectors.T
-        ao = (root @ c) ** 2
+        ao = (basis.overlap_half @ c) ** 2
     else:
-        ao = c * (overlap @ c)
-    ao /= np.diag(metric)[selected]
-    atom = np.zeros((natoms, len(selected)))
-    np.add.at(atom, mapping, ao)
+        ao = c * sc
+    ao /= np.einsum('ij,ij->j', c, sc)
+    atom = np.zeros((basis.natoms, len(selected)))
+    np.add.at(atom, basis.ao_atom, ao)
     return {
         'scheme': scheme,
         'axes': ['atom', 'orbital'],
         'orb_idx': selected.tolist(),
-        'orbital_occupations': occupations[selected].tolist(),
+        'orbital_occupations': basis.occupations[selected].tolist(),
         'atom_pop': atom.tolist(),
-        'mo_n_e': (atom @ occupations[selected]).tolist(),
-        'orthonormality_error': error,
+        'mo_n_e': (atom @ basis.occupations[selected]).tolist(),
+        'orthonormality_error': basis.orthonormality_error,
         'normalization': 'unit norm per MO; electron populations include occupations',
     }
 

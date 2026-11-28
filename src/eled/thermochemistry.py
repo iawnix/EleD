@@ -18,7 +18,8 @@ from typing import Any
 
 import numpy as np
 
-from .backends.native import ANGSTROM_TO_BOHR, _run_xtb_native
+from .backends.native import _run_xtb_native
+from .constants import ANGSTROM_TO_BOHR
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions
 from .xtb import _resolve_options

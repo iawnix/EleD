@@ -17,7 +17,7 @@ import numpy as np
 from .errors import DescriptorUnavailableError
 from .esp_input import _normalize_esp_points
 
-ANGSTROM_TO_BOHR = 1.8897261254578281
+from .constants import ANGSTROM_TO_BOHR
 
 
 def _real(value, name, positive=False):

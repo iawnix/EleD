@@ -7,21 +7,19 @@ overlap, MO coefficients, and AO-to-atom mapping are required
 """
 from __future__ import annotations
 
-import json
 from numbers import Real
 
 import numpy as np
 
+from .constants import HARTREE_TO_EV
 from .electronic_descriptors import (
     _as_result,
     _charges,
     _cm5_charges,
-    _has_population_basis,
     _nonnegative,
-    _orbital_basis_arrays,
+    _orbital_basis,
     _orbitals,
 )
-from .errors import DescriptorUnavailableError
 from .mapping import _validate_mapping
 from .populations import CalcOrbitalPopulations
 
@@ -195,7 +193,6 @@ def CalcOrbitalWeightedFukui(
         ),
         "missing": missing,
     }
-    json.dumps(output, allow_nan=False)
     return output
 
 
@@ -399,28 +396,14 @@ def CalcAtomicOrbitalEnergies(
         ),
         "missing": missing,
     }
-    json.dumps(output, allow_nan=False)
     return output
 
 
-def _overlap_basis(result, *, orthonormalityTolerance: float = 1e-5):
-    if not _has_population_basis(result):
-        raise DescriptorUnavailableError(
-            "bond overlap descriptors require same-calculation overlap, coefficients, and AO-to-atom mapping; "
-            "use XTBCalculator(...).Calculate(..., keepOverlap=True)"
-        )
-    energies, occupations, occupied, virtual = _orbitals(result)
-    _validate_spin_summed_occupations(occupations)
-    natoms = result.metadata.get("atom_count", len(result.atomicCharges))
-    c, s, ao_atom = _orbital_basis_arrays(result, len(energies), natoms)
-    eig, _ = np.linalg.eigh(s)
-    if eig.min() <= max(1.0, eig.max()) * 1e-10:
-        raise ValueError("overlap must be positive definite")
-    metric = c.T @ s @ c
-    err = float(np.max(np.abs(metric - np.eye(len(energies)))))
-    if err > orthonormalityTolerance:
-        raise ValueError(f"coefficients are not S-orthonormal: error={err:g}")
-    return energies, occupations, occupied, virtual, c, s, ao_atom, err
+def _overlap_basis(result):
+    basis = _orbital_basis(result)
+    _validate_spin_summed_occupations(basis.occupations)
+    return (basis.energies, basis.occupations, basis.occupied, basis.virtual,
+            basis.coefficients, basis.overlap, basis.ao_atom, basis.orthonormality_error)
 
 
 def CalcBondOverlapDescriptors(
@@ -564,11 +547,9 @@ def CalcBondOverlapDescriptors(
         ),
         "missing": missing,
     }
-    json.dumps(output, allow_nan=False)
     return output
 
 
-_HARTREE_TO_EV = 27.211386245988
 
 
 def CalcLinearResponseMatrix(
@@ -675,7 +656,6 @@ def CalcLinearResponseMatrix(
             ),
             "missing": missing,
         }
-        json.dumps(output, allow_nan=False)
         return output
 
     c_occ = c[:, occupied]
@@ -687,8 +667,7 @@ def CalcLinearResponseMatrix(
 
     q_flat = np.zeros((natoms, n_occ * n_vir), dtype=float)
     if scheme == "lowdin":
-        eigvals, eigvecs = np.linalg.eigh(s)
-        s_half = (eigvecs * np.sqrt(eigvals)) @ eigvecs.T
+        s_half = _orbital_basis(result).overlap_half
         ct_occ = s_half @ c_occ
         ct_vir = s_half @ c_vir
         for a in range(natoms):
@@ -704,7 +683,7 @@ def CalcLinearResponseMatrix(
 
     chi_ev = -4.0 * ((q_flat * inv_de_flat[None, :]) @ q_flat.T)
     chi_ev = 0.5 * (chi_ev + chi_ev.T)
-    chi_ha = chi_ev * _HARTREE_TO_EV
+    chi_ha = chi_ev * HARTREE_TO_EV
     sum_rule_err = float(np.max(np.abs(np.sum(chi_ev, axis=1))))
 
     atoms = []
@@ -749,5 +728,4 @@ def CalcLinearResponseMatrix(
         ),
         "missing": {},
     }
-    json.dumps(output, allow_nan=False)
     return output

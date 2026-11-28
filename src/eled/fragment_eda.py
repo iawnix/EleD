@@ -39,7 +39,8 @@ from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions
 from .orbital_descriptors import CalcLinearResponseMatrix, _overlap_basis
 from .populations import CalcOrbitalPopulations
-from .properties import HARTREE_TO_KCAL_MOL, CalcEnergyDecomposition
+from .constants import HARTREE_TO_KCAL_MOL
+from .properties import CalcEnergyDecomposition
 
 FRAGMENT_EDA_PROTOCOL = 'eled-fragment-eda-v1'
 

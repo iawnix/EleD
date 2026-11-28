@@ -7,19 +7,12 @@ MO coefficients, and AO-to-atom mapping are required
 """
 from __future__ import annotations
 
-import json
 import math
 from numbers import Integral, Real
 
 import numpy as np
 
-from .electronic_descriptors import (
-    _as_result,
-    _has_population_basis,
-    _orbital_basis_arrays,
-    _orbitals,
-)
-from .errors import DescriptorUnavailableError
+from .electronic_descriptors import _as_result, _orbital_basis
 from .mapping import _validate_mapping
 
 _FRACTIONAL_TOL = 1e-2
@@ -65,6 +58,7 @@ def _validate_lmo_args(
 def _charge_matrices(
     c_occ: np.ndarray,
     s: np.ndarray,
+    s_half: np.ndarray,
     ao_atom: np.ndarray,
     natoms: int,
     scheme: str,
@@ -73,8 +67,6 @@ def _charge_matrices(
     n_occ = c_occ.shape[1]
     q_mats = np.empty((natoms, n_occ, n_occ), dtype=float)
     if scheme == "lowdin":
-        eig, vec = np.linalg.eigh(s)
-        s_half = (vec * np.sqrt(eig)) @ vec.T
         c_orth = s_half @ c_occ
         for a in range(natoms):
             block = c_orth[ao_atom == a, :]
@@ -238,7 +230,6 @@ def _withheld_output(
             "n_localized_orbitals": reason,
         },
     }
-    json.dumps(output, allow_nan=False)
     return output
 
 
@@ -321,25 +312,12 @@ def CalcLocalizedOrbitals(
     )
     result = _as_result(result)
     _validate_mapping(mol, result)
-    if not _has_population_basis(result):
-        raise DescriptorUnavailableError(
-            "localized orbitals require same-calculation overlap, coefficients, and AO-to-atom mapping; "
-            "use XTBCalculator(...).Calculate(..., keepOverlap=True)"
-        )
-
-    energies, occupations, _, _ = _orbitals(result)
+    basis = _orbital_basis(result)
+    energies, occupations = basis.energies, basis.occupations
     if np.any(occupations > 2.0 + 1e-8):
         raise ValueError("spin-summed occupations must not exceed two")
-
     natoms = mol.GetNumAtoms()
-    c, s, ao_atom = _orbital_basis_arrays(result, len(energies), natoms)
-    eig, _ = np.linalg.eigh(s)
-    if eig.min() <= max(1.0, eig.max()) * 1e-10:
-        raise ValueError("overlap must be positive definite")
-    metric = c.T @ s @ c
-    ortho_err = float(np.max(np.abs(metric - np.eye(len(energies)))))
-    if ortho_err > 1e-5:
-        raise ValueError(f"coefficients are not S-orthonormal: error={ortho_err:g}")
+    c, s, ao_atom, ortho_err = basis.coefficients, basis.overlap, basis.ao_atom, basis.orthonormality_error
 
     if result.numUnpairedElectrons is None:
         return _withheld_output(
@@ -388,7 +366,7 @@ def CalcLocalizedOrbitals(
 
     c_occ = c[:, occ_idx]
     e_occ = energies[occ_idx]
-    q_init = _charge_matrices(c_occ, s, ao_atom, natoms, scheme)
+    q_init = _charge_matrices(c_occ, s, basis.overlap_half, ao_atom, natoms, scheme)
     q_rot, u_mat, converged, iterations, initial_p, final_p = _jacobi_pipek_mezey(
         q_init, max_iterations=max_iter, tolerance=tol
     )
@@ -472,5 +450,4 @@ def CalcLocalizedOrbitals(
         "invariance": _lmo_invariance(),
         "missing": missing,
     }
-    json.dumps(output, allow_nan=False)
     return output

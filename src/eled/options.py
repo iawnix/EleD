@@ -122,20 +122,6 @@ class XTBOptions:
         values = asdict(self)
         values['espPointsAngstrom'] = [list(row) for row in self.espPointsAngstrom]
         values['realSpacePointsAngstrom'] = [list(row) for row in self.realSpacePointsAngstrom]
-        # Preserve existing cache keys and serialization when real-space sampling is unset.
-        if (
-            not self.realSpacePointsAngstrom
-            and self.realSpaceOccupationThreshold == 1e-7
-            and self.realSpaceLEAWindowEV == 0.0
-        ):
-            values.pop('realSpacePointsAngstrom', None)
-            values.pop('realSpaceOccupationThreshold', None)
-            values.pop('realSpaceLEAWindowEV', None)
-        # Preserve gas-phase cache keys and serialization when solvation is unset.
-        if self.solvent is None and self.solvationModel == 'alpb' and self.solvationGrid is None:
-            values.pop('solvent', None)
-            values.pop('solvationModel', None)
-            values.pop('solvationGrid', None)
         return values
 
     @classmethod

@@ -9,11 +9,12 @@ from typing import Any, Iterable
 
 import numpy as np
 
-from .backends.native import ANGSTROM_TO_BOHR, _run_xtb_native
+from .backends.native import _run_xtb_native
+from .constants import ANGSTROM_TO_BOHR
 from .errors import XTBRunError
 from .result import XTBResults
 
-HARTREE_TO_KCAL_MOL = 627.5094740631
+from .constants import HARTREE_TO_KCAL_MOL
 
 
 @dataclass(frozen=True)

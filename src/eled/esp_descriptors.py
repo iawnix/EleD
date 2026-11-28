@@ -33,8 +33,7 @@ from .esp_input import _normalize_esp_points
 from .input import _xyz_from_mol
 from .mapping import _validate_mapping
 
-HARTREE_TO_KCAL_MOL = 627.5094740631
-HARTREE2_TO_KCAL_MOL2 = HARTREE_TO_KCAL_MOL * HARTREE_TO_KCAL_MOL
+from .constants import HARTREE2_TO_KCAL_MOL2, HARTREE_TO_KCAL_MOL
 ESP_SURFACE_PROTOCOL = 'eled-esp-surface-v1'
 SURFACE_MODEL_VDW_FIBONACCI = 'rdkit_vdw_fibonacci_shell'
 
