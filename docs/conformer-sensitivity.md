@@ -1,4 +1,4 @@
-# Conformer sensitivity (1.4)
+# Conformer sensitivity (1.6)
 
 `RunConformerAnalysis` evaluates **explicitly supplied conformers of one RDKit
 molecule** using native libxtb. It does not generate or optimize geometries.

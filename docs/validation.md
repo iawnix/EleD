@@ -1,494 +1,72 @@
-# Local validation — 2026-11-26
-
-
-## Current scope: 0.12 RDKit interface alignment and visualization
-
-EleD `0.12.0` unifies all public Python classes, methods, parameters and result
-attributes on RDKit `PascalCase`/`camelCase` conventions (`XTBResults`,
-`XTBCalculator.Calculate`, `confId`, `keepOverlap`, etc.), adds
-`CalcMolXTBDescriptors`, `RegisterRDKitProperties` and `AnnotateMol(..., privateProps=True)`,
-moves CM5 calculation and option/ESP validation natively into C++ `rdXTBTools`,
-and upgrades `DrawDescriptorMap` with fragment-free continuous colormaps, bond
-overlays, implicit-H preservation and provenance checks.
-
-The [0.12.0 evidence](validation/0.12.0/README.md) records **618 passed, 12 skipped**
-in the full extended-engine suite (`.eled/runtime` with `ELED_REQUIRE_RDXTB=1`,
-`ELED_EXPECT_BASIS=1`, `ELED_EXPECT_NATIVE_GFN0=1`), **410 passed, 11 skipped**
-in the pure-Python suite (`.runtime-env`), **1/1 passed** for standalone C++
-CTest (`rdXTBTools/core`), **10/10 passed** across all `examples/` scripts,
-passing CLI optimization and `--vfukui` comparisons, and passing outside-checkout
-fresh-venv checks for both pure and compiled `0.12.0` wheels (GFN2 with overlap
-and reactivity, GFN0 with overlap, and inherited venv without library overrides).
-Remote GitHub CI runs must be checked separately on GitHub.
-
-## 0.10 checked geometry preparation
-
-[`PrepareConformers`](geometry-preparation.md) adds deterministic bounded RDKit
-retries, supported coordinate-derived stereo checks, converged force-field
-selection, provenance and partial/failure accounting. Full extended-engine
-development tests report **389 passed, 4 skipped**. The
-[0.10 evidence](validation/0.10.0/README.md) includes a separate preparation audit:
-**22/41** previously failed embeddings and **39/40** prior-success controls
-produce accepted optimized structures under the new protocol. Neither original
-prediction splits nor their historical scores are changed.
-
-The rejected control prompted an audit of all 983 old generated geometries:
-**nine fail coordinate-derived specified-stereo checks**. The 0.9.1 geometry
-study did not independently check stereo after MMFF; its old prediction results
-include these rows and must be interpreted with that limitation. New preparation
-rejects such coordinates before they reach xTB. This illustrates why embedding
-success alone is insufficient, not a new excited-state accuracy result.
-
-## 0.9.1 inherited runtime and matched geometry study
-
-The [0.9.1 evidence](validation/0.9.1/README.md) records **359 passed, 4 skipped**
-in development and isolated installed-wheel suites, **243 passed, 120 skipped**
-with the official engine and **23 passed** for optional benchmark/discovery
-tests. A research venv now automatically finds its base runtime's libxtb;
-native and compiled population checks pass with library/prefix overrides unset.
-
-The QM8 geometry/model study artifacts from this release were removed from the
-repository (0.17.0); application studies are maintained externally.
-
-All three 0.9.0 remote CI workflows passed; current-commit remote status must
-be distinguished from these local checks.
-
-## 0.9 conformer sensitivity and QM8 pilot
-
-The [0.9 evidence](validation/0.9.0/README.md) includes **340 passed, 3 skipped**
-in both the development and isolated installed-wheel suites. Official libxtb
-compatibility reports **224 passed, 119 skipped**. Optional benchmark protocol
-tests all pass (3) in a separate sklearn environment. Standard installation,
-both wheel variants and standalone C++ checks pass locally.
-
-[Conformer sensitivity](conformer-sensitivity.md) covers per-field missing and
-failure accounting, actual conformer IDs, rigid-transform invariance, unchanged
-inputs, cache reuse and protocol consistency. The installed example retains
-11 conformers over five molecules with auditable ETKDG/MMFF preparation.
-
-The QM8 pilot archive from this release was removed from the repository
-(0.17.0); application studies are maintained externally.
-
-The preceding 0.8 commit's three remote CI workflows were confirmed successful.
-New-commit CI status must be checked on GitHub separately from these local logs.
-
-## 0.8 persistent reactivity datasets
-
-The [0.8 evidence](validation/0.8.0/README.md) covers transactional disk caching,
-exact-dataset checkpoint recovery, explicit failure retry/history and fatal
-runtime/configuration/storage errors. Full development and installed suites
-each report **316 passed, 1 skipped**; official libxtb compatibility reports
-**202 passed, 115 skipped**. Standalone C++, installation and wheel checks passed.
-
-The frozen corpus now includes 37 molecules plus three additional difficulty
-profiles, tested across two methods, both initialization policies and both
-interfaces: **320 triplets**, with **304 completed and 16 failures retained**.
-All **160 interface comparisons** agree, including failed-state identity.
-Original `--vfukui` comparison increased from 8 to **74 cases**, all matching
-within its three-decimal printed precision. These checks verify software and
-protocol behavior, not predictive accuracy. See [persistent batch usage](persistent-batches.md).
-
-## 0.7 reference wavefunctions and unified temperature baseline
-
-Reactivity now defaults to 300 K and separate reference-wavefunction copies for
-both adjacent states. Independent initialization and explicit cold settings
-remain available; open-shell adjacent spins stay explicit. No libxtb patch or
-new production backend is needed. The [0.7 evidence](validation/0.7.0/README.md)
-records **287 passed, 1 skipped** for both development and installed-wheel suites,
-and **173 passed, 115 skipped** with official libxtb. Standalone C++, installer
-upgrade and fresh-venv wheel checks passed.
-
-Eight matched-settings GFN1/2 cases agree with original `--vfukui` to its printed
-three-decimal precision (absolute tolerance 0.00051). Full logs, exact geometries
-and both initialization reports are archived. Maximum initialization-dependent
-Fukui difference on this corpus was 7.97e-6; this is not a guarantee that both
-initializations always find the same SCF solution. Protocol version 2.0 records
-the new defaults; descriptor formulas and schema are unchanged.
-
-## 0.6 descriptor reports and vertical reactivity baseline
-
-Version 0.6 retains the 0.5 extended engine and adds shared numerical settings,
-versioned reports, CSV/JSONL export, observable quality flags and fixed-geometry
-GFN1/2 ΔSCF/Fukui analysis. The [0.6 evidence](validation/0.6.0/README.md) records:
-
-- Complete extended-engine suite and installed wheel outside checkout: each
-  **274 passed, 1 skipped**; official-library compatibility: **172 passed,
-  103 skipped** for unavailable extended capabilities.
-- Standalone C++, standard installer upgrade and both wheel variants passed.
-  Installed GFN1/2 diagnostics include all three charge states.
-- Nine temperature-protocol cases retain exact geometries and settings, seven
-  completed reports and two explicit cold SCF failures. No automatic temperature
-  retries or discarded failures.
-
-Analytical and interface tests verify formulas, provenance and conservation;
-they do not validate experimental IP/EA accuracy or excited-state predictions.
-See [API conventions and limitations](descriptor-reports.md).
-
-## 0.5 standard native installation baseline
-
-The native dependency now pins upstream PR #1490's merged commit `33fe381`.
-Only the basis-export patch is applied; the local D4 repair is retained as
-historical evidence and for explicitly selected 0.4 libraries.
-
-| Local check | Result |
-| --- | --- |
-| New extended engine upstream tests | 45 passed |
-| Installed method-switch sequences | 12 passed |
-| Native basis/lifecycle diagnostic | GFN0/1/2 passed |
-| Adapter suite, new upstream-fixed engine | 216 passed, 1 official-only skip |
-| Adapter suite, previously verified 0.4 engine | 216 passed, 1 official-only skip |
-| Adapter suite, official conda 6.7.1 | 133 passed, 84 capability-dependent skips |
-| Standard installer from fresh locked prefixes and incremental rerun | Both passed six installed checks: native/compiled × GFN0/1/2, all with populations |
-| Full tests against the installed wheel outside the checkout | 216 passed, 1 official-only skip |
-| Standalone C++ core against the standard engine | Passed |
-
-The [migration comparison](validation/0.5.0/migration-comparison.json) covers
-33 fixed conformers × GFN0/1/2 (99 cases), with each engine loaded in a separate
-process. Maximum differences were zero in this environment for total energy,
-orbital energies, charges, dipoles and Wiberg matrices. Both builds' populations
-also passed overlap/electron checks. This is evidence for the tested corpus,
-not a claim of numerical identity on all elements or calculation modes.
-The upstream repair and our old local patch differ in how secondary D4 charges
-are selected, so the comparison was measured rather than assumed.
-
-`tools/install_native.py` installs libxtb directly into its matched RDKit
-runtime prefix. Its checks use isolated Python outside the source tree with
-all xTB path overrides removed. Both interfaces resolve the installed library
-and verify native populations. Runtime/toolchain locks are checked before
-reuse; drifted or unmanaged environments are rejected without resetting them.
-
-The [0.5 evidence directory](validation/0.5.0/README.md) retains installation,
-build and migration records. Existing 0.4 binaries and reports are preserved.
-The [standard-install CI](../.github/workflows/standard-install.yml) repeats
-fresh installation and installed-wheel checks. Local results here do not imply
-that a new remote CI run has completed. Portable package distribution is still
-separate from this tested local source-install workflow.
-
-
-## Historical 0.4 native basis export
-
-All production calculations use libxtb. The reviewed native extension exports
-S and AO/shell/atom maps from the same successful calculation as C; tblite is
-absent from the backend, dependencies and active comparison tests. Historical
-comparison evidence is preserved below and in the diagnostic archive.
-
-Local validation on Linux x86-64 / Python 3.11 / RDKit 2026.09.1:
-
-| Check | Result |
-| --- | --- |
-| Extended libxtb upstream suite | 45 passed |
-| Installed D4 method-switch sequences | 12 passed |
-| C basis ABI and result lifecycle diagnostic | GFN0/1/2 passed; worst water CᵀSC error 1.33e-15 |
-| Full adapter suite, extended library | 205 passed, 1 official-only test skipped |
-| Full adapter suite, official conda xTB 6.7.1 | 122 passed, 84 capability-dependent tests skipped |
-| Standalone C++ core | Passed against extended and official engines |
-
-The 66 GFN1/2 frozen-conformer cases all satisfy the native overlap metric,
-map/shell contracts and electron conservation. This replaces cross-engine
-coefficient alignment as the production population validation. Additional
-GFN0/1/2 cases cover ethanol, ammonium and methyl radical, compiled/ctypes
-agreement, owned NumPy outputs, provenance checks and actual benzene
-subspace invariance. Build tests verify patch idempotence and preserve tampered
-source rather than overwriting it. The C diagnostic includes result copying,
-invalid buffers, disabled retention, failed SCF and Hessian invalidation/recovery.
-CPCM-X entry-point invalidation is implemented but not numerically exercised,
-since this source build disables CPCM-X.
-
-`ldd` on `.xtb-native/lib/libxtb.so` shows no tblite dependency. The locked
-runtime environment has neither Python tblite nor ASE. Official conda xTB
-may have a native tblite dependency imposed by its own distribution.
-
-A [committed validation snapshot](validation/0.4.0/README.md) retains the
-local test and installed-wheel records. Version 0.4 artifacts and full reports are recorded under
-`dist/0.4.0/`; see its validation manifest for artifact hashes and installation
-checks. The source and pure/compiled wheels are built locally; no upload or
-remote CI execution is implied. Compiled wheels need the matching local SDK
-and native-library prefixes. These checks establish numerical/API contracts,
-not accuracy for excited-state prediction or a new electronic Hamiltonian.
-
-## Historical 0.3 electronic descriptors
-
-The descriptor layer now includes molecular scalars, atomic/bond/fragment
-summaries, and opt-in same-calculation tblite population analysis. See the
-[API definitions and validation contracts](descriptors.md). The local suites
-passed **159 tests with the patched library** and **152 tests with 7 GFN0-only
-skips with the official library**. New coverage includes nonorthogonal metric
-handling, charge/electron conservation, signed Mulliken values, AO permutation,
-orbital phase and degenerate rotations, coordinate transforms, fragment
-accounting, compiled-result compatibility and overlap-aware cache identity.
-
-On ten real GFN1/2 method/molecule combinations (water, ethanol, ammonium,
-dimethyl sulfoxide, chloromethane), occupation-weighted Mulliken populations
-recover tblite's atomic charges within 1e-8 e. Symmetric benzene tests actual
-degenerate frontier subspaces. This checks numerical implementation and
-invariance, not predictive accuracy for excited states. No native/tblite
-cross-basis overlap substitution is used by the descriptor API.
-
-Installed-wheel diagnostics now check scalar/atom/fragment extraction, and
-explicit tblite checks verify population conservation. Reports for 0.3 live
-with the new local artifacts. The 0.1/0.2 artifacts and earlier numerical
-records are retained separately. Remote GitHub CI remains unexecuted.
-
-## 0.2 validation after CLI removal
-
-Version 0.2 removes the external calculation backend and automatic fallback.
-The gas-phase libxtb calculation path is now the default; tblite remains an
-explicit optional backend. Tests check execution with an empty `PATH` and
-subprocess launches disabled, rejection of removed backends/options, missing
-library failures, GFN0 verification, charge/electron conservation, mapping,
-sequential batching and cache reuse. The compiled and tblite comparisons remain.
-A fixed water reference retains a numerical check against an archived 0.1 CLI
-calculation without requiring an executable at runtime.
-
-The local patched-library suite passed **118 tests**. With the official xTB
-library, **111 passed and 7 native-GFN0-only cases skipped**. Installation checks for
-0.2 are recorded separately from the old 0.1 artifacts. Remote GitHub CI has
-not been run. See [migration notes](migration-0.2.md) and [installation](install.md).
-
-## Historical validation records (through 0.1)
-
-The dated records below describe the implementations at the time of each
-experiment. Their references to CLI, automatic fallback, optimization and
-parallel subprocess batches do not describe the current API. Historical
-numerical evidence and the archived 0.1 packages have been preserved.
-
-
-Environment: Linux x86-64; Python 3.11.18; RDKit 2026.09.1; conda-forge
-xTB 6.7.1 (`gfortran_ha02e54d_5`); C API version 10000. The isolated test
-environment is at `/tmp/eled-check`; no existing user environment was
-modified. CLI and shared library came from the same conda package.
-
-Run from the project root:
-
-```bash
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  /tmp/eled-check/bin/python -m pytest -q
-```
-
-Result: **28 tests passed**, including 9 real-engine integration cases.
-The tests cover:
-
-- GFN2 CLI/native comparisons for methanol, benzene, ammonium and methyl
-  radical. Absolute tolerances: 2e-6 Hartree for total energy; 2e-5 eV for
-  orbital energies; 2e-5 for atomic charges and existing-bond WBOs.
-- GFN1 CLI/native agreement; GFN0 execution in a separate CLI process.
-- Native coefficient `[AO][MO]` ordering against an independently generated
-  xTB Molden file, comparing absolute values to allow orbital sign changes.
-- ALPB water optimization; automatic backend selection and missing-library
-  fallback; coordinate/conformer preservation and property mapping.
-- Invalid H counts, inconsistent spin/electron parity, invalid coordinates,
-  wrong structure/atom order, incomplete arrays, timeout and missing outputs.
-- Parallel ordering, duplicate calculation reuse, failed-calculation retry,
-  engine/parameter-aware cache keys, and independent result metadata copies.
-
-## GFN0 native limitation
-
-A reproducible sequential experiment found that a GFN0 call through the
-6.7.1 C API changes subsequent GFN2 results in that process. For an ethanol
-conformer embedded with seed 1, GFN2 after GFN0 differed from GFN2 before GFN0
-by approximately -1.11e-4 Hartree in total energy and up to 7.64e-4 eV in
-orbital energies. GFN1 did not produce this effect in the same check.
-A follow-up pure-C experiment localized the cause to D4 initialization:
-GFN0 overwrites module-level `refq` and `refh` arrays, and later GFN2
-initialization reuses them. Loading GFN0 parameters alone triggers the change;
-restoring just these two arrays restores the baseline. See the
-[root-cause analysis and standalone reproducer](gfn0-native-state.md).
-The result was reported upstream in [issue #1486](https://github.com/grimme-lab/xtb/issues/1486).
-
-For an unverified library, the adapter rejects explicit native GFN0 calls and
-routes auto GFN0 requests to the CLI. Verified patched builds now support
-native GFN0 as described below. All native calls through this adapter are
-serialized; a mutex alone does not resolve the GFN0 state issue.
-
-## Patched dependency — 2026-11-02
-
-The automated [source-build workflow](xtb-patched-build.md) was exercised from
-a fresh Git fetch into `.xtb-rdkit/source` and repeated incrementally. It pins
-upstream commit `a9040512dd7c15793472aa20f9647d36a266f7cd`, applies the reviewed
-D4 patch, and installs to `.xtb-rdkit` using the separate `.xtb-build-env`
-compiler/dependency environment. Both directories are ignored by Git.
-
-- Upstream tests: **45/45 passed**.
-- Installed-library C regression: **12/12 method-switch sequences passed**,
-  with zero total-energy and orbital-energy differences.
-- Python adapter suite against the patched installation: **33 passed**,
-  including 9 real-engine integration cases.
-- The same suite against official conda-forge 6.7.1: **33 passed**.
-- The example workflow completed with the patched CLI.
-
-The source commit uses C API 2.0 (`20000`), while release 6.7.1 uses 1.0
-(`10000`). The 25 functions bound by this adapter have identical signatures
-in both headers. The adapter now accepts both API major versions for these
-gas-phase calls and still rejects unknown major versions. The changed
-`xtb_setSolvent` function is not bound; solvation continues through the CLI.
-
-The added source-preparation tests verify repeatable patch application,
-rejection of a different commit, and preservation of unrelated source edits.
-Build provenance, binary/parameter hashes, licenses, and regression results
-are installed under `.xtb-rdkit/share/xtb/eled/`.
-
-## Native GFN0 enablement — 2026-11-02
-
-The build helper now emits a versioned `native_gfn0` capability after the
-installed-library regression succeeds. The adapter checks this record, the
-reviewed D4 patch hash, and the actual library digest before selecting native
-GFN0. Missing/malformed records and replaced binaries leave `auto` on CLI;
-explicit native requests fail before initializing GFN0, including through the
-direct `run_xtb_native` entry point. GFN1/2 do not require this capability.
-
-Validation: **51 passed** against the patched installation; **45 passed,
-6 skipped** against official 6.7.1. The six skipped cases require native GFN0.
-The builder again passed 45 upstream tests and 12 method-switch checks.
-
-Additional cases cover GFN0 CLI/native agreement for ethanol, water, benzene,
-ammonium, and methyl radical (energy, orbitals, occupations, charges, and
-bond orders); sequential batch caching without CLI calls; and
-GFN2 → GFN0 → GFN1 → GFN0 on another molecule → GFN2. GFN2's final energy,
-orbital energies and coefficients agree with baseline. Native calls remain
-serialized; this does not establish general libxtb thread safety.
-
-## Compiled rdXTBTools — 2026-11-02
-
-The independent Boost.Python extension was compiled against the matching
-conda-forge RDKit/librdkit-dev 2026.09.1, Boost 1.90, Python 3.11.18 and NumPy
-SDK in `.rdxtb-build-env`, using GNU C++ 16.2. The C++ core calls libxtb
-directly; a test disables the Python ctypes and CLI calculation entry points
-while the compiled call still succeeds.
-
-- Complete suite with patched xTB C API 20000: **88 passed**, including
-  **37 compiled-interface tests**.
-- Complete suite with official 6.7.1 C API 10000: **76 passed, 12 skipped**.
-  The skips require a verified native-GFN0 installation.
-- Standalone C++ CTest passed against both libraries. A separate core-only
-  build using the release's API 1 header also compiled and passed CTest.
-- C++ SDK installation and an external CMake consumer passed. The consumer
-  links the exported `RDKitXTB::RDKitXTB` target and runs without Python.
-- Opt-in pip editable installation and compiled wheel build passed. The wheel
-  was installed to a separate target directory and executed GFN2 → GFN0 →
-  GFN1 → GFN2, with identical initial/final GFN2 energies.
-- The default pure Python wheel was also built and inspected: it contains no
-  compiled extension, even when one exists in the source checkout.
-- A source archive containing the C++ sources, CMake configuration and xTB
-  build helpers was built, then successfully rebuilt into a compiled wheel.
-- The EHT/xTB comparison example completed. This preserves separate total
-  energy fields and bond-population semantics.
-
-The numerical comparisons cover GFN0/1/2 on ethanol, water, benzene, ammonium
-and methyl radical. CLI tolerances are 2e-6 Hartree for total energy and 2e-5
-for orbital energies in eV, occupations, charges and existing-bond WBOs.
-Compiled and ctypes results agree within 1e-10 Hartree for energies; dipoles
-and WBOs within 1e-9; absolute orbital coefficients within 1e-8. The existing
-Molden comparison independently checks the ctypes reference's `[AO,MO]`
-layout. Modeled/total electron counts are distinguished (8/10 for water).
-
-Other checks exercise atom/conformer identity and input preservation,
-finite 3D coordinates and explicit-H requirements, charge/spin validation,
-copy ownership, missing coefficients, failed SCF diagnostics and recovery,
-shared serialization with the ctypes adapter, and rejection of missing or
-mismatched GFN0 provenance before parameter loading. The standalone C++ test
-also exercises four concurrent callers and failed-calculation cleanup.
-
-To repeat the patched Python run from the project root:
-
-```bash
-source .xtb-rdkit/activate.sh
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  ELED_REQUIRE_RDXTB=1 ELED_EXPECT_NATIVE_GFN0=1 \
-  .rdxtb-build-env/bin/python -m pytest -q
-```
-
-For the release run, start a fresh Python process and set `XTB_LIBRARY`,
-`XTB_PATH`, and `XTBPATH` to the matching official installation, with
-`ELED_EXPECT_NATIVE_GFN0=0`. The [build/API guide](rdxtb-tools.md)
-documents installation, C++ consumers and platform/ABI limitations.
-
-## Optional tblite backend — 2026-11-02
-
-The optional `tblite==0.8.0` wheel was installed separately with CFFI in the
-same Python environment. It did not install ASE. The explicit
-`backend="tblite"` path was tested on GFN1/2 water, ethanol, benzene and
-ammonium against the patched libxtb C API. Results agree within `2e-7` Hartree
-for total energies, `1.5e-4` eV for orbital energies, `5e-5` elementary charge
-for charges, `2e-4` e·Bohr for dipoles and `5e-5` for Wiberg bond orders.
-A separate exploratory **GFN2** run on water, ethanol, benzene, acetic acid
-and ammonium found maxima of `4e-10` Hartree, `8.4e-5` eV, `2.4e-5` e,
-`7.9e-5` e·Bohr and `1.7e-5`, respectively. These were not GFN1/GFN2
-benchmark-wide maxima. The broader evidence below supersedes that small probe.
-
-The comparison also verified that `backend="auto"` does not silently select
-tblite, that GFN0 and spin-polarized results produce explicit errors, and that
-tblite's orbital/shell/atom map metadata is retained. A separate environment
-without tblite raises `TBLiteNotFoundError` with installation instructions.
-The optional backend is excluded from the base dependency set; ASE is not
-needed. These tolerances apply to the tested tblite 0.8.0 and patched xTB
-build, not to all future versions.
-
-With tblite installed, the complete suite is **98 passed** against the patched
-engine and **86 passed, 12 skipped** against official 6.7.1. Without the
-optional wheel, tblite-specific tests are skipped; engine discovery and
-compiled-extension availability can produce additional skips.
-
-## Direct compiled-module orbital comparison — 2026-11-03
-
-[Orbital alignment](orbital-alignment.md) documents source-reviewed s/p/d
-conversion, fixed conformers, S-metric sign/subspace/density comparisons and
-per-case JSON/CSV reports. It uses `rdXTBTools.RunMol` directly. At default
-accuracy 1 the local build has 51/66 cases within all diagnostic limits; at
-accuracy 0.01 all 66 are within the same limits. Official conda 6.7.1 has
-64/66 within limits at accuracy 0.01; GFN1 bromomethane and iodomethane remain
-explicit exceptions. All three runs have zero calculation errors.
-
-These cross-engine diagnostics are separate from regression-test pass counts.
-The new tests cover rotated molecular coordinates, d-basis phases, invalid
-maps, nonorthogonal metrics and degenerate/equal-occupation subspaces.
-
-Complete suite: **117 passed** with the local source build; **105 passed,
-12 skipped** with the official release. In the environment without tblite,
-**73 passed, 24 skipped**; those skips also include compiled/engine-specific
-checks. These runs used one OpenMP/OpenBLAS thread.
-
-The follow-up [controlled source investigation](xtb-671-basis-differences.md)
-reproduced the 64/66 outcome with release v6.7.1 rebuilt using the same
-toolchain as current upstream. Separate on-site S/H0 and 5s/5p source edits
-localized the Br and I exceptions, respectively; together they produce 66/66.
-Current upstream without our D4 patch also produces 66/66 and passes 45
-upstream tests. Four raw-tag test failures under this toolchain were separately
-traced to the unassigned `stmp` in a gradient routine: applying upstream #1121
-alone restores 38/38 tests. A water finite-difference check confirms the fix;
-the installed conda binary also passes that derivative check. The research
-builds and partial basis patches are not production replacements.
-
-## 0.1 packaging and locked installation — 2026-11-03
-
-The [installation guide](install.md) now uses separate SHA256-locked conda
-prefixes for the official runtime, RDKit SDK, and xTB source toolchain.
-All three were recreated in fresh directories. The fresh source build passed
-45 upstream tests and 12 installed-library method-switch checks. The Python
-suite including the new installation diagnostic checks passed **119 tests**.
-
-`tools/build_release.py` builds pure and compiled wheels from independent
-extractions of the same source archive. `tools/check_wheel.py` installs each
-wheel into a fresh venv, runs outside the source checkout with isolated
-Python, asserts the imported package origin, and runs `pip check`. Both
-variants passed installed GFN2 checks; the compiled wheel also passed native
-GFN0 checks. These checks initially ran without the optional tblite Python
-package, confirming that it is not needed for the libxtb paths.
-
-The generated artifact manifest records hashes and build/lock identities;
-the installed-wheel reports record the actual loaded libraries and parameter
-hashes. The C++ wheel remains local to its SDK/native-library prefixes, not a
-portable binary distribution. CI now includes the same source-archive and
-installed-wheel checks with separate official/patched engine jobs. Workflow
-configuration was checked locally; remote GitHub CI has not been run in this
-workspace, and no package has been published.
-
-## Scope
-
-Adapter regression checks validate numerical agreement and protocol behavior,
-not scientific accuracy against experiment.
-Tests do not establish portability across all xTB releases or operating systems.
-macOS/Windows and the conda recipe remain unverified. The extended source build
-is validated on Linux x86-64 as described in
-[the build guide](xtb-patched-build.md). Historical sections describe capabilities
-and CI status at their release date; persistent caching and AO-to-atom mapping
-are now implemented, and the 0.8 Linux CI workflows have passed remotely.
+# Validation and verification
+
+EleD validates software contracts, numerical parity and physical invariances
+through automated C++, pure-Python and extended-`libxtb` test suites.
+Application studies, benchmark datasets and model training are maintained
+outside the EleD repository.
+
+## Verification commands
+
+From a Linux x86-64 checkout using the locked prefixes:
+
+1. **Pure-Python / schema / report tests** (`.runtime-env`):
+
+   ```bash
+   conda run -p "$PWD/.runtime-env" python -m pytest -q \
+     -m "not integration and not benchmark"
+   ```
+
+2. **Full extended-engine suite** (`.eled/runtime`, native + compiled `rdXTBTools`):
+
+   ```bash
+   ELED_EXPECT_BASIS=1 .eled/runtime/bin/python -m pytest -q -m "not benchmark"
+   ```
+
+3. **Standalone C++ core tests** (`.eled/rdxtb-build`):
+
+   ```bash
+   ctest --test-dir .eled/rdxtb-build --output-on-failure
+   ```
+
+4. **Backend and ABI diagnostics**:
+
+   ```bash
+   .eled/runtime/bin/python -m eled doctor --check native --keep-overlap --reactivity
+   .eled/runtime/bin/python -m eled doctor --check compiled --keep-overlap --reactivity
+   ```
+
+5. **Optional xTB CLI numerical cross-checks** (developer regression tools, not
+   runtime backends):
+
+   - `tools/compare_fukui_cli.py`: checks native/compiled vertical Fukui indices
+     against `xtb --vfukui` on `tests/data/reactivity_cases.json`.
+   - `tools/benchmark_xtb_optimization.py`: checks `OptimizeXTB` geometries and
+     energies against the `xtb` CLI optimizer.
+   - `tools/validate_reactivity_dataset.py`: checks checkpoint recovery and
+     `native`/`compiled` parity across the frozen regression corpus.
+
+## What the test suite checks
+
+- **Engine and ABI parity**: `libxtb` upstream tests, D4 method-switch state
+  isolation (upstream PR #1490; see [upstream/xtb-gfn0-upstream-fix.md](upstream/xtb-gfn0-upstream-fix.md)),
+  basis export, SCC diagnostics, ESP ABI, extended properties ABI v1, real-space
+  ABI v2, and `native` vs compiled `rdXTBTools` parity.
+- **Physical and mathematical invariants**: rigid 3D translation/rotation
+  invariance, MO phase and degenerate-subspace rotation invariance, AO
+  permutation invariance, charge/electron/sum-rule conservation, original RDKit
+  atom/bond index preservation, and explicit `None` + `missing` handling
+  (undefined quantities are never encoded as zero).
+- **Current report schema**: `SCHEMA_VERSION = 2`, `DESCRIPTOR_VERSION = '1.6'`
+  (aufbau frontier orbitals), and `REACTIVITY_PROTOCOL_VERSION = '2.2'`.
+
+## Scope and historical records
+
+These checks establish numerical implementation consistency and protocol
+behavior; they do not claim experimental prediction accuracy or portability
+across unverified xTB releases or operating systems.
+
+Historical pre-0.13 validation logs, wheel-check snapshots and early
+investigation archives (`docs/validation/`, `tools/diagnostics/evidence/`,
+`tools/diagnostics/archive/tblite-0.3/`) were removed from the working tree to
+keep the repository focused on current EleD sources and remain accessible in Git
+history.

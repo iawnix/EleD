@@ -403,7 +403,7 @@ Breaking pre-1.0 API alignment:
 
 ## 0.2.0 — in-process calculation backends
 
-Breaking API changes; see [migration notes](docs/migration-0.2.md).
+Breaking API changes (historical migration notes `docs/migration-0.2.md` are retained in Git history).
 
 - Removed the xTB CLI backend, executable discovery, output parsers and
   automatic fallback. Native libxtb is the default; tblite stays explicit.

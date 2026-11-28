@@ -1,4 +1,4 @@
-# Descriptor reports and vertical reactivity (1.4)
+# Descriptor reports and vertical reactivity (1.6)
 
 These APIs organize libxtb results into reproducible features. They do not add
 a new electronic Hamiltonian, excited-state solver or fitted IP/EA model.

@@ -31,7 +31,7 @@ The [source lock](../tools/xtb-source.json) pins commit
 `33fe381adde775c4992610c0f90d8914b7572bb5`, the upstream-repaired D4 source,
 the basis/diagnostics/ESP/properties/realspace patches and all modified source
 files by SHA256. This upstream main commit reports
-6.7.1 but differs from the release tag; see [earlier verification](gfn0-reverification.md).
+6.7.1 but differs from the release tag; see [upstream GFN0 fix notes](upstream/xtb-gfn0-upstream-fix.md).
 The builder accepts a clean pinned checkout or an exactly matching patched
 checkout. It refuses unrelated or mismatched edits and never resets them.
 Reruns reuse the incremental build. An optional second positional argument

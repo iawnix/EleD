@@ -1,4 +1,4 @@
-# 报告与反应性（1.4）
+# 报告与反应性（1.6）
 
 ## 单点报告
 
@@ -93,7 +93,7 @@ population scheme 和 charge model；`"mulliken"`、`"lowdin"` 指轨道布居�
 
 ## 报告版本
 
-当前单点报告使用 schema 2、descriptor version 1.4，反应性协议版本为 2.1。报告字段带有显式单位，
+当前单点报告使用 schema 2、descriptor version 1.6，反应性协议版本为 2.2。报告字段带有显式单位，
 原子编号固定遵循输入分子。修改公开字段时需要同步更新目录、测试和版本说明。
 
 英文详细说明见 [descriptor-reports.md](../descriptor-reports.md)。

@@ -23,7 +23,7 @@ from eled import DrawDescriptorMap
 # Single-molecule charge heatmap directly from XTBResults or a report (no fragments required)
 charge_svg = DrawDescriptorMap(mol, result, atomField="q_e")
 
-# Bond-order or density-derived fields (e.g. wbo, mbo, pi_bo, frontier_bonds.homo.mul_ovlp_e)
+# Bond-order or density-derived fields (e.g. wbo, pi_bo, coop_e, frontier_bonds.homo.mul_ovlp_e)
 bond_svg = DrawDescriptorMap(mol, report, bondField="wbo", colorBy="value")
 
 # Custom RDKit MolDrawOptions callback

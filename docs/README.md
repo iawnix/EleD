@@ -42,17 +42,11 @@ EleD repository.
 应用研究、数据集和模型训练在 EleD 仓库之外维护。
 
 - [SCF diagnostics](scf-diagnostics.md) · [SCC 收敛诊断](zh-CN/scf-diagnostics.md)
-- [Validation history](validation.md)
+- [Validation](validation.md)
 
-### Engineering records (English only) / 工程记录（仅英文）
+Historical pre-0.13 validation logs and engineering investigation records remain
+available in Git history; upstream xTB GFN0 fix records are kept under
+[`docs/upstream/`](upstream/xtb-gfn0-upstream-fix.md).
 
-These pages record past investigations and migrations. They are kept for
-traceability, are not user guides, and are not translated.
-
-以下页面记录历史排查与迁移过程，仅为可追溯性保留，不是用户指南，不提供中文版。
-
-- [Migration to 0.2](migration-0.2.md)
-- [tblite comparison](tblite-comparison.md)
-- [GFN0 native state](gfn0-native-state.md) · [GFN0 re-verification](gfn0-reverification.md)
-- [Orbital alignment](orbital-alignment.md)
-- [xTB 6.7.1 basis differences](xtb-671-basis-differences.md)
+0.13 之前的历史验证日志与工程排查记录保留在 Git 历史中；上游 xTB GFN0 修复记录保留在
+[`docs/upstream/`](upstream/xtb-gfn0-upstream-fix.md)。

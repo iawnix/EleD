@@ -1,4 +1,4 @@
-# 描述符（1.5）
+# 描述符（1.6）
 
 公开函数/方法采用 RDKit `PascalCase`，参数与结果属性采用 `camelCase`，导出的描述符字段名统一采用带显式单位后缀的小写 `snake_case`。基于结果对象的描述符函数只分析已有的 `XTBResults`；需要一步从 `Mol` 提取分子标量或接入 `rdMolDescriptors.Properties` 时，可使用 `CalcMolXTBDescriptors()` 与 `RegisterRDKitProperties()`；只有 `XTBCalculator.Calculate()`、`CalcMolXTBDescriptors()`、`RunReactivity()` 等入口会调用引擎。
 

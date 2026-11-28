@@ -1,4 +1,4 @@
-# Electronic descriptors and density analysis (1.5)
+# Electronic descriptors and density analysis (1.6)
 
 For standardized reports, quality flags, CSV/JSONL export and vertical charge-state
 analysis, see [descriptor reports](descriptor-reports.md).
@@ -22,7 +22,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcXTBFragmentDescriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
 | `CalcOrbitalPopulations(result, scheme="lowdin", orbIdx=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
 | `CalcFrontierDescriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
-| `CalcDensityDescriptors(mol, result, mciRings=None)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond, π and optional MCI descriptors | Same-calculation C/S/maps; `keepOverlap=True` |
+| `CalcDensityDescriptors(mol, result, mciRings=None)` | Density conservation, shell populations, Wiberg, frontier-bond, π and optional MCI descriptors | Same-calculation C/S/maps; `keepOverlap=True` |
 | `CalcOrbitalWeightedFukui(result, *, deltaEV=0.5, scheme="lowdin")` | Single-point orbital-weighted Fukui (`f_w_plus`, `f_w_minus`, `f_w_radical`, `dual_w`) | Same-calculation basis (`keepOverlap=True`) |
 | `CalcAtomicOrbitalEnergies(result, *, scheme="lowdin", windowEV=2.0)` | Atomic `occ_n_e`, `vir_n`, `occ_e_mean_ev` (negative condensed ALIE proxy), `vir_e_mean_ev`, frontier-weighted energies and PDOS windows | Same-calculation basis (`keepOverlap=True`) |
 | `CalcBondOverlapDescriptors(mol, result)` | Per-bond `coop_e`, `ecohp_ev` and Mulliken/CM5 bond polarity (`delta_q_e`, `signed_delta_q_e`, `q_prod_e2`, `*_cm5_*`) | Same-calculation basis (`keepOverlap=True`) + matching molecule |

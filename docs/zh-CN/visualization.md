@@ -19,7 +19,7 @@ from eled import DrawDescriptorMap
 # 直接从 XTBResults 或无片段报告绘制电荷连续色阶图
 charge_svg = DrawDescriptorMap(mol, result, atomField="q_e")
 
-# 绘制键级或密度派生键描述符（如 wbo、mbo、pi_bo、frontier_bonds.homo.mul_ovlp_e）
+# 绘制键级或密度派生键描述符（如 wbo、pi_bo、coop_e、frontier_bonds.homo.mul_ovlp_e）
 bond_svg = DrawDescriptorMap(mol, report, bondField="wbo", colorBy="value")
 
 # 传入 RDKit MolDrawOptions 回调自定义绘图样式

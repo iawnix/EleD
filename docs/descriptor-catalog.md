@@ -1,8 +1,7 @@
 # Descriptor catalog
 
-The public descriptor API has five layers. The complete machine-readable
-catalog is returned by `eled.DescriptorCatalog()`; this page states which
-layers are appropriate for validation.
+The complete machine-readable catalog is returned by `eled.DescriptorCatalog()`;
+this page summarizes the public descriptor layers and naming rules.
 
 Public descriptor functions and class methods follow RDKit's `PascalCase`
 (`Calc...`, `Run...`, `Calculate`, `Get*`), and Python parameters and result
@@ -16,8 +15,8 @@ The naming rules keep feature columns short while retaining their meaning:
 
 - `ha`, `ev`, `e`, `ebohr`, `debye` and `a` identify Hartree, eV, electron,
   e·Bohr, Debye and Ångström values;
-- `q`, `wbo`, `mbo`, `mul`, `low`, `eta`, `s` and `omega` identify charge,
-  Wiberg, Mayer, Mulliken, Löwdin, hardness, softness and electrophilicity;
+- `q`, `wbo`, `mul`, `low`, `eta`, `s` and `omega` identify charge,
+  Wiberg, Mulliken, Löwdin, hardness, softness and electrophilicity;
 - `idx`, `n`, `sd`, `ipr`, `pr` and `ent` mean index, count, standard deviation,
   inverse participation ratio, participation ratio and entropy;
 - `xtb_` marks molecular fields directly reported by xTB. Atom and bond rows
