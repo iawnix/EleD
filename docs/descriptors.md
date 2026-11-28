@@ -36,7 +36,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcFODFromResult(result, *, scheme="lowdin", electronicTemperature=None)` / `RunFOD(mol, *, electronicTemperature=5000.0, ...)` | Grimme FOD static-correlation index (`n_fod_e`), spin-resolved Fermi levels, orbital FOD weights and atomic/shell `fod_pop_e` (`s/p/d`) | Retained result (`keepOverlap=True` for atomic/shell FOD) or explicit-H 3D `Mol` (1 SCF) |
 | `CalcLinearResponseMatrix(result, *, scheme="lowdin", ...)` | Closed-shell independent-particle atom-condensed linear response $\chi_{AB}^{\mathrm{IP}}$ (`chi_e_per_ev`, `chi_e_per_ha`, per-atom softness & nonlocal coupling) | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
 | `CalcBondElectricField(mol, *, stepAngstrom=1e-3, ...)` / `CalcBondElectricFieldFromESP(mol, result, ...)` | Bond-midpoint electric field $\mathbf{E}=-\nabla V$ projected along every RDKit bond (`e_parallel_*`, `e_perp_*`, `e_norm_*`, `e_vec_au`) | Explicit-H 3D `Mol` (1 batched ESP SCF) or matching stencil result |
-| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v1/v2 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
+| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v2 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
 | `CalcRealSpaceTopology(mol, pts)` / `CalcBondDensityTopology(mol)` / `CalcNCIDescriptors(mol)` | Analytical valence density derivatives, ELF, LOL, RDG, $\mathrm{sign}(\lambda_2)\rho$, bond ellipticity $\varepsilon$, and volumetric NCI/RDG regimes | `realspace_extension` ABI v2 (1 native SCF) |
 | `CalcDirectedSurfaceDescriptors(mol, *, isovalueAU=0.001, ...)` | Directed `0.001 a.u.` isosurface extrema for halogen $\sigma$-holes, polar X–H HBD, heteroatom HBA, and aromatic $\pi$-holes | `realspace_extension` + `esp_extension` (1 native SCF) |
 | `CalcFragmentInteraction(mol, fragmentA, fragmentB, ...)` | Fixed-geometry fragment EDA ($\Delta E_{\text{elec/rep/es/disp/solv}}$), charge transfer (`ct_*_a_to_b_e`), and inter-fragment WBO/COOP/ECOHP/$\chi_{AB}$ | 3 matched single points (`AB`, `A`, `B`, `keepOverlap=True`) |
@@ -431,9 +431,12 @@ iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 1 SCF exact 0.001 a.u.
   in one batched single point (`e_parallel_au`/`mv_cm`, `e_perp_au`/`mv_cm`, `e_norm_au`/`mv_cm`,
   `e_vec_au`; `1 a.u. = 5142.2067476326 MV/cm`).
 - `CalcRealSpaceProperties`, `CalcRealSpaceSurfaceDescriptors`, and `CalcDensityIsosurface`
-  use the reviewed `realspace_extension` ABI v1 in `libxtb` to evaluate exact Cartesian GTO
+  use the reviewed `realspace_extension` ABI v2 in `libxtb` to evaluate exact Cartesian GTO
   valence electron density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})$,
-  virtual density, and $\mathrm{LEA}(\mathbf{r})$ without additional SCF calls. Points below
+  virtual density, and $\mathrm{LEA}(\mathbf{r})$ without additional SCF calls. Under Fermi
+  smearing orbitals are weighted rather than thresholded: ALIE uses occupations $n_i$ and
+  the virtual density/LEA use vacancies $2-n_i$; the LEA window starts at the lowest orbital
+  with at least one vacancy (aufbau LUMO, or SOMO for open shells). Points below
   `densityCutoffAU` return `None` rather than zero. `CalcDensityIsosurface` locates the exact
   `0.001 a.u.` isosurface in one SCF via Voronoi-partitioned batched radial bisection and
   returns molecular volume, surface area, sphericity, surface grid, and optional isosurface

@@ -1,6 +1,6 @@
 """Real-space wavefunction descriptors: density, ALIE, LEA, and 0.001 a.u. isosurface.
 
-Uses EleD's reviewed ``realspace_extension`` ABI v1 in ``libxtb`` to evaluate
+Uses EleD's reviewed ``realspace_extension`` ABI v2 in ``libxtb`` to evaluate
 exact Cartesian GTO valence electron density ``rho(r)`` (``e/Bohr^3``),
 Average Local Ionization Energy ``ALIE(r)`` (``eV``), virtual orbital density
 (``1/Bohr^3``), and Local Electron Affinity ``LEA(r)`` (``eV``) at arbitrary
@@ -145,7 +145,7 @@ def CalcRealSpaceProperties(
             'density_cutoff_au': 'e/Bohr^3',
         },
         'analysis_settings': {
-            'source': 'libxtb_realspace_cartesian_gto_v1',
+            'source': 'libxtb_realspace_cartesian_gto_v2',
             'density_cutoff_au': cutoff,
             'alie_definition': 'sum_{i in occ} f_i * (-eps_i) * |psi_i(r)|^2 / rho(r)',
             'lea_definition': 'sum_{a in vir} (2 - f_a) * (-eps_a) * |psi_a(r)|^2 / rho_vir(r)',

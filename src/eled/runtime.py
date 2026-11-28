@@ -79,8 +79,7 @@ def _native_diagnostics_build(path):
 
 _ESP_EXPORT_PATCH = 'aca69861eaf5e25b5437553c1a7f3c6117091c7abc3e6b3ab900109f50b70cd0'
 _PROPERTIES_EXPORT_PATCH = '56ea1fab2c624e37f851ce3d59d11d73d1a9abd6f9553c5464983c36c07ff817'
-_REALSPACE_EXPORT_PATCH_V1 = '4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74'
-_REALSPACE_EXPORT_PATCH = '2221b9658c10b262802cbbbac84a9d48cd3e6808fa8e59b1b0d13d20ba56b7f3'
+_REALSPACE_EXPORT_PATCH = '2a69bc44fbebd842619ca182cf97e17fbde487c555978d4b5d7158c2c4f6857b'
 
 
 def _native_esp_build(path):
@@ -124,8 +123,6 @@ def _native_realspace_api_version(path) -> int:
         sha = extension['patch_sha256']
         if cap == ver == 2 and sha == _REALSPACE_EXPORT_PATCH:
             return 2
-        if cap == ver == 1 and sha == _REALSPACE_EXPORT_PATCH_V1:
-            return 1
         return 0
     except (OSError, ValueError, KeyError, TypeError):
         return 0

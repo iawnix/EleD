@@ -47,6 +47,14 @@
   - `xtb_energy_ha` is documented as the total (not electronic) energy.
   - Real-space metadata records the live ABI version instead of a fixed `1`.
   - Docs note that SambVca %Vbur literature values use Bondi radii x1.17.
+- **Real-space LEA under Fermi smearing (libxtb rebuild required)**: the realspace
+  extension weighted the virtual density/LEA only over orbitals with occupation
+  `<= occ_thr`, so a partially occupied LUMO was dropped from the LEA. Acceptor
+  orbitals are now weighted by their vacancy `2 - n_i` for every orbital with a
+  vacancy above `occ_thr`, and the LEA window starts at the lowest orbital with at
+  least one vacancy. The ABI stays v2; the patch hash changes, and the v1/old-v2
+  patch acceptance paths are removed from `runtime.py`, `rdXTBTools` and the
+  ctypes binding.
 
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 
