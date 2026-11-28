@@ -597,7 +597,7 @@ def _run_xtb_native(
         library.check(environment, "orbital extraction")
         energies_ev = tuple(value * HARTREE_TO_EV for value in orbital_energies)
         occupation_values = tuple(float(value) for value in occupations)
-        homo, lumo = _frontier_energies(energies_ev, occupation_values)
+        homo, lumo = _frontier_energies(energies_ev, occupation_values, None, unpaired)
         esp = library.esp_data(environment, results, espPointsAngstrom) if espPointsAngstrom else {}
         realspace = (
             library.realspace_data(

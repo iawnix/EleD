@@ -13,7 +13,7 @@ import numpy as np
 
 from .charges import CHARGE_MODEL_SCC, _calc_cm5_charges, _charge_model_for_method
 from .errors import DescriptorUnavailableError
-from .result import XTBResults
+from .result import XTBResults, _aufbau_occupied_count
 
 AU_DIPOLE_TO_DEBYE = 2.541746473
 
@@ -178,8 +178,13 @@ def _nonnegative(value, name):
         raise ValueError(f'{name} must be finite and nonnegative')
 
 
-def _orbitals(result: XTBResults, occupationThreshold=1e-7):
-    _nonnegative(occupationThreshold, 'occupationThreshold')
+def _orbitals(result: XTBResults):
+    """Return energies, occupations and the aufbau occupied/virtual partition.
+
+    ``occupied`` holds the lowest ``n_alpha`` spatial orbitals and ``virtual``
+    the rest; occupations are not thresholded (see
+    :func:`eled.result._aufbau_occupied_count`).
+    """
     energies = _finite(result.orbitalEnergiesEV, 'orbital energies', 1)
     occupations = _finite(result.orbitalOccupancies, 'occupations', 1)
     if energies.shape != occupations.shape or np.any(occupations < 0):
@@ -188,9 +193,11 @@ def _orbitals(result: XTBResults, occupationThreshold=1e-7):
         raise ValueError('orbital energies must be sorted')
     if result.numOrbitals is not None and len(energies) != result.numOrbitals:
         raise ValueError('orbital count does not match arrays')
-    occupied = np.flatnonzero(occupations > occupationThreshold)
-    virtual = np.flatnonzero(occupations <= occupationThreshold)
-    return energies, occupations, occupied, virtual
+    n_occ = _aufbau_occupied_count(
+        len(energies), occupations, result.numElectrons, result.numUnpairedElectrons
+    )
+    order = np.arange(len(energies))
+    return energies, occupations, order[:n_occ], order[n_occ:]
 
 
 def _charges(result: XTBResults):
@@ -283,9 +290,10 @@ def _fragments(fragments, natoms):
     return groups
 
 
-def CalcXTBDescriptors(result, *, frontierDepth=2, occupationThreshold=1e-7):
+def CalcXTBDescriptors(result, *, frontierDepth=2):
     """Return JSON-compatible molecular scalars; unavailable values are None.
 
+    HOMO/LUMO follow the aufbau electron count, not an occupation threshold.
     ``frontierDepth=2`` adds HOMO-1/-2 and LUMO+1/+2. Charge standard deviation
     uses ``ddof=0``. Dipoles refer to the supplied coordinate origin (relevant
     for ions); a.u. denotes ``e*Bohr``.
@@ -293,7 +301,7 @@ def CalcXTBDescriptors(result, *, frontierDepth=2, occupationThreshold=1e-7):
     if isinstance(frontierDepth, bool) or not isinstance(frontierDepth, Integral) or frontierDepth < 0:
         raise ValueError('frontierDepth must be a nonnegative integer')
     result = _as_result(result)
-    energies, occupations, occupied, virtual = _orbitals(result, occupationThreshold)
+    energies, occupations, occupied, virtual = _orbitals(result)
     charges = _charges(result)
     dipole = _finite(result.dipoleAtomicUnits, 'dipole', 1)
     if len(dipole) not in (0, 3):
@@ -314,7 +322,6 @@ def CalcXTBDescriptors(result, *, frontierDepth=2, occupationThreshold=1e-7):
         'xtb_n_orb': result.numOrbitals,
         'xtb_n_e': result.numElectrons,
         'xtb_n_unpaired': result.numUnpairedElectrons,
-        'xtb_occ_cut': float(occupationThreshold),
         'xtb_homo_idx': int(occupied[-1]) if len(occupied) else None,
         'xtb_lumo_idx': int(virtual[0]) if len(virtual) else None,
     }

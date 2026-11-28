@@ -11,8 +11,8 @@ from copy import deepcopy
 _CATALOG = {
     'molecular': {
         'xtb_energy_ha': {'definition': 'xTB total electronic energy', 'unit': 'Hartree', 'invariance': 'rigid-motion invariant; method/reference dependent', 'requires': 'single point', 'missing': 'engine did not return energy'},
-        'xtb_homo_ev': {'definition': 'highest orbital with occupation above threshold', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'orbital energies and occupations', 'missing': 'no occupied orbital under threshold'},
-        'xtb_lumo_ev': {'definition': 'lowest orbital at or below occupation threshold', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'orbital energies and occupations', 'missing': 'no virtual orbital under threshold'},
+        'xtb_homo_ev': {'definition': 'energy of aufbau orbital n_alpha - 1, n_alpha = (N_e + N_unpaired)/2 (SOMO for open shells); independent of Fermi smearing', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'orbital energies and occupations', 'missing': 'no electrons'},
+        'xtb_lumo_ev': {'definition': 'energy of aufbau orbital n_alpha, the first orbital empty in the aufbau reference; independent of Fermi smearing', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'orbital energies and occupations', 'missing': 'all orbitals occupied in the aufbau reference'},
         'xtb_gap_ev': {'definition': 'LUMO minus HOMO', 'unit': 'eV', 'invariance': 'same as frontier energies', 'requires': 'HOMO and LUMO', 'missing': 'HOMO or LUMO unavailable'},
         'xtb_dip_debye': {'definition': 'norm of the xTB dipole', 'unit': 'Debye', 'invariance': 'rigid rotation invariant; origin dependent for charged systems', 'requires': 'dipole vector', 'missing': 'dipole not returned'},
         'xtb_dip_*_ebohr': {'definition': 'Cartesian xTB dipole component', 'unit': 'e*Bohr', 'invariance': 'components rotate with the coordinate frame; origin dependent for charged systems', 'requires': 'dipole vector', 'missing': 'dipole not returned'},
@@ -21,8 +21,7 @@ _CATALOG = {
         'xtb_cm5_q_*_e': {'definition': 'summary statistics of CM5 charges derived from GFN1/2 SCC Mulliken charges with the xTB CM5 geometry correction', 'unit': 'e', 'invariance': 'atom reordering invariant for aggregate statistics', 'requires': 'GFN1/2 SCC charges and calculation geometry', 'missing': 'CM5 is undefined for GFN0/EEQ or missing geometry'},
         'xtb_wbo_sum': {'definition': 'sum of all off-diagonal Wiberg pairs', 'unit': 'dimensionless', 'invariance': 'atom reordering invariant', 'requires': 'Wiberg matrix', 'missing': 'bond orders not returned'},
         'xtb_n_*': {'definition': 'reported orbital/electron/unpaired-electron count', 'unit': 'count', 'invariance': 'molecule invariant', 'requires': 'engine result', 'missing': 'engine did not return count'},
-        'xtb_*_idx': {'definition': 'zero-based orbital index under the recorded occupation convention', 'unit': 'index', 'invariance': 'depends on the retained orbital ordering', 'requires': 'orbital energies and occupations', 'missing': 'frontier unavailable'},
-        'xtb_occ_cut': {'definition': 'occupation threshold used to define occupied/virtual orbitals', 'unit': 'dimensionless', 'invariance': 'protocol setting', 'requires': 'descriptor extraction', 'missing': 'never missing for a valid extraction'},
+        'xtb_*_idx': {'definition': 'zero-based aufbau HOMO/LUMO orbital index', 'unit': 'index', 'invariance': 'depends on the retained orbital ordering', 'requires': 'orbital energies and occupations', 'missing': 'frontier unavailable'},
     },
     'atom': {
         'q_e': {'definition': 'engine atomic charge; exact model is result.charge_model (GFN1/2 SCC Mulliken or GFN0 PEEQ/EEQ)', 'unit': 'e', 'invariance': 'rigid-motion invariant; atom index follows input order', 'requires': 'partial charges and charge_model provenance', 'missing': 'charges not returned'},
@@ -197,7 +196,7 @@ _STATUS = {
         'zpe_ha / thermal_energy_correction_ha / thermal_enthalpy_correction_ha / entropy_j_mol_k / gibbs_correction_ha / total_gibbs_free_energy_ha',
     },
     'diagnostic': {
-        'xtb_n_*', 'xtb_*_idx', 'xtb_occ_cut',
+        'xtb_n_*', 'xtb_*_idx',
         'fermi_alpha_ha / fermi_beta_ha / fermi_alpha_ev / fermi_beta_ev',
         'fermi_alpha_ev / fermi_beta_ev', 'orbital_fod_e',
         'g_solv_direct_ha / solute_polarization_energy_ha',

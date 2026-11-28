@@ -56,11 +56,14 @@ def test_report_records_mci_request_when_basis_is_not_retained():
     assert report['analysis_settings']['mciRings'] == {'candidate': [0, 1, 2]}
 
 
-def test_quality_flags_fractional_and_threshold_sensitive_frontiers():
+def test_quality_flags_fractional_and_smeared_frontiers():
     _, r = sample()
-    mixed = replace(r,orbitalOccupancies=(2.,1.9999995,5e-7))
-    quality=AssessDescriptorQuality(mixed)
-    assert 'frontier_threshold_sensitive' in {f['code'] for f in quality['flags']}
+    quality=AssessDescriptorQuality(replace(r,orbitalOccupancies=(2.,2.,5e-7)))
+    assert 'fractional_frontier_occupation' not in {f['code'] for f in quality['flags']}
+    assert quality['frontier_occupations']=={'homo':2.,'lumo':5e-7}
+    quality=AssessDescriptorQuality(replace(r,orbitalOccupancies=(2.,1.9,.1)))
+    assert 'fractional_frontier_occupation' in {f['code'] for f in quality['flags']}
+    assert quality['frontier_occupations']=={'homo':1.9,'lumo':.1}
     quality=AssessDescriptorQuality(replace(r,orbitalOccupancies=(2.,1.5,.5)))
     assert quality['fractional_orb_idx']==[1,2]
     assert quality['status']=='warning'
@@ -96,7 +99,7 @@ def test_batch_failures_preserve_order_ids_and_null_features():
 
 
 @pytest.mark.parametrize('kwargs',[{'typo':1},{'degeneracyEV':-1},
-                                  {'occupationThreshold':float('nan')}, {'includeOrbitals':1}])
+                                  {'occupationTolerance':float('nan')}, {'includeOrbitals':1}])
 def test_batch_rejects_global_analysis_errors_before_calculation(kwargs):
     mol,_=sample()
     with patch('eled.batch.RunXTBBatch',side_effect=AssertionError('must not calculate')):

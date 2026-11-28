@@ -71,7 +71,6 @@ def CalcOrbitalWeightedFukui(
     *,
     deltaEV: float = 0.5,
     scheme: str = "lowdin",
-    occupationThreshold: float = 1e-7,
 ):
     """Pino-Rios / Martinez-Araya orbital-weighted condensed Fukui indices.
 
@@ -95,7 +94,7 @@ def CalcOrbitalWeightedFukui(
     result = _as_result(result)
     delta = _validate_positive(deltaEV, "deltaEV")
     scheme = _validate_scheme(scheme)
-    energies, occupations, occupied, virtual = _orbitals(result, occupationThreshold)
+    energies, occupations, occupied, virtual = _orbitals(result)
     _validate_spin_summed_occupations(occupations)
     pop = CalcOrbitalPopulations(result, scheme=scheme)
     atom_pop = np.asarray(pop["atom_pop"], dtype=float)
@@ -164,7 +163,7 @@ def CalcOrbitalWeightedFukui(
         "lumo_ev": lumo_ev,
         "delta_ev": delta,
         "scheme": scheme,
-        "occupation_threshold": float(occupationThreshold),
+        "frontier_definition": "aufbau electron count",
         "n_occupied": int(len(occupied)),
         "n_virtual": int(len(virtual)),
         "sum_errors": sum_errors,
@@ -174,7 +173,7 @@ def CalcOrbitalWeightedFukui(
             "reference": "Pino-Rios et al. (2017) / Martinez-Araya (2017)",
             "delta_ev": delta,
             "scheme": scheme,
-            "occupation_threshold": float(occupationThreshold),
+            "frontier_definition": "aufbau electron count",
             "mu_definition": "(eps_HOMO + eps_LUMO) / 2",
             "weight_definition": "exp(-((mu - eps_i) / delta_ev)^2), normalized over occupied/virtual subspaces",
             "f_w_radical_definition": "(f_w_plus + f_w_minus) / 2",
@@ -204,7 +203,6 @@ def CalcAtomicOrbitalEnergies(
     result,
     *,
     scheme: str = "lowdin",
-    occupationThreshold: float = 1e-7,
     windowEV: float = 2.0,
 ):
     """Per-atom condensed ALIE proxy, mean virtual energies, and PDOS window populations.
@@ -229,7 +227,7 @@ def CalcAtomicOrbitalEnergies(
     result = _as_result(result)
     scheme = _validate_scheme(scheme)
     window = _validate_nonnegative(windowEV, "windowEV")
-    energies, occupations, occupied, virtual = _orbitals(result, occupationThreshold)
+    energies, occupations, occupied, virtual = _orbitals(result)
     _validate_spin_summed_occupations(occupations)
     pop = CalcOrbitalPopulations(result, scheme=scheme)
     atom_pop = np.asarray(pop["atom_pop"], dtype=float)
@@ -362,7 +360,7 @@ def CalcAtomicOrbitalEnergies(
         "homo_window_orb_idx": homo_win_idx,
         "lumo_window_orb_idx": lumo_win_idx,
         "scheme": scheme,
-        "occupation_threshold": float(occupationThreshold),
+        "frontier_definition": "aufbau electron count",
         "orthonormality_error": float(pop["orthonormality_error"]),
         "sign_convention": (
             "occ_e_mean_ev is the occupation-weighted mean occupied MO energy in eV "
@@ -371,7 +369,7 @@ def CalcAtomicOrbitalEnergies(
         ),
         "analysis_settings": {
             "scheme": scheme,
-            "occupation_threshold": float(occupationThreshold),
+            "frontier_definition": "aufbau electron count",
             "window_ev": window,
             "occ_e_mean_definition": "sum_{i in occ}(n_i * p_{A,i} * eps_i) / sum_{i in occ}(n_i * p_{A,i})",
             "vir_e_mean_definition": "sum_{i in vir}(p_{A,i} * eps_i) / sum_{i in vir}(p_{A,i})",
@@ -405,13 +403,13 @@ def CalcAtomicOrbitalEnergies(
     return output
 
 
-def _overlap_basis(result, *, occupationThreshold: float = 1e-7, orthonormalityTolerance: float = 1e-5):
+def _overlap_basis(result, *, orthonormalityTolerance: float = 1e-5):
     if not _has_population_basis(result):
         raise DescriptorUnavailableError(
             "bond overlap descriptors require same-calculation overlap, coefficients, and AO-to-atom mapping; "
             "use XTBCalculator(...).Calculate(..., keepOverlap=True)"
         )
-    energies, occupations, occupied, virtual = _orbitals(result, occupationThreshold)
+    energies, occupations, occupied, virtual = _orbitals(result)
     _validate_spin_summed_occupations(occupations)
     natoms = result.metadata.get("atom_count", len(result.atomicCharges))
     c, s, ao_atom = _orbital_basis_arrays(result, len(energies), natoms)
@@ -428,20 +426,18 @@ def _overlap_basis(result, *, occupationThreshold: float = 1e-7, orthonormalityT
 def CalcBondOverlapDescriptors(
     mol,
     result,
-    *,
-    occupationThreshold: float = 1e-7,
 ):
     """Per-RDKit-bond COOP, eigenvalue-weighted COHP proxy, and charge polarity.
 
     For each RDKit bond ``(A, B)`` in original bond order:
     - ``coop_e``: total occupied Mulliken overlap population in e,
-      ``2 * sum_{i in occ} n_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}``
+      ``2 * sum_i n_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}``
       (positive for bonding, negative for antibonding).
     - ``ecohp_ev``: occupied eigenvalue-weighted Mulliken overlap population in eV,
-      ``2 * sum_{i in occ} n_i * eps_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}``
+      ``2 * sum_i n_i * eps_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}``
       (negative for bonding stabilization, positive for antibonding). Note that
-      ``Tr(W S) = sum_{i in occ} n_i * eps_i`` using the occupied energy-weighted
-      density ``W = C_occ diag(n_occ * eps_occ) C_occ^T``.
+      ``Tr(W S) = sum_i n_i * eps_i`` using the energy-weighted
+      density ``W = C diag(n * eps) C^T`` over all orbitals.
     - ``delta_q_e``: ``|q_A - q_B|`` in e.
     - ``signed_delta_q_e``: ``q_begin - q_end`` in e (RDKit bond orientation).
     - ``q_prod_e2``: ``q_A * q_B`` in e^2.
@@ -451,9 +447,7 @@ def CalcBondOverlapDescriptors(
     """
     result = _as_result(result)
     _validate_mapping(mol, result)
-    energies, occupations, occupied, _, c, s, ao_atom, ortho_err = _overlap_basis(
-        result, occupationThreshold=occupationThreshold
-    )
+    energies, occupations, occupied, _, c, s, ao_atom, ortho_err = _overlap_basis(result)
     charges = _charges(result)
     if len(charges) != mol.GetNumAtoms():
         raise ValueError("bond overlap descriptors require atomic partial charges matching the molecule")
@@ -466,13 +460,12 @@ def CalcBondOverlapDescriptors(
             else "cm5_charges_unavailable"
         )
 
-    occ_missing_reason = None if len(occupied) else "no_occupied_orbitals"
+    occ_missing_reason = None if np.any(occupations > 0.0) else "no_occupied_orbitals"
     if occ_missing_reason is None:
-        c_occ = c[:, occupied]
-        n_occ = occupations[occupied]
-        e_occ = energies[occupied]
-        p_mat = (c_occ * n_occ[None, :]) @ c_occ.T
-        w_mat = (c_occ * (n_occ * e_occ)[None, :]) @ c_occ.T
+        # All orbitals weighted by their (possibly fractional) occupations: the
+        # exact density, independent of any occupied/virtual partition.
+        p_mat = (c * occupations[None, :]) @ c.T
+        w_mat = (c * (occupations * energies)[None, :]) @ c.T
         ps_elem = p_mat * s
         ws_elem = w_mat * s
     else:
@@ -540,7 +533,7 @@ def CalcBondOverlapDescriptors(
     output = {
         "bonds": rows,
         "charge_model": result.chargeModel,
-        "occupation_threshold": float(occupationThreshold),
+        "frontier_definition": "aufbau electron count",
         "orthonormality_error": ortho_err,
         "sign_convention": {
             "coop_e": "positive for bonding overlap, negative for antibonding overlap",
@@ -548,9 +541,9 @@ def CalcBondOverlapDescriptors(
             "signed_delta_q_e": "q(begin_atom_index) - q(end_atom_index)",
         },
         "analysis_settings": {
-            "occupation_threshold": float(occupationThreshold),
-            "coop_definition": "2 * sum_{i in occ} n_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}",
-            "ecohp_definition": "2 * sum_{i in occ} n_i * eps_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}",
+            "frontier_definition": "aufbau electron count",
+            "coop_definition": "2 * sum_i n_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}",
+            "ecohp_definition": "2 * sum_i n_i * eps_i * sum_{mu in A, nu in B} C_{mu,i} C_{nu,i} S_{mu,nu}",
             "charge_model": result.chargeModel,
         },
         "units": {
@@ -582,7 +575,6 @@ def CalcLinearResponseMatrix(
     result,
     *,
     scheme: str = "lowdin",
-    occupationThreshold: float = 1e-7,
     gapToleranceEV: float = 1e-6,
     occupationTolerance: float = 1e-4,
 ):
@@ -610,9 +602,7 @@ def CalcLinearResponseMatrix(
     scheme = _validate_scheme(scheme)
     gap_tol = _validate_positive(gapToleranceEV, "gapToleranceEV")
     occ_tol = _validate_positive(occupationTolerance, "occupationTolerance")
-    energies, occupations, occupied, virtual, c, s, ao_atom, ortho_err = _overlap_basis(
-        result, occupationThreshold=occupationThreshold
-    )
+    energies, occupations, occupied, virtual, c, s, ao_atom, ortho_err = _overlap_basis(result)
     natoms = int(result.metadata.get("atom_count", len(result.atomicCharges)))
 
     uhf = result.numUnpairedElectrons
@@ -672,7 +662,7 @@ def CalcLinearResponseMatrix(
                 "method": "independent_particle_condensed_linear_response",
                 "reference": "Geerlings et al., Chem. Soc. Rev. 2014, 43, 4989",
                 "scheme": scheme,
-                "occupation_threshold": float(occupationThreshold),
+                "frontier_definition": "aufbau electron count",
                 "gap_tolerance_ev": gap_tol,
                 "occupation_tolerance": occ_tol,
                 "definition": "chi_AB = -4 * sum_{i in occ, a in vir} Q^A_{ia} Q^B_{ia} / (eps_a - eps_i)",
@@ -746,7 +736,7 @@ def CalcLinearResponseMatrix(
             "method": "independent_particle_condensed_linear_response",
             "reference": "Geerlings et al., Chem. Soc. Rev. 2014, 43, 4989",
             "scheme": scheme,
-            "occupation_threshold": float(occupationThreshold),
+            "frontier_definition": "aufbau electron count",
             "gap_tolerance_ev": gap_tol,
             "occupation_tolerance": occ_tol,
             "definition": "chi_AB = -4 * sum_{i in occ, a in vir} Q^A_{ia} Q^B_{ia} / (eps_a - eps_i)",

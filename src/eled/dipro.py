@@ -190,7 +190,6 @@ def CalcElectronicCouplingFromResults(
     fragmentB: Any,
     *,
     degeneracyEV: float = 1e-3,
-    occupationThreshold: float = 1e-7,
     occupationTolerance: float = 1e-6,
 ) -> dict[str, Any]:
     """Compute DIPRO electronic couplings from three retained ``keepOverlap=True`` results.
@@ -199,7 +198,6 @@ def CalcElectronicCouplingFromResults(
     complex and isolated fragments.
     """
     _nonnegative(degeneracyEV, 'degeneracyEV')
-    _nonnegative(occupationThreshold, 'occupationThreshold')
     _nonnegative(occupationTolerance, 'occupationTolerance')
 
     natoms = int(mol.GetNumAtoms())
@@ -213,13 +211,13 @@ def CalcElectronicCouplingFromResults(
     res_b = _as_result(fragmentBResult)
 
     e_ab, _, _, _, c_ab, s_ab, ao_atom_ab, ortho_ab = _overlap_basis(
-        res_ab, occupationThreshold=occupationThreshold
+        res_ab
     )
     e_a, occ_a, occ_idx_a, vir_idx_a, c_a, s_a, _, ortho_a = _overlap_basis(
-        res_a, occupationThreshold=occupationThreshold
+        res_a
     )
     e_b, occ_b, occ_idx_b, vir_idx_b, c_b, s_b, _, ortho_b = _overlap_basis(
-        res_b, occupationThreshold=occupationThreshold
+        res_b
     )
 
     ao_a, err_a = _map_fragment_aos(ao_atom_ab, idx_a, s_ab, s_a, 'fragmentA')
@@ -294,7 +292,7 @@ def CalcElectronicCouplingFromResults(
             'protocol': DIPRO_PROTOCOL,
             'reference': 'Valeev (2006); Kohn, Gildemeister, Fazzi & Hansen, J. Chem. Phys. 2023, 159, 144106',
             'degeneracy_ev': float(degeneracyEV),
-            'occupation_threshold': float(occupationThreshold),
+            'frontier_definition': 'aufbau electron count',
             'occupation_tolerance': float(occupationTolerance),
             'definition': 'H_eff = S_sub^(-1/2) H_sub S_sub^(-1/2); j_eff = sqrt(sum(J_ab^2) / (n_a * n_b))',
         },
@@ -318,7 +316,6 @@ def CalcElectronicCoupling(
     unpairedB: int | None = None,
     allowCovalentCut: bool = False,
     degeneracyEV: float = 1e-3,
-    occupationThreshold: float = 1e-7,
     occupationTolerance: float = 1e-6,
     options: XTBOptions | None = None,
     interface: str = 'native',
@@ -395,7 +392,6 @@ def CalcElectronicCoupling(
         idx_a,
         idx_b,
         degeneracyEV=degeneracyEV,
-        occupationThreshold=occupationThreshold,
         occupationTolerance=occupationTolerance,
     )
     report['analysis_settings']['interface'] = interface

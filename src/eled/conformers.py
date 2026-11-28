@@ -40,7 +40,6 @@ def ConformerDescriptorColumns(*, charge=0, frontierDepth=2):
         for k, u in DescriptorColumns(frontierDepth).items()
         if u is not None
         and u != 'index'
-        and k != 'xtb_occ_cut'
         and not any(k == f'xtb_dip_{a}_ebohr' or k.endswith(f'c{a}_a') for a in 'xyz')
         and not (charge and k.startswith('xtb_dip_'))
     }

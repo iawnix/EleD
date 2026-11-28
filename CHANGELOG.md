@@ -12,6 +12,26 @@
   documents; and dataset-derived validation artifacts. Historical validation
   READMEs note the removal; the files remain in Git history.
 - `AGENTS.md` (local workspace rules) is no longer tracked.
+- **Frontier orbitals (breaking, `DESCRIPTOR_VERSION = '1.6'`)**: HOMO/LUMO now
+  follow the aufbau electron count (`n_alpha = (N_e + N_unpaired)/2`) instead of
+  an occupation threshold. Under xTB Fermi smearing the old `occupation > 1e-7`
+  rule labelled the LUMO as HOMO whenever the gap was below about 0.9 eV at 300 K
+  (about 2.9 eV at 1000 K), corrupting HOMO/LUMO/gap, frontier groups,
+  orbital-weighted Fukui, linear response and frontier bond descriptors.
+  `occupationThreshold` is removed from `CalcXTBDescriptors`,
+  `CalcMolXTBDescriptors`, `RegisterRDKitProperties`, `CalcFrontierDescriptors`,
+  `CalcFrontierBondDescriptors`, `CalcOrbitalWeightedFukui`,
+  `CalcAtomicOrbitalEnergies`, `CalcBondOverlapDescriptors`,
+  `CalcLinearResponseMatrix`, `CalcElectronicCoupling*`,
+  `CalcFragmentInteraction`, `AssessDescriptorQuality` and the report APIs; the
+  `xtb_occ_cut` column is removed. `AssessDescriptorQuality` replaces
+  `frontier_threshold_sensitive` / `occupied_counts_threshold_window` with
+  `fractional_frontier_occupation` / `frontier_occupations`.
+- COOP/eCOHP (bond and inter-fragment) use the full occupation-weighted density
+  over all orbitals rather than a thresholded occupied subset.
+- `CalcDescriptorReport` no longer passes the frontier threshold (1e-7) to
+  `CalcLocalizedOrbitals`, whose `occupationThreshold` (default 1.5) selects
+  doubly occupied orbitals; reports now use that default.
 
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 

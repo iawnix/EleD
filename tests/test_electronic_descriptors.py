@@ -98,10 +98,19 @@ def test_scalar_units_frontier_depth_and_missing_boundaries(simple):
     assert d['xtb_wbo_sum'] == pytest.approx(1.9)
     assert json.loads(json.dumps(d, allow_nan=False)) == d
     assert not any('minus' in k for k in CalcXTBDescriptors(result, frontierDepth=0))
-    tiny = replace(result, orbitalOccupancies=(2., 2., 1e-8, 0.))
-    assert CalcXTBDescriptors(tiny)['xtb_homo_idx'] == 1
-    assert CalcXTBDescriptors(tiny, occupationThreshold=1e-9)['xtb_homo_idx'] == 2
-    filled = replace(result, orbitalOccupancies=(2., 2., 2., 2.))
+    # Fermi smearing must not move the frontier: a partially filled LUMO stays the LUMO.
+    for occupations in ((2., 2., 1e-8, 0.), (2., 1.99, 0.01, 0.), (2., 1.6, 0.4, 0.)):
+        smeared = CalcXTBDescriptors(replace(result, orbitalOccupancies=occupations))
+        assert (smeared['xtb_homo_idx'], smeared['xtb_lumo_idx']) == (1, 2)
+        assert smeared['xtb_gap_ev'] == pytest.approx(3.)
+        assert 'xtb_occ_cut' not in smeared
+    doublet = replace(result, numElectrons=3, numUnpairedElectrons=1, orbitalOccupancies=(2., 1., 0., 0.))
+    assert (CalcXTBDescriptors(doublet)['xtb_homo_idx'], CalcXTBDescriptors(doublet)['xtb_lumo_idx']) == (1, 2)
+    triplet = replace(result, numElectrons=4, numUnpairedElectrons=2, orbitalOccupancies=(2., 1., 1., 0.))
+    assert (CalcXTBDescriptors(triplet)['xtb_homo_idx'], CalcXTBDescriptors(triplet)['xtb_lumo_idx']) == (2, 3)
+    assert replace(result, orbitalOccupancies=(2., 1.6, 0.4, 0.)).homoEV == -2.
+    assert replace(result, orbitalOccupancies=(2., 1.6, 0.4, 0.)).lumoEV == 1.
+    filled = replace(result, numElectrons=8, orbitalOccupancies=(2., 2., 2., 2.))
     assert CalcXTBDescriptors(filled)['xtb_lumo_ev'] is None
     assert CalcXTBDescriptors(filled)['xtb_gap_ev'] is None
 

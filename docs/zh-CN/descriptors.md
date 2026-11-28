@@ -51,7 +51,7 @@ CM5 缺失时，报告为 GFN0 记录 `cm5_unsupported_method`，为 GFN1/2 记�
 
 电荷数组沿用计算时的原子顺序。直接提取、Fukui 分析和报告都会检查电荷模型及原子数。缺少重叠矩阵、轨道系数或 AO 到原子的映射时，报告保留标量结果并记录轨道部分缺失。已提供的矩阵维度或原子索引有误时，接口报告输入错误。
 
-HOMO/LUMO 由轨道占据阈值定义。能隙是基态前线轨道差值，不是光学激发能。
+HOMO/LUMO 按 aufbau 电子数确定，而不是按占据阈值。记 `n_alpha = (N_e + N_unpaired) / 2`，HOMO 是第 `n_alpha - 1` 个分子轨道（开壳层即 SOMO），LUMO 是第 `n_alpha` 个。xTB 的占据数带 Fermi 展宽：300 K 下能隙小于约 0.9 eV（1000 K 下约 2.9 eV）时，LUMO 的占据数已超过 1e-7，按阈值划分会选错前线轨道。`AssessDescriptorQuality` 在 `frontier_occupations` 中报告 HOMO/LUMO 的实际占据数，展宽明显时给出 `fractional_frontier_occupation` 警告。COOP/eCOHP 使用全部轨道按占据数加权的完整密度。能隙是基态前线轨道差值，不是光学激发能。
 
 ## 密度和 shell 描述符
 

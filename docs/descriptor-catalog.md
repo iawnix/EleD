@@ -79,7 +79,7 @@ bond-aligned electric fields, Politzer–Murray ESP surface statistics, EPN, D4
 polarizability/C6/C8, energy decomposition, ALPB/GBSA solvation shifts, and
 harmonic thermochemistry),
 `diagnostic` marks single-point diagnostic fields (orbital indices/counts,
-occupation thresholds, Fermi levels, orbital FOD weights, and direct solvation
+Fermi levels, orbital FOD weights, and direct solvation
 polarization decomposition), and
 `exploratory` is retained for testing new hypotheses (signed
 frontier-bond overlap, π projections, local nucleophilicity proxy, orbital-weighted
