@@ -420,11 +420,15 @@ def test_catalog_columns_and_visualization_new_fields():
         assert key in ConformerDescriptorColumns(charge=1)
 
     cat = DescriptorCatalog()
-    assert 'j_hole_ev / j_electron_ev / j_ct_ab_ev / j_ct_ba_ev' in cat['fragment']
-    assert 'cone_angle_deg / half_angle_deg' in cat['local_geometry']
-    assert 'pyramidalization_p / pyramidalization_angle_deg / poav_angle_deg / angle_sum_deg / pyramid_height_a' in cat['local_geometry']
+    for name in ('j_hole_ev', 'j_electron_ev', 'j_ct_ab_ev', 'j_ct_ba_ev'):
+        assert cat['fragment'][name]['unit'] == 'eV'
+    for name in ('cone_angle_deg', 'half_angle_deg'):
+        assert cat['local_geometry'][name]['unit'] == 'degree'
+    for name in ('pyramidalization_p', 'pyramidalization_angle_deg', 'poav_angle_deg',
+                 'angle_sum_deg', 'pyramid_height_a'):
+        assert name in cat['local_geometry']
     status = DescriptorStatus()
-    assert 'j_hole_ev / j_electron_ev / j_ct_ab_ev / j_ct_ba_ev' in status['recommended']
+    assert {'j_hole_ev', 'j_electron_ev', 'j_ct_ab_ev', 'j_ct_ba_ev'} <= set(status['recommended'])
 
     # CalcDescriptorReport with includeExtended=False round-trips analysis_settings
     mol = _mol_from_coords(['O', 'H', 'H'], [(0, 0, 0), (1, 0, 0), (0, 1, 0)], [(0, 1), (0, 2)])
