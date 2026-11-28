@@ -1,4 +1,4 @@
-# Electronic descriptors and density analysis (1.4)
+# Electronic descriptors and density analysis (1.5)
 
 For standardized reports, quality flags, CSV/JSONL export and vertical charge-state
 analysis, see [descriptor reports](descriptor-reports.md).
@@ -40,6 +40,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcRealSpaceTopology(mol, pts)` / `CalcBondDensityTopology(mol)` / `CalcNCIDescriptors(mol)` | Analytical valence density derivatives, ELF, LOL, RDG, $\mathrm{sign}(\lambda_2)\rho$, bond ellipticity $\varepsilon$, and volumetric NCI/RDG regimes | `realspace_extension` ABI v2 (1 native SCF) |
 | `CalcDirectedSurfaceDescriptors(mol, *, isovalueAU=0.001, ...)` | Directed `0.001 a.u.` isosurface extrema for halogen $\sigma$-holes, polar X–H HBD, heteroatom HBA, and aromatic $\pi$-holes | `realspace_extension` + `esp_extension` (1 native SCF) |
 | `CalcFragmentInteraction(mol, fragmentA, fragmentB, ...)` | Fixed-geometry fragment EDA ($\Delta E_{\text{elec/rep/es/disp/solv}}$), charge transfer (`ct_*_a_to_b_e`), and inter-fragment WBO/COOP/ECOHP/$\chi_{AB}$ | 3 matched single points (`AB`, `A`, `B`, `keepOverlap=True`) |
+| `CalcElectronicCoupling(mol, fragmentA, fragmentB, ...)` / `CalcElectronicCouplingFromResults(...)` | DIPRO/Valeev electronic coupling transfer integrals (`j_hole_ev`/`mev`, `j_electron_ev`/`mev`, `j_ct_ab_ev`/`mev`, `j_ct_ba_ev`/`mev`) invariant to degenerate frontier rotations | 3 matched `keepOverlap=True` single points (0 SCF for `CalcElectronicCouplingFromResults`) |
 | `CalcLocalBondForceConstants(mol)` / `CalcLocalBondForceConstantsFromHessian(mol, hess)` | Cremer–Kraka local bond stretching force constants $k^a$ (`mDyn/Å`), Grunenberg compliance constants $C_{ii}$, and adiabatic local frequencies $\omega^a$ | Cartesian Hessian (0 SCF from `CalcVibrationalThermochemistry(..., includeHessian=True)`, or `1 + 6N` gradient evaluations) |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned

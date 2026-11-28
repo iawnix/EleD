@@ -59,7 +59,9 @@ geometry reports as JSON or JSONL directly.
 | Function | Selection | Scalar results |
 | --- | --- | --- |
 | `CalcSterimol(mol, atomIndices, axis=(base, attached))` | Substituent atoms and directed bonded axis | `l_a`, `b1_a`, `b5_a`, Angstrom |
-| `CalcBuriedVolume(mol, atomIndices, center=i)` | Occupying atoms and excluded center atom | `vbur_percent`, percent |
+| `CalcBuriedVolume(mol, atomIndices, center=i, zAxisAtom=None, xzPlaneAtom=None)` | Occupying atoms, excluded center atom, and optional molecular alignment frame | `vbur_percent`, optional `vbur_q1_percent`..`vbur_q4_percent` and `vbur_z_pos_percent`/`vbur_z_neg_percent`, percent |
+| `CalcPyramidalization(mol, atomIdx, neighborIndices=None)` | 3-coordinate center atom (or 3 explicit neighbors) | `pyramidalization_p` (dimensionless), `pyramidalization_angle_deg`, `poav_angle_deg`, `angle_sum_deg` (degree), `pyramid_height_a` (Angstrom) |
+| `CalcConeAngle(mol, atomIndices, center=i, axisAtom=None)` | Ligand atoms, excluded apex `center`, and optional fixed `axisAtom` | `cone_angle_deg`, `half_angle_deg` (degree), plus `cone_axis` and `tangent_atom_indices` |
 | `CalcPlaneDescriptors(mol, atomIndices, otherAtomIndices=None)` | One or two atom sets, at least three atoms each | `plane_rms_a`, `plane_max_a`, optional `centroid_distance_a`, Angstrom; `plane_angle_deg`, degree |
 | `CalcHOMA(mol, ringAtomIndices)` | Ordered ring | `homa`, dimensionless; individual `bonds` with `length_a` |
 | `CalcRingPuckering(mol, ringAtomIndices)` | Ordered ring of at least four atoms | `q_total_a`, optional `q_alternating_a`, Angstrom; six-membered `theta_deg`; per-mode `q_a` and `phi_deg` |
@@ -101,9 +103,13 @@ spacing and occupied/total point counts are recorded. The percentage is
 `100 * occupied_grid_points / grid_points`. Overlaps count once. Rotation
 invariance is approximate at finite resolution. Repeat with smaller spacing to
 assess numerical sensitivity. The implementation supports 4–256 cells per
-sphere diameter and processes one grid plane at a time. Radius scaling and
-hydrogen treatment are explicit, including for comparisons to ligand %Vbur
-literature.
+sphere diameter and processes one grid plane at a time. Radius scaling and hydrogen treatment are explicit, including for comparisons to ligand %Vbur literature. When `zAxisAtom` (and optional `xzPlaneAtom`) is provided, `CalcBuriedVolume` also resolves SambVca-style four quadrants (`vbur_q1_percent`..`vbur_q4_percent`) in the xy plane perpendicular to `center -> zAxisAtom` and the two hemispheres (`vbur_z_pos_percent`, `vbur_z_neg_percent`).
+
+## Pyramidalization and cone angle
+
+`CalcPyramidalization(mol, atomIdx, *, neighborIndices=None, confId=-1)` computes Haddon POAV1 pyramidalization for a 3-coordinate center atom: `pyramidalization_p = sin(theta_p)` (`0` planar, `1/3` ideal tetrahedral), `pyramidalization_angle_deg = theta_p` (`0°` planar, `19.4712°` ideal tetrahedral), `poav_angle_deg = 90° + theta_p`, `angle_sum_deg`, and `pyramid_height_a` above the neighbor plane. Degenerate geometries return `None` with explicit `missing` reasons.
+
+`CalcConeAngle(mol, atomIndices, *, center, axisAtom=None, ...)` computes the exact Bilbrey–Allen (2013) minimum enclosing spherical cone over the selected atomic van der Waals spheres from apex `center` (or the Tolman axial cone angle around `center -> axisAtom` when `axisAtom` is specified). If any selected atom sphere encloses the apex (`r_i >= d_i`), `cone_angle_deg` is `None` with `missing['cone_angle_deg'] = 'apex_inside_atom_sphere'`. Both descriptors can also be requested through `AnalyzeLocalGeometry(..., pyramidalization=..., coneAngle=...)`.
 
 ## Planes and ring puckering
 

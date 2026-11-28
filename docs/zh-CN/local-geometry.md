@@ -46,7 +46,9 @@ many = RunLocalGeometryBatch([mol], selections,
 | 接口 | 选择对象 | 主要结果 |
 | --- | --- | --- |
 | `CalcSterimol(mol, atomIndices, axis=(base, attached))` | 取代基和有向连接键 | `l_a`、`b1_a`、`b5_a`，Å |
-| `CalcBuriedVolume(mol, atomIndices, center=i)` | 占据空间的原子和被排除的中心原子 | `vbur_percent`，百分数 |
+| `CalcBuriedVolume(mol, atomIndices, center=i, zAxisAtom=None, xzPlaneAtom=None)` | 占据空间的原子、被排除的中心原子及可选分子对齐坐标系 | `vbur_percent`，以及可选的四象限 `vbur_q1_percent`..`vbur_q4_percent` 与半球 `vbur_z_pos_percent`/`vbur_z_neg_percent`，百分数 |
+| `CalcPyramidalization(mol, atomIdx, neighborIndices=None)` | 三配位中心原子（或显式指定 3 个相邻原子） | 无量纲 `pyramidalization_p`、`pyramidalization_angle_deg`、`poav_angle_deg`、`angle_sum_deg`（度）及 `pyramid_height_a`（Å） |
+| `CalcConeAngle(mol, atomIndices, center=i, axisAtom=None)` | 配体原子、被排除的顶点 `center` 及可选固定轴 `axisAtom` | `cone_angle_deg`、`half_angle_deg`（度），以及 `cone_axis` 与 `tangent_atom_indices` |
 | `CalcPlaneDescriptors(mol, atomIndices, otherAtomIndices=None)` | 一个或两个至少含三个原子的集合 | `plane_rms_a`、`plane_max_a`，可选 `centroid_distance_a`，Å；`plane_angle_deg`，度 |
 | `CalcHOMA(mol, ringAtomIndices)` | 有序环路径 | 无量纲 `homa` 和逐键 `length_a`，Å |
 | `CalcRingPuckering(mol, ringAtomIndices)` | 至少四元的有序环 | `q_total_a`、偶数环 `q_alternating_a`，Å；六元环 `theta_deg`；各模式的 `q_a` 和 `phi_deg` |
@@ -88,7 +90,13 @@ B1 默认沿横截面整圆均匀采样 `angularSamples=7200` 个方向，离散
 球直径分成整数个网格单元，记录有效间距、球内点数和占据点数，百分数为
 `100*占据点数/球内点数`，重叠部分只计一次。有限网格下旋转不变性有数值误差，
 可减小间距检查结果敏感性。支持直径方向 4–256 个单元，按平面处理控制内存。
-与配体 %Vbur 文献比较时还需要匹配半径缩放及氢处理。
+与配体 %Vbur 文献比较时还需要匹配半径缩放及氢处理。传入 `zAxisAtom`（及可选 `xzPlaneAtom`）时，`CalcBuriedVolume` 同时输出以 `center -> zAxisAtom` 为 +z 轴的 SambVca 四象限埋藏体积（`vbur_q1_percent`..`vbur_q4_percent`）和正负半球占比（`vbur_z_pos_percent`、`vbur_z_neg_percent`）。
+
+## 锥体化与配体锥角
+
+`CalcPyramidalization(mol, atomIdx, *, neighborIndices=None, confId=-1)` 计算三配位中心原子的 Haddon POAV1 锥体化指标：`pyramidalization_p = sin(theta_p)`（平面为 `0`，理想四面体为 `1/3`）、`pyramidalization_angle_deg`（平面 `0°`，理想四面体 `19.4712°`）、`poav_angle_deg`、`angle_sum_deg` 及中心到邻居平面的距离 `pyramid_height_a`。退化几何返回 `None` 并写入 `missing` 原因。
+
+`CalcConeAngle(mol, atomIndices, *, center, axisAtom=None, ...)` 从顶点 `center` 计算包围所选配体原子范德华球面的精确 Bilbrey–Allen（2013）最小外接圆锥角（传入 `axisAtom` 时按 `center -> axisAtom` 固定轴计算 Tolman 轴向锥角）。若任一所选原子球面包围顶点（`r_i >= d_i`），显式返回 `cone_angle_deg=None` 及 `apex_inside_atom_sphere`。二者均可通过 `AnalyzeLocalGeometry(..., pyramidalization=..., coneAngle=...)` 统一调度。
 
 ## 平面与环起伏
 

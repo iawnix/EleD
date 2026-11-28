@@ -1,5 +1,22 @@
 # Changes
 
+## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
+
+- **DIPRO dimer-projection electronic coupling / transfer integral (`eled.dipro`)**:
+  - Added `CalcElectronicCouplingFromResults(mol, complexResult, fragmentAResult, fragmentBResult, fragmentA, fragmentB, ...)` (0 SCF calls) and `CalcElectronicCoupling(mol, fragmentA, fragmentB, ...)` (3 matched `keepOverlap=True` single points, `native`/`compiled` parity, zero C ABI changes).
+  - Reconstructs the exact complex AO Hamiltonian $H_{\text{AO}} = (S_{AB}C_{AB})\operatorname{diag}(\varepsilon_{AB})(S_{AB}C_{AB})^T$, verifies fragment-to-dimer AO overlap alignment, and performs symmetric Löwdin orthogonalization $H_{\text{eff}} = S_{\text{sub}}^{-1/2} H_{\text{sub}} S_{\text{sub}}^{-1/2}$ for hole (`j_hole_ev`/`mev`), electron (`j_electron_ev`/`mev`), and cross charge-transfer (`j_ct_ab_ev`/`mev`, `j_ct_ba_ev`/`mev`) channels, invariant to rigid 3D motion, MO phase flips, degenerate frontier subspace rotations (e.g. benzene dimers), and monomer swaps.
+- **Full `0.13`–`0.15` pipeline integration (`reports`, `conformers`, `visualization`, `diagnostics`)**:
+  - Upgraded `CalcDescriptorReport` (`DESCRIPTOR_VERSION = '1.5'`, optional `includeExtended=True`) to populate zero-extra-SCF sections (`energy_decomposition`, `polarizability`, `multipoles`, `nuclear_esp`, `orbital_weighted_fukui`, `atomic_orbital_energies`, `bond_overlap`, `localized_orbitals`, `linear_response`, and sampled `realspace`) identically across `native` and `compiled` `XTBResults`.
+  - Added 10 rigid-motion-invariant extended scalar columns (`e_elec_ha`, `e_rep_ha`, `e_es_ha`, `e_disp_ha`, `mol_pol_bohr3`, `mol_c6_ha_bohr6`, `mol_c8_ha_bohr8`, `epn_min_au`, `epn_max_au`, `epn_mean_au`) to `DescriptorColumns()` and `ConformerDescriptorColumns()`, and extended `RunConformerAnalysis` local statistics to track per-atom/per-bond extended sections.
+  - Updated `DrawDescriptorMap` (`eled.visualization`) with semantic labels, diverging/sequential palettes, unit rules, and section resolvers for all `0.13`–`0.16` atom and bond descriptors.
+  - Extended `CheckBackend` (`eled doctor`) to report `properties_export_verified`, `esp_api_verified`, `realspace_export_verified`, and `realspace_api_version`.
+- **Catalysis steric & geometric complements (`eled.local_geometry`)**:
+  - Added optional molecularly aligned quadrant and hemisphere breakdown (`zAxisAtom`, `xzPlaneAtom` → `vbur_q1_percent`..`vbur_q4_percent`, `vbur_z_pos_percent`, `vbur_z_neg_percent`) to `CalcBuriedVolume`.
+  - Added `CalcPyramidalization(mol, atomIdx, *, neighborIndices=None, confId=-1)` reporting Haddon POAV1 `pyramidalization_p`, `pyramidalization_angle_deg`, `poav_angle_deg`, `angle_sum_deg`, and `pyramid_height_a` (with explicit `None` + `missing` for degenerate geometries).
+  - Added `CalcConeAngle(mol, atomIndices, *, center, axisAtom=None, ...)` computing the exact Bilbrey–Allen (2013) minimum enclosing spherical cone angle (or Tolman axial cone angle when `axisAtom` is given), with explicit `apex_inside_atom_sphere` missing handling.
+  - Wired optional `pyramidalization` and `coneAngle` requests into `AnalyzeLocalGeometry` and `RunLocalGeometryBatch`.
+- **Catalog & exports**: Exported `CalcElectronicCoupling`, `CalcElectronicCouplingFromResults`, `CalcPyramidalization`, and `CalcConeAngle` at package top level and registered all new fields in `DescriptorCatalog()` and `DescriptorStatus()`.
+
 ## 0.15.0 — Real-space ABI v2 (ELF/LOL/bond ellipticity/NCI), directed σ/π-hole & H-bond extrema, fragment EDA, and Cremer–Kraka local bond force constants
 
 - **Real-space wavefunction ABI v2 & valence density topology (`eled.realspace`)**:

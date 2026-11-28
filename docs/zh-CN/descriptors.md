@@ -1,4 +1,4 @@
-# 描述符（1.4）
+# 描述符（1.5）
 
 公开函数/方法采用 RDKit `PascalCase`，参数与结果属性采用 `camelCase`，导出的描述符字段名统一采用带显式单位后缀的小写 `snake_case`。基于结果对象的描述符函数只分析已有的 `XTBResults`；需要一步从 `Mol` 提取分子标量或接入 `rdMolDescriptors.Properties` 时，可使用 `CalcMolXTBDescriptors()` 与 `RegisterRDKitProperties()`；只有 `XTBCalculator.Calculate()`、`CalcMolXTBDescriptors()`、`RunReactivity()` 等入口会调用引擎。
 
@@ -228,6 +228,12 @@ thermo = CalcVibrationalThermochemistry(
 `frequencies_cm1`、红外强度 `ir_intensities_km_mol`、转动常数 `rotational_constants_cm1` 及
 RRHO（`rotorCutoffCm1=0`）或 Grimme qRRHO（默认 `rotorCutoffCm1=100.0`）的 ZPE/U/H/S/G，
 并通过 `is_stationary_point=False` 和 `warnings` 明确标记非驻点几何或虚频。
+
+## 片段相互作用（EDA）与 DIPRO 电子耦合
+
+`CalcFragmentInteraction(mol, fragmentA, fragmentB, ...)` 在固定几何下执行三次匹配的单点计算（复合物 `AB` 与单体 `A`/`B`），返回能量分解差值（`delta_e_total_ha`、`delta_e_elec_ha`、`delta_e_rep_ha`、`delta_e_es_ha`、`delta_e_disp_ha`、`delta_g_solv_ha` 等）、净电荷转移（`ct_scc_a_to_b_e`、`ct_cm5_a_to_b_e`、`ct_lowdin_a_to_b_e`、`ct_mulliken_a_to_b_e`）以及片段间 WBO/COOP/ECOHP/$\chi_{AB}$。
+
+`CalcElectronicCoupling(mol, fragmentA, fragmentB, ...)` 与零额外 SCF 的 `CalcElectronicCouplingFromResults(...)` 基于 DIPRO/Valeev 方案，从复合物保留基组精确重构 AO 哈密顿量 $H_{\mathrm{AO}} = (S_{AB}C_{AB})\operatorname{diag}(\varepsilon_{AB})(S_{AB}C_{AB})^T$ 并执行对称 Löwdin 子空间正交化，给出空穴（`j_hole_ev`/`mev`）、电子（`j_electron_ev`/`mev`）及跨通道电荷转移耦合（`j_ct_ab_ev`/`mev`、`j_ct_ba_ev`/`mev`），对刚体旋转/平移、MO 相位翻转、简并前线子空间旋转（如苯二聚体）及片段互换严格不变。
 
 ## 缺失值和不变性
 

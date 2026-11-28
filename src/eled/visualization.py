@@ -23,6 +23,9 @@ _SIGNED_FIELDS = frozenset({
     'q_e',
     'cm5_q_e',
     'dual',
+    'dual_w',
+    'delta_omega_loc_ev',
+    's2_loc_1ev2',
     'pi_q_e',
     'mul_qrec_e',
     'low_qrec_e',
@@ -31,6 +34,26 @@ _SIGNED_FIELDS = frozenset({
     'lumo_mul_ovlp_e',
     'frontier_bonds.homo.mul_ovlp_e',
     'frontier_bonds.lumo.mul_ovlp_e',
+    'coop_e',
+    'ecohp_ev',
+    'signed_delta_q_e',
+    'signed_delta_cm5_q_e',
+    'q_prod_e2',
+    'cm5_q_prod_e2',
+    'e_parallel_au',
+    'e_parallel_mv_cm',
+    'epn_au',
+    'epn_kcalmol',
+    'v_mean_au',
+    'v_min_au',
+    'v_max_au',
+    'v_mean_kcalmol',
+    'laplacian_au',
+    'sign_lambda2_rho_au',
+    'chi_diag_e_per_ev',
+    'chi_diag_e_per_ha',
+    'delta_q_e',
+    'delta_cm5_q_e',
 })
 
 _FIELD_LABELS = {
@@ -45,6 +68,50 @@ _FIELD_LABELS = {
     's_loc_1ev': 'local softness',
     'omega_loc_ev': 'local electrophilicity',
     'n_loc_1ev': 'local nucleophilicity',
+    'omega_minus_loc_ev': 'local electrodonating power',
+    'omega_plus_loc_ev': 'local electroaccepting power',
+    'delta_omega_loc_ev': 'multiphilic descriptor',
+    's2_loc_1ev2': 'local hyper-softness',
+    'f_w_plus': 'orbital-weighted f+',
+    'f_w_minus': 'orbital-weighted f−',
+    'f_w_radical': 'orbital-weighted f0',
+    'dual_w': 'orbital-weighted dual',
+    'occ_e_mean_ev': 'mean occupied orbital energy',
+    'vir_e_mean_ev': 'mean virtual orbital energy',
+    'pdos_homo_win_e': 'HOMO-window PDOS',
+    'pdos_lumo_win': 'LUMO-window PDOS',
+    'epn_au': 'nuclear ESP (EPN)',
+    'epn_kcalmol': 'nuclear ESP (EPN)',
+    'alpha_bohr3': 'atomic polarizability',
+    'alpha_angstrom3': 'atomic polarizability',
+    'c6_aa_ha_bohr6': 'atomic C6 dispersion',
+    'dip_norm_debye': 'atomic dipole norm',
+    'quad_frobenius_ebohr2': 'atomic quadrupole norm',
+    'n_lone_pairs': 'Pipek-Mezey lone pairs',
+    'n_localized_bonds': 'localized bonds',
+    'fod_pop_e': 'FOD population',
+    'chi_diag_e_per_ev': 'linear response chi_AA',
+    'atomic_softness_e_per_ev': 'atomic linear-response softness',
+    'nonlocal_coupling_e_per_ev': 'nonlocal linear-response coupling',
+    'alie_mean_ev': 'surface mean ALIE',
+    'lea_mean_ev': 'surface mean LEA',
+    'v_mean_au': 'surface mean ESP',
+    'v_mean_kcalmol': 'surface mean ESP',
+    'coop_e': 'bond COOP',
+    'ecohp_ev': 'bond ECOHP',
+    'delta_q_e': 'bond charge polarity',
+    'signed_delta_q_e': 'signed bond polarity',
+    'e_parallel_au': 'bond-aligned electric field',
+    'e_parallel_mv_cm': 'bond-aligned electric field',
+    'e_norm_mv_cm': 'electric field magnitude',
+    'rho_au': 'bond valence density',
+    'laplacian_au': 'bond density Laplacian',
+    'elf': 'bond ELF',
+    'lol': 'bond LOL',
+    'ellipticity': 'bond ellipticity',
+    'k_local_mdyn_a': 'local bond force constant',
+    'compliance_a_mdyn': 'bond compliance constant',
+    'omega_local_cm1': 'local bond frequency',
     'homo_population': 'HOMO population',
     'lumo_population': 'LUMO population',
     'frontier.homo.atom_pop': 'HOMO population',
@@ -128,8 +195,30 @@ def _unit_from_name(field):
     if not field:
         return 'dimensionless'
     leaf = field.rsplit('.', 1)[-1]
+    if leaf.endswith('_mv_cm'):
+        return 'MV/cm'
+    if leaf.endswith('_mdyn_a'):
+        return 'mDyn/Angstrom'
+    if leaf.endswith('_a_mdyn'):
+        return 'Angstrom/mDyn'
+    if leaf.endswith('_cm1'):
+        return 'cm^-1'
+    if leaf.endswith('_bohr3'):
+        return 'Bohr^3'
+    if leaf.endswith('_angstrom3'):
+        return 'Angstrom^3'
+    if leaf.endswith('_kcalmol'):
+        return 'kcal/mol'
+    if leaf.endswith('_1ev2'):
+        return '1/eV^2'
     if leaf.endswith('_1ev'):
         return '1/eV'
+    if leaf.endswith('_e_per_ev'):
+        return 'e/eV'
+    if leaf.endswith('_e_per_ha'):
+        return 'e/Hartree'
+    if leaf.endswith('_ebohr2'):
+        return 'e*Bohr^2'
     if leaf.endswith('_ebohr'):
         return 'e*Bohr'
     if leaf.endswith('_debye'):
@@ -138,11 +227,36 @@ def _unit_from_name(field):
         return 'eV'
     if leaf.endswith('_ha'):
         return 'Hartree'
+    if leaf.endswith('_au'):
+        return 'a.u.'
     if leaf.endswith('_a'):
         return 'Angstrom'
     if leaf.endswith('_e') or leaf in {'charge', 'q_e'}:
         return 'e'
     return 'dimensionless'
+
+
+_EXTENDED_ATOM_SECTIONS = (
+    'shell_populations',
+    'pi',
+    'nuclear_esp',
+    'polarizability',
+    'multipoles',
+    'orbital_weighted_fukui',
+    'atomic_orbital_energies',
+    'localized_orbitals',
+    'linear_response',
+    'esp_surface',
+    'realspace_surface',
+)
+
+_EXTENDED_BOND_SECTIONS = (
+    'pi',
+    'bond_overlap',
+    'bond_electric_field',
+    'bond_density_topology',
+    'local_modes',
+)
 
 
 def _resolve_unit(report, field):
@@ -155,7 +269,7 @@ def _resolve_unit(report, field):
             report.get('bond_units'),
             report.get('units'),
         ]
-        for section_name in ('shell_populations', 'frontier_bonds', 'pi'):
+        for section_name in (*_EXTENDED_ATOM_SECTIONS, 'frontier_bonds', *_EXTENDED_BOND_SECTIONS):
             section = report.get(section_name)
             if isinstance(section, Mapping):
                 unit_maps.append(section.get('units'))
@@ -318,14 +432,11 @@ def _resolve_atom_values(report, field, natoms):
     candidate_maps = []
     if section_name in (None, 'atoms'):
         candidate_maps.append(_index_rows(report.get('atoms'), 'atom_index'))
-    if section_name in (None, 'shell_populations'):
-        shells = report.get('shell_populations')
-        if isinstance(shells, Mapping):
-            candidate_maps.append(_index_rows(shells.get('atoms'), 'atom_index'))
-    if section_name in (None, 'pi'):
-        pi = report.get('pi')
-        if isinstance(pi, Mapping):
-            candidate_maps.append(_index_rows(pi.get('atoms'), 'atom_index'))
+    for sec in _EXTENDED_ATOM_SECTIONS:
+        if section_name in (None, sec):
+            sub = report.get(sec)
+            if isinstance(sub, Mapping):
+                candidate_maps.append(_index_rows(sub.get('atoms'), 'atom_index'))
 
     for row_map in candidate_maps:
         if any(leaf in row for row in row_map.values()):
@@ -360,10 +471,11 @@ def _resolve_bond_values(report, field, nbonds):
     candidate_maps = []
     if section_name in (None, 'bonds'):
         candidate_maps.append(_index_rows(report.get('bonds'), 'bond_index'))
-    if section_name in (None, 'pi'):
-        pi = report.get('pi')
-        if isinstance(pi, Mapping):
-            candidate_maps.append(_index_rows(pi.get('bonds'), 'bond_index'))
+    for sec in _EXTENDED_BOND_SECTIONS:
+        if section_name in (None, sec):
+            sub = report.get(sec)
+            if isinstance(sub, Mapping):
+                candidate_maps.append(_index_rows(sub.get('bonds'), 'bond_index'))
 
     for row_map in candidate_maps:
         if any(leaf in row for row in row_map.values()):

@@ -62,8 +62,11 @@ def CheckBackend(backend, method, library=None, keepOverlap=False, reactivity=Fa
         energy = result.totalEnergyHartree
         charges = result.GetAtomicCharges()
         nao = result.numOrbitals
+        from .runtime import _native_esp_build, _native_realspace_api_version
+        lib_path = result.libraryPath
+        rs_ver = int(_native_realspace_api_version(lib_path)) if lib_path else 0
         engine = {
-            "library": result.libraryPath,
+            "library": lib_path,
             "sha256": result.librarySHA256,
             "api_version": result.apiVersion,
             "parameter_file": result.parameterFile,
@@ -72,10 +75,19 @@ def CheckBackend(backend, method, library=None, keepOverlap=False, reactivity=Fa
             "native_gfn0_verified": result.gfn0StateFixVerified,
             "compiled_rdkit_version": rdXTBTools.rdkitVersion,
             "basis_export_verified": result.basisExportVerified,
+            "properties_export_verified": getattr(result, "propertiesExportVerified", False),
+            "esp_api_verified": bool(_native_esp_build(lib_path)) if lib_path else False,
+            "realspace_export_verified": getattr(result, "realSpaceExportVerified", rs_ver >= 1),
+            "realspace_api_version": rs_ver,
             "overlap_retained": result.overlapRetained,
         }
     else:
         from . import XTBCalculator
+        from .runtime import (
+            _native_esp_build,
+            _native_properties_build,
+            _native_realspace_api_version,
+        )
         result = XTBCalculator(
             method=method,
             backend=backend,
@@ -85,7 +97,14 @@ def CheckBackend(backend, method, library=None, keepOverlap=False, reactivity=Fa
         energy = result.totalEnergyHartree
         charges = result.GetAtomicCharges()
         nao = result.numOrbitals
-        engine = result.metadata["engine"]
+        engine = dict(result.metadata["engine"])
+        lib_path = engine.get("path")
+        if lib_path:
+            rs_ver = int(_native_realspace_api_version(lib_path))
+            engine["properties_export_verified"] = bool(_native_properties_build(lib_path))
+            engine["esp_api_verified"] = bool(_native_esp_build(lib_path))
+            engine["realspace_export_verified"] = rs_ver >= 1
+            engine["realspace_api_version"] = rs_ver
     if (energy is None or not math.isfinite(energy) or energy >= 0
             or nao is None or nao < 1 or len(charges) != 3
             or not all(math.isfinite(float(q)) for q in charges)

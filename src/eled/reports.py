@@ -33,11 +33,39 @@ from .electronic_descriptors import (
     _orbitals,
 )
 from .errors import DescriptorUnavailableError
+from .localized_orbitals import CalcLocalizedOrbitals
+from .orbital_descriptors import (
+    CalcAtomicOrbitalEnergies,
+    CalcBondOverlapDescriptors,
+    CalcLinearResponseMatrix,
+    CalcOrbitalWeightedFukui,
+)
 from .populations import CalcFrontierDescriptors, CalcOrbitalPopulations
+from .properties import (
+    CalcEnergyDecomposition,
+    CalcMultipoleDescriptors,
+    CalcNuclearESP,
+    CalcPolarizabilityDescriptors,
+    _as_property_result,
+)
+from .realspace import CalcRealSpaceProperties
 from .result import XTBResults
 
-DESCRIPTOR_VERSION = '1.4'
+DESCRIPTOR_VERSION = '1.5'
 SCHEMA_VERSION = 2
+
+_EXTENDED_SCALAR_UNITS = (
+    ('e_elec_ha', 'Hartree'),
+    ('e_rep_ha', 'Hartree'),
+    ('e_es_ha', 'Hartree'),
+    ('e_disp_ha', 'Hartree'),
+    ('mol_pol_bohr3', 'Bohr^3'),
+    ('mol_c6_ha_bohr6', 'Hartree*Bohr^6'),
+    ('mol_c8_ha_bohr8', 'Hartree*Bohr^8'),
+    ('epn_min_au', 'Hartree/e'),
+    ('epn_max_au', 'Hartree/e'),
+    ('epn_mean_au', 'Hartree/e'),
+)
 
 
 def DescriptorColumns(frontierDepth=2):
@@ -82,6 +110,8 @@ def DescriptorColumns(frontierDepth=2):
     units['hl_dist_a'] = 'angstrom'
     for label in ('sum', 'min', 'max', 'mean', 'sd', 'abs'):
         units[f'xtb_cm5_q_{label}_e'] = 'e'
+    for key, unit in _EXTENDED_SCALAR_UNITS:
+        units[key] = unit
     return units
 
 
@@ -204,6 +234,16 @@ def _base_report(recordId, columns, analysis):
         'frontier_bonds': None,
         'pi': None,
         'mci': None,
+        'energy_decomposition': None,
+        'polarizability': None,
+        'multipoles': None,
+        'nuclear_esp': None,
+        'orbital_weighted_fukui': None,
+        'atomic_orbital_energies': None,
+        'bond_overlap': None,
+        'localized_orbitals': None,
+        'linear_response': None,
+        'realspace': None,
     }
 
 
@@ -214,6 +254,7 @@ def _analysis_settings(
     degeneracyEV=1e-3,
     occupationTolerance=1e-6,
     includeOrbitals=True,
+    includeExtended=True,
     fractionalTolerance=1e-4,
     conservationTolerance=1e-5,
     piScheme='lowdin',
@@ -223,6 +264,8 @@ def _analysis_settings(
     DescriptorColumns(frontierDepth)
     if not isinstance(includeOrbitals, bool):
         raise ValueError('includeOrbitals must be Boolean')
+    if not isinstance(includeExtended, bool):
+        raise ValueError('includeExtended must be Boolean')
     checked = [
         ('occupationThreshold', occupationThreshold),
         ('degeneracyEV', degeneracyEV),
@@ -236,6 +279,7 @@ def _analysis_settings(
     return dict(
         frontierDepth=int(frontierDepth),
         includeOrbitals=includeOrbitals,
+        includeExtended=includeExtended,
         piScheme=pi['scheme'],
         piPlaneTolAngstrom=pi['plane_tol_a'],
         piRef=pi['pi_ref'],
@@ -254,6 +298,7 @@ def CalcDescriptorReport(
     degeneracyEV=1e-3,
     occupationTolerance=1e-6,
     includeOrbitals=True,
+    includeExtended=True,
     fractionalTolerance=1e-4,
     conservationTolerance=1e-5,
     piScheme='lowdin',
@@ -270,6 +315,7 @@ def CalcDescriptorReport(
         degeneracyEV=degeneracyEV,
         occupationTolerance=occupationTolerance,
         includeOrbitals=includeOrbitals,
+        includeExtended=includeExtended,
         fractionalTolerance=fractionalTolerance,
         conservationTolerance=conservationTolerance,
         piScheme=piScheme,
@@ -283,7 +329,7 @@ def CalcDescriptorReport(
         analysis['mciScheme'] = mciScheme
         analysis['mciRings'] = {str(name): list(indices) for name, indices in mciRings.items()}
     pi_options = _pi_options(piScheme, piPlaneTolAngstrom, analysis['piRef'], natoms=mol.GetNumAtoms())
-    result = _as_result(result)
+    result = _as_property_result(result)
     _validate_mapping(mol, result)
     report = _base_report(recordId, DescriptorColumns(frontierDepth), analysis)
     report['provenance'] = deepcopy(dict(result.metadata))
@@ -371,6 +417,44 @@ def CalcDescriptorReport(
                     report['quality']['status'] = 'partial'
         if mciRings is not None:
             report['mci'] = CalcMCIDescriptors(mol, result, mciRings, scheme=mciScheme)
+        if includeExtended:
+            extended_orbital_tasks = [
+                (
+                    'orbital_weighted_fukui',
+                    lambda r: CalcOrbitalWeightedFukui(r, occupationThreshold=occupationThreshold),
+                ),
+                (
+                    'atomic_orbital_energies',
+                    lambda r: CalcAtomicOrbitalEnergies(r, occupationThreshold=occupationThreshold),
+                ),
+                (
+                    'localized_orbitals',
+                    lambda r: CalcLocalizedOrbitals(
+                        mol,
+                        r,
+                        occupationThreshold=occupationThreshold if occupationThreshold > 0.0 else 1e-12,
+                    ),
+                ),
+                (
+                    'linear_response',
+                    lambda r: CalcLinearResponseMatrix(r, occupationThreshold=occupationThreshold),
+                ),
+            ]
+            if len(result.atomicCharges) == mol.GetNumAtoms():
+                extended_orbital_tasks.insert(
+                    2,
+                    (
+                        'bond_overlap',
+                        lambda r: CalcBondOverlapDescriptors(mol, r, occupationThreshold=occupationThreshold),
+                    ),
+                )
+            else:
+                report['missing']['bond_overlap'] = 'charges_not_reported'
+            for name, function in extended_orbital_tasks:
+                try:
+                    report[name] = function(result)
+                except DescriptorUnavailableError as exc:
+                    report['missing'][name] = f'{type(exc).__name__}: {exc}'
     else:
         reason = 'basis_not_retained' if includeOrbitals else 'not_requested'
         report['missing'].update(
@@ -381,10 +465,82 @@ def CalcDescriptorReport(
             frontier_bonds=reason,
             pi=reason,
         )
+        if includeExtended:
+            report['missing'].update(
+                orbital_weighted_fukui=reason,
+                atomic_orbital_energies=reason,
+                bond_overlap=reason,
+                localized_orbitals=reason,
+                linear_response=reason,
+            )
         if mciRings is not None:
             report['missing']['mci'] = reason
         if includeOrbitals and report['quality']['status'] == 'ok':
             report['quality']['status'] = 'partial'
+    if includeExtended:
+        ed = CalcEnergyDecomposition(result)
+        if ed['available']:
+            report['energy_decomposition'] = ed
+        else:
+            report['missing']['energy_decomposition'] = 'properties_extension_unavailable'
+        for key in ('e_elec_ha', 'e_rep_ha', 'e_es_ha', 'e_disp_ha'):
+            report['values'][key] = ed[key]
+            if ed[key] is None:
+                report['missing'][key] = ed['missing'].get(key, 'properties_extension_unavailable')
+
+        pol = CalcPolarizabilityDescriptors(result, mol=mol)
+        if pol['available']:
+            report['polarizability'] = pol
+        else:
+            report['missing']['polarizability'] = pol['missing'].get(
+                'mol_pol_bohr3', 'properties_extension_unavailable'
+            )
+        for key in ('mol_pol_bohr3', 'mol_c6_ha_bohr6', 'mol_c8_ha_bohr8'):
+            report['values'][key] = pol[key]
+            if pol[key] is None:
+                report['missing'][key] = pol['missing'].get(key, 'properties_extension_unavailable')
+
+        mp = CalcMultipoleDescriptors(result, mol=mol)
+        if mp['available']:
+            report['multipoles'] = mp
+        else:
+            report['missing']['multipoles'] = mp['missing'].get(
+                'multipole_model', 'properties_extension_unavailable'
+            )
+
+        epn = CalcNuclearESP(result, mol=mol)
+        if epn['available']:
+            report['nuclear_esp'] = epn
+        else:
+            report['missing']['nuclear_esp'] = 'properties_extension_unavailable'
+        for key in ('epn_min_au', 'epn_max_au', 'epn_mean_au'):
+            report['values'][key] = epn[key]
+            if epn[key] is None:
+                report['missing'][key] = epn['missing'].get(key, 'properties_extension_unavailable')
+
+        if result.realSpaceSampled:
+            try:
+                report['realspace'] = CalcRealSpaceProperties(result)
+            except DescriptorUnavailableError as exc:
+                report['missing']['realspace'] = f'{type(exc).__name__}: {exc}'
+        else:
+            report['missing']['realspace'] = 'realspace_not_sampled'
+    else:
+        for section in (
+            'energy_decomposition',
+            'polarizability',
+            'multipoles',
+            'nuclear_esp',
+            'orbital_weighted_fukui',
+            'atomic_orbital_energies',
+            'bond_overlap',
+            'localized_orbitals',
+            'linear_response',
+            'realspace',
+        ):
+            report['missing'][section] = 'not_requested'
+        for key, _ in _EXTENDED_SCALAR_UNITS:
+            report['missing'][key] = 'not_requested'
     for key, value in report['values'].items():
         if key.startswith('xtb_cm5_q_') and value is None:
             report['missing'][key] = (

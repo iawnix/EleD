@@ -16,7 +16,7 @@
 - Mulliken/Löwdin s/p/d 布居和 p/s 比；
 - GFN1/2 固定几何 ΔSCF 的 IP、EA、硬度、软度、Fukui 指数、Gázquez 给/受电子能力 `omega_minus_ev`/`omega_plus_ev` 及局域超软度 `s2_loc_1ev2`；
 - Grimme FOD 静态关联指数（`n_fod_e`、`fod_pop_e`、`fod_s_e`/`p`/`d`）；
-- 实空间电子密度/ALIE/LEA、`0.001 a.u.` 等值面体积/面积/球度、定向 σ/π-hole 与氢键供受体极值（`realspace`）、键中点局域电场、Cremer–Kraka 局域键力常数（`bond`）及片段 EDA 与电荷转移（`fragment`）；
+- 实空间电子密度/ALIE/LEA、`0.001 a.u.` 等值面体积/面积/球度、定向 σ/π-hole 与氢键供受体极值（`realspace`）、键中点局域电场、Cremer–Kraka 局域键力常数（`bond`）、片段 EDA/电荷转移/DIPRO 电子耦合（`fragment`）及四象限 `%Vbur`/锥体化/精确配体锥角（`local_geometry`）；
 - Politzer–Murray 表面静电势统计（`esp_surface`）与原子核静电势 `epn_au`；
 - D4 极化率/C6/C8、能量分解（`properties`）、ALPB/GBSA 隐式溶剂化位移（`solvation`）及谐振 RRHO/qRRHO 热化学（`thermochemistry`）。
 

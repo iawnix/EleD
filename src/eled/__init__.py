@@ -19,6 +19,7 @@ from .density_descriptors import (
     CalcShellPopulations,
 )
 from .descriptor_catalog import DescriptorCatalog, DescriptorStatus
+from .dipro import CalcElectronicCoupling, CalcElectronicCouplingFromResults
 from .electronic_descriptors import (
     CalcCM5Charges,
     CalcXTBAtomDescriptors,
@@ -48,8 +49,10 @@ from .geometry import ConformerGenerationResult, PrepareConformers
 from .local_geometry import (
     AnalyzeLocalGeometry,
     CalcBuriedVolume,
+    CalcConeAngle,
     CalcHOMA,
     CalcPlaneDescriptors,
+    CalcPyramidalization,
     CalcRingPuckering,
     CalcSterimol,
     RunLocalGeometryBatch,
@@ -189,6 +192,8 @@ __all__ = [
     "CalcNCIDescriptors",
     "CalcDirectedSurfaceDescriptors",
     "CalcFragmentInteraction",
+    "CalcElectronicCoupling",
+    "CalcElectronicCouplingFromResults",
     "CalcLocalBondForceConstants",
     "CalcLocalBondForceConstantsFromHessian",
     "CalcEnergyDecomposition",
@@ -202,6 +207,8 @@ __all__ = [
     "CalcPlaneDescriptors",
     "CalcHOMA",
     "CalcRingPuckering",
+    "CalcPyramidalization",
+    "CalcConeAngle",
     "AnalyzeLocalGeometry",
     "RunLocalGeometryBatch",
     "SelectionSet",
