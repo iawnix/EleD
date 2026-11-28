@@ -28,7 +28,8 @@ from typing import Any
 
 import numpy as np
 
-from .backends.native import ANGSTROM_TO_BOHR, _run_xtb_native
+from .backends.native import _run_xtb_native
+from .constants import ANGSTROM_TO_BOHR
 from .electronic_descriptors import _as_result
 from .errors import DescriptorUnavailableError
 from .esp import _vector

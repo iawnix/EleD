@@ -262,7 +262,8 @@ def _analysis_settings(
     piPlaneTolAngstrom=0.1,
     piRef=None,
 ):
-    DescriptorColumns(frontierDepth)
+    if isinstance(frontierDepth, bool) or not isinstance(frontierDepth, int) or frontierDepth < 0:
+        raise ValueError('frontierDepth must be a nonnegative integer')
     if not isinstance(includeOrbitals, bool):
         raise ValueError('includeOrbitals must be Boolean')
     if not isinstance(includeExtended, bool):

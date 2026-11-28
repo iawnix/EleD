@@ -1,6 +1,7 @@
 """Tests for bond electric fields, real-space density/ALIE/LEA, and 0.001 a.u. isosurface."""
 from __future__ import annotations
 
+from dataclasses import fields
 import json
 
 import numpy as np
@@ -120,7 +121,7 @@ def test_realspace_options_and_pure_python_cutoff_missing_semantics():
     assert opt.realSpaceOccupationThreshold == 1e-7
     assert opt.realSpaceLEAWindowEV == 0.0
     d = opt.ToDict()
-    assert 'realSpacePointsAngstrom' not in d
+    assert d['realSpacePointsAngstrom'] == [] and set(d) == {f.name for f in fields(XTBOptions)}
     assert XTBOptions.FromDict(d) == opt
 
     opt2 = XTBOptions(

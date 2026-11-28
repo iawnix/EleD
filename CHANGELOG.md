@@ -77,6 +77,25 @@
     single-point keyword arguments of `CalcSolvationDescriptors`,
     `CalcVibrationalThermochemistry` and `CalcLocalBondForceConstants`, which
     were silently ignored when `options` was given; pass `options=XTBOptions(...)`.
+- **Validate once, compute once**:
+  - Single-point settings are validated in one place, `XTBOptions`; the native
+    backend builds its options through it instead of repeating the checks, the
+    thin `run_xtb_native` wrapper is removed, and `_run_xtb` no longer re-resolves
+    charge/spin and reloads the library before the backend does it again.
+  - Same-basis analyses share one cached `_orbital_basis(result)` (positive
+    definite S, C^T S C check, S^(1/2), P, PS and S^(1/2) P S^(1/2), read-only).
+    A full descriptor report previously re-diagonalized S about ten times.
+    All analyses use one `ORTHONORMALITY_TOLERANCE = 1e-5` (populations used
+    1e-6, the rest 1e-5); `CalcOrbitalPopulations` loses its
+    `orthonormalityTolerance` argument.
+  - Physical constants live in `eled.constants` (previously redefined in about
+    eight modules).
+  - `XTBOptions.ToDict()` always returns every field (the "preserve cache key"
+    branch was dead: cache keys already hash all package sources).
+  - Removed assertion-only `json.dumps(...)` calls from analysis functions (kept
+    at report/export boundaries), discarded validation-only calls, `is None`
+    checks on tuple fields, and checks in `AnnotateMol` that repeated
+    `_validate_mapping`.
 
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 

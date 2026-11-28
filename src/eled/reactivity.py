@@ -13,7 +13,8 @@ import json
 
 import numpy as np
 
-from .backends.native import HARTREE_TO_EV, _native_charge_states
+from .backends.native import _native_charge_states
+from .constants import HARTREE_TO_EV
 from .calculator import XTBCalculator
 from .charges import CHARGE_MODEL_CM5, CHARGE_MODEL_SCC, _charge_model_for_method
 from .electronic_descriptors import CalcCM5Charges, _as_result, _finite, _fragments
@@ -60,7 +61,7 @@ def _summary(result):
         'num_electrons': result.numElectrons,
         'partial_charges_e': list(result.atomicCharges),
         'charge_model': result.chargeModel,
-        'cm5_charges_e': list(result.cm5Charges) if result.cm5Charges is not None else [],
+        'cm5_charges_e': list(result.cm5Charges),
         'provenance': deepcopy(dict(result.metadata)),
     }
 
@@ -202,7 +203,6 @@ def CalcReactivityDescriptors(
             raise ValueError(f'{label} has the wrong molecular charge')
         if result.numElectrons != ref.numElectrons - delta:
             raise ValueError(f'{label} has the wrong modeled electron count')
-        _effective_charge_uhf(mol, result.metadata['charge'], result.metadata['uhf'])
         if result.numUnpairedElectrons != result.metadata['uhf']:
             raise ValueError('charge-state spin count disagrees with its provenance')
         energy = result.totalEnergyHartree
@@ -387,7 +387,8 @@ def RunReactivity(
         raise ValueError('initialization must be reference or independent')
     if not isinstance(returnErrors, bool):
         raise ValueError('returnErrors must be Boolean')
-    _empty_report(recordId, populationScheme, {})
+    if recordId is not None and not isinstance(recordId, str):
+        raise ValueError('recordId must be a string or None')
     snapshot = Chem.Mol(mol)
     config = options or XTBOptions()
     _xyz_from_mol(snapshot, config.confId)

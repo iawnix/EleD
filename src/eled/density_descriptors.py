@@ -14,10 +14,9 @@ import numpy as np
 from .electronic_descriptors import (
     _as_result,
     _finite,
-    _has_population_basis,
     _indices,
     _nonnegative,
-    _orbital_basis_arrays,
+    _orbital_basis,
     _orbitals,
 )
 from .errors import DescriptorUnavailableError
@@ -31,49 +30,24 @@ _VALENCE = {1: 1, 5: 3, 6: 4, 7: 5, 8: 6, 9: 7, 14: 4, 15: 5,
 
 def _basis(result):
     result = _as_result(result)
-    fields = (result.aoShellMap, result.shellAtomMap, result.shellAngularMomenta)
-    if not _has_population_basis(result) or not all(v is not None and len(v) for v in fields):
+    if not all(len(v) for v in (result.aoShellMap, result.shellAtomMap, result.shellAngularMomenta)):
         raise DescriptorUnavailableError(
             "density descriptors require same-calculation overlap, coefficients and shell maps; "
             "use XTBCalculator(...).Calculate(..., keepOverlap=True)"
         )
-    energies, occ, _, _ = _orbitals(result)
-    natoms = result.metadata.get('atom_count', len(result.atomicCharges))
-    c, s, atom = _orbital_basis_arrays(result, len(energies), natoms)
-    eig, u = np.linalg.eigh(s)
-    if eig.min() <= max(1.0, eig.max()) * 1e-10:
-        raise ValueError('overlap must be positive definite')
-    metric = c.T @ s @ c
-    err = float(np.max(np.abs(metric - np.eye(len(energies)))))
-    if err > 1e-5:
-        raise ValueError(f'coefficients are not S-orthonormal: error={err:g}')
-
-    def integer_map(values, name):
-        array = np.asarray(values)
-        if array.ndim != 1 or array.dtype.kind not in 'iu':
-            raise ValueError(f'{name} must contain integer indices')
-        return array.astype(int)
-
-    shell = integer_map(result.aoShellMap, 'AO shell map')
-    shell_atom = integer_map(result.shellAtomMap, 'shell atom map')
-    shell_l = integer_map(result.shellAngularMomenta, 'shell angular momentum map')
-    if len(shell) != len(atom) or np.any(shell < 0) or np.any(shell >= len(shell_atom)):
-        raise ValueError('AO shell map is invalid')
-    if (np.any(atom < 0) or np.any(atom >= natoms) or np.any(shell_atom < 0)
-            or np.any(shell_atom >= natoms) or not np.array_equal(np.unique(atom), np.arange(natoms))):
-        raise ValueError('AO atom map must cover the calculation atoms')
-    if not np.array_equal(shell_atom[shell], atom):
-        raise ValueError('AO shell and atom maps disagree')
-    if len(shell_l) != len(shell_atom) or np.any(shell_l < 0):
-        raise ValueError('shell angular momentum map is invalid')
-    if not np.array_equal(np.bincount(shell, minlength=len(shell_l)), 2 * shell_l + 1):
-        raise ValueError('shell size must equal 2*l+1')
-    if np.any(occ > 2 + 1e-8):
+    basis = _orbital_basis(result)
+    atom = basis.ao_atom
+    shell = np.asarray(result.aoShellMap, dtype=int)
+    shell_atom = np.asarray(result.shellAtomMap, dtype=int)
+    shell_l = np.asarray(result.shellAngularMomenta, dtype=int)
+    if (len(shell) != len(atom) or len(shell_l) != len(shell_atom)
+            or not np.array_equal(shell_atom[shell], atom)
+            or not np.array_equal(np.bincount(shell, minlength=len(shell_l)), 2 * shell_l + 1)):
+        raise ValueError('AO shell, shell-atom and angular-momentum maps are inconsistent')
+    if np.any(basis.occupations > 2 + 1e-8):
         raise ValueError('spin-summed occupations must not exceed two')
-    p = (c * occ[None, :]) @ c.T
-    ps = p @ s
-    lowdin_metric = (u * np.sqrt(eig)) @ u.T @ p @ (u * np.sqrt(eig)) @ u.T
-    return result, c, s, p, ps, lowdin_metric, atom, shell, shell_atom, shell_l, err
+    return (result, basis.coefficients, basis.overlap, basis.density, basis.density_overlap,
+            basis.lowdin_density, atom, shell, shell_atom, shell_l, basis.orthonormality_error)
 
 
 def CalcDensityMatrix(result):

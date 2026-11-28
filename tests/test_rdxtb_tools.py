@@ -201,7 +201,7 @@ def test_native_calculation_does_not_delegate_to_python_backends(library, monkey
     def forbidden(*args, **kwargs):
         pytest.fail('compiled calculations must call libxtb directly')
     monkeypatch.setattr(native._NativeXTB, '__init__', forbidden)
-    monkeypatch.setattr(native, 'run_xtb_native', forbidden)
+    monkeypatch.setattr(native, '_run_xtb_native', forbidden)
     monkeypatch.setattr(adapter, '_run_xtb', forbidden)
     assert rdXTBTools.RunMol(molecule(), xtbLibrary=library)[0]
 

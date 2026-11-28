@@ -14,13 +14,10 @@ from typing import Any
 
 import numpy as np
 
-from .electronic_descriptors import AU_DIPOLE_TO_DEBYE, _as_result
+from .electronic_descriptors import _as_result
 from .mapping import _validate_mapping
 
-BOHR_TO_ANGSTROM = 0.529177210903
-BOHR3_TO_ANGSTROM3 = BOHR_TO_ANGSTROM ** 3
-HARTREE_TO_KCAL_MOL = 627.5094740631
-HARTREE_TO_EV = 27.211386245988
+from .constants import AU_DIPOLE_TO_DEBYE, BOHR3_TO_ANGSTROM3, HARTREE_TO_KCAL_MOL
 
 _QUADRUPOLE_COMPONENTS = ('xx', 'xy', 'yy', 'xz', 'yz', 'zz')
 

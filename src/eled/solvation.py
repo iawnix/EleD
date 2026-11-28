@@ -14,10 +14,9 @@ from typing import Any
 import numpy as np
 
 from .calculator import XTBCalculator
-from .electronic_descriptors import AU_DIPOLE_TO_DEBYE
 from .options import XTBOptions, _validate_solvation_settings
 
-HARTREE_TO_KCAL_MOL = 627.5094740631
+from .constants import AU_DIPOLE_TO_DEBYE, HARTREE_TO_KCAL_MOL
 
 
 def CalcSolvationDescriptors(

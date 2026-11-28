@@ -44,7 +44,7 @@ def test_solvation_options_defaults_roundtrip_and_guards():
     gas = XTBOptions()
     assert gas.solvent is None and gas.solvationModel == 'alpb' and gas.solvationGrid is None
     gas_dict = gas.ToDict()
-    assert 'solvent' not in gas_dict and 'solvationModel' not in gas_dict and 'solvationGrid' not in gas_dict
+    assert gas_dict['solvent'] is None and gas_dict['solvationModel'] == 'alpb' and gas_dict['solvationGrid'] is None
     assert XTBOptions.FromDict(gas_dict) == gas
 
     solv = XTBOptions(solvent=' water ', solvationModel='GBSA', solvationGrid=110)

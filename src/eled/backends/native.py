@@ -11,8 +11,8 @@ from typing import Any, Sequence
 
 from ..charges import CHARGE_MODEL_CM5, _calc_cm5_charges, _charge_model_for_method
 from ..errors import DescriptorUnavailableError, XTBEnvironmentError, XTBNativeNotFoundError, XTBRunError
-from ..input import _effective_charge_uhf, _input_metadata, _method_flag, _xyz_from_mol
-from ..options import _validate_calculation_settings, _validate_solvation_settings
+from ..input import _effective_charge_uhf, _input_metadata, _xyz_from_mol
+from ..options import _validate_calculation_settings
 from ..result import XTBResults, _frontier_energies
 from ..runtime import (
     _engine_identity,
@@ -23,8 +23,7 @@ from ..runtime import (
     _require_extended_libxtb,
 )
 
-HARTREE_TO_EV = 27.211386245988
-ANGSTROM_TO_BOHR = 1.8897261254578281
+from ..constants import ANGSTROM_TO_BOHR, HARTREE_TO_EV
 
 
 class _NativeXTB:
@@ -439,34 +438,31 @@ def _run_xtb_native(
     _keep_esp_for_hook: bool = False,
     _post_singlepoint_hook=None,
 ) -> XTBResults:
-    """Run a single point through a shared ``libxtb`` C API library."""
-    import math
-    from numbers import Real
+    """Run a single point through a shared ``libxtb`` C API library.
+
+    All settings are validated once, by :class:`XTBOptions`.
+    """
     from rdkit import Chem
-    from ..esp_input import _normalize_esp_points
-    espPointsAngstrom = _normalize_esp_points(espPointsAngstrom)
-    realSpacePointsAngstrom = _normalize_esp_points(realSpacePointsAngstrom)
-    for label, val in (
-        ('realSpaceOccupationThreshold', realSpaceOccupationThreshold),
-        ('realSpaceLEAWindowEV', realSpaceLEAWindowEV),
-    ):
-        if isinstance(val, bool) or not isinstance(val, Real) or not math.isfinite(val) or val < 0:
-            raise ValueError(f'{label} must be a finite nonnegative real number')
-    realSpaceOccupationThreshold = float(realSpaceOccupationThreshold)
-    realSpaceLEAWindowEV = float(realSpaceLEAWindowEV)
-    settings = _validate_calculation_settings(maxIterations, accuracy, electronicTemperature)
-    solvent_val, solv_model, solv_grid = _validate_solvation_settings(
-        solvent, solvationModel, solvationGrid
+    from ..options import XTBOptions
+    opts = XTBOptions(
+        confId=confId, method=method, charge=charge, numUnpairedElectrons=numUnpairedElectrons,
+        xtbLibrary=xtbLibrary, keepOverlap=keepOverlap, espPointsAngstrom=espPointsAngstrom,
+        realSpacePointsAngstrom=realSpacePointsAngstrom,
+        realSpaceOccupationThreshold=realSpaceOccupationThreshold,
+        realSpaceLEAWindowEV=realSpaceLEAWindowEV, maxIterations=maxIterations, accuracy=accuracy,
+        electronicTemperature=electronicTemperature, solvent=solvent, solvationModel=solvationModel,
+        solvationGrid=solvationGrid,
     )
-    eff_solv_grid = (230 if solv_grid is None else solv_grid) if solvent_val is not None else None
+    espPointsAngstrom, realSpacePointsAngstrom = opts.espPointsAngstrom, opts.realSpacePointsAngstrom
+    realSpaceOccupationThreshold = opts.realSpaceOccupationThreshold
+    realSpaceLEAWindowEV = opts.realSpaceLEAWindowEV
+    keepOverlap, confId, method_name = opts.keepOverlap, opts.confId, opts.method
+    settings = _validate_calculation_settings(opts.maxIterations, opts.accuracy, opts.electronicTemperature)
+    solvent_val, solv_model = opts.solvent, opts.solvationModel
+    eff_solv_grid = (230 if opts.solvationGrid is None else opts.solvationGrid) if solvent_val is not None else None
     mol = Chem.Mol(mol)  # Own the exact geometry/topology while ctypes releases the GIL.
-    if not isinstance(keepOverlap, bool):
-        raise ValueError('keepOverlap must be a bool')
     xyz = _xyz_from_mol(mol, confId)
-    method_name, _ = _method_flag(method)
-    if method_name == 'GFN-FF':
-        raise ValueError('GFN-FF does not provide molecular orbital descriptors')
-    charge, unpaired = _effective_charge_uhf(mol, charge, numUnpairedElectrons)
+    charge, unpaired = _effective_charge_uhf(mol, opts.charge, opts.numUnpairedElectrons)
     library = _NativeXTB(_find_xtb_library(xtbLibrary))
     _require_extended_libxtb(library.library)
     engine = _engine_identity('native', library.library)
@@ -744,48 +740,6 @@ def _run_xtb_native(
         library._delete(library.del_calculator, calculator)
         library._delete(library.del_molecule, molecule)
         library._delete(library.del_environment, environment)
-
-
-def run_xtb_native(
-    mol,
-    *,
-    confId=-1,
-    method='GFN2-xTB',
-    charge=None,
-    numUnpairedElectrons=None,
-    xtbLibrary=None,
-    keepOverlap=False,
-    espPointsAngstrom=(),
-    realSpacePointsAngstrom=(),
-    realSpaceOccupationThreshold=1e-7,
-    realSpaceLEAWindowEV=0.0,
-    maxIterations=250,
-    accuracy=1.0,
-    electronicTemperature=300.0,
-    solvent=None,
-    solvationModel='alpb',
-    solvationGrid=None,
-):
-    """Run an independently initialized libxtb single point."""
-    return _run_xtb_native(
-        mol,
-        confId=confId,
-        method=method,
-        charge=charge,
-        numUnpairedElectrons=numUnpairedElectrons,
-        xtbLibrary=xtbLibrary,
-        keepOverlap=keepOverlap,
-        espPointsAngstrom=espPointsAngstrom,
-        realSpacePointsAngstrom=realSpacePointsAngstrom,
-        realSpaceOccupationThreshold=realSpaceOccupationThreshold,
-        realSpaceLEAWindowEV=realSpaceLEAWindowEV,
-        maxIterations=maxIterations,
-        accuracy=accuracy,
-        electronicTemperature=electronicTemperature,
-        solvent=solvent,
-        solvationModel=solvationModel,
-        solvationGrid=solvationGrid,
-    )
 
 
 def _native_charge_states(mol, configurations):

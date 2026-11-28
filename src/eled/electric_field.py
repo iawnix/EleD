@@ -29,13 +29,12 @@ import numpy as np
 
 from .calculator import _calculate
 from .electronic_descriptors import _as_result
-from .esp import ANGSTROM_TO_BOHR, CalcESP
+from .constants import ANGSTROM_TO_BOHR, AU_EFIELD_TO_MV_CM
+from .esp import CalcESP
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .mapping import _validate_mapping
 from .options import XTBOptions
 
-# CODATA 2018 exact atomic unit of electric field in MV/cm (1 a.u. = 5.1422067476326e11 V/m).
-AU_EFIELD_TO_MV_CM = 5142.2067476326
 BOND_EFIELD_PROTOCOL = 'eled-bond-electric-field-v1'
 
 __all__ = [

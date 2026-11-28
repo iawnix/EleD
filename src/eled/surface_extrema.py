@@ -32,7 +32,8 @@ from typing import Any
 import numpy as np
 
 from .backends.native import _run_xtb_native
-from .esp_descriptors import HARTREE_TO_KCAL_MOL, _require_mol, _vdw_radii
+from .constants import HARTREE_TO_KCAL_MOL
+from .esp_descriptors import _require_mol, _vdw_radii
 from .esp_input import _normalize_esp_points
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions

@@ -10,6 +10,7 @@ import numpy as np
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem
 
+from .constants import HARTREE_TO_KCAL_MOL
 from .input import _geometry_hash, _ordered_structure_hash, _xyz_from_mol
 
 _METHODS = {n.lower(): n for n in ('ETKDG', 'ETKDGv2', 'ETKDGv3', 'ETKDGv4', 'srETKDGv3', 'KDG')}
@@ -298,7 +299,7 @@ def PrepareConformers(
                         record.update(
                             optimization_status=status,
                             energy_hartree=float(energy),
-                            energy_kcal_mol=float(energy * 627.5094740631),
+                            energy_kcal_mol=float(energy * HARTREE_TO_KCAL_MOL),
                             xtb_optimization=optimized.report,
                         )
                         if not optimized.success:

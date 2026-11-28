@@ -32,7 +32,7 @@ from .calculator import _calculate
 from .electronic_descriptors import (
     _as_result,
     _has_population_basis,
-    _orbital_basis_arrays,
+    _orbital_basis,
     _orbitals,
 )
 from .input import _effective_charge_uhf, _xyz_from_mol
@@ -120,24 +120,10 @@ def _fermi_channel(energies_ev: np.ndarray, n_spin: int, temperature_k: float) -
 
 def _ao_orbital_weights(result, scheme: str) -> tuple[np.ndarray, float]:
     """Return [AO, MO] population weights matching Lowdin or Mulliken scheme."""
-    energies, _, _, _ = _orbitals(result)
-    nmo = len(energies)
-    natoms = result.metadata.get('atom_count', len(result.atomicCharges))
-    c, s, _ = _orbital_basis_arrays(result, nmo, natoms)
-    eigvals, eigvecs = np.linalg.eigh(s)
-    if eigvals.min() <= max(1.0, eigvals.max()) * 1e-10:
-        raise ValueError('overlap must be positive definite and well conditioned')
-    metric = c.T @ s @ c
-    ortho_err = float(np.max(np.abs(metric - np.eye(nmo))))
-    if ortho_err > 1e-5 or np.any(np.diag(metric) <= 0):
-        raise ValueError(f'coefficients are not S-orthonormal: error={ortho_err:g}')
-    if scheme == 'lowdin':
-        s_half = (eigvecs * np.sqrt(eigvals)) @ eigvecs.T
-        ao_mo = (s_half @ c) ** 2
-    else:
-        ao_mo = c * (s @ c)
-    ao_mo = ao_mo / np.diag(metric)[None, :]
-    return ao_mo, ortho_err
+    basis = _orbital_basis(result)
+    c, sc = basis.coefficients, basis.overlap @ basis.coefficients
+    ao_mo = (basis.overlap_half @ c) ** 2 if scheme == 'lowdin' else c * sc
+    return ao_mo / np.einsum('ij,ij->j', c, sc)[None, :], basis.orthonormality_error
 
 
 def CalcFODFromResult(
