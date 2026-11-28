@@ -57,7 +57,9 @@ def test_native_results_and_mapping_without_executable(smiles, method, library, 
     assert sum(native.orbitalOccupancies) == pytest.approx(native.numElectrons, abs=1e-7)
     assert np.isfinite(native.orbitalEnergiesEV).all()
     nao = native.numOrbitals
-    assert np.shape(native.orbitalCoefficients) == (nao, nao)
+    assert native.orbitalCoefficients == ()  # retained only with keepOverlap, as in rdXTBTools
+    assert np.shape(calculate_xtb(mol, method=method, xtbLibrary=library, keepOverlap=True)
+                    .orbitalCoefficients) == (nao, nao)
     np.testing.assert_allclose(native.wibergBondOrders, np.array(native.wibergBondOrders).T, atol=1e-10)
     target = AnnotateMol(mol, native)
     for bond in mol.GetBonds():
