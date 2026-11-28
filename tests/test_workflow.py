@@ -49,9 +49,8 @@ def engine(tmp_path, monkeypatch):
 def test_options_are_serializable_and_validate():
     opts = XTBOptions(method='gfn2', xtbLibrary=Path('/test/xtb'))
     assert XTBOptions.FromDict(json.loads(json.dumps(opts.ToDict()))) == opts
-    assert opts.backend == 'native'
-    with pytest.raises(ValueError, match='backend'):
-        XTBOptions(backend='unknown')
+    with pytest.raises(TypeError):
+        XTBOptions(backend='native')
 
 
 def test_mapping_preserves_input_and_bond_types():
@@ -167,7 +166,7 @@ def test_batch_keeps_order_and_retries_failed_calculations(engine):
         RunXTBBatch([b], cache=cache, xtbLibrary=engine)
     assert calculate.call_count == 1
     with pytest.raises(ValueError, match='maxWorkers'):
-        RunXTBBatch([a], backend='native', maxWorkers=0)
+        RunXTBBatch([a], maxWorkers=0)
     with pytest.raises(TypeError):
         RunXTBBatch([a], unsupported_option=True, cache=cache)
 
@@ -184,9 +183,9 @@ def test_removed_backends_fail_before_calculation(backend, monkeypatch):
         pytest.fail('removed backends must not launch a process or load libxtb')
     monkeypatch.setattr(subprocess, 'Popen', forbidden)
     monkeypatch.setattr('eled.xtb._find_xtb_library', forbidden)
-    with pytest.raises(ValueError, match='removed'):
+    with pytest.raises(TypeError):
         calculate_xtb(molecule(), backend=backend)
-    with pytest.raises(ValueError, match='removed'):
+    with pytest.raises(TypeError):
         RunXTBBatch([molecule()], backend=backend)
 
 

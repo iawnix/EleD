@@ -26,7 +26,7 @@ from typing import Any
 
 import numpy as np
 
-from .calculator import XTBCalculator
+from .calculator import _calculate
 from .electronic_descriptors import (
     AU_DIPOLE_TO_DEBYE,
     _as_result,
@@ -35,7 +35,6 @@ from .electronic_descriptors import (
     _indices,
     _wbo,
 )
-from .errors import XTBEnvironmentError, XTBRunError
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions
 from .orbital_descriptors import CalcLinearResponseMatrix, _overlap_basis
@@ -81,33 +80,6 @@ def _extract_submol(mol: Any, conf_id: int, indices: np.ndarray) -> Any:
         conf.SetAtomPosition(new_i, pos)
     sub.AddConformer(conf, assignId=False)
     return sub
-
-
-def _run_single(mol: Any, opts: XTBOptions, interface: str):
-    if interface == 'native':
-        return XTBCalculator(**opts.ToDict()).Calculate(mol)
-    from . import rdXTBTools
-
-    ok, raw = rdXTBTools.RunMol(
-        mol,
-        confId=opts.confId,
-        method=opts.method,
-        charge=opts.charge,
-        numUnpairedElectrons=opts.numUnpairedElectrons,
-        keepOrbitalCoefficients=True,
-        xtbLibrary=opts.xtbLibrary or '',
-        maxIterations=opts.maxIterations,
-        accuracy=opts.accuracy,
-        electronicTemperature=opts.electronicTemperature,
-        keepOverlap=True,
-        solvent=opts.solvent,
-        solvationModel=opts.solvationModel,
-        solvationGrid=opts.solvationGrid,
-    )
-    if not ok:
-        error_type = XTBRunError if raw.failureKind == 'calculation' else XTBEnvironmentError
-        raise error_type(raw.errorMessage)
-    return raw
 
 
 def _delta_opt(c_val: float | None, a_val: float | None, b_val: float | None) -> float | None:
@@ -196,9 +168,9 @@ def CalcFragmentInteraction(
         espPointsAngstrom=(), realSpacePointsAngstrom=(),
     )
 
-    raw_ab = _run_single(snapshot, opts_ab, interface)
-    raw_a = _run_single(mol_a, opts_a, interface)
-    raw_b = _run_single(mol_b, opts_b, interface)
+    raw_ab = _calculate(snapshot, opts_ab, interface)
+    raw_a = _calculate(mol_a, opts_a, interface)
+    raw_b = _calculate(mol_b, opts_b, interface)
 
     res_ab = _as_result(raw_ab)
     res_a = _as_result(raw_a)

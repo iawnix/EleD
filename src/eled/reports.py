@@ -46,7 +46,6 @@ from .properties import (
     CalcMultipoleDescriptors,
     CalcNuclearESP,
     CalcPolarizabilityDescriptors,
-    _as_property_result,
 )
 from .realspace import CalcRealSpaceProperties
 from .result import XTBResults
@@ -328,7 +327,7 @@ def CalcDescriptorReport(
         analysis['mciScheme'] = mciScheme
         analysis['mciRings'] = {str(name): list(indices) for name, indices in mciRings.items()}
     pi_options = _pi_options(piScheme, piPlaneTolAngstrom, analysis['piRef'], natoms=mol.GetNumAtoms())
-    result = _as_property_result(result)
+    result = _as_result(result)
     _validate_mapping(mol, result)
     report = _base_report(recordId, DescriptorColumns(frontierDepth), analysis)
     report['provenance'] = deepcopy(dict(result.metadata))

@@ -22,6 +22,7 @@ from .descriptor_catalog import DescriptorCatalog, DescriptorStatus
 from .dipro import CalcElectronicCoupling, CalcElectronicCouplingFromResults
 from .electronic_descriptors import (
     CalcCM5Charges,
+    CalcXTBDescriptors,
     CalcXTBAtomDescriptors,
     CalcXTBBondDescriptors,
     CalcXTBFragmentDescriptors,
@@ -87,6 +88,7 @@ from .realspace import (
     CalcRealSpaceSurfaceDescriptors,
     CalcRealSpaceTopology,
 )
+from .result import XTBResults
 from .reports import (
     DESCRIPTOR_VERSION,
     AssessDescriptorQuality,
@@ -106,12 +108,10 @@ from .visualization import (
     PlotFragmentSummary,
     RenderFragmentAnalysis,
 )
-from .xtb import CalcXTBDescriptors, XTBResult, XTBResults
 
 __all__ = [
     "XTBError",
     "XTBResults",
-    "XTBResult",
     "XTBRunError",
     "XTBNativeNotFoundError",
     "XTBCacheError",

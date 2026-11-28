@@ -27,9 +27,8 @@ from typing import Any
 
 import numpy as np
 
-from .calculator import XTBCalculator
+from .calculator import _calculate
 from .electronic_descriptors import _as_result
-from .errors import XTBEnvironmentError, XTBRunError
 from .esp import ANGSTROM_TO_BOHR, CalcESP
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .mapping import _validate_mapping
@@ -257,32 +256,7 @@ def CalcBondElectricField(
         numUnpairedElectrons=unpaired,
         espPointsAngstrom=tuple(tuple(map(float, row)) for row in stencil),
     )
-    if interface == 'native':
-        result = XTBCalculator(**selected.ToDict()).Calculate(snapshot)
-    else:
-        from . import rdXTBTools
-
-        ok, raw = rdXTBTools.RunMol(
-            snapshot,
-            confId=selected.confId,
-            method=selected.method,
-            charge=selected.charge,
-            numUnpairedElectrons=selected.numUnpairedElectrons,
-            keepOrbitalCoefficients=selected.keepOverlap,
-            xtbLibrary=selected.xtbLibrary or '',
-            maxIterations=selected.maxIterations,
-            accuracy=selected.accuracy,
-            electronicTemperature=selected.electronicTemperature,
-            keepOverlap=selected.keepOverlap,
-            espPointsAngstrom=stencil if len(stencil) else None,
-            solvent=selected.solvent,
-            solvationModel=selected.solvationModel,
-            solvationGrid=selected.solvationGrid,
-        )
-        if not ok:
-            error_type = XTBRunError if raw.failureKind == 'calculation' else XTBEnvironmentError
-            raise error_type(raw.errorMessage)
-        result = raw
+    result = _calculate(snapshot, selected, interface)
 
     report = CalcBondElectricFieldFromESP(snapshot, result, stepAngstrom=step)
     report['analysis_settings']['interface'] = interface

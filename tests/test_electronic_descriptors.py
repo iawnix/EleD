@@ -25,44 +25,6 @@ def test_missing_population_inputs_raise_descriptor_unavailable(overlap, mapping
         CalcOrbitalPopulations(result)
 
 
-def legacy_compiled_result(metadata):
-    from types import SimpleNamespace
-    result_type = type('XTBResults', (SimpleNamespace,), {'__module__': 'eled.rdXTBTools'})
-    return result_type(
-        success=True, overlapRetained=False, inputProvenanceJSON=json.dumps(metadata),
-        method='GFN2-xTB', initialization='independent', maxIterations=250,
-        accuracy=1., electronicTemperature=300., effectiveElectronicTemperature=300.,
-        libraryPath='test', librarySHA256='test', sourceCommit='test', apiVersion=1,
-        parameterFile=None, totalEnergyHartree=-1., numAtoms=2, numOrbitals=2,
-        numElectrons=2, numUnpairedElectrons=0,
-        GetAtomicCharges=lambda: (0.2, -0.2), GetOrbitalEnergies=lambda: (-1., 1.),
-        GetOrbitalOccupancies=lambda: (2., 0.), GetDipole=lambda: (0., 0., 0.),
-        GetWibergBondOrders=lambda: ((0., 1.), (1., 0.)),
-    )
-
-
-@pytest.mark.parametrize('numbers', [None, (), (1, 17)])
-def test_legacy_compiled_cm5_requires_atomic_numbers(numbers):
-    from eled.electronic_descriptors import _as_result
-    metadata = {'coordinates_angstrom': ((0., 0., 0.), (1.3, 0., 0.)),
-                'atomic_numbers': numbers}
-    result = _as_result(legacy_compiled_result(metadata))
-    assert result.atomicCharges == (0.2, -0.2)
-    if numbers:
-        assert len(result.cm5Charges) == 2
-        assert sum(result.cm5Charges) == pytest.approx(0.)
-    else:
-        assert result.cm5Charges == ()
-
-
-def test_legacy_compiled_cm5_rejects_inconsistent_atom_counts():
-    from eled.electronic_descriptors import _as_result
-    result = legacy_compiled_result({'atomic_numbers': (1, 17),
-                                     'coordinates_angstrom': ((0., 0., 0.),)})
-    with pytest.raises(ValueError, match='matching atom counts'):
-        _as_result(result)
-
-
 @pytest.fixture
 def simple():
     mol = Chem.AddHs(Chem.MolFromSmiles('O'))

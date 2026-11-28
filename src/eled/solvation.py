@@ -24,17 +24,9 @@ def CalcSolvationDescriptors(
     mol: Any,
     solvent: str,
     *,
-    confId: int = -1,
-    method: str = 'GFN2-xTB',
     solvationModel: str = 'alpb',
     solvationGrid: int | None = None,
-    charge: int | None = None,
-    numUnpairedElectrons: int | None = None,
     options: XTBOptions | None = None,
-    xtbLibrary: Any = None,
-    maxIterations: int = 250,
-    accuracy: float = 1.0,
-    electronicTemperature: float = 300.0,
 ) -> dict[str, Any]:
     """Compute matched gas-phase vs implicit-solvation descriptors at fixed geometry.
 
@@ -49,36 +41,20 @@ def CalcSolvationDescriptors(
     solvationGrid : int | None
         Optional Lebedev angular grid size (default ``None`` -> xTB default ``230``).
     options : XTBOptions | None
-        Optional base calculation options; ``solvent``, ``solvationModel``, and
-        ``solvationGrid`` override any solvation fields on ``options``.
+        Single-point settings shared by both calculations (default
+        ``XTBOptions()``); its solvation fields are replaced by the gas phase
+        and by ``solvent``/``solvationModel``/``solvationGrid``.
     """
     if solvent is None:
         raise ValueError('solvent must be a nonempty solvent name string')
     solv_name, solv_model, solv_grid = _validate_solvation_settings(
         solvent, solvationModel, solvationGrid
     )
-    if options is not None:
-        if not isinstance(options, XTBOptions):
-            raise TypeError('options must be an XTBOptions instance or None')
-        gas_opts = replace(options, solvent=None, solvationModel='alpb', solvationGrid=None)
-        solv_opts = replace(
-            options, solvent=solv_name, solvationModel=solv_model, solvationGrid=solv_grid
-        )
-    else:
-        gas_opts = XTBOptions(
-            confId=confId,
-            method=method,
-            charge=charge,
-            numUnpairedElectrons=numUnpairedElectrons,
-            xtbLibrary=xtbLibrary,
-            maxIterations=maxIterations,
-            accuracy=accuracy,
-            electronicTemperature=electronicTemperature,
-            solvent=None,
-        )
-        solv_opts = replace(
-            gas_opts, solvent=solv_name, solvationModel=solv_model, solvationGrid=solv_grid
-        )
+    if options is not None and not isinstance(options, XTBOptions):
+        raise TypeError('options must be an XTBOptions instance or None')
+    base = options or XTBOptions()
+    gas_opts = replace(base, solvent=None, solvationModel='alpb', solvationGrid=None)
+    solv_opts = replace(base, solvent=solv_name, solvationModel=solv_model, solvationGrid=solv_grid)
 
     gas_res = XTBCalculator(**gas_opts.ToDict()).Calculate(mol)
     solv_res = XTBCalculator(**solv_opts.ToDict()).Calculate(mol)

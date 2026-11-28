@@ -15,9 +15,7 @@ from typing import Any
 import numpy as np
 
 from .electronic_descriptors import AU_DIPOLE_TO_DEBYE, _as_result
-from .errors import DescriptorUnavailableError
 from .mapping import _validate_mapping
-from .result import XTBResults
 
 BOHR_TO_ANGSTROM = 0.529177210903
 BOHR3_TO_ANGSTROM3 = BOHR_TO_ANGSTROM ** 3
@@ -25,100 +23,6 @@ HARTREE_TO_KCAL_MOL = 627.5094740631
 HARTREE_TO_EV = 27.211386245988
 
 _QUADRUPOLE_COMPONENTS = ('xx', 'xy', 'yy', 'xz', 'yz', 'zz')
-
-
-def _is_compiled_result(result: Any) -> bool:
-    return (
-        type(result).__module__ == 'eled.rdXTBTools'
-        and type(result).__name__ == 'XTBResults'
-    )
-
-
-def _as_property_result(result: Any) -> XTBResults:
-    """Normalize native or compiled XTBResults while preserving extended properties."""
-    if isinstance(result, XTBResults):
-        if not result.success:
-            detail = result.metadata.get('error_message', 'calculation failed')
-            raise ValueError(f'calculation failed: {detail}')
-        return result
-    base = _as_result(result)
-    if not _is_compiled_result(result):
-        return base
-
-    # Copy extended property fields directly from compiled rdXTBTools.XTBResults.
-    extra: dict[str, Any] = {}
-    for attr in (
-        'solvent',
-        'solvationModel',
-        'solvationGrid',
-        'electronicEnergyHartree',
-        'repulsionEnergyHartree',
-        'electrostaticEnergyHartree',
-        'anisotropicElectrostaticEnergyHartree',
-        'anisotropicXCEnergyHartree',
-        'dispersionEnergyHartree',
-        'halogenBondEnergyHartree',
-        'solvationEnergyHartree',
-        'solvationBornEnergyHartree',
-        'solvationSASAEnergyHartree',
-        'solvationHBEnergyHartree',
-        'solvationShiftEnergyHartree',
-        'fermiLevelAlphaHartree',
-        'fermiLevelBetaHartree',
-        'fermiLevelAlphaEV',
-        'fermiLevelBetaEV',
-        'molecularPolarizabilityAU',
-        'molecularC6AU',
-        'molecularC8AU',
-    ):
-        if hasattr(result, attr):
-            extra[attr] = getattr(result, attr)
-
-    if getattr(result, 'energyDecompositionAvailable', False):
-        flags = 1
-        if extra.get('electronicEnergyHartree') is not None:
-            flags |= 2
-        if extra.get('repulsionEnergyHartree') is not None:
-            flags |= 4
-        if extra.get('electrostaticEnergyHartree') is not None:
-            flags |= 8
-        if extra.get('anisotropicElectrostaticEnergyHartree') is not None:
-            flags |= 16
-        if extra.get('anisotropicXCEnergyHartree') is not None:
-            flags |= 32
-        if extra.get('dispersionEnergyHartree') is not None:
-            flags |= 64
-        if extra.get('halogenBondEnergyHartree') is not None:
-            flags |= 128
-        if extra.get('solvationEnergyHartree') is not None:
-            flags |= 256
-        if extra.get('fermiLevelAlphaHartree') is not None:
-            flags |= 512
-        if extra.get('solvationBornEnergyHartree') is not None:
-            flags |= 1024
-        extra['energyDecompositionFlags'] = flags
-
-    if getattr(result, 'polarizabilityAvailable', False):
-        extra['atomicPolarizabilitiesAU'] = tuple(map(float, result.GetAtomicPolarizabilities()))
-        extra['atomicC6AU'] = tuple(map(float, result.GetAtomicC6()))
-    if getattr(result, 'multipolesAvailable', False):
-        extra['atomicDipolesAU'] = tuple(map(tuple, result.GetAtomicDipoles()))
-        extra['atomicQuadrupolesAU'] = tuple(map(tuple, result.GetAtomicQuadrupoles()))
-        extra['molecularQuadrupoleAU'] = tuple(map(float, result.GetMolecularQuadrupole()))
-    if getattr(result, 'nuclearESPAvailable', False):
-        extra['nuclearESPAU'] = tuple(map(float, result.GetNuclearESP()))
-
-    from dataclasses import replace
-    metadata = dict(base.metadata)
-    if extra.get('solvent') is not None:
-        metadata['solvent'] = {
-            'solvent': extra['solvent'],
-            'model': extra.get('solvationModel'),
-            'grid': extra.get('solvationGrid'),
-        }
-    if getattr(result, 'propertiesExportVerified', False):
-        metadata['properties_api'] = 1
-    return replace(base, metadata=metadata, **extra)
 
 
 def _unpack_symmetric_3x3(packed: np.ndarray) -> np.ndarray:
@@ -156,7 +60,7 @@ def CalcEnergyDecomposition(result: Any) -> dict[str, Any]:
     ``electronicTemperature <= 0.1 K``) are returned as ``None`` with explicit
     entries in ``missing``.
     """
-    res = _as_property_result(result)
+    res = _as_result(result)
     method = res.method
     missing: dict[str, str] = {}
     available = res.energyDecompositionAvailable
@@ -250,7 +154,7 @@ def CalcMultipoleDescriptors(result: Any, *, mol: Any = None) -> dict[str, Any]:
     and returns ``available=False`` with ``None`` fields and explicit ``missing``
     reasons.
     """
-    res = _as_property_result(result)
+    res = _as_result(result)
     if mol is not None:
         _validate_mapping(mol, res)
 
@@ -382,7 +286,7 @@ def CalcNuclearESP(result: Any, *, mol: Any = None) -> dict[str, Any]:
     each nuclear position in original RDKit atom order, omitting the singular
     self-nuclear term ``Z_A / |r - R_A|``.
     """
-    res = _as_property_result(result)
+    res = _as_result(result)
     if mol is not None:
         _validate_mapping(mol, res)
 
@@ -474,7 +378,7 @@ def CalcPolarizabilityDescriptors(result: Any, *, mol: Any = None) -> dict[str, 
     returns ``available=False`` with ``None`` fields and explicit ``missing``
     reasons.
     """
-    res = _as_property_result(result)
+    res = _as_result(result)
     if mol is not None:
         _validate_mapping(mol, res)
 

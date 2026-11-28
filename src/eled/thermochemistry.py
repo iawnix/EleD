@@ -133,25 +133,14 @@ def _external_mode_basis(coords_bohr: np.ndarray, masses_amu: np.ndarray) -> tup
 def CalcVibrationalThermochemistry(
     mol: Any,
     *,
-    confId: int = -1,
     options: XTBOptions | None = None,
     temperatureK: float = 298.15,
     pressureAtm: float = 1.0,
-    method: str = 'GFN2-xTB',
     stepBohr: float = 0.005,
     imaginaryThresholdCm1: float = 10.0,
     stationaryGradientThresholdHaBohr: float = 1.0e-3,
     rotorCutoffCm1: float = 100.0,
     symmetryNumber: int = 1,
-    charge: int | None = None,
-    numUnpairedElectrons: int | None = None,
-    xtbLibrary: Any = None,
-    solvent: str | None = None,
-    solvationModel: str = 'alpb',
-    solvationGrid: int | None = None,
-    maxIterations: int = 250,
-    accuracy: float = 1.0,
-    electronicTemperature: float = 300.0,
     includeHessian: bool = False,
 ) -> dict[str, Any]:
     """Compute harmonic vibrational frequencies and RRHO/qRRHO thermochemistry.
@@ -162,11 +151,8 @@ def CalcVibrationalThermochemistry(
     modes below ``-imaginaryThresholdCm1``) are explicitly flagged via
     ``is_stationary_point`` and ``warnings``.
 
-    When ``options`` (an ``XTBOptions`` instance) is provided, it takes
-    precedence over individual single-point calculation keyword arguments
-    (``confId``, ``method``, ``charge``, ``numUnpairedElectrons``,
-    ``xtbLibrary``, ``solvent``, ``solvationModel``, ``solvationGrid``,
-    ``maxIterations``, ``accuracy``, ``electronicTemperature``).
+    All single-point settings (conformer, method, charge, spin, library,
+    solvation and SCF settings) come from ``options`` (default ``XTBOptions()``).
     """
     from rdkit import Chem
 
@@ -180,24 +166,9 @@ def CalcVibrationalThermochemistry(
     sthr = _positive_real(rotorCutoffCm1, 'rotorCutoffCm1', allow_zero=True)
     sigma = _positive_int(symmetryNumber, 'symmetryNumber')
 
-    if options is not None:
-        if not isinstance(options, XTBOptions):
-            raise TypeError('options must be an XTBOptions instance or None')
-        opts = options
-    else:
-        opts = XTBOptions(
-            confId=confId,
-            method=method,
-            charge=charge,
-            numUnpairedElectrons=numUnpairedElectrons,
-            xtbLibrary=xtbLibrary,
-            maxIterations=maxIterations,
-            accuracy=accuracy,
-            electronicTemperature=electronicTemperature,
-            solvent=solvent,
-            solvationModel=solvationModel,
-            solvationGrid=solvationGrid,
-        )
+    if options is not None and not isinstance(options, XTBOptions):
+        raise TypeError('options must be an XTBOptions instance or None')
+    opts = options or XTBOptions()
 
     working = Chem.Mol(mol)
     _xyz_from_mol(working, opts.confId)
@@ -216,7 +187,6 @@ def CalcVibrationalThermochemistry(
         solvent=resolved.solvent,
         solvationModel=resolved.solvationModel,
         solvationGrid=resolved.solvationGrid,
-        _return_gradient=True,
     )
 
     eq_res = _run_xtb_native(working, **run_kwargs)

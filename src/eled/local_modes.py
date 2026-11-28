@@ -271,46 +271,20 @@ def CalcLocalBondForceConstantsFromHessian(
 def CalcLocalBondForceConstants(
     mol: Any,
     *,
-    confId: int = -1,
     extraPairs: Any = (),
     stepBohr: float = 0.005,
     eigenvalueTolerance: float = 1e-6,
     stationaryGradientThresholdHaBohr: float = 1e-3,
     imaginaryThresholdCm1: float = 10.0,
     options: XTBOptions | None = None,
-    method: str = 'GFN2-xTB',
-    charge: int | None = None,
-    numUnpairedElectrons: int | None = None,
-    xtbLibrary: Any = None,
-    solvent: str | None = None,
-    solvationModel: str = 'alpb',
-    solvationGrid: int | None = None,
-    maxIterations: int = 250,
-    accuracy: float = 1.0,
-    electronicTemperature: float = 300.0,
 ) -> dict[str, Any]:
     """Compute Cremer-Kraka local bond force constants & compliance constants via native xTB Hessian."""
     from rdkit import Chem
 
     step = _positive_real(stepBohr, 'stepBohr')
-    if options is not None:
-        if not isinstance(options, XTBOptions):
-            raise TypeError('options must be an XTBOptions instance or None')
-        opts = options
-    else:
-        opts = XTBOptions(
-            confId=confId,
-            method=method,
-            charge=charge,
-            numUnpairedElectrons=numUnpairedElectrons,
-            xtbLibrary=xtbLibrary,
-            maxIterations=maxIterations,
-            accuracy=accuracy,
-            electronicTemperature=electronicTemperature,
-            solvent=solvent,
-            solvationModel=solvationModel,
-            solvationGrid=solvationGrid,
-        )
+    if options is not None and not isinstance(options, XTBOptions):
+        raise TypeError('options must be an XTBOptions instance or None')
+    opts = options or XTBOptions()
 
     working = Chem.Mol(mol)
     _xyz_from_mol(working, opts.confId)
@@ -331,7 +305,6 @@ def CalcLocalBondForceConstants(
         solvent=resolved.solvent,
         solvationModel=resolved.solvationModel,
         solvationGrid=resolved.solvationGrid,
-        _return_gradient=True,
     )
 
     eq_res = _run_xtb_native(working, **run_kwargs)

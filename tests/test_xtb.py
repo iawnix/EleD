@@ -2,7 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from eled.xtb import _frontier_energies
+from eled.result import _frontier_energies
 
 
 class AdapterTests(unittest.TestCase):

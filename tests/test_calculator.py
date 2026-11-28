@@ -6,8 +6,8 @@ from eled import XTBCalculator, XTBResults
 
 def test_calculator_owns_validated_options_and_repr():
     calculator = XTBCalculator(method='gfn1', electronicTemperature=300.)
-    assert calculator.options.method == 'GFN1-xTB'
-    assert calculator.GetOptions() == calculator.options
+    assert calculator.GetOptions().method == 'GFN1-xTB'
+    assert not hasattr(calculator, 'options') and not callable(calculator)
     assert 'GFN1-xTB' in repr(calculator)
 
 
@@ -32,7 +32,7 @@ def test_calculator_forwards_rdkit_result_and_per_call_overrides(monkeypatch):
     assert captured['options']['confId'] == 2
     assert captured['options']['keepOverlap'] is True
     assert captured['options']['electronicTemperature'] == 300.
-    assert calculator(molecule, confId=5) is expected
+    assert calculator.Calculate(molecule, confId=5) is expected
     assert captured['options']['confId'] == 5
 
 

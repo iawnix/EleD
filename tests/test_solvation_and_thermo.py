@@ -77,6 +77,11 @@ def test_solvation_and_thermo_input_guards():
         CalcSolvationDescriptors(mol, 'water', solvationModel='smd')
     with pytest.raises(TypeError, match='XTBOptions'):
         CalcSolvationDescriptors(mol, 'water', options={'method': 'GFN2-xTB'})
+    for loose in ({'method': 'GFN2-xTB'}, {'xtbLibrary': None}, {'confId': 0}):
+        with pytest.raises(TypeError):
+            CalcSolvationDescriptors(mol, 'water', **loose)
+        with pytest.raises(TypeError):
+            CalcVibrationalThermochemistry(mol, **loose)
 
     for bad in (
         {'temperatureK': 0.0},
@@ -147,7 +152,7 @@ def test_calc_solvation_descriptors_physics_permutation_and_error_recovery(libra
     mol = _make_mol('O', seed=17)
     original_bin = mol.ToBinary()
 
-    desc_water = CalcSolvationDescriptors(mol, 'water', solvationModel='alpb', xtbLibrary=library)
+    desc_water = CalcSolvationDescriptors(mol, 'water', solvationModel='alpb', options=XTBOptions(xtbLibrary=library))
     assert mol.ToBinary() == original_bin
     assert desc_water['solvent'] == 'water'
     assert desc_water['solvation_model'] == 'alpb'
@@ -165,7 +170,7 @@ def test_calc_solvation_descriptors_physics_permutation_and_error_recovery(libra
     # Atom-permutation invariance
     perm = [2, 0, 1]
     reordered = Chem.RenumberAtoms(mol, perm)
-    desc_perm = CalcSolvationDescriptors(reordered, 'water', solvationModel='alpb', xtbLibrary=library)
+    desc_perm = CalcSolvationDescriptors(reordered, 'water', solvationModel='alpb', options=XTBOptions(xtbLibrary=library))
     assert desc_perm['delta_g_solv_ha'] == pytest.approx(desc_water['delta_g_solv_ha'], abs=1e-8)
     for new_idx, old_idx in enumerate(perm):
         assert desc_perm['atoms'][new_idx]['solv_delta_q_e'] == pytest.approx(
@@ -173,7 +178,7 @@ def test_calc_solvation_descriptors_physics_permutation_and_error_recovery(libra
         )
 
     # GFN0 solvation: CM5 shifts must be None with explicit missing reasons
-    desc_gfn0 = CalcSolvationDescriptors(mol, 'water', method='GFN0-xTB', solvationModel='alpb', xtbLibrary=library)
+    desc_gfn0 = CalcSolvationDescriptors(mol, 'water', solvationModel='alpb', options=XTBOptions(method='GFN0-xTB', xtbLibrary=library))
     assert desc_gfn0['atoms'][0]['cm5_q_gas_e'] is None
     assert desc_gfn0['atoms'][0]['missing']['solv_delta_cm5_q_e'] == 'cm5_undefined_for_gfn0_eeq'
     assert desc_gfn0['missing']['cm5_charges'] == 'cm5_undefined_for_gfn0_eeq'
@@ -198,7 +203,7 @@ def test_vibrational_thermochemistry_optimized_water_and_invariance(library):
     original_bin = opt_mol.ToBinary()
 
     thermo = CalcVibrationalThermochemistry(
-        opt_mol, method='GFN2-xTB', temperatureK=298.15, pressureAtm=1.0, symmetryNumber=2, xtbLibrary=library
+        opt_mol, temperatureK=298.15, pressureAtm=1.0, symmetryNumber=2, options=XTBOptions(xtbLibrary=library)
     )
     assert opt_mol.ToBinary() == original_bin
     assert thermo['is_stationary_point'] is True
@@ -230,7 +235,7 @@ def test_vibrational_thermochemistry_optimized_water_and_invariance(library):
 
     # Pure RRHO mode
     thermo_rrho = CalcVibrationalThermochemistry(
-        opt_mol, method='GFN2-xTB', rotorCutoffCm1=0.0, symmetryNumber=2, xtbLibrary=library
+        opt_mol, rotorCutoffCm1=0.0, symmetryNumber=2, options=XTBOptions(xtbLibrary=library)
     )
     assert thermo_rrho['thermo_model'] == 'rrho'
     assert thermo_rrho['zpe_ha'] == pytest.approx(thermo['zpe_ha'], abs=1e-12)
@@ -238,7 +243,7 @@ def test_vibrational_thermochemistry_optimized_water_and_invariance(library):
     # Rigid motion + atom permutation invariance
     moved = _rotate_translate_permute(opt_mol, [2, 0, 1])
     thermo_moved = CalcVibrationalThermochemistry(
-        moved, method='GFN2-xTB', temperatureK=298.15, pressureAtm=1.0, symmetryNumber=2, xtbLibrary=library
+        moved, temperatureK=298.15, pressureAtm=1.0, symmetryNumber=2, options=XTBOptions(xtbLibrary=library)
     )
     np.testing.assert_allclose(thermo_moved['frequencies_cm1'], thermo['frequencies_cm1'], atol=0.5)
     assert thermo_moved['zpe_ha'] == pytest.approx(thermo['zpe_ha'], abs=1e-6)
@@ -258,7 +263,7 @@ def test_vibrational_thermochemistry_linear_atom_and_nonstationary_flags(library
     co2.AddConformer(conf, assignId=True)
     opt_co2 = OptimizeXTB(co2, method='GFN2-xTB', gradientTolerance=1e-5, xtbLibrary=library)
     assert opt_co2.success
-    th_co2 = CalcVibrationalThermochemistry(opt_co2.GetMolecule(), symmetryNumber=2, xtbLibrary=library)
+    th_co2 = CalcVibrationalThermochemistry(opt_co2.GetMolecule(), symmetryNumber=2, options=XTBOptions(xtbLibrary=library))
     assert th_co2['is_linear'] is True
     assert th_co2['n_vibrational_modes'] == 4  # 3N - 5
     assert len(th_co2['rotational_constants_cm1']) == 1
@@ -271,7 +276,7 @@ def test_vibrational_thermochemistry_linear_atom_and_nonstationary_flags(library
     ar_conf.Set3D(True)
     ar_conf.SetAtomPosition(0, (0.0, 0.0, 0.0))
     ar.AddConformer(ar_conf, assignId=True)
-    th_ar = CalcVibrationalThermochemistry(ar, xtbLibrary=library)
+    th_ar = CalcVibrationalThermochemistry(ar, options=XTBOptions(xtbLibrary=library))
     assert th_ar['is_atom'] is True
     assert th_ar['n_vibrational_modes'] == 0
     assert th_ar['zpe_ha'] == 0.0
@@ -286,7 +291,7 @@ def test_vibrational_thermochemistry_linear_atom_and_nonstationary_flags(library
     dconf.SetAtomPosition(0, (0.0, 0.0, 0.0))
     dconf.SetAtomPosition(1, (1.10, 0.0, 0.0))
     dconf.SetAtomPosition(2, (-1.10, 0.0, 0.0))
-    th_bad = CalcVibrationalThermochemistry(distorted, xtbLibrary=library)
+    th_bad = CalcVibrationalThermochemistry(distorted, options=XTBOptions(xtbLibrary=library))
     assert th_bad['is_stationary_point'] is False
     assert 'non_stationary_geometry_large_gradient' in th_bad['warnings']
     assert th_bad['max_atom_gradient_ha_bohr'] > 1e-3

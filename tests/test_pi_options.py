@@ -64,7 +64,7 @@ def test_conformer_pi_statistics_and_settings_agree_with_direct_analysis(monkeyp
     mol.AddConformer(second, assignId=False)
     monkeypatch.setattr('eled.batch._resolve_options', lambda options: options)
     def calculate(self, snapshot):
-        conf_id = self.options.confId
+        conf_id = self.GetOptions().confId
         return replace(result, metadata={**result.metadata,
             **_input_metadata(snapshot, conf_id, 0, 0, _xyz_from_mol(snapshot, conf_id))})
     monkeypatch.setattr('eled.conformers.XTBCalculator.Calculate', calculate)

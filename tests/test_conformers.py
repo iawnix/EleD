@@ -25,7 +25,7 @@ def synthetic(monkeypatch):
         mol.AddConformer(conf, assignId=False)
     monkeypatch.setattr('eled.batch._resolve_options', lambda options: options)
     def calculate(self, molecule, **kwargs):
-        identifier = kwargs.get('confId', self.options.confId)
+        identifier = kwargs.get('confId', self.GetOptions().confId)
         h = {3: -3., 8: -2., 12: -1.}[identifier]
         metadata = _input_metadata(molecule, identifier, 0, 0, _xyz_from_mol(molecule, identifier))
         metadata.update(calculation_settings=_validate_calculation_settings(), calculation_status='success',
@@ -74,7 +74,7 @@ def test_boltzmann_statistics_are_separate_and_energy_weighted(synthetic):
 def test_failure_counts_and_fatal_errors(synthetic, monkeypatch):
     mol, calculate = synthetic
     def fail_middle(self, mol, **kwargs):
-        if kwargs.get('confId', self.options.confId) == 8: raise XTBRunError('SCF failed')
+        if kwargs.get('confId', self.GetOptions().confId) == 8: raise XTBRunError('SCF failed')
         return calculate(self, mol, **kwargs)
     monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', fail_middle)
     report = RunConformerAnalysis(mol, columns=['xtb_homo_ev'])
@@ -117,7 +117,7 @@ def test_mixed_or_wrong_provenance_is_rejected(synthetic, monkeypatch, field, va
     mol, calculate = synthetic
     def mixed(self, mol, **kwargs):
         r = calculate(self, mol, **kwargs)
-        identifier = kwargs.get('confId', self.options.confId)
+        identifier = kwargs.get('confId', self.GetOptions().confId)
         return replace(r, metadata={**r.metadata, field: value}) if identifier == 8 else r
     monkeypatch.setattr(conformers.XTBCalculator, 'Calculate', mixed)
     with pytest.raises(ValueError, match='provenance|protocol'): RunConformerAnalysis(mol)

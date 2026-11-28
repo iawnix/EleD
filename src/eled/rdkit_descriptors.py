@@ -29,7 +29,7 @@ _REGISTRY_LOCK = RLock()
 
 def _numeric_descriptor_names(frontierDepth: int, method: str) -> tuple[str, ...]:
     template = CalcXTBDescriptors(XTBResults(method), frontierDepth=frontierDepth)
-    excluded = {'xtb_method', 'xtb_backend', 'xtb_version'}
+    excluded = {'xtb_method'}
     names = [name for name in template if name not in excluded]
     if method in ('GFN1-xTB', 'GFN2-xTB'):
         for label in ('sum', 'min', 'max', 'mean', 'sd', 'abs'):

@@ -650,7 +650,6 @@ def CalcDensityIsosurface(
         return out
 
     opts_dict = selected.ToDict()
-    opts_dict.pop('backend', None)
     result = _run_xtb_native(
         snapshot,
         **opts_dict,
@@ -830,7 +829,6 @@ def CalcRealSpaceTopology(
         return {}
 
     opts_dict = selected.ToDict()
-    opts_dict.pop('backend', None)
     result = _run_xtb_native(snapshot, **opts_dict, _post_singlepoint_hook=_hook)
 
     rho = captured['density']
@@ -1051,7 +1049,6 @@ def CalcBondDensityTopology(
         return {}
 
     opts_dict = selected.ToDict()
-    opts_dict.pop('backend', None)
     result = _run_xtb_native(snapshot, **opts_dict, _post_singlepoint_hook=_hook)
 
     rows = []
@@ -1273,7 +1270,6 @@ def CalcNCIDescriptors(
         return {}
 
     opts_dict = selected.ToDict()
-    opts_dict.pop('backend', None)
     result = _run_xtb_native(snapshot, **opts_dict, _post_singlepoint_hook=_hook)
 
     if acc['nci_rho']:

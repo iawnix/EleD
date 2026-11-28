@@ -52,7 +52,7 @@ def test_numerical_agreement_units_and_mapping(method, smiles, library):
     ok, result = rdXTBTools.RunMol(mol, confId=7, method=method, xtbLibrary=library,
                                  keepOrbitalCoefficients=True)
     assert ok and result.success and result.errorMessage == ''
-    native = calculate_xtb(mol, confId=7, method=method, backend='native', xtbLibrary=library)
+    native = calculate_xtb(mol, confId=7, method=method, xtbLibrary=library, keepOverlap=True)
     assert result.totalEnergyHartree == pytest.approx(native.totalEnergyHartree, abs=1e-10)
     np.testing.assert_allclose(result.GetOrbitalEnergies(), native.orbitalEnergiesEV, atol=2e-5, rtol=0)
     np.testing.assert_allclose(result.GetOrbitalOccupancies(), native.orbitalOccupancies, atol=2e-5, rtol=0)
@@ -121,7 +121,7 @@ def test_cm5_agrees_across_backends_and_atom_permutations(library, method):
     for candidate in (mol, permuted):
         ok, compiled = rdXTBTools.RunMol(candidate, method=method, xtbLibrary=library)
         assert ok
-        native = calculate_xtb(candidate, method=method, backend='native', xtbLibrary=library)
+        native = calculate_xtb(candidate, method=method, xtbLibrary=library)
         np.testing.assert_allclose(compiled.GetCM5Charges(), native.cm5Charges, atol=2e-5, rtol=0)
         np.testing.assert_allclose(compiled.GetCM5Charges(), native.GetCM5Charges(), atol=2e-5, rtol=0)
         assert sum(native.cm5Charges) == pytest.approx(0., abs=1e-7)
@@ -221,7 +221,7 @@ def test_mixed_threads_share_lock_and_preserve_method_state(library):
         def calculate(index):
             method = methods[index]
             if index % 2:
-                return calculate_xtb(mol, method=method, backend='native', xtbLibrary=library).totalEnergyHartree
+                return calculate_xtb(mol, method=method, xtbLibrary=library).totalEnergyHartree
             ok, result = rdXTBTools.RunMol(mol, method=method, xtbLibrary=library)
             assert ok
             return result.totalEnergyHartree
@@ -277,7 +277,6 @@ def test_common_descriptors_accept_compiled_results(library):
     native = calculate_xtb(mol, xtbLibrary=library)
     a, b = CalcXTBDescriptors(compiled), CalcXTBDescriptors(native)
     for key in a:
-        if key in ('xtb_backend', 'xtb_version'): continue
         if a[key] is None or isinstance(a[key], str): assert a[key] == b[key]
         else: assert a[key] == pytest.approx(b[key], abs=1e-8)
     assert len(CalcXTBAtomDescriptors(compiled)) == mol.GetNumAtoms()

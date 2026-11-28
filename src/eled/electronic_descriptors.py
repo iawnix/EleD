@@ -11,15 +11,48 @@ from numbers import Integral
 
 import numpy as np
 
-from .charges import CHARGE_MODEL_SCC, _calc_cm5_charges, _charge_model_for_method
+from .charges import CHARGE_MODEL_SCC, _charge_model_for_method
 from .errors import DescriptorUnavailableError
 from .result import XTBResults, _aufbau_occupied_count
 
 AU_DIPOLE_TO_DEBYE = 2.541746473
 
 
+_COMPILED_SCALAR_PROPERTIES = (
+    'energyDecompositionFlags',
+    'electronicEnergyHartree',
+    'repulsionEnergyHartree',
+    'electrostaticEnergyHartree',
+    'anisotropicElectrostaticEnergyHartree',
+    'anisotropicXCEnergyHartree',
+    'dispersionEnergyHartree',
+    'halogenBondEnergyHartree',
+    'solvationEnergyHartree',
+    'solvationBornEnergyHartree',
+    'solvationSASAEnergyHartree',
+    'solvationHBEnergyHartree',
+    'solvationShiftEnergyHartree',
+    'fermiLevelAlphaHartree',
+    'fermiLevelBetaHartree',
+    'fermiLevelAlphaEV',
+    'fermiLevelBetaEV',
+    'molecularPolarizabilityAU',
+    'molecularC6AU',
+    'molecularC8AU',
+    'solvent',
+    'solvationModel',
+    'solvationGrid',
+)
+
+
 def _as_result(result) -> XTBResults:
-    """Copy numeric fields from a compiled result; never fabricate provenance."""
+    """Return a successful :class:`XTBResults`, converting a compiled result.
+
+    This is the single normalization point for both interfaces: a compiled
+    ``rdXTBTools.XTBResults`` is copied field by field (including the extended
+    properties) into the same model and provenance layout that the native
+    ctypes backend produces. Nothing is reconstructed or inferred.
+    """
     if isinstance(result, XTBResults):
         if not result.success:
             detail = result.metadata.get('error_message', 'calculation failed')
@@ -35,12 +68,15 @@ def _as_result(result) -> XTBResults:
         raise TypeError('expected XTBResults or rdXTBTools.XTBResults')
     if not result.success:
         raise ValueError(f'calculation failed: {result.errorMessage}')
-    basis = {}
+    from .result import _frontier_energies
+    from .runtime import _engine_identity, _native_realspace_api_version
+    from .scf import scf_record
+    fields = {}
     if result.overlapRetained:
         from .basis import _native_p_directions
         ao_shells = tuple(map(int, result.GetAOShellMap()))
         shell_l = tuple(map(int, result.GetShellAngularMomenta()))
-        basis = dict(
+        fields.update(
             overlapMatrix=tuple(map(tuple, result.GetOverlapMatrix())),
             orbitalCoefficients=tuple(map(tuple, result.GetOrbitalCoefficients())),
             aoAtomMap=tuple(map(int, result.GetAOAtomMap())),
@@ -49,69 +85,39 @@ def _as_result(result) -> XTBResults:
             shellAngularMomenta=shell_l,
             aoPDirections=_native_p_directions(ao_shells, shell_l),
         )
-    metadata = (
-        json.loads(result.inputProvenanceJSON)
-        if result.inputProvenanceJSON
-        else {'atom_count': result.numAtoms}
-    )
-    metadata = dict(metadata)
-    charge_model = getattr(result, 'chargeModel', None) or metadata.get(
-        'charge_model', _charge_model_for_method(result.method)
-    )
-    from .scf import scf_record
-    metadata['scf'] = scf_record(
-        result.method,
-        getattr(result, 'scfIterations', -1),
-        [
-            getattr(result, name, -1.0)
-            for name in (
-                'scfEnergyChangeHartree',
-                'scfMixerRMS',
-                'scfEnergyThresholdHartree',
-                'scfMixerThreshold',
-            )
-        ],
-    )
+    metadata = dict(json.loads(result.inputProvenanceJSON))
+    engine = _engine_identity('native', result.libraryPath)
+    engine.update(source_commit=result.sourceCommit, api_version=result.apiVersion)
     metadata.update(
         calculation_status='success',
+        interface='compiled',
         initialization=result.initialization,
+        scf=scf_record(
+            result.method,
+            result.scfIterations,
+            [result.scfEnergyChangeHartree, result.scfMixerRMS,
+             result.scfEnergyThresholdHartree, result.scfMixerThreshold],
+        ),
         calculation_settings={
             'max_iterations': result.maxIterations,
             'accuracy': result.accuracy,
             'electronic_temperature': result.electronicTemperature,
             'effective_electronic_temperature': result.effectiveElectronicTemperature,
         },
-        engine={
-            'backend': 'compiled',
-            'path': result.libraryPath,
-            'sha256': result.librarySHA256,
-            'source_commit': result.sourceCommit,
-            'api_version': result.apiVersion,
-        },
+        engine=engine,
         parameter_file=(
             {'path': result.parameterFile, 'sha256': result.parameterSHA256}
             if result.parameterFile
             else None
         ),
+        solvent=(
+            {'solvent': result.solvent, 'model': result.solvationModel, 'grid': result.solvationGrid}
+            if result.solvent is not None
+            else None
+        ),
     )
-    metadata['charge_model'] = charge_model
-    grad_rows = ()
-    if hasattr(result, 'GetGradient'):
-        grad = np.asarray(result.GetGradient(), dtype=float)
-        grad_rows = tuple(map(tuple, grad))
-        metadata['gradient_hartree_per_bohr'] = tuple(float(value) for value in grad.ravel())
-    atomic_charges = tuple(map(float, result.GetAtomicCharges()))
-    cm5_charges = ()
-    if charge_model == 'xtb_scc_mulliken' and hasattr(result, 'GetCM5Charges'):
-        cm5_charges = tuple(map(float, result.GetCM5Charges()))
-    elif charge_model == 'xtb_scc_mulliken':
-        coordinates = metadata.get('coordinates_angstrom')
-        atomic_numbers = metadata.get('atomic_numbers', ())
-        if coordinates is not None and atomic_numbers is not None and len(atomic_numbers):
-            cm5_charges = _calc_cm5_charges(atomic_numbers, coordinates, atomic_charges)
-    esp = {}
-    if getattr(result, 'espSampled', False):
-        esp = dict(
+    if result.espSampled:
+        fields.update(
             espPointsAngstrom=tuple(map(tuple, result.GetESPPoints())),
             espValuesAU=tuple(map(float, result.GetESPValues())),
         )
@@ -121,9 +127,8 @@ def _as_result(result) -> XTBResults:
             'coordinate_unit': 'angstrom',
             'source': 'native_density',
         }
-    realspace = {}
-    if getattr(result, 'realSpaceSampled', False):
-        realspace = dict(
+    if result.realSpaceSampled:
+        fields.update(
             realSpacePointsAngstrom=tuple(map(tuple, result.GetRealSpacePoints())),
             realSpaceDensityAU=tuple(map(float, result.GetRealSpaceDensity())),
             realSpaceALIEEV=tuple(map(float, result.GetRealSpaceALIE())),
@@ -131,7 +136,7 @@ def _as_result(result) -> XTBResults:
             realSpaceLEAEV=tuple(map(float, result.GetRealSpaceLEA())),
         )
         metadata['realspace'] = {
-            'api_version': 1,
+            'api_version': _native_realspace_api_version(result.libraryPath),
             'density_unit': 'e/bohr^3',
             'alie_unit': 'eV',
             'virtual_density_unit': '1/bohr^3',
@@ -139,23 +144,49 @@ def _as_result(result) -> XTBResults:
             'coordinate_unit': 'angstrom',
             'source': 'native_cartesian_gto',
         }
+    if result.propertiesExportVerified:
+        metadata['properties_api'] = 1
+        fields.update({name: getattr(result, name) for name in _COMPILED_SCALAR_PROPERTIES})
+        if result.polarizabilityAvailable:
+            fields.update(
+                atomicPolarizabilitiesAU=tuple(map(float, result.GetAtomicPolarizabilities())),
+                atomicC6AU=tuple(map(float, result.GetAtomicC6())),
+            )
+        if result.multipolesAvailable:
+            fields.update(
+                atomicDipolesAU=tuple(map(tuple, result.GetAtomicDipoles())),
+                atomicQuadrupolesAU=tuple(map(tuple, result.GetAtomicQuadrupoles())),
+                molecularQuadrupoleAU=tuple(map(float, result.GetMolecularQuadrupole())),
+            )
+        if result.nuclearESPAvailable:
+            fields['nuclearESPAU'] = tuple(map(float, result.GetNuclearESP()))
+    else:
+        fields.update(solvent=result.solvent, solvationModel=result.solvationModel,
+                      solvationGrid=result.solvationGrid)
+    energies = tuple(map(float, result.GetOrbitalEnergies()))
+    occupations = tuple(map(float, result.GetOrbitalOccupancies()))
+    homo, lumo = _frontier_energies(
+        energies, occupations, result.numElectrons, result.numUnpairedElectrons
+    )
+    charge_model = result.chargeModel
+    metadata['charge_model'] = charge_model
     return XTBResults(
-        **esp,
-        **realspace,
-        **basis,
-        gradientHartreePerBohr=grad_rows,
+        **fields,
+        gradientHartreePerBohr=tuple(map(tuple, np.asarray(result.GetGradient(), dtype=float))),
         method=result.method,
-        version=None,
+        version=engine['version'],
         totalEnergyHartree=result.totalEnergyHartree,
-        homoLumoGapEV=None,
+        homoLumoGapEV=(lumo - homo if homo is not None and lumo is not None else None),
         numOrbitals=result.numOrbitals,
         numElectrons=result.numElectrons,
         numUnpairedElectrons=result.numUnpairedElectrons,
-        orbitalEnergiesEV=tuple(map(float, result.GetOrbitalEnergies())),
-        orbitalOccupancies=tuple(map(float, result.GetOrbitalOccupancies())),
-        atomicCharges=atomic_charges,
+        orbitalEnergiesEV=energies,
+        orbitalOccupancies=occupations,
+        atomicCharges=tuple(map(float, result.GetAtomicCharges())),
         chargeModel=charge_model,
-        cm5Charges=cm5_charges,
+        cm5Charges=(
+            tuple(map(float, result.GetCM5Charges())) if charge_model == CHARGE_MODEL_SCC else ()
+        ),
         dipoleAtomicUnits=tuple(map(float, result.GetDipole())),
         wibergBondOrders=tuple(map(tuple, result.GetWibergBondOrders())),
         backend='compiled',
@@ -313,8 +344,6 @@ def CalcXTBDescriptors(result, *, frontierDepth=2):
     lumo = float(energies[virtual[0]]) if len(virtual) else None
     output = {
         'xtb_method': result.method,
-        'xtb_backend': result.backend,
-        'xtb_version': result.version,
         'xtb_energy_ha': energy,
         'xtb_homo_ev': homo,
         'xtb_lumo_ev': lumo,

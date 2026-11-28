@@ -58,13 +58,9 @@ def _fixed_indices(values: Iterable[int], natoms: int) -> tuple[int, ...]:
 
 
 def _gradient(result: XTBResults, natoms: int) -> np.ndarray:
-    if len(result.gradientHartreePerBohr) == natoms:
-        array = np.asarray(result.gradientHartreePerBohr, dtype=float)
-    else:
-        values = result.metadata.get("gradient_hartree_per_bohr")
-        if values is None or len(values) != 3 * natoms:
-            raise ValueError("the selected libxtb build did not return a gradient")
-        array = np.asarray(values, dtype=float).reshape(natoms, 3)
+    if len(result.gradientHartreePerBohr) != natoms:
+        raise ValueError("the selected libxtb build did not return a gradient")
+    array = np.asarray(result.gradientHartreePerBohr, dtype=float)
     if array.shape != (natoms, 3) or not np.isfinite(array).all():
         raise ValueError("xTB returned a nonfinite gradient")
     return array
@@ -137,7 +133,6 @@ def OptimizeXTB(
         xtbLibrary=xtbLibrary,
         accuracy=accuracy,
         electronicTemperature=electronicTemperature,
-        _return_gradient=True,
     )
     current = _run_xtb_native(working, maxIterations=scf_iterations, **options)
     initial_energy = float(current.totalEnergyHartree)

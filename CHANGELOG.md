@@ -55,6 +55,28 @@
   least one vacancy. The ABI stays v2; the patch hash changes, and the v1/old-v2
   patch acceptance paths are removed from `runtime.py`, `rdXTBTools` and the
   ctypes binding.
+- **One interface layer (breaking API)**:
+  - `_as_result` is the single normalizer for native and compiled results; it
+    copies the compiled extended properties directly (the previous
+    `_as_property_result` reconstructed `energyDecompositionFlags` from
+    non-`None` fields; `rdXTBTools.XTBResults.energyDecompositionFlags` is now
+    exposed). Compiled results carry the same engine identity, version,
+    HOMO-LUMO gap and solvation provenance as native ones, and CM5 is no longer
+    recomputed as a fallback.
+  - Native and compiled results hold the same fields: the gradient is always
+    returned and stored once (`gradientHartreePerBohr`; the duplicate
+    `metadata['gradient_hartree_per_bohr']` is removed), and MO coefficients are
+    retained only with `keepOverlap=True`.
+  - `interface='native'|'compiled'` is dispatched in one place
+    (`calculator._calculate`) instead of four copies of `rdXTBTools.RunMol`.
+  - `xtb_backend` / `xtb_version` are removed from the scalar descriptor table
+    (they are provenance), so native and compiled tables are identical.
+  - Removed: `XTBOptions.backend`, the `XTBResult` alias,
+    `XTBCalculator.options` / `__call__` (use `GetOptions()` / `Calculate()`),
+    `XTBResults.fermiEnergyEV` (it returned the HOMO), and the loose
+    single-point keyword arguments of `CalcSolvationDescriptors`,
+    `CalcVibrationalThermochemistry` and `CalcLocalBondForceConstants`, which
+    were silently ignored when `options` was given; pass `options=XTBOptions(...)`.
 
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 

@@ -69,16 +69,16 @@ def test_public_routing_requires_complete_extended_profile(verified_install, mon
     library, manifest, _ = verified_install
     monkeypatch.setattr('eled.xtb._find_xtb_library', lambda _: str(library))
     monkeypatch.setattr('eled.xtb._NativeXTB', lambda path: SimpleNamespace(library=path))
-    options = XTBOptions(method='gfn0', backend='native')
+    options = XTBOptions(method='gfn0')
     # A GFN0-only manifest is deliberately insufficient: every public method
     # now requires the complete extended runtime profile.
     with pytest.raises(XTBEnvironmentError, match='extended libxtb'):
         _resolve_options(options)
     manifest.unlink()
     with pytest.raises(XTBEnvironmentError, match='extended libxtb'):
-        _resolve_options(XTBOptions(method='gfn0', backend='native'))
+        _resolve_options(XTBOptions(method='gfn0'))
     with pytest.raises(XTBEnvironmentError, match='extended libxtb'):
-        _resolve_options(XTBOptions(method='gfn2', backend='native'))
+        _resolve_options(XTBOptions(method='gfn2'))
 
 
 @pytest.mark.parametrize('damage', [None, 'commit', 'fix-commit', 'kind', 'file-hash', 'malformed'])

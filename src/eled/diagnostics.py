@@ -90,7 +90,6 @@ def CheckBackend(backend, method, library=None, keepOverlap=False, reactivity=Fa
         )
         result = XTBCalculator(
             method=method,
-            backend=backend,
             xtbLibrary=library,
             keepOverlap=keepOverlap,
         ).Calculate(mol)

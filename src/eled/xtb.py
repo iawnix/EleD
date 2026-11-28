@@ -12,11 +12,9 @@ import os
 from typing import Any
 
 from .backends.native import _NativeXTB, run_xtb_native
-from .electronic_descriptors import CalcXTBDescriptors
-from .errors import XTBError, XTBNativeNotFoundError, XTBRunError
 from .input import _effective_charge_uhf, _xyz_from_mol
 from .options import XTBOptions
-from .result import XTBResult, XTBResults, _frontier_energies
+from .result import XTBResults
 from .runtime import _find_xtb_library, _require_extended_libxtb
 
 
@@ -28,7 +26,6 @@ def _run_xtb(
     charge: int | None = None,
     numUnpairedElectrons: int | None = None,
     xtbLibrary: str | os.PathLike[str] | None = None,
-    backend: str = "native",
     keepOverlap: bool = False,
     espPointsAngstrom=(),
     realSpacePointsAngstrom=(),
@@ -48,7 +45,6 @@ def _run_xtb(
         charge=charge,
         numUnpairedElectrons=numUnpairedElectrons,
         xtbLibrary=xtbLibrary,
-        backend=backend,
         keepOverlap=keepOverlap,
         espPointsAngstrom=espPointsAngstrom,
         realSpacePointsAngstrom=realSpacePointsAngstrom,
