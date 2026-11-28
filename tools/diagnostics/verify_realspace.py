@@ -36,6 +36,10 @@ class API:
                 c.c_int,
                 [h, h, c.c_int, dp, c.c_double, c.c_double, dp, dp, dp, dp],
             ),
+            'rdkit_evalRealSpaceDerivatives': (
+                c.c_int,
+                [h, h, c.c_int, dp, c.c_double, dp, dp, dp, dp, dp, dp, dp, dp, dp],
+            ),
         }
         for method in (0, 1, 2):
             signatures[f'loadGFN{method}xTB'] = (None, [h, h, h, c.c_char_p])
@@ -45,7 +49,7 @@ class API:
             fn = getattr(self.lib, 'xtb_' + name)
             fn.restype, fn.argtypes = restype, argtypes
             setattr(self, name, fn)
-        assert self.rdkit_getRealSpaceAPIVersion() == 1
+        assert self.rdkit_getRealSpaceAPIVersion() == 2
         self.env = self.own('Environment', self.newEnvironment())
         self.setVerbosity(self.env, 0)
 
@@ -93,6 +97,34 @@ class API:
             self.env, res, npts, pts, occ_thr, lea_win, rho, alie, vrho, lea
         )
         return ok, list(rho), list(alie), list(vrho), list(lea)
+
+    def eval_derivs(self, res, points, *, occ_thr=1e-7):
+        npts = len(points)
+        pts = (c.c_double * (3 * npts))(*(v for row in points for v in row))
+        rho = (c.c_double * npts)(*([12345.0] * npts))
+        grad = (c.c_double * (3 * npts))(*([12345.0] * (3 * npts)))
+        hess = (c.c_double * (6 * npts))(*([12345.0] * (6 * npts)))
+        lap = (c.c_double * npts)(*([12345.0] * npts))
+        tau = (c.c_double * npts)(*([12345.0] * npts))
+        elf = (c.c_double * npts)(*([12345.0] * npts))
+        lol = (c.c_double * npts)(*([12345.0] * npts))
+        rdg = (c.c_double * npts)(*([12345.0] * npts))
+        sl2 = (c.c_double * npts)(*([12345.0] * npts))
+        ok = self.rdkit_evalRealSpaceDerivatives(
+            self.env, res, npts, pts, occ_thr, rho, grad, hess, lap, tau, elf, lol, rdg, sl2
+        )
+        return (
+            ok,
+            list(rho),
+            [tuple(grad[3 * i : 3 * i + 3]) for i in range(npts)],
+            [tuple(hess[6 * i : 6 * i + 6]) for i in range(npts)],
+            list(lap),
+            list(tau),
+            list(elf),
+            list(lol),
+            list(rdg),
+            list(sl2),
+        )
 
 
 def _rotate_translate(coords):
@@ -158,15 +190,79 @@ def verify(prefix, library=None):
                 bad_ok, b_rho, b_alie, b_vrho, b_lea = api.eval_points(copied, probes, occ_thr=-1.0)
                 assert bad_ok == 0 and api.error()
                 assert b_rho == [12345.0] * len(probes) and b_alie == [12345.0] * len(probes)
+
+                # ABI v2 derivatives verification (grad, Hessian, Laplacian, tau, ELF, LOL, RDG, sign(lambda2)*rho)
+                ok_d, d_rho, grad, hess, lap, tau, elf, lol, rdg, sl2 = api.eval_derivs(copied, probes)
+                assert ok_d == 1 and not api.error()
+                for a, b in zip(rho, d_rho):
+                    assert abs(a - b) < 1e-12, (method, name, a, b)
+                for i in range(len(probes)):
+                    assert abs((hess[i][0] + hess[i][2] + hess[i][5]) - lap[i]) < 1e-12
+                    assert tau[i] >= 0.0 and 0.0 <= elf[i] <= 1.0 + 1e-12 and 0.0 <= lol[i] <= 1.0 + 1e-12
+                    assert rdg[i] >= 0.0 and abs(abs(sl2[i]) - rho[i]) < 1e-12
+
+                # Analytical vs finite-difference gradient and Hessian check on H2S (includes d-shells)
+                if name == 'hydrogen_sulfide' and method == 2:
+                    h_step = 1e-4
+                    p0 = probes[1]
+                    fd_pts = []
+                    for ax in range(3):
+                        for sgn in (1.0, -1.0):
+                            q = list(p0); q[ax] += sgn * h_step; fd_pts.append(tuple(q))
+                    ok_fd, rho_fd, _, _, _ = api.eval_points(copied, fd_pts)
+                    assert ok_fd == 1 and not api.error()
+                    for ax in range(3):
+                        g_num = (rho_fd[2 * ax] - rho_fd[2 * ax + 1]) / (2.0 * h_step)
+                        assert abs(grad[1][ax] - g_num) < 1e-7, (ax, grad[1][ax], g_num)
+                    # Finite-difference check on Hessian from analytical gradient
+                    ok_hfd, _, grad_fd, _, _, _, _, _, _, _ = api.eval_derivs(copied, fd_pts)
+                    assert ok_hfd == 1 and not api.error()
+                    h_idx = {(0, 0): 0, (0, 1): 1, (1, 1): 2, (0, 2): 3, (1, 2): 4, (2, 2): 5}
+                    for (a_i, b_i), slot in h_idx.items():
+                        h_num = (grad_fd[2 * b_i][a_i] - grad_fd[2 * b_i + 1][a_i]) / (2.0 * h_step)
+                        assert abs(hess[1][slot] - h_num) < 1e-6, ((a_i, b_i), hess[1][slot], h_num)
+                    # Rotation invariance of v2 scalar fields on H2S
+                    ok_dr, d_rho_r, grad_r, _, lap_r, tau_r, elf_r, lol_r, rdg_r, sl2_r = api.eval_derivs(
+                        res_rot, moved_probes
+                    )
+                    assert ok_dr == 1 and not api.error()
+                    for i in range(len(probes)):
+                        gn0 = math.sqrt(sum(v * v for v in grad[i]))
+                        gn1 = math.sqrt(sum(v * v for v in grad_r[i]))
+                        assert abs(gn0 - gn1) < 1e-7
+                        assert abs(lap[i] - lap_r[i]) < 1e-7
+                        assert abs(tau[i] - tau_r[i]) < 1e-7
+                        assert abs(elf[i] - elf_r[i]) < 1e-7
+                        assert abs(lol[i] - lol_r[i]) < 1e-7
+                        assert abs(rdg[i] - rdg_r[i]) < 1e-6
+                        assert abs(sl2[i] - sl2_r[i]) < 1e-8
+
+                # Bad-input guard leaves v2 buffers untouched
+                bad_d = api.eval_derivs(copied, probes, occ_thr=-0.5)
+                assert bad_d[0] == 0 and api.error()
+                assert bad_d[1] == [12345.0] * len(probes)
+
                 api.singlepoint(api.env, None, calc, res)
                 assert api.error()
                 assert api.eval_points(res, probes)[0] == 0 and api.error()
+                assert api.eval_derivs(res, probes)[0] == 0 and api.error()
                 assert api.eval_points(copied, probes) == (1, rho, alie, vrho, lea)
 
-                rows.append({'method': method, 'case': name, 'rho_0_au': rho[0], 'alie_0_ev': alie[0]})
+                rows.append({'method': method, 'case': name, 'rho_0_au': rho[0], 'alie_0_ev': alie[0], 'elf_0': elf[0]})
             finally:
                 api.close()
-    return {'api_version': 1, 'cases': rows}
+
+    # Exact closed-shell 2-electron H2 check: Becke-Edgecombe ELF == 1.0 everywhere!
+    api = API(prefix, library)
+    try:
+        _, _, res_h2 = api.calculate([1, 1], [(0.0, 0.0, 0.0), (0.0, 0.0, 1.4)], 0, 0, 2)
+        ok_h2, _, _, _, _, _, elf_h2, _, _, _ = api.eval_derivs(res_h2, [(0.0, 0.0, 0.7), (0.5, 0.3, 0.7)])
+        assert ok_h2 == 1 and not api.error()
+        assert all(abs(v - 1.0) < 1e-10 for v in elf_h2), elf_h2
+    finally:
+        api.close()
+
+    return {'api_version': 2, 'cases': rows}
 
 
 def main():

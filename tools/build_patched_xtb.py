@@ -311,7 +311,7 @@ def main():
     if lock.get('properties_extension'):
         manifest['capabilities']['properties_api'] = 1
     if lock.get('realspace_extension'):
-        manifest['capabilities']['realspace_api'] = 1
+        manifest['capabilities']['realspace_api'] = int(lock['realspace_extension']['api_version'])
     (record_dir / 'build.json').write_text(json.dumps(manifest, indent=2) + '\n')
     activation = '# Source this file to select this local xTB installation.\n'
     for key, value in [('XTB_LIBRARY', library), ('XTBPATH', parameters)]:

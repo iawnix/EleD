@@ -43,6 +43,7 @@ from .esp_descriptors import (
     GenerateESPSurfaceGrid,
 )
 from .fod import CalcFODFromResult, RunFOD
+from .fragment_eda import CalcFragmentInteraction
 from .geometry import ConformerGenerationResult, PrepareConformers
 from .local_geometry import (
     AnalyzeLocalGeometry,
@@ -53,6 +54,7 @@ from .local_geometry import (
     CalcSterimol,
     RunLocalGeometryBatch,
 )
+from .local_modes import CalcLocalBondForceConstants, CalcLocalBondForceConstantsFromHessian
 from .localized_orbitals import CalcLocalizedOrbitals
 from .mapping import AnnotateMol
 from .optimization import OptimizeXTB, XTBOptimizationResult
@@ -75,9 +77,12 @@ from .rdkit_descriptors import CalcMolXTBDescriptors, RegisterRDKitProperties
 from .reactivity import CalcReactivityDescriptors, ChargeStateCalculationError, RunReactivity
 from .reactivity_batch import ReactivityJob, RunReactivityBatch
 from .realspace import (
+    CalcBondDensityTopology,
     CalcDensityIsosurface,
+    CalcNCIDescriptors,
     CalcRealSpaceProperties,
     CalcRealSpaceSurfaceDescriptors,
+    CalcRealSpaceTopology,
 )
 from .reports import (
     DESCRIPTOR_VERSION,
@@ -89,6 +94,7 @@ from .reports import (
 )
 from .selections import NormalizeSelections, SelectionSet
 from .solvation import CalcSolvationDescriptors
+from .surface_extrema import CalcDirectedSurfaceDescriptors
 from .thermochemistry import CalcVibrationalThermochemistry
 from .visualization import (
     BuildFragmentVisualData,
@@ -178,6 +184,13 @@ __all__ = [
     "CalcRealSpaceProperties",
     "CalcRealSpaceSurfaceDescriptors",
     "CalcDensityIsosurface",
+    "CalcRealSpaceTopology",
+    "CalcBondDensityTopology",
+    "CalcNCIDescriptors",
+    "CalcDirectedSurfaceDescriptors",
+    "CalcFragmentInteraction",
+    "CalcLocalBondForceConstants",
+    "CalcLocalBondForceConstantsFromHessian",
     "CalcEnergyDecomposition",
     "CalcMultipoleDescriptors",
     "CalcNuclearESP",

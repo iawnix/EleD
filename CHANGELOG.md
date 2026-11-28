@@ -1,5 +1,19 @@
 # Changes
 
+## 0.15.0 — Real-space ABI v2 (ELF/LOL/bond ellipticity/NCI), directed σ/π-hole & H-bond extrema, fragment EDA, and Cremer–Kraka local bond force constants
+
+- **Real-space wavefunction ABI v2 & valence density topology (`eled.realspace`)**:
+  - Upgraded `tools/diagnostics/xtb_realspace_export.patch` (`api_version = 2`, backward-compatible with v1) and `tools/diagnostics/verify_realspace.py` with `xtb_rdkit_evalRealSpaceDerivatives`: exact analytical Cartesian GTO first/second derivatives yielding $\rho(\mathbf{r})$, $\nabla\rho(\mathbf{r})$, packed Hessian $\nabla\nabla\rho(\mathbf{r})$, Laplacian $\nabla^2\rho$, positive-definite kinetic energy density $\tau(\mathbf{r})$, Becke–Edgecombe ELF, Schmider–Becke LOL, reduced density gradient RDG, and $\mathrm{sign}(\lambda_2)\rho(\mathbf{r})$.
+  - Added `CalcRealSpaceTopology(mol, pointsAngstrom, ...)` (point-level analytical density derivatives, ELF, LOL, RDG, and $\mathrm{sign}(\lambda_2)\rho$), `CalcBondDensityTopology(mol, *, refineAlongBond=True, ...)` (per-RDKit-bond saddle/midpoint valence density topology, ELF, LOL, and bond ellipticity $\varepsilon = \lambda_1/\lambda_2 - 1$), and `CalcNCIDescriptors(mol, ...)` (volumetric NCI/RDG attractive, van der Waals, and steric repulsion descriptors in one SCF, with optional intermolecular `fragmentA`/`fragmentB` interface focus).
+- **Directed surface extrema (`eled.surface_extrema`)**:
+  - Added `CalcDirectedSurfaceDescriptors(mol, *, isovalueAU=0.001, ...)` locating exact `0.001 a.u.` isosurface extrema in one native SCF along halogen $\sigma$-hole axes (and 15° cones), polar `X–H` hydrogen-bond donor axes (`v_hbd_au`/`kcalmol`), heteroatom acceptor Voronoi surfaces (`v_hba_min_au`/`kcalmol`), and aromatic ring $\pi$-hole normals (`v_pi_max_au`/`kcalmol`).
+- **Fragment interaction EDA & charge transfer (`eled.fragment_eda`)**:
+  - Added `CalcFragmentInteraction(mol, fragmentA, fragmentB, ...)` running 3 matched fixed-geometry single points (`AB`, `A`, `B`, with `keepOverlap=True` and `native`/`compiled` parity) to report energy decomposition differences (`delta_e_total`, `delta_e_elec`, `delta_e_rep`, `delta_e_es`, `delta_e_aes`, `delta_e_axc`, `delta_e_disp`, `delta_e_xb`, `delta_g_solv`), charge transfer (`ct_scc_a_to_b_e`, `ct_cm5_a_to_b_e`, `ct_lowdin_a_to_b_e`, `ct_mulliken_a_to_b_e`), inter-fragment `wbo_inter`, `coop_inter_e`, `ecohp_inter_ev`, closed-shell `chi_inter_e_per_ev`, and `delta_dipole_debye`.
+- **Cremer–Kraka local bond force constants & compliance constants (`eled.local_modes`)**:
+  - Added `CalcLocalBondForceConstantsFromHessian(mol, hessianHartreePerBohr2, ...)` (0 SCF calls) and `CalcLocalBondForceConstants(mol, *, extraPairs=(), ...)` computing coordinate-invariant Grunenberg compliance constants $C_{ii} = \mathbf{b}_i^T H_{\mathrm{int}}^+ \mathbf{b}_i$, Cremer–Kraka local stretching force constants $k^a = 1/C_{ii}$ (`mDyn/Angstrom`, `Hartree/Bohr^2`), and adiabatic local frequencies $\omega^a$ (`cm^-1`) for every RDKit bond and optional noncovalent `extraPairs`.
+  - Added optional `includeHessian=False` to `CalcVibrationalThermochemistry` so its Hessian can be reused directly without extra gradient evaluations.
+- **Catalog**: Registered all new fields across `bond`, `fragment`, and `realspace` in `DescriptorCatalog()` and `DescriptorStatus()`.
+
 ## 0.14.0 — Real-space wavefunction ABI (density/ALIE/LEA & 0.001 a.u. isosurface), Grimme FOD, higher-order CDFT, linear response matrix, and bond electric fields
 
 - **Real-space wavefunction ABI v1 & 0.001 a.u. isosurface (`eled.realspace`)**:

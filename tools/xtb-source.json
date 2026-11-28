@@ -62,12 +62,12 @@
     }
   },
   "realspace_extension": {
-    "api_version": 1,
+    "api_version": 2,
     "patch": "diagnostics/xtb_realspace_export.patch",
-    "patch_sha256": "4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74",
+    "patch_sha256": "2221b9658c10b262802cbbbac84a9d48cd3e6808fa8e59b1b0d13d20ba56b7f3",
     "patched_files": {
-      "include/xtb.h": "b1f8ae59b8ee92c7681ea83812464e5f509e2cabeb6d6c09bc311c66c87c7a2d",
-      "src/api/results.f90": "5115bcaa435a87f508b8583a27f26eea36f29168dcdd2fd6e9482764d8ee82e9",
+      "include/xtb.h": "a36b74ce6ffb63e19681d19f7cd6bf28fa91b082a97b36e525a97ec0aa097011",
+      "src/api/results.f90": "7aa5773717bda79151fbdcf773221751a28f6f2ec044dbc55fdc49e20d6b9bc9",
       "src/api/interface.f90": "9e7c0eb5811f537c815b5ad049b58422e79ffb2eaf1aa7659e45e1c69fdf70bb"
     }
   }

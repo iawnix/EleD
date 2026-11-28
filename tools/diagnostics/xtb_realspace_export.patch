@@ -1,26 +1,35 @@
 diff --git a/include/xtb.h b/include/xtb.h
 --- a/include/xtb.h
 +++ b/include/xtb.h
-@@ -400,6 +400,23 @@
+@@ -400,6 +400,32 @@
  extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getNuclearESP(
      xtb_TEnvironment, xtb_TResults, int natoms, double* output);
  
-+/* EleD real-space wavefunction ABI v1; upstream API version remains unchanged.
-+ * Evaluates exact Cartesian GTO valence electron density rho(r) (e/Bohr^3),
-+ * Average Local Ionization Energy ALIE(r) (eV), virtual density (1/Bohr^3),
-+ * and Local Electron Affinity LEA(r) (eV) at arbitrary 3D points (Bohr) from
-+ * an existing nonperiodic GFN0/1/2 singlepoint snapshot without new SCF calls.
-+ * points: contiguous [npoints][3] in Bohr. Outputs: [npoints] doubles each.
-+ * occ_threshold >= 0 separates occupied (f > thr) and virtual (f <= thr) MOs.
-+ * lea_window_ev == 0 includes all valence virtual MOs; > 0 restricts virtual
-+ * MOs to [LUMO, LUMO + lea_window_ev]. Returns 1 on success, 0 on error
-+ * (environment diagnostic set, output buffers untouched).
++/* EleD real-space wavefunction ABI v2 (backward-compatible with v1); upstream
++ * API version remains unchanged.
++ * v1 (xtb_rdkit_evalRealSpace): exact Cartesian GTO valence electron density
++ * rho(r) (e/Bohr^3), ALIE(r) (eV), virtual density (1/Bohr^3), and LEA(r) (eV)
++ * at arbitrary 3D points (Bohr) from an existing nonperiodic GFN0/1/2
++ * singlepoint snapshot without new SCF calls.
++ * v2 (xtb_rdkit_evalRealSpaceDerivatives): analytical GTO first/second
++ * derivatives yielding density (e/Bohr^3), grad_rho [npoints][3] (e/Bohr^4),
++ * symmetric hess_rho [npoints][6] packed (xx,xy,yy,xz,yz,zz) (e/Bohr^5),
++ * laplacian (e/Bohr^5), kinetic energy density tau (Hartree/Bohr^3), Becke-
++ * Edgecombe ELF, Schmider-Becke LOL, reduced density gradient RDG, and
++ * sign(lambda2)*rho (e/Bohr^3).
++ * Returns 1 on success, 0 on error (diagnostic set, output buffers untouched).
 + */
 +extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_getRealSpaceAPIVersion(void);
 +extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_evalRealSpace(
 +    xtb_TEnvironment, xtb_TResults, int npoints, const double* points,
 +    double occ_threshold, double lea_window_ev,
 +    double* density, double* alie_ev, double* vir_density, double* lea_ev);
++extern XTB_API_ENTRY int XTB_API_CALL xtb_rdkit_evalRealSpaceDerivatives(
++    xtb_TEnvironment, xtb_TResults, int npoints, const double* points,
++    double occ_threshold,
++    double* density, double* grad_rho, double* hess_rho,
++    double* laplacian, double* tau, double* elf, double* lol,
++    double* rdg, double* sign_lambda2_rho);
 +
  #ifdef __cplusplus
  }
@@ -40,7 +49,7 @@ diff --git a/src/api/results.f90 b/src/api/results.f90
     public :: rdkit_esp_version, rdkit_keep_esp, rdkit_get_esp
     public :: rdkit_properties_version, rdkit_get_energy_decomposition, &
        & rdkit_get_polarizability, rdkit_get_multipoles, rdkit_get_nuclear_esp
-+   public :: rdkit_realspace_version, rdkit_eval_realspace
++   public :: rdkit_realspace_version, rdkit_eval_realspace, rdkit_eval_realspace_derivs
     public :: PropsResult
     public :: VResults
     public :: newResults_api, delResults_api, getEnergy_api, getGradient_api, &
@@ -53,14 +62,14 @@ diff --git a/src/api/results.f90 b/src/api/results.f90
     end type PropsResult
  
     !> Void pointer to wavefunction and result objects
-@@ -887,4 +889,222 @@
+@@ -887,4 +889,575 @@
     ok = 1
  end function
  
-+! Real-space wavefunction evaluation ABI v1 (density, ALIE, virtual density, LEA).
++! Real-space wavefunction evaluation ABI v2 (v1: density/ALIE/LEA; v2: analytical derivatives/ELF/LOL/RDG/sign(lambda2)*rho).
 +function rdkit_realspace_version() result(version) bind(C, name="xtb_rdkit_getRealSpaceAPIVersion")
 +   integer(c_int) :: version
-+   version = 1
++   version = 2
 +end function
 +
 +subroutine eval_realspace_kernel(nmo, nbf, xyz, occ, emo, C_cao, basis, np, points, &
@@ -272,6 +281,359 @@ diff --git a/src/api/results.f90 b/src/api/results.f90
 +   a_out = a_tmp
 +   vd_out = vd_tmp
 +   l_out = l_tmp
++   ok = 1
++end function
++
++subroutine sym3_eigenvalues(hxx, hxy, hyy, hxz, hyz, hzz, e1, e2, e3)
++   real(wp), intent(in) :: hxx, hxy, hyy, hxz, hyz, hzz
++   real(wp), intent(out) :: e1, e2, e3
++   real(wp), parameter :: two_pi_3 = 2.09439510239319549231_wp
++   real(wp) :: p1, q, p2, p, invp, bxx, bxy, byy, bxz, byz, bzz, r, phi, tmp
++
++   p1 = hxy*hxy + hxz*hxz + hyz*hyz
++   if (p1 <= 1.0e-30_wp * (hxx*hxx + hyy*hyy + hzz*hzz + 1.0e-30_wp)) then
++      e1 = hxx
++      e2 = hyy
++      e3 = hzz
++   else
++      q = (hxx + hyy + hzz) / 3.0_wp
++      p2 = (hxx - q)**2 + (hyy - q)**2 + (hzz - q)**2 + 2.0_wp * p1
++      p = sqrt(p2 / 6.0_wp)
++      invp = 1.0_wp / p
++      bxx = (hxx - q) * invp
++      byy = (hyy - q) * invp
++      bzz = (hzz - q) * invp
++      bxy = hxy * invp
++      bxz = hxz * invp
++      byz = hyz * invp
++      r = 0.5_wp * (bxx*(byy*bzz - byz*byz) - bxy*(bxy*bzz - byz*bxz) + bxz*(bxy*byz - byy*bxz))
++      r = max(-1.0_wp, min(1.0_wp, r))
++      phi = acos(r) / 3.0_wp
++      e3 = q + 2.0_wp * p * cos(phi)
++      e1 = q + 2.0_wp * p * cos(phi + two_pi_3)
++      e2 = 3.0_wp * q - e1 - e3
++   end if
++   if (e1 > e2) then
++      tmp = e1; e1 = e2; e2 = tmp
++   end if
++   if (e2 > e3) then
++      tmp = e2; e2 = e3; e3 = tmp
++   end if
++   if (e1 > e2) then
++      tmp = e1; e1 = e2; e2 = tmp
++   end if
++end subroutine
++
++subroutine eval_realspace_derivs_kernel(nmo, nbf, xyz, occ, C_cao, basis, np, points, occ_thr, &
++      & density, grad_rho, hess_rho, laplacian, tau, elf, lol, rdg, sign_l2_rho, invalid_lao)
++   type(TBasisset), intent(in) :: basis
++   integer, intent(in) :: nmo, nbf, np
++   real(wp), intent(in) :: xyz(3, *), occ(nmo), C_cao(nbf, nmo)
++   real(wp), intent(in) :: points(3, np), occ_thr
++   real(wp), intent(out) :: density(np), grad_rho(3, np), hess_rho(6, np)
++   real(wp), intent(out) :: laplacian(np), tau(np), elf(np), lol(np), rdg(np), sign_l2_rho(np)
++   logical, intent(out) :: invalid_lao
++
++   real(wp), parameter :: c_fermi = 2.8712340001881911_wp   ! 3/10 * (3*pi^2)^(2/3)
++   real(wp), parameter :: c_rdg = 6.1873354525602719_wp     ! 2 * (3*pi^2)^(1/3)
++   real(wp), allocatable :: chi0(:, :), chix(:, :), chiy(:, :), chiz(:, :)
++   real(wp), allocatable :: chixx(:, :), chixy(:, :), chiyy(:, :), chixz(:, :), chiyz(:, :), chizz(:, :)
++   real(wp), allocatable :: psi0(:, :), psix(:, :), psiy(:, :), psiz(:, :)
++   real(wp), allocatable :: psixx(:, :), psixy(:, :), psiyy(:, :), psixz(:, :), psiyz(:, :), psizz(:, :)
++   real(wp), allocatable :: C_occ(:, :), f_occ(:)
++   integer, allocatable :: primstart(:)
++   integer :: i, k, m, nocc, p_idx, ip, iat, lao
++   real(wp) :: dx, dy, dz, r2, ar2, alp, cexp, r0, r1, r2d
++   real(wp) :: a0, ax, ay, az, axx, axy, ayy, axz, ayz, azz
++   real(wp) :: rho, gx, gy, gz, hxx, hxy, hyy, hxz, hyz, hzz, tk, f
++   real(wp) :: p0, px, py, pz, g2, gnorm, d0, d_ex, chi_elf, e1, e2, e3
++
++   invalid_lao = .false.
++   allocate(primstart(nbf))
++   ip = 0
++   do i = 1, nbf
++      primstart(i) = ip
++      ip = ip + basis%nprim(i)
++      lao = basis%lao(i)
++      if (lao < 1 .or. lao > 10) then
++         invalid_lao = .true.
++         return
++      end if
++   end do
++
++   nocc = 0
++   do m = 1, nmo
++      if (occ(m) > occ_thr) nocc = nocc + 1
++   end do
++   if (nocc == 0) then
++      density = 0.0_wp
++      grad_rho = 0.0_wp
++      hess_rho = 0.0_wp
++      laplacian = 0.0_wp
++      tau = 0.0_wp
++      elf = 0.0_wp
++      lol = 0.0_wp
++      rdg = 0.0_wp
++      sign_l2_rho = 0.0_wp
++      return
++   end if
++
++   allocate(C_occ(nbf, nocc), f_occ(nocc))
++   ip = 0
++   do m = 1, nmo
++      if (occ(m) > occ_thr) then
++         ip = ip + 1
++         C_occ(:, ip) = C_cao(:, m)
++         f_occ(ip) = occ(m)
++      end if
++   end do
++
++   allocate(chi0(nbf, np), chix(nbf, np), chiy(nbf, np), chiz(nbf, np))
++   allocate(chixx(nbf, np), chixy(nbf, np), chiyy(nbf, np), chixz(nbf, np), chiyz(nbf, np), chizz(nbf, np))
++
++   do k = 1, np
++      do i = 1, nbf
++         iat = basis%aoat(i)
++         dx = points(1, k) - xyz(1, iat)
++         dy = points(2, k) - xyz(2, iat)
++         dz = points(3, k) - xyz(3, iat)
++         r2 = dx*dx + dy*dy + dz*dz
++         ip = primstart(i)
++         r0 = 0.0_wp
++         r1 = 0.0_wp
++         r2d = 0.0_wp
++         do p_idx = 1, basis%nprim(i)
++            alp = basis%alp(ip + p_idx)
++            ar2 = alp * r2
++            if (ar2 < 50.0_wp) then
++               cexp = basis%cont(ip + p_idx) * exp(-ar2)
++               r0 = r0 + cexp
++               r1 = r1 - 2.0_wp * alp * cexp
++               r2d = r2d + 4.0_wp * alp * alp * cexp
++            end if
++         end do
++         ax = 0.0_wp; ay = 0.0_wp; az = 0.0_wp
++         axx = 0.0_wp; axy = 0.0_wp; ayy = 0.0_wp
++         axz = 0.0_wp; ayz = 0.0_wp; azz = 0.0_wp
++         select case(basis%lao(i))
++         case(1)
++            a0 = 1.0_wp
++         case(2)
++            a0 = dx; ax = 1.0_wp
++         case(3)
++            a0 = dy; ay = 1.0_wp
++         case(4)
++            a0 = dz; az = 1.0_wp
++         case(5)
++            a0 = dx*dx; ax = 2.0_wp*dx; axx = 2.0_wp
++         case(6)
++            a0 = dy*dy; ay = 2.0_wp*dy; ayy = 2.0_wp
++         case(7)
++            a0 = dz*dz; az = 2.0_wp*dz; azz = 2.0_wp
++         case(8)
++            a0 = dx*dy; ax = dy; ay = dx; axy = 1.0_wp
++         case(9)
++            a0 = dx*dz; ax = dz; az = dx; axz = 1.0_wp
++         case(10)
++            a0 = dy*dz; ay = dz; az = dy; ayz = 1.0_wp
++         case default
++            a0 = 0.0_wp
++         end select
++         chi0(i, k)  = a0 * r0
++         chix(i, k)  = ax * r0 + a0 * dx * r1
++         chiy(i, k)  = ay * r0 + a0 * dy * r1
++         chiz(i, k)  = az * r0 + a0 * dz * r1
++         chixx(i, k) = axx * r0 + (2.0_wp*ax*dx + a0) * r1 + a0 * dx*dx * r2d
++         chiyy(i, k) = ayy * r0 + (2.0_wp*ay*dy + a0) * r1 + a0 * dy*dy * r2d
++         chizz(i, k) = azz * r0 + (2.0_wp*az*dz + a0) * r1 + a0 * dz*dz * r2d
++         chixy(i, k) = axy * r0 + (ax*dy + ay*dx) * r1 + a0 * dx*dy * r2d
++         chixz(i, k) = axz * r0 + (ax*dz + az*dx) * r1 + a0 * dx*dz * r2d
++         chiyz(i, k) = ayz * r0 + (ay*dz + az*dy) * r1 + a0 * dy*dz * r2d
++      end do
++   end do
++
++   allocate(psi0(nocc, np), psix(nocc, np), psiy(nocc, np), psiz(nocc, np))
++   allocate(psixx(nocc, np), psixy(nocc, np), psiyy(nocc, np), psixz(nocc, np), psiyz(nocc, np), psizz(nocc, np))
++
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chi0,  nbf, 0.0_wp, psi0,  nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chix,  nbf, 0.0_wp, psix,  nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chiy,  nbf, 0.0_wp, psiy,  nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chiz,  nbf, 0.0_wp, psiz,  nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chixx, nbf, 0.0_wp, psixx, nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chixy, nbf, 0.0_wp, psixy, nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chiyy, nbf, 0.0_wp, psiyy, nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chixz, nbf, 0.0_wp, psixz, nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chiyz, nbf, 0.0_wp, psiyz, nocc)
++   call blas_gemm('T', 'N', nocc, np, nbf, 1.0_wp, C_occ, nbf, chizz, nbf, 0.0_wp, psizz, nocc)
++
++   do k = 1, np
++      rho = 0.0_wp
++      gx = 0.0_wp; gy = 0.0_wp; gz = 0.0_wp
++      hxx = 0.0_wp; hxy = 0.0_wp; hyy = 0.0_wp
++      hxz = 0.0_wp; hyz = 0.0_wp; hzz = 0.0_wp
++      tk = 0.0_wp
++      do m = 1, nocc
++         f = f_occ(m)
++         p0 = psi0(m, k)
++         px = psix(m, k); py = psiy(m, k); pz = psiz(m, k)
++         rho = rho + f * p0 * p0
++         gx = gx + 2.0_wp * f * p0 * px
++         gy = gy + 2.0_wp * f * p0 * py
++         gz = gz + 2.0_wp * f * p0 * pz
++         hxx = hxx + 2.0_wp * f * (px*px + p0*psixx(m, k))
++         hxy = hxy + 2.0_wp * f * (px*py + p0*psixy(m, k))
++         hyy = hyy + 2.0_wp * f * (py*py + p0*psiyy(m, k))
++         hxz = hxz + 2.0_wp * f * (px*pz + p0*psixz(m, k))
++         hyz = hyz + 2.0_wp * f * (py*pz + p0*psiyz(m, k))
++         hzz = hzz + 2.0_wp * f * (pz*pz + p0*psizz(m, k))
++         tk = tk + 0.5_wp * f * (px*px + py*py + pz*pz)
++      end do
++      density(k) = rho
++      grad_rho(1, k) = gx
++      grad_rho(2, k) = gy
++      grad_rho(3, k) = gz
++      hess_rho(1, k) = hxx
++      hess_rho(2, k) = hxy
++      hess_rho(3, k) = hyy
++      hess_rho(4, k) = hxz
++      hess_rho(5, k) = hyz
++      hess_rho(6, k) = hzz
++      laplacian(k) = hxx + hyy + hzz
++      tau(k) = tk
++      if (rho > 1.0e-30_wp) then
++         g2 = gx*gx + gy*gy + gz*gz
++         gnorm = sqrt(g2)
++         d0 = c_fermi * (rho ** (5.0_wp / 3.0_wp))
++         d_ex = max(0.0_wp, tk - 0.125_wp * g2 / rho)
++         if (d0 > 1.0e-300_wp) then
++            chi_elf = d_ex / d0
++            elf(k) = 1.0_wp / (1.0_wp + chi_elf * chi_elf)
++         else
++            elf(k) = 0.0_wp
++         end if
++         if (d0 + tk > 1.0e-300_wp) then
++            lol(k) = d0 / (d0 + tk)
++         else
++            lol(k) = 0.0_wp
++         end if
++         rdg(k) = gnorm / (c_rdg * (rho ** (4.0_wp / 3.0_wp)))
++         call sym3_eigenvalues(hxx, hxy, hyy, hxz, hyz, hzz, e1, e2, e3)
++         if (e2 < 0.0_wp) then
++            sign_l2_rho(k) = -rho
++         else if (e2 > 0.0_wp) then
++            sign_l2_rho(k) = rho
++         else
++            sign_l2_rho(k) = 0.0_wp
++         end if
++      else
++         elf(k) = 0.0_wp
++         lol(k) = 0.0_wp
++         rdg(k) = 0.0_wp
++         sign_l2_rho(k) = 0.0_wp
++      end if
++   end do
++end subroutine
++
++function rdkit_eval_realspace_derivs(venv, vres, count, points_ptr, occ_thr, &
++      & density_ptr, grad_ptr, hess_ptr, lap_ptr, tau_ptr, elf_ptr, lol_ptr, &
++      & rdg_ptr, sl2_ptr) result(ok) bind(C, name="xtb_rdkit_evalRealSpaceDerivatives")
++   type(c_ptr), value :: venv, vres, points_ptr
++   type(c_ptr), value :: density_ptr, grad_ptr, hess_ptr, lap_ptr, tau_ptr
++   type(c_ptr), value :: elf_ptr, lol_ptr, rdg_ptr, sl2_ptr
++   integer(c_int), value :: count
++   real(c_double), value :: occ_thr
++   integer(c_int) :: ok
++   type(VEnvironment), pointer :: env
++   type(VResults), pointer :: res
++   real(c_double), pointer :: points(:, :), d_out(:), g_out(:, :), h_out(:, :)
++   real(c_double), pointer :: lap_out(:), tau_out(:), elf_out(:), lol_out(:), rdg_out(:), sl2_out(:)
++   real(wp), allocatable :: d_tmp(:), g_tmp(:, :), h_tmp(:, :), lap_tmp(:), tau_tmp(:)
++   real(wp), allocatable :: elf_tmp(:), lol_tmp(:), rdg_tmp(:), sl2_tmp(:), coefficients(:, :)
++   logical :: invalid_lao
++   ok = 0
++   if (.not.c_associated(venv)) return
++   call c_f_pointer(venv, env)
++   call checkGlobalEnv
++   if (.not.c_associated(vres)) then
++      call env%ptr%error("Results object is not allocated", "rdkit_realspace")
++      return
++   end if
++   call c_f_pointer(vres, res)
++   if (.not.allocated(res%props)) then
++      call env%ptr%error("Real-space snapshot unavailable", "rdkit_realspace")
++      return
++   end if
++   if (.not.res%props%has_nuclear_esp .or. .not.allocated(res%props%emo)) then
++      call env%ptr%error("Real-space wavefunction unavailable for this calculation", "rdkit_realspace")
++      return
++   end if
++   if (count <= 0 .or. .not.c_associated(points_ptr) .or. &
++       & .not.c_associated(density_ptr) .or. .not.c_associated(grad_ptr) .or. &
++       & .not.c_associated(hess_ptr) .or. .not.c_associated(lap_ptr) .or. &
++       & .not.c_associated(tau_ptr) .or. .not.c_associated(elf_ptr) .or. &
++       & .not.c_associated(lol_ptr) .or. .not.c_associated(rdg_ptr) .or. &
++       & .not.c_associated(sl2_ptr)) then
++      call env%ptr%error("Real-space derivatives point count or buffer pointer invalid", "rdkit_realspace")
++      return
++   end if
++   if (.not.ieee_is_finite(occ_thr) .or. occ_thr < 0.0_wp) then
++      call env%ptr%error("Real-space occupation threshold must be finite and nonnegative", "rdkit_realspace")
++      return
++   end if
++   call c_f_pointer(points_ptr, points, [3, count])
++   if (.not.all(ieee_is_finite(points))) then
++      call env%ptr%error("Real-space points must be finite", "rdkit_realspace")
++      return
++   end if
++   allocate(d_tmp(count), g_tmp(3, count), h_tmp(6, count), lap_tmp(count), tau_tmp(count))
++   allocate(elf_tmp(count), lol_tmp(count), rdg_tmp(count), sl2_tmp(count))
++   associate(p => res%props)
++      if (allocated(res%esp)) then
++         call eval_realspace_derivs_kernel(p%basis%nao, p%basis%nbf, p%xyz, p%occ, &
++            & res%esp%coefficients, p%basis, count, points, occ_thr, &
++            & d_tmp, g_tmp, h_tmp, lap_tmp, tau_tmp, elf_tmp, lol_tmp, rdg_tmp, sl2_tmp, invalid_lao)
++      else
++         allocate(coefficients(p%basis%nbf, p%basis%nao))
++         if (p%basis%nbf == p%basis%nao) then
++            coefficients = p%c_sao
++         else
++            call sao2cao(p%basis%nao, p%c_sao, p%basis%nbf, coefficients, p%basis)
++         end if
++         call eval_realspace_derivs_kernel(p%basis%nao, p%basis%nbf, p%xyz, p%occ, &
++            & coefficients, p%basis, count, points, occ_thr, &
++            & d_tmp, g_tmp, h_tmp, lap_tmp, tau_tmp, elf_tmp, lol_tmp, rdg_tmp, sl2_tmp, invalid_lao)
++      end if
++   end associate
++   if (invalid_lao) then
++      call env%ptr%error("Real-space evaluation supports s/p/d Cartesian basis functions only", "rdkit_realspace")
++      return
++   end if
++   if (.not.all(ieee_is_finite(d_tmp)) .or. .not.all(ieee_is_finite(g_tmp)) .or. &
++       & .not.all(ieee_is_finite(h_tmp)) .or. .not.all(ieee_is_finite(lap_tmp)) .or. &
++       & .not.all(ieee_is_finite(tau_tmp)) .or. .not.all(ieee_is_finite(elf_tmp)) .or. &
++       & .not.all(ieee_is_finite(lol_tmp)) .or. .not.all(ieee_is_finite(rdg_tmp)) .or. &
++       & .not.all(ieee_is_finite(sl2_tmp))) then
++      call env%ptr%error("Real-space derivatives produced nonfinite values", "rdkit_realspace")
++      return
++   end if
++   call c_f_pointer(density_ptr, d_out, [count])
++   call c_f_pointer(grad_ptr, g_out, [3, count])
++   call c_f_pointer(hess_ptr, h_out, [6, count])
++   call c_f_pointer(lap_ptr, lap_out, [count])
++   call c_f_pointer(tau_ptr, tau_out, [count])
++   call c_f_pointer(elf_ptr, elf_out, [count])
++   call c_f_pointer(lol_ptr, lol_out, [count])
++   call c_f_pointer(rdg_ptr, rdg_out, [count])
++   call c_f_pointer(sl2_ptr, sl2_out, [count])
++   d_out = d_tmp
++   g_out = g_tmp
++   h_out = h_tmp
++   lap_out = lap_tmp
++   tau_out = tau_tmp
++   elf_out = elf_tmp
++   lol_out = lol_tmp
++   rdg_out = rdg_tmp
++   sl2_out = sl2_tmp
 +   ok = 1
 +end function
 +

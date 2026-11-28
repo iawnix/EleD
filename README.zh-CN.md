@@ -56,8 +56,9 @@ print(values["xtb_homo_ev"], values["xtb_lumo_ev"], values["xtb_gap_ev"])
 | 分子级 | 能量、HOMO/LUMO、能隙、偶极矩、电荷统计、`rdMolDescriptors.Properties` | `CalcXTBDescriptors`、`CalcMolXTBDescriptors`、`RegisterRDKitProperties` |
 | 扩展性质 | 能量分解、费米能级、D4 极化率/C6/C8、CAMM 原子与分子多极矩、精确原子核静电势（EPN） | `CalcEnergyDecomposition`、`CalcPolarizabilityDescriptors`、`CalcMultipoleDescriptors`、`CalcNuclearESP` |
 | 原子级 | xTB/CM5 电荷、Wiberg 总和、ΔSCF 与轨道加权 Fukui、Gázquez $\omega^\pm$/$S^2\Delta f$、凝聚态 ALIE/PDOS、FOD 静态关联与线性响应矩阵 $\chi_{AB}$ | `CalcXTBAtomDescriptors`、`RunReactivity`、`CalcOrbitalWeightedFukui`、`CalcAtomicOrbitalEnergies`、`RunFOD`、`CalcLinearResponseMatrix` |
-| [静电势、实空间表面与电荷](docs/zh-CN/esp-api.md) | 静电势采样、Politzer–Murray 范德华壳层与精确 `0.001 a.u.` 电子密度等值面（体积/面积/球度/ESP/ALIE/LEA）、ESP/单阶段 RESP 拟合电荷 | `GenerateESPGrid`、`GenerateESPSurfaceGrid`、`CalcESP`、`CalcESPSurfaceDescriptors`、`CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors`、`CalcDensityIsosurface`、`FitESPCharges`、`FitRESPCharges` |
-| 键级 | Wiberg 键级、前线键重叠、COOP/ECOHP、键极性与键中点局域电场 | `CalcXTBBondDescriptors`、`CalcFrontierBondDescriptors`、`CalcBondOverlapDescriptors`、`CalcBondElectricField` |
+| [静电势、实空间表面与电荷](docs/zh-CN/esp-api.md) | 静电势采样、Politzer–Murray 范德华壳层与精确 `0.001 a.u.` 等值面（体积/面积/球度/ESP/ALIE/LEA）、定向 σ/π-hole 与氢键供受体极值、价电子 ELF/LOL 与 NCI/RDG、ESP/单阶段 RESP 电荷 | `GenerateESPGrid`、`GenerateESPSurfaceGrid`、`CalcESP`、`CalcESPSurfaceDescriptors`、`CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors`、`CalcDensityIsosurface`、`CalcDirectedSurfaceDescriptors`、`CalcRealSpaceTopology`、`CalcNCIDescriptors`、`FitESPCharges`、`FitRESPCharges` |
+| 键级 | Wiberg 键级、前线键重叠、COOP/ECOHP、键极性、键中点局域电场、价电子键拓扑/椭圆度与 Cremer–Kraka 局域键力常数 | `CalcXTBBondDescriptors`、`CalcFrontierBondDescriptors`、`CalcBondOverlapDescriptors`、`CalcBondElectricField`、`CalcBondDensityTopology`、`CalcLocalBondForceConstants` |
+| 片段相互作用（EDA） | 片段电荷与 WBO、固定几何片段相互作用能分解（EDA）、净电荷转移与片段间 COOP/ECOHP/$\chi_{AB}$ | `CalcXTBFragmentDescriptors`、`CalcFragmentInteraction` |
 | 密度与局域轨道 | Mulliken/Löwdin shell 布居、密度矩阵、π 描述符、Pipek–Mezey 局域轨道（LMO） | `CalcDensityMatrix`、`CalcShellPopulations`、`CalcPiDescriptors`、`CalcLocalizedOrbitals` |
 | 前线轨道 | 简并 HOMO/LUMO 组、参与度、质心和键分解 | `CalcFrontierDescriptors`、`CalcFrontierBondDescriptors` |
 | 溶剂化与热化学 | ALPB/GBSA 隐式溶剂化位移、谐振频率、红外强度与 RRHO/qRRHO 热化学 | `CalcSolvationDescriptors`、`CalcVibrationalThermochemistry` |

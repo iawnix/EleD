@@ -79,7 +79,8 @@ def _native_diagnostics_build(path):
 
 _ESP_EXPORT_PATCH = 'aca69861eaf5e25b5437553c1a7f3c6117091c7abc3e6b3ab900109f50b70cd0'
 _PROPERTIES_EXPORT_PATCH = '56ea1fab2c624e37f851ce3d59d11d73d1a9abd6f9553c5464983c36c07ff817'
-_REALSPACE_EXPORT_PATCH = '4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74'
+_REALSPACE_EXPORT_PATCH_V1 = '4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74'
+_REALSPACE_EXPORT_PATCH = '2221b9658c10b262802cbbbac84a9d48cd3e6808fa8e59b1b0d13d20ba56b7f3'
 
 
 def _native_esp_build(path):
@@ -110,18 +111,34 @@ def _native_properties_build(path):
         return False
 
 
-def _native_realspace_build(path):
-    """Verify real-space wavefunction ABI identity for the selected binary."""
+def _native_realspace_api_version(path) -> int:
+    """Return verified real-space wavefunction ABI version (0, 1, or 2)."""
     try:
         if not _native_gfn0_build(path):
-            return False
-        record = Path(path).resolve().parent.parent/'share/xtb/eled/build.json'
+            return 0
+        record = Path(path).resolve().parent.parent / 'share/xtb/eled/build.json'
         data = json.loads(record.read_text())
         extension = data['source']['realspace_extension']
-        return (data['capabilities']['realspace_api'] == extension['api_version'] == 1
-                and extension['patch_sha256'] == _REALSPACE_EXPORT_PATCH)
+        cap = data['capabilities']['realspace_api']
+        ver = extension['api_version']
+        sha = extension['patch_sha256']
+        if cap == ver == 2 and sha == _REALSPACE_EXPORT_PATCH:
+            return 2
+        if cap == ver == 1 and sha == _REALSPACE_EXPORT_PATCH_V1:
+            return 1
+        return 0
     except (OSError, ValueError, KeyError, TypeError):
-        return False
+        return 0
+
+
+def _native_realspace_build(path):
+    """Verify real-space wavefunction ABI identity (v1 or v2) for the selected binary."""
+    return _native_realspace_api_version(path) >= 1
+
+
+def _native_realspace_derivs_build(path):
+    """Verify real-space wavefunction ABI v2 (analytical derivatives/ELF/LOL/NCI)."""
+    return _native_realspace_api_version(path) >= 2
 
 
 def _extended_libxtb_build(path: str) -> dict | None:

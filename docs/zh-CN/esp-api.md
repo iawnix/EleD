@@ -235,6 +235,12 @@ print(iso["esp_surface"]["v_min_au"], iso["realspace_surface"]["alie_min_ev"])
 `libxtb` 单点计算中通过 Voronoi 分区批量径向二分求取精确等值面，并计算体积、表面积、
 球度以及等值面上的 Politzer–Murray ESP 和 ALIE/LEA 表面统计量。
 
+EleD 0.15.0 将 `realspace_extension` 升级至向后兼容的 **ABI v2**（`xtb_rdkit_evalRealSpaceDerivatives`），
+提供解析笛卡尔 GTO 一/二阶导，支撑 `CalcRealSpaceTopology`、`CalcBondDensityTopology`（价电子
+$\rho$、$\nabla^2\rho$、$\tau$、ELF、LOL、RDG 与键椭圆度 $\varepsilon$）、`CalcNCIDescriptors`
+（吸引/范德华/位阻排斥三区间 NCI/RDG 体积与密度积分）以及 `CalcDirectedSurfaceDescriptors`
+（`0.001 a.u.` 等值面定向卤键 $\sigma$-hole、极性 `X–H` 氢键供体、杂原子受体与芳环 $\pi$-hole 极值）。
+
 ## 构建和验证
 
 复用标准安装中的固定运行时和工具链：

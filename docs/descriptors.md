@@ -36,7 +36,11 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcFODFromResult(result, *, scheme="lowdin", electronicTemperature=None)` / `RunFOD(mol, *, electronicTemperature=5000.0, ...)` | Grimme FOD static-correlation index (`n_fod_e`), spin-resolved Fermi levels, orbital FOD weights and atomic/shell `fod_pop_e` (`s/p/d`) | Retained result (`keepOverlap=True` for atomic/shell FOD) or explicit-H 3D `Mol` (1 SCF) |
 | `CalcLinearResponseMatrix(result, *, scheme="lowdin", ...)` | Closed-shell independent-particle atom-condensed linear response $\chi_{AB}^{\mathrm{IP}}$ (`chi_e_per_ev`, `chi_e_per_ha`, per-atom softness & nonlocal coupling) | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
 | `CalcBondElectricField(mol, *, stepAngstrom=1e-3, ...)` / `CalcBondElectricFieldFromESP(mol, result, ...)` | Bond-midpoint electric field $\mathbf{E}=-\nabla V$ projected along every RDKit bond (`e_parallel_*`, `e_perp_*`, `e_norm_*`, `e_vec_au`) | Explicit-H 3D `Mol` (1 batched ESP SCF) or matching stencil result |
-| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v1 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
+| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v1/v2 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
+| `CalcRealSpaceTopology(mol, pts)` / `CalcBondDensityTopology(mol)` / `CalcNCIDescriptors(mol)` | Analytical valence density derivatives, ELF, LOL, RDG, $\mathrm{sign}(\lambda_2)\rho$, bond ellipticity $\varepsilon$, and volumetric NCI/RDG regimes | `realspace_extension` ABI v2 (1 native SCF) |
+| `CalcDirectedSurfaceDescriptors(mol, *, isovalueAU=0.001, ...)` | Directed `0.001 a.u.` isosurface extrema for halogen $\sigma$-holes, polar X–H HBD, heteroatom HBA, and aromatic $\pi$-holes | `realspace_extension` + `esp_extension` (1 native SCF) |
+| `CalcFragmentInteraction(mol, fragmentA, fragmentB, ...)` | Fixed-geometry fragment EDA ($\Delta E_{\text{elec/rep/es/disp/solv}}$), charge transfer (`ct_*_a_to_b_e`), and inter-fragment WBO/COOP/ECOHP/$\chi_{AB}$ | 3 matched single points (`AB`, `A`, `B`, `keepOverlap=True`) |
+| `CalcLocalBondForceConstants(mol)` / `CalcLocalBondForceConstantsFromHessian(mol, hess)` | Cremer–Kraka local bond stretching force constants $k^a$ (`mDyn/Å`), Grunenberg compliance constants $C_{ii}$, and adiabatic local frequencies $\omega^a$ | Cartesian Hessian (0 SCF from `CalcVibrationalThermochemistry(..., includeHessian=True)`, or `1 + 6N` gradient evaluations) |
 
 The Python `rdXTBTools.RunMol` wrapper records input provenance from its owned
 molecule snapshot. Both Python result types support bond mapping, annotation and
@@ -427,3 +431,37 @@ iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 1 SCF exact 0.001 a.u.
   `0.001 a.u.` isosurface in one SCF via Voronoi-partitioned batched radial bisection and
   returns molecular volume, surface area, sphericity, surface grid, and optional isosurface
   Politzer–Murray ESP and ALIE/LEA surface statistics.
+
+## Real-space valence topology (ELF/LOL/ellipticity/NCI), directed σ/π-hole extrema, fragment EDA and Cremer–Kraka local bond force constants
+
+```python
+from eled import (
+    CalcBondDensityTopology, CalcNCIDescriptors, CalcDirectedSurfaceDescriptors,
+    CalcFragmentInteraction, CalcLocalBondForceConstants,
+)
+
+topo = CalcBondDensityTopology(mol)                                  # bond rho, ELF, LOL, ellipticity
+nci = CalcNCIDescriptors(dimer, fragmentA=[0, 1, 2], fragmentB=[3, 4, 5])
+extrema = CalcDirectedSurfaceDescriptors(mol, isovalueAU=0.001)      # sigma/pi-holes & HBD/HBA
+eda = CalcFragmentInteraction(dimer, [0, 1, 2], [3, 4, 5])           # 3-SCF EDA + charge transfer
+k_local = CalcLocalBondForceConstants(mol, extraPairs=[(1, 3)])      # Cremer-Kraka k^a (mDyn/A)
+```
+
+- `CalcRealSpaceTopology`, `CalcBondDensityTopology`, and `CalcNCIDescriptors` use
+  `realspace_extension` ABI v2 analytical Cartesian GTO derivatives ($\nabla\psi, \nabla^2\psi$)
+  to evaluate $\rho$, $\nabla\rho$, Hessian eigenvalues, $\nabla^2\rho$, kinetic energy density
+  $\tau$, Becke–Edgecombe ELF, Schmider–Becke LOL, RDG, $\mathrm{sign}(\lambda_2)\rho$, bond
+  ellipticity $\varepsilon = \lambda_1/\lambda_2 - 1$, and volumetric NCI/RDG attractive/vdW/repulsive
+  integrals in one SCF. Outputs explicitly note that GFN-xTB uses a valence-only minimal basis
+  (no core electrons).
+- `CalcDirectedSurfaceDescriptors` locates exact `0.001 a.u.` isosurface extrema along halogen
+  $\sigma$-hole axes (and 15° cones), polar `X–H` hydrogen-bond donor axes, heteroatom acceptor
+  Voronoi patches, and aromatic ring $\pi$-hole normals in one SCF.
+- `CalcFragmentInteraction` decomposes fixed-geometry fragment interactions (`AB - A - B`) across
+  electronic, repulsion, electrostatic, dispersion, halogen-bond, and solvation terms alongside
+  SCC/CM5/Löwdin/Mulliken charge transfer, inter-fragment WBO/COOP/ECOHP, closed-shell $\chi_{AB}$,
+  and interaction dipole shifts.
+- `CalcLocalBondForceConstants` and `CalcLocalBondForceConstantsFromHessian` evaluate coordinate-invariant
+  Grunenberg compliance constants $C_{ii} = \mathbf{b}_i^T H_{\mathrm{int}}^+ \mathbf{b}_i$,
+  Cremer–Kraka local stretching force constants $k^a = 1/C_{ii}$ (`mDyn/Å`), and adiabatic local
+  bond frequencies $\omega^a$ (`cm^-1`) for RDKit bonds and optional noncovalent `extraPairs`.

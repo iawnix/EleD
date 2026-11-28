@@ -39,7 +39,8 @@ constexpr const char *d4PatchSHA256 =
 constexpr const char *basisPatchSHA256 = "3c18bd5e5c418910e9873e915478458026dba6228cbe19eb0da32fde6f106e2c";
 constexpr const char *scfPatchSHA256 = "d8db37846002ebc19ed6808356cbd83304cc1608915e69956c1a7afc174d18fd";
 constexpr const char *propertiesPatchSHA256 = "56ea1fab2c624e37f851ce3d59d11d73d1a9abd6f9553c5464983c36c07ff817";
-constexpr const char *realSpacePatchSHA256 = "4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74";
+constexpr const char *realSpacePatchSHA256V1 = "4765e93cd00aaaf4a69ea67feca05fc382146006348da11353ef0220da65ca74";
+constexpr const char *realSpacePatchSHA256 = "2221b9658c10b262802cbbbac84a9d48cd3e6808fa8e59b1b0d13d20ba56b7f3";
 constexpr std::array<int, 32> validSolvationGrids = {
     6, 14, 26, 38, 50, 74, 86, 110, 146, 170, 194, 230, 266, 302, 350, 434,
     590, 770, 974, 1202, 1454, 1730, 2030, 2354, 2702, 3074, 3470, 3890, 4334, 4802, 5294, 5810};
@@ -270,10 +271,14 @@ bool verifyRealSpace(const API &api) {
     boost::property_tree::ptree record;
     boost::property_tree::read_json((prefix / "share/xtb/eled/build.json").string(), record);
     std::string commit;
-    return verifyGFN0(api, commit) && record.get<int>("capabilities.realspace_api", 0) == 1 &&
-      record.get<int>("source.realspace_extension.api_version", 0) == 1 &&
-      record.get<std::string>("source.realspace_extension.patch_sha256", "") == realSpacePatchSHA256 &&
-      api.getRealSpaceAPIVersion() == 1;
+    if (!verifyGFN0(api, commit)) return false;
+    const int cap = record.get<int>("capabilities.realspace_api", 0);
+    const int ver = record.get<int>("source.realspace_extension.api_version", 0);
+    const std::string sha = record.get<std::string>("source.realspace_extension.patch_sha256", "");
+    const int live = api.getRealSpaceAPIVersion();
+    if (cap == 2 && ver == 2 && live == 2 && sha == realSpacePatchSHA256) return true;
+    if (cap == 1 && ver == 1 && live == 1 && sha == realSpacePatchSHA256V1) return true;
+    return false;
   } catch (const std::exception &) { return false; }
 }
 

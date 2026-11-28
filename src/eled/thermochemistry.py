@@ -151,6 +151,7 @@ def CalcVibrationalThermochemistry(
     maxIterations: int = 250,
     accuracy: float = 1.0,
     electronicTemperature: float = 300.0,
+    includeHessian: bool = False,
 ) -> dict[str, Any]:
     """Compute harmonic vibrational frequencies and RRHO/qRRHO thermochemistry.
 
@@ -171,6 +172,8 @@ def CalcVibrationalThermochemistry(
     temp = _positive_real(temperatureK, 'temperatureK')
     press = _positive_real(pressureAtm, 'pressureAtm')
     step = _positive_real(stepBohr, 'stepBohr')
+    if not isinstance(includeHessian, bool):
+        raise ValueError('includeHessian must be bool')
     imag_thr = _positive_real(imaginaryThresholdCm1, 'imaginaryThresholdCm1', allow_zero=True)
     grad_thr = _positive_real(stationaryGradientThresholdHaBohr, 'stationaryGradientThresholdHaBohr')
     sthr = _positive_real(rotorCutoffCm1, 'rotorCutoffCm1', allow_zero=True)
@@ -474,4 +477,7 @@ def CalcVibrationalThermochemistry(
         ),
         'missing': {},
     }
+    if includeHessian:
+        payload['hessian_ha_bohr2'] = hess.tolist()
+        payload['units']['hessian_ha_bohr2'] = 'Hartree/Bohr^2'
     return json.loads(json.dumps(payload, allow_nan=False))

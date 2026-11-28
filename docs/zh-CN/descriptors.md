@@ -130,7 +130,27 @@ iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 单次 SCF 精确 0.00
 - `RunFOD` / `CalcFODFromResult` 实现 Grimme–Hansen 有限温 Fermi–Dirac 分数占据电子密度（FOD）诊断，返回 `n_fod_e`、自旋分辨费米能级 `fermi_alpha_ev`/`fermi_beta_ev`、每轨道 `orbital_fod_e` 以及原子与 `s/p/d` 壳层 `fod_pop_e`/`fod_s_e`/`fod_p_e`/`fod_d_e`。
 - `CalcLinearResponseMatrix` 在 `keepOverlap=True` 的闭壳层单点结果上计算独立粒子原子凝聚线性响应矩阵 $\chi_{AB}^{\mathrm{IP}}$（`chi_e_per_ev`、`chi_e_per_ha`、对角 `chi_diag_e_per_ev`、`atomic_softness_e_per_ev`、`nonlocal_coupling_e_per_ev`），精确满足 $\sum_B \chi_{AB} = 0$，并对开壳层、未知自旋、分数占据或零能隙体系显式返回 `available=False` 与 `missing` 原因。
 - `CalcBondElectricField` / `CalcBondElectricFieldFromESP` 在单次 `libxtb` 单点计算中对全部 RDKit 键中点构造 6 点中心有限差分模板求取 $\mathbf{E} = -\nabla V$，输出键向投影 `e_parallel_au`/`e_parallel_mv_cm`、垂直分量 `e_perp_au`/`mv_cm`、模长 `e_norm_au`/`mv_cm` 及三维向量 `e_vec_au`（`1 a.u. = 5142.2067476326 MV/cm`）。
-- `CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors` 与 `CalcDensityIsosurface` 通过扩展版 `libxtb` 的 `realspace_extension` ABI v1 在内存中精确求值笛卡尔 GTO 价电子密度 $\rho(\mathbf{r})$、实空间平均局域电离能 $\mathrm{ALIE}(\mathbf{r})$、虚轨道密度和局域电子亲和能 $\mathrm{LEA}(\mathbf{r})$，并在单次 SCF 内给出精确 `0.001 a.u.` 等值面的分子体积、表面积、球度以及表面 ESP/ALIE/LEA 统计；低于 `densityCutoffAU` 的点显式返回 `None`，绝不填零。
+- `CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors` 与 `CalcDensityIsosurface` 通过扩展版 `libxtb` 的 `realspace_extension` ABI v1/v2 在内存中精确求值笛卡尔 GTO 价电子密度 $\rho(\mathbf{r})$、实空间平均局域电离能 $\mathrm{ALIE}(\mathbf{r})$、虚轨道密度和局域电子亲和能 $\mathrm{LEA}(\mathbf{r})$，并在单次 SCF 内给出精确 `0.001 a.u.` 等值面的分子体积、表面积、球度以及表面 ESP/ALIE/LEA 统计；低于 `densityCutoffAU` 的点显式返回 `None`，绝不填零。
+
+## 实空间价电子拓扑（ELF/LOL/椭圆度/NCI）、定向 σ/π-hole 极值、片段 EDA 与 Cremer–Kraka 局域键力常数
+
+```python
+from eled import (
+    CalcBondDensityTopology, CalcNCIDescriptors, CalcDirectedSurfaceDescriptors,
+    CalcFragmentInteraction, CalcLocalBondForceConstants,
+)
+
+topo = CalcBondDensityTopology(mol)                                  # 键鞍点/中点 rho、ELF、LOL 与键椭圆度
+nci = CalcNCIDescriptors(dimer, fragmentA=[0, 1, 2], fragmentB=[3, 4, 5])
+extrema = CalcDirectedSurfaceDescriptors(mol, isovalueAU=0.001)      # 卤键 σ-hole、芳环 π-hole、HBD/HBA 极值
+eda = CalcFragmentInteraction(dimer, [0, 1, 2], [3, 4, 5])           # 3 次单点片段 EDA 与电荷转移
+k_local = CalcLocalBondForceConstants(mol, extraPairs=[(1, 3)])      # Cremer-Kraka 局域力常数 k^a (mDyn/Å)
+```
+
+- `CalcRealSpaceTopology`、`CalcBondDensityTopology` 与 `CalcNCIDescriptors` 基于 `realspace_extension` ABI v2 解析笛卡尔 GTO 一/二阶导，单次 SCF 即可得到 $\rho$、$\nabla\rho$、Hessian 特征值、$\nabla^2\rho$、动能密度 $\tau$、Becke–Edgecombe ELF、Schmider–Becke LOL、RDG、$\mathrm{sign}(\lambda_2)\rho$、键椭圆度 $\varepsilon = \lambda_1/\lambda_2 - 1$ 以及 NCI 吸引/范德华/位阻排斥区间的体积与密度积分（显式标注为 xTB 价电子密度，不含内层芯电子）。
+- `CalcDirectedSurfaceDescriptors` 在单次 SCF 中求取精确 `0.001 a.u.` 等值面上的卤键 $\sigma$-hole 轴向与 15° 锥面极大值、极性 `X–H` 氢键供体（HBD）轴向静电势、杂原子受体（HBA）表面极小值及芳环 $\pi$-hole 法向静电势。
+- `CalcFragmentInteraction` 对固定几何复合物执行三次匹配单点（`AB`、`A`、`B`，`keepOverlap=True`，支持 `native`/`compiled` 一致性），输出能量分解差值、SCC/CM5/Löwdin/Mulliken 净电荷转移、片段间 WBO/COOP/ECOHP 与闭壳层 $\chi_{AB}$。
+- `CalcLocalBondForceConstants` / `CalcLocalBondForceConstantsFromHessian`（可直接复用 `CalcVibrationalThermochemistry(..., includeHessian=True)` 的 Hessian）计算坐标无关的 Grunenberg 柔度常数 $C_{ii}$、Cremer–Kraka 局域伸缩力常数 $k^a$（`mDyn/Å`）和局域振动频率 $\omega^a$（`cm^-1`），并支持对非共价氢键/配位键传入 `extraPairs`。
 
 ## 轨道加权反应性、ALIE/PDOS、COOP/ECOHP 与 Pipek–Mezey 局域轨道
 

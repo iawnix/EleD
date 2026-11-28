@@ -270,6 +270,14 @@ batched radial bisection inside one native `libxtb` single point to locate the e
 `isovalueAU` isosurface and compute volume, area, sphericity, and optional isosurface ESP
 and ALIE/LEA surface statistics.
 
+EleD 0.15.0 upgrades `realspace_extension` to **ABI v2** (`xtb_rdkit_evalRealSpaceDerivatives`,
+backward-compatible with v1) with analytical Cartesian GTO first and second derivatives for
+`CalcRealSpaceTopology`, `CalcBondDensityTopology` (valence $\rho$, $\nabla^2\rho$, $\tau$,
+ELF, LOL, RDG, and bond ellipticity $\varepsilon$), `CalcNCIDescriptors` (volumetric NCI/RDG
+attractive/vdW/repulsive regimes), and `CalcDirectedSurfaceDescriptors` (directed halogen
+$\sigma$-holes, polar `X–H` HBD, heteroatom HBA, and aromatic $\pi$-holes on the `0.001 a.u.`
+isosurface).
+
 ## Build and verification
 
 Reuse the fixed runtime and toolchain from the standard installation:

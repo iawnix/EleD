@@ -165,8 +165,10 @@ class _NativeXTB:
                 'real-space evaluation requires the verified realspace extension; rebuild libxtb'
             )
         h, i, d = self._handle, ctypes.c_int, ctypes.c_double
-        if self._bind('xtb_rdkit_getRealSpaceAPIVersion', i, [])() != 1:
-            raise DescriptorUnavailableError('unsupported native real-space API')
+        version = int(self._bind('xtb_rdkit_getRealSpaceAPIVersion', i, [])())
+        if version not in (1, 2):
+            raise DescriptorUnavailableError(f'unsupported native real-space API {version}')
+        self.realspace_api_version = version
         self.eval_realspace = self._bind(
             'xtb_rdkit_evalRealSpace',
             i,
@@ -183,6 +185,78 @@ class _NativeXTB:
                 ctypes.POINTER(d),
             ],
         )
+        if version >= 2:
+            self.eval_realspace_derivs = self._bind(
+                'xtb_rdkit_evalRealSpaceDerivatives',
+                i,
+                [
+                    h,
+                    h,
+                    i,
+                    ctypes.POINTER(d),
+                    d,
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                    ctypes.POINTER(d),
+                ],
+            )
+        else:
+            self.eval_realspace_derivs = None
+
+    def realspace_derivs_data(self, environment, results, points_angstrom, occ_threshold=1e-7):
+        import numpy as np
+        if getattr(self, 'eval_realspace_derivs', None) is None:
+            raise DescriptorUnavailableError(
+                'real-space derivatives require verified realspace ABI v2; rebuild libxtb'
+            )
+        pts_arr = np.ascontiguousarray(np.asarray(points_angstrom, dtype=np.float64) * ANGSTROM_TO_BOHR)
+        count = int(pts_arr.shape[0])
+        density = np.empty(count, dtype=np.float64)
+        grad = np.empty((count, 3), dtype=np.float64)
+        hess = np.empty((count, 6), dtype=np.float64)
+        lap = np.empty(count, dtype=np.float64)
+        tau = np.empty(count, dtype=np.float64)
+        elf = np.empty(count, dtype=np.float64)
+        lol = np.empty(count, dtype=np.float64)
+        rdg = np.empty(count, dtype=np.float64)
+        sl2 = np.empty(count, dtype=np.float64)
+        dp = ctypes.POINTER(ctypes.c_double)
+        ok = self.eval_realspace_derivs(
+            environment,
+            results,
+            count,
+            pts_arr.ctypes.data_as(dp),
+            float(occ_threshold),
+            density.ctypes.data_as(dp),
+            grad.ctypes.data_as(dp),
+            hess.ctypes.data_as(dp),
+            lap.ctypes.data_as(dp),
+            tau.ctypes.data_as(dp),
+            elf.ctypes.data_as(dp),
+            lol.ctypes.data_as(dp),
+            rdg.ctypes.data_as(dp),
+            sl2.ctypes.data_as(dp),
+        )
+        self.check(environment, 'real-space derivatives evaluation')
+        if not ok:
+            raise XTBEnvironmentError('native real-space derivatives evaluation failed without a diagnostic')
+        return {
+            'density': density,
+            'grad_rho': grad,
+            'hess_rho': hess,
+            'laplacian': lap,
+            'tau': tau,
+            'elf': elf,
+            'lol': lol,
+            'rdg': rdg,
+            'sign_lambda2_rho': sl2,
+        }
 
     def realspace_data(self, environment, results, points, occ_threshold=1e-7, lea_window_ev=0.0):
         count = len(points)
