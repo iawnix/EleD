@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import cached_property
+import hashlib
 import json
 from numbers import Integral
 import weakref
@@ -325,26 +326,44 @@ def _readonly(array: np.ndarray) -> np.ndarray:
     return array
 
 
-_BASIS_CACHE: dict[int, tuple[weakref.ref, _OrbitalBasis]] = {}
+_BASIS_CACHE: dict[int, tuple[weakref.ref, tuple, _OrbitalBasis]] = {}
+
+
+def _basis_signature(result):
+    """Track the contents of basis inputs, including mutable lists and arrays."""
+    digest = hashlib.sha256()
+    for values in (result.orbitalEnergiesEV, result.orbitalOccupancies,
+                   result.orbitalCoefficients, result.overlapMatrix, result.aoAtomMap):
+        array = np.asarray(values)
+        # Object-array bytes encode pointers, not the values they reference.
+        if array.dtype.hasobject:
+            return None
+        digest.update(repr((array.shape, array.dtype.str)).encode('ascii'))
+        digest.update(array.tobytes())
+    return (result.numAtoms, result.numOrbitals, result.numElectrons,
+            result.numUnpairedElectrons, digest.digest())
 
 
 def _orbital_basis(result: XTBResults) -> _OrbitalBasis:
-    """Validate and decompose a result's overlap/coefficients once per result object.
+    """Reuse validated basis decompositions while the result's inputs are unchanged.
 
     Every same-basis analysis (populations, density, Fukui, COOP, linear
     response, FOD, localized orbitals) shares this: S is checked to be
     positive definite, C to be S-orthonormal within
     ``ORTHONORMALITY_TOLERANCE``, and S^(1/2) is built a single time.
     """
-    key = id(result)
-    cached = _BASIS_CACHE.get(key)
-    if cached is not None and cached[0]() is result:
-        return cached[1]
     if not _has_population_basis(result):
         raise DescriptorUnavailableError(
             'this analysis requires same-calculation overlap, coefficients and AO-to-atom mapping; '
             'use XTBCalculator(...).Calculate(..., keepOverlap=True)'
         )
+    key = id(result)
+    signature = _basis_signature(result)
+    cached = _BASIS_CACHE.get(key)
+    if (signature is not None and cached is not None
+            and cached[0]() is result and cached[1] == signature):
+        return cached[2]
+    _BASIS_CACHE.pop(key, None)
     energies, occupations, occupied, virtual = _orbitals(result)
     natoms = result.numAtoms
     c, s, mapping = _orbital_basis_arrays(result, len(energies), natoms)
@@ -356,12 +375,12 @@ def _orbital_basis(result: XTBResults) -> _OrbitalBasis:
     if error > ORTHONORMALITY_TOLERANCE:
         raise ValueError(f'coefficients are not S-orthonormal: error={error:g}')
     basis = _OrbitalBasis(
-        energies=energies,
-        occupations=occupations,
+        energies=energies.copy(),
+        occupations=occupations.copy(),
         occupied=occupied,
         virtual=virtual,
-        coefficients=c,
-        overlap=s,
+        coefficients=c.copy(),
+        overlap=s.copy(),
         ao_atom=mapping.astype(int),
         natoms=int(natoms),
         overlap_half=(vec * np.sqrt(eig)) @ vec.T,
@@ -370,7 +389,11 @@ def _orbital_basis(result: XTBResults) -> _OrbitalBasis:
     for array in (basis.energies, basis.occupations, basis.occupied, basis.virtual, basis.coefficients,
                   basis.overlap, basis.ao_atom, basis.overlap_half):
         _readonly(array)  # shared across analyses
-    _BASIS_CACHE[key] = (weakref.ref(result, lambda _ref, key=key: _BASIS_CACHE.pop(key, None)), basis)
+    if signature is not None:
+        _BASIS_CACHE[key] = (
+            weakref.ref(result, lambda _ref, key=key: _BASIS_CACHE.pop(key, None)),
+            signature, basis,
+        )
     return basis
 
 

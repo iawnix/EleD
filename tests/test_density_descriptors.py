@@ -243,3 +243,74 @@ def test_corrupt_retained_basis_across_interfaces(damage):
                  lambda data: CalcDescriptorReport(molecule(), data)):
         with pytest.raises(ValueError, match='mapping|square'):
             read(r)
+
+
+@pytest.mark.parametrize('field', ['aoShellMap', 'shellAtomMap', 'shellAngularMomenta'])
+@pytest.mark.parametrize('kind', ['fractional', 'boolean', 'nested', 'string'])
+def test_shell_maps_reject_noninteger_inputs(field, kind):
+    r = result()
+    original = getattr(r, field)
+    values = {
+        'fractional': tuple(v + .25 for v in original),
+        'boolean': tuple(bool(v) for v in original),
+        'nested': (original,),
+        'string': tuple(str(v) for v in original),
+    }[kind]
+    damaged = replace(r, **{field: values})
+    for read in (CalcDensityMatrix, CalcShellPopulations):
+        with pytest.raises(ValueError, match='map must contain integer indices'):
+            read(damaged)
+
+
+def test_basis_cache_reuses_decomposition_and_refreshes_mutated_occupations(monkeypatch):
+    from eled import CalcOrbitalPopulations
+    calls = []
+    eigh = np.linalg.eigh
+
+    def counted(matrix):
+        calls.append(matrix.shape)
+        return eigh(matrix)
+
+    monkeypatch.setattr(np.linalg, 'eigh', counted)
+    occupations = list(result().orbitalOccupancies)
+    r = replace(result(), orbitalOccupancies=occupations)
+    before = CalcDensityMatrix(r)
+    CalcOrbitalPopulations(r)
+    CalcShellPopulations(r)
+    assert len(calls) == 1
+    # Move two electrons between atoms, preserving the total electron count.
+    occupations[0], occupations[4] = occupations[4], occupations[0]
+    after = CalcDensityMatrix(r)
+    assert len(calls) == 2
+    assert after['tr_ps_e'] == before['tr_ps_e'] == 8.
+    assert after['density_matrix'][0][0] == 0.
+    assert after['density_matrix'][4][4] == 2.
+    assert after == CalcDensityMatrix(replace(r))
+
+
+def test_basis_cache_owns_arrays_and_revalidates_changed_coefficients():
+    coefficients = np.array(result().orbitalCoefficients)
+    r = replace(result(), orbitalCoefficients=coefficients)
+    report = CalcDensityMatrix(r)
+    assert coefficients.flags.writeable
+    coefficients[0, 0] = 2.
+    with pytest.raises(ValueError, match='not S-orthonormal'):
+        CalcDensityMatrix(r)
+    assert report['density_matrix'][0][0] == 2.
+
+
+def test_basis_cache_revalidates_changed_atom_count():
+    r = result()
+    CalcDensityMatrix(r)
+    r.metadata['atom_count'] += 1
+    with pytest.raises(ValueError, match='mapping'):
+        CalcDensityMatrix(r)
+
+
+def test_basis_cache_refreshes_mutated_ao_map():
+    from eled import CalcOrbitalPopulations
+    mapping = list(result().aoAtomMap)
+    r = replace(result(), aoAtomMap=mapping)
+    assert CalcOrbitalPopulations(r)['mo_n_e'] == pytest.approx([8., 0.])
+    mapping[:] = [1 - atom for atom in mapping]
+    assert CalcOrbitalPopulations(r)['mo_n_e'] == pytest.approx([0., 8.])
