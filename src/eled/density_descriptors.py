@@ -37,9 +37,15 @@ def _basis(result):
         )
     basis = _orbital_basis(result)
     atom = basis.ao_atom
-    shell = np.asarray(result.aoShellMap, dtype=int)
-    shell_atom = np.asarray(result.shellAtomMap, dtype=int)
-    shell_l = np.asarray(result.shellAngularMomenta, dtype=int)
+    def integer_map(values, name):
+        array = np.asarray(values)
+        if array.ndim != 1 or array.dtype.kind not in 'iu':
+            raise ValueError(f'{name} must contain integer indices')
+        return array.astype(int)
+
+    shell = integer_map(result.aoShellMap, 'AO shell map')
+    shell_atom = integer_map(result.shellAtomMap, 'shell atom map')
+    shell_l = integer_map(result.shellAngularMomenta, 'shell angular momentum map')
     if (len(shell) != len(atom) or len(shell_l) != len(shell_atom)
             or np.any(shell < 0) or np.any(shell >= len(shell_atom))
             or not np.array_equal(shell_atom[shell], atom)

@@ -17,6 +17,11 @@ Atom and bond indices follow the original RDKit molecule. Functions taking
 `mol` verify its topology, atom order and coordinates against the calculation.
 `CalcDescriptorReport` includes these sections by default when overlap is retained.
 
+Analyses of unchanged basis data share the overlap decomposition and density
+matrices. Changes to input arrays or the atom count trigger revalidation and
+recomputation. Cached arrays are owned by EleD. AO/shell maps must be
+one-dimensional integer arrays.
+
 ## Density and shell populations
 
 For spin-summed occupations, define
