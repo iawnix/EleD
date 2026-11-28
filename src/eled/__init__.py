@@ -2,8 +2,8 @@
 
 The public package is centered on :class:`XTBCalculator`, :class:`XTBResults`
 and the project-built extended ``libxtb``, following RDKit's ``PascalCase``
-function/method and ``camelCase`` parameter/property conventions. Dataset
-splitting utilities for the frozen EAS study live in :mod:`eled.eas`.
+function/method and ``camelCase`` parameter/property conventions. Datasets,
+model training and application studies are maintained outside this package.
 """
 
 from .batch import RunXTBBatch, XTBCache, XTBCacheKey

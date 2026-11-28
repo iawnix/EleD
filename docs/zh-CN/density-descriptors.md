@@ -110,5 +110,4 @@ mul_ovlp_e(A,B) = 2 Σ[μ∈A,ν∈B] PGμν Sμν
 还用于验证 π 描述符的刚体运动不变性。
 
 密度分析基于 Mulliken（1955）、Löwdin（1950）和 Mayer（1983）的定义。
-`DescriptorCatalog()` 提供机器可读的定义和单位；
-[文献定位](../literature-density-ml-audit.md) 单独记录。
+`DescriptorCatalog()` 提供机器可读的定义和单位。

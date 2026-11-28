@@ -28,30 +28,10 @@ individual descriptor reports and field coverage are included. These are
 uniform descriptive statistics, not Boltzmann averages. Single-conformer zero
 spreads are not evidence of stability across unsampled geometries.
 
-The [QM8 protocol and interpretation](../../qm8-pilot.md) describes the
-target, source, filtering, feature lists, fixed model and caveats. Evidence:
-
-- `qm8-manifest.json.gz`: archive/script/source hashes, all exclusions, selected
-  IDs, chemical identities, target values, geometry hashes, settings and versions.
-- `qm8-splits.json.gz`: exact training/test IDs for all six fixed splits.
-- `qm8-features.jsonl.gz`: numerical features, quality flags, per-molecule
-  engine/parameter provenance and measured cost for the common cohort.
-- `qm8-predictions.json.gz`: every test target and prediction for all 18 fits.
-- `qm8-summary.json`: MAE/RMSE, sizes, feature counts, software versions and
-  timings. `qm8-failures.json` records calculation/feature failures (empty here).
-
-MAE averaged over the three random splits is 0.3469 → 0.2085 → 0.2028 eV
-for RDKit, +basic xTB, +orbital distributions. For scaffold splits it is
-0.3473 → 0.2105 → 0.2093 eV. Basic xTB helps this pilot; additional orbital
-features provide small, inconsistent incremental gains. No significance,
-state-of-the-art or general scientific accuracy claim is made. Source
-geometries are provided, and their preparation cost is not included.
-
-JSON evidence can be opened using standard-library `gzip.open(path, 'rt')`
-and `json.load`, or one `json.loads(line)` per JSONL line. The full QM8 download
-stays outside Git in `build/qm8`; raw source structures are not bundled here.
-Scripts refuse to overwrite an existing benchmark output directory and verify
-the input archive checksum before reading it.
+Dataset-derived artifacts (QM8/QM9 cohorts, splits, features, predictions,
+geometry-preparation audits) were removed from the repository in 0.17.0;
+application studies are maintained outside EleD. They remain available in
+Git history. `SHA256SUMS.json` still lists the original evidence set.
 
 `installation.json`, `artifact-manifest.json`, installed-wheel reports and test
 logs identify the locally tested 0.9 artifacts in `dist/0.9.0`. Evidence is

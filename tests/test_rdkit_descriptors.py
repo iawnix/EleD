@@ -60,8 +60,9 @@ def _synthetic_water_result(mol):
     )
 
 
-def test_top_level_namespace_exports_rdkit_helpers_and_excludes_eas_dataset_tools():
-    import eled.eas as eas_module
+def test_top_level_namespace_exports_rdkit_helpers_and_excludes_dataset_tools():
+    import importlib.util
+    assert importlib.util.find_spec('eled.eas') is None
     assert XTBResult is XTBResults
     assert callable(CalcMolXTBDescriptors)
     assert callable(RegisterRDKitProperties)
@@ -78,7 +79,6 @@ def test_top_level_namespace_exports_rdkit_helpers_and_excludes_eas_dataset_tool
     ):
         assert eas_name not in eled.__all__
         assert not hasattr(eled, eas_name)
-        assert hasattr(eas_module, eas_name)
 
 
 def test_passing_mol_directly_to_result_descriptor_gives_actionable_type_error():

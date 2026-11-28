@@ -33,7 +33,6 @@ eled = "eled.diagnostics:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-eled = ["protocol.json"]
 
 [tool.setuptools.exclude-package-data]
 eled = ["*.so"]

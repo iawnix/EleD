@@ -47,13 +47,8 @@ with the official engine and **23 passed** for optional benchmark/discovery
 tests. A research venv now automatically finds its base runtime's libxtb;
 native and compiled population checks pass with library/prefix overrides unset.
 
-The [matched QM8 geometry study](qm8-geometry-study.md) keeps the 0.9.0 selected
-IDs, model and split memberships. 41 embedding failures leave 983 common
-successful molecules. Both geometry protocols are refitted on this cohort.
-Generated-geometry basic xTB features retain a useful pilot benefit but have
-higher error than source geometries. Additional orbital-distribution gains
-remain small; all three generated-geometry scaffold paired intervals include
-zero. Evidence includes every attempted geometry and all matched comparisons.
+The QM8 geometry/model study artifacts from this release were removed from the
+repository (0.17.0); application studies are maintained externally.
 
 All three 0.9.0 remote CI workflows passed; current-commit remote status must
 be distinguished from these local checks.
@@ -71,12 +66,8 @@ failure accounting, actual conformer IDs, rigid-transform invariance, unchanged
 inputs, cache reuse and protocol consistency. The installed example retains
 11 conformers over five molecules with auditable ETKDG/MMFF preparation.
 
-The separate [QM8 pilot](qm8-pilot.md) uses 1,024 complete source geometries,
-three fixed random/scaffold splits and three nested feature groups. Basic xTB
-features improve this small prediction task; additional orbital distributions
-show only small, split-dependent gains. This is neither a full QM8 result nor
-evidence that xTB directly calculates excited states. All selected IDs, splits,
-features, predictions, exclusions, metrics and timings are archived.
+The QM8 pilot archive from this release was removed from the repository
+(0.17.0); application studies are maintained externally.
 
 The preceding 0.8 commit's three remote CI workflows were confirmed successful.
 New-commit CI status must be checked on GitHub separately from these local logs.
@@ -494,8 +485,7 @@ workspace, and no package has been published.
 ## Scope
 
 Adapter regression checks validate numerical agreement and protocol behavior,
-not scientific accuracy against experiment. The 0.9 QM8 pilot is a separate,
-limited prediction experiment with its own stated scope and exclusions.
+not scientific accuracy against experiment.
 Tests do not establish portability across all xTB releases or operating systems.
 macOS/Windows and the conda recipe remain unverified. The extended source build
 is validated on Linux x86-64 as described in

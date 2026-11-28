@@ -124,5 +124,4 @@ GFN0/1/2 calculations through ctypes and compiled interfaces. Benzene, pyridine,
 ethylene and furan also exercise π invariance under rigid motion.
 
 The density analyses follow Mulliken (1955), Löwdin (1950) and Mayer (1983).
-Definitions and units are available programmatically from `DescriptorCatalog()`;
-[literature positioning](literature-density-ml-audit.md) is documented separately.
+Definitions and units are available programmatically from `DescriptorCatalog()`.

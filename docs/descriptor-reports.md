@@ -220,7 +220,7 @@ python examples/descriptor_reports.py --output build/reports --sensitivity
 
 The example saves exact geometries, settings, all three state records and failure
 rows for a small temperature study. Its unoptimized structures test protocol
-behavior, not predictive accuracy. Conformer sensitivity and a QM8 descriptor pilot are now available separately.
+behavior, not predictive accuracy. Conformer sensitivity is documented separately.
 Solvent support and calibrated IP/EA validation remain outside this protocol.
 
 

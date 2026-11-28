@@ -154,8 +154,6 @@ python -m eled doctor --check compiled --method GFN2-xTB
 - [Geometry preparation and xTB optimization](docs/geometry-preparation.md)
 - [C++ interface](docs/rdxtb-tools.md)
 - [Native backend build](docs/xtb-patched-build.md)
-- [Research and case-study plan](docs/research-plan-eled.md)
-- [Multi-model application plan](docs/research-plan-ml.md)
 
 Application model training, datasets and trained artifacts are maintained outside
 the EleD repository. The public package supplies descriptor reports and feature

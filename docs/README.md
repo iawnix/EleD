@@ -34,20 +34,11 @@ EleD 是基于 xTB 的 RDKit 电子结构描述符扩展。文档按实际使用
 - [Runtime bundle](runtime-bundle.md) · [离线运行时包](zh-CN/runtime-bundle.md)
 - [Project positioning](project-positioning.md) · [项目定位](zh-CN/project-positioning.md)
 
-## Research and validation / 研究与验证
+## Validation / 验证
 
-The research pages separate EleD's software validation from optional application
-cases. They are useful when reproducing experiments or extending the feature
-set.
+Application studies, datasets and model training are maintained outside the
+EleD repository.
 
-研究页面把 EleD 软件验证、特征归档和可选应用案例分开记录，适合复现实验或
-扩展描述符功能。
+应用研究、数据集和模型训练在 EleD 仓库之外维护。
 
-- [EleD research and case-study plan](research-plan-eled.md) · [EleD 研究与案例方案](zh-CN/research-plan-eled.md)
-- [Multi-model application plan](research-plan-ml.md) · [多模型应用方案](zh-CN/research-plan-ml.md)
-- [EAS research plan](research-plan-eas-en.md) · [EAS 研究方案](zh-CN/research-plan-eas.md)
-- [Application case research](research-application-cases.md) · [应用案例调研](zh-CN/research-application-cases.md)
-- [EAS protocol audit](protocol-audit.md)
-- [Validation scope](mainline-validation.md)
 - [SCF diagnostics](scf-diagnostics.md)
-- [Literature and ML positioning](literature-density-ml-audit.md)

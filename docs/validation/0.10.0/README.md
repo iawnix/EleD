@@ -24,50 +24,12 @@ nonconvergence, force-field parameter gaps, partial pools, seed/initialization
 retries, unavailable presets, input immutability, unspecified stereo and native
 descriptor geometry-hash agreement. Unexpected exceptions propagate.
 
-## Separate preparation audit
+## Removed preparation audit
 
-`tools/validate_geometry_preparation.py` uses the frozen 41 failure IDs from
-0.9.1 plus the first 40 prior-success controls in the original target-blind
-selection order. It requests **one** conformer with seed 42 under the new
-preparation protocol: ETKDGv3 → ETKDGv4 → srETKDGv3 when available, two seeds
-for each initialization mode, 300 internal embedding iterations, MMFF94 up to
-500 iterations, and coordinate/stereo validation before and after optimization.
-The first attempt with an accepted pool ends retries. This differs from the
-old eight-conformer benchmark protocol; it is not a controlled comparison of
-individual embedding presets and is not a new prediction benchmark.
-
-Of the 41 old failures, 22 now return accepted optimized geometries: eight first
-succeed under ETKDGv3/random initialization, twelve under ETKDGv4/standard
-initialization, and two under srETKDGv3/standard initialization. Nineteen remain
-failures. Of 40 prior-success controls, 39 pass and ID **2226** fails the new
-stereo checks. No chirality constraint is disabled. Across all attempts, 33
-candidate conformers are rejected for stereo mismatch; this is a candidate
-count, not a unique-molecule count. RDKit internal failure counters likewise
-count internal attempts/stages, not distinct failed molecules.
-
-`preparation-manifest.json` records exact IDs, input and implementation hashes.
-`preparation-reports.jsonl.gz` records every attempt, raw/named failure counters,
-candidate checks, optimization outcomes, final coordinates and atom ordering.
-`preparation-summary.json` records counts and IDs. The run took 100.5 s locally;
-timing is not a portability or performance guarantee.
-
-## Correction to interpretation of the historical geometry benchmark
-
-The failed prior-success control motivated a post-hoc audit of **all 983**
-generated geometries saved in 0.9.1. `tools/audit_geometry_stereo.py` reconstructs
-the original explicit-H atom ordering, applies the saved coordinates, removes
-stereo tags on a temporary copy and reassigns stereo from the geometry.
-Nine coordinate sets do not reproduce a specified input tetrahedral center.
-IDs and mismatched atom indices are in `prior-stereo-audit.json` together with
-input/script/implementation hashes. No E/Z mismatch was found in this audit.
-
-The original procedure enforced chirality during embedding but did not perform
-this independent check after force-field optimization. The saved final
-coordinates alone do not establish which step introduced each discrepancy.
-Original geometries, predictions, scores and checksums remain unchanged in
-0.9.1 for reproducibility. Their published table **includes these nine rows**
-and is not a fully stereo-validated benchmark; this limitation is now stated in
-the main study document. No corrected MAE or renewed accuracy claim is made here.
+Dataset-derived artifacts (QM8/QM9 cohorts, splits, features, predictions,
+geometry-preparation audits) were removed from the repository in 0.17.0;
+application studies are maintained outside EleD. They remain available in
+Git history. `SHA256SUMS.json` still lists the original evidence set.
 
 The preparation layer's contribution is observable acceptance, provenance and
 honest failures around RDKit's algorithms. It does not establish that every

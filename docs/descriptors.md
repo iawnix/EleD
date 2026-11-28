@@ -291,8 +291,7 @@ near-degenerate HOMO/LUMO projectors and signed Mulliken overlap populations.
 `CalcPiDescriptors` reports p-shell projection for aromatic/sp2 atoms and
 π-bond order where a local plane exists. Units, invariance and missing-value
 semantics are included in each section. See [density-descriptors](density-descriptors.md)
-for formulas, units and applicability. The scope and literature
-positioning audit is in [literature-density-ml-audit](literature-density-ml-audit.md).
+for formulas, units and applicability.
 
 ## Orbital-weighted reactivity, ALIE/PDOS, COOP/ECOHP and Pipek–Mezey LMOs
 
