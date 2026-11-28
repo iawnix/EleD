@@ -204,7 +204,6 @@ def CalcFrontierBondDescriptors(
     result,
     *,
     degeneracyEV=1e-3,
-    occupationThreshold=1e-7,
     occupationTolerance=1e-6,
 ):
     """Mulliken overlap populations of the rotation-invariant HOMO/LUMO groups."""
@@ -213,7 +212,7 @@ def CalcFrontierBondDescriptors(
     _nonnegative(degeneracyEV, "degeneracyEV")
     _nonnegative(occupationTolerance, "occupationTolerance")
     result, c, s, _, _, _, atom, _, _, _, _ = _basis(result)
-    energies, occ, occupied, virtual = _orbitals(result, occupationThreshold)
+    energies, occ, occupied, virtual = _orbitals(result)
     rows = []
     missing = {}
     for label, indices in (

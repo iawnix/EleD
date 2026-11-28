@@ -16,16 +16,16 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | --- | --- | --- |
 | `CalcMolXTBDescriptors(mol, confId=-1, ..., missingVal=None, silent=False, cache=None)` | Flat molecular features in one call | Explicit-H RDKit `Mol` with a 3D conformer |
 | `RegisterRDKitProperties(*, method="GFN2-xTB", confId=-1, ..., prefix="")` | Tuple of registered numeric property names | Integrates with `rdMolDescriptors.Properties` |
-| `CalcXTBDescriptors(result, frontierDepth=2, occupationThreshold=1e-7)` | Flat molecular features | Native `XTBResults` or compiled `rdXTBTools.XTBResults` |
+| `CalcXTBDescriptors(result, frontierDepth=2)` | Flat molecular features | Native `XTBResults` or compiled `rdXTBTools.XTBResults` |
 | `CalcXTBAtomDescriptors(result)` | One row per atom | Both result paths |
 | `CalcXTBBondDescriptors(mol, result)` | One row per existing RDKit bond | Either result type with matching input provenance |
 | `CalcXTBFragmentDescriptors(result, fragments)` | Named fragment records, fragment-pair records, unassigned atoms | Both result paths; explicit original atom indices |
 | `CalcOrbitalPopulations(result, scheme="lowdin", orbIdx=None)` | Atom × selected-MO populations and electron populations | Same-calculation coefficients, overlap and AO map; verified native basis extension |
 | `CalcFrontierDescriptors(mol, result, fragments=None)` | HOMO/LUMO subspace populations, localization and atom-centroid proxies | Same as population analysis, plus matching molecule/conformer |
 | `CalcDensityDescriptors(mol, result, mciRings=None)` | Density conservation, shell populations, Mayer/Wiberg, frontier-bond, π and optional MCI descriptors | Same-calculation C/S/maps; `keepOverlap=True` |
-| `CalcOrbitalWeightedFukui(result, *, deltaEV=0.5, scheme="lowdin", occupationThreshold=1e-7)` | Single-point orbital-weighted Fukui (`f_w_plus`, `f_w_minus`, `f_w_radical`, `dual_w`) | Same-calculation basis (`keepOverlap=True`) |
-| `CalcAtomicOrbitalEnergies(result, *, scheme="lowdin", occupationThreshold=1e-7, windowEV=2.0)` | Atomic `occ_n_e`, `vir_n`, `occ_e_mean_ev` (negative condensed ALIE proxy), `vir_e_mean_ev`, frontier-weighted energies and PDOS windows | Same-calculation basis (`keepOverlap=True`) |
-| `CalcBondOverlapDescriptors(mol, result, *, occupationThreshold=1e-7)` | Per-bond `coop_e`, `ecohp_ev` and Mulliken/CM5 bond polarity (`delta_q_e`, `signed_delta_q_e`, `q_prod_e2`, `*_cm5_*`) | Same-calculation basis (`keepOverlap=True`) + matching molecule |
+| `CalcOrbitalWeightedFukui(result, *, deltaEV=0.5, scheme="lowdin")` | Single-point orbital-weighted Fukui (`f_w_plus`, `f_w_minus`, `f_w_radical`, `dual_w`) | Same-calculation basis (`keepOverlap=True`) |
+| `CalcAtomicOrbitalEnergies(result, *, scheme="lowdin", windowEV=2.0)` | Atomic `occ_n_e`, `vir_n`, `occ_e_mean_ev` (negative condensed ALIE proxy), `vir_e_mean_ev`, frontier-weighted energies and PDOS windows | Same-calculation basis (`keepOverlap=True`) |
+| `CalcBondOverlapDescriptors(mol, result)` | Per-bond `coop_e`, `ecohp_ev` and Mulliken/CM5 bond polarity (`delta_q_e`, `signed_delta_q_e`, `q_prod_e2`, `*_cm5_*`) | Same-calculation basis (`keepOverlap=True`) + matching molecule |
 | `CalcLocalizedOrbitals(mol, result, *, scheme="lowdin", occupationThreshold=1.5, maxIterations=200, tolerance=1e-8)` | Pipek–Mezey LMOs (`lone_pair`, `bond`, `delocalized`), rotated Fock energies, centroids and per-atom lone-pair/bond counts | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
 | `CalcEnergyDecomposition(result)` | Energy terms (`e_elec_ha`…`e_xb_ha`, `g_solv_ha` + sub-terms) and Fermi levels (`fermi_alpha_ha`/`ev`, `fermi_beta_ha`/`ev`) | Native or compiled `XTBResults` from extended properties ABI v1 |
 | `CalcMultipoleDescriptors(result, *, mol=None)` | CAMM atomic dipoles/traceless quadrupoles and molecular traceless quadrupole with rotational invariants | GFN2/GFN1 `XTBResults` (GFN0 returns `available=False`) |
@@ -88,11 +88,16 @@ energy_ha, gap_ev, dipole_debye = props.ComputeProperties(mol)
 - `xtb_q_sum_e`, `_min_e`, `_max_e`, `_mean_e`, `_sd_e`, `_abs_e`.
   Standard deviation uses all atoms and `ddof=0`, including explicit hydrogens.
 - `xtb_wbo_sum`: sum over all `i < j`, including pairs outside RDKit bonds.
-- `xtb_occ_cut`: records the frontier convention used.
 
-An orbital is occupied when its occupation exceeds the specified threshold.
-HOMO is the last occupied MO and LUMO the first unoccupied MO in energy order.
-Fractional occupations can change that classification. The gap is not an optical
+HOMO and LUMO follow the aufbau electron count, not an occupation threshold.
+With `n_alpha = (N_e + N_unpaired) / 2`, the HOMO is MO `n_alpha - 1` (the SOMO
+for open shells) and the LUMO is MO `n_alpha`. xTB smears occupations with a
+Fermi distribution, so at 300 K a LUMO already holds more than 1e-7 electrons
+when the gap is below about 0.9 eV (about 2.9 eV at 1000 K); a threshold rule
+would then mislabel the frontier. `AssessDescriptorQuality` reports the actual
+HOMO/LUMO occupations as `frontier_occupations` and raises
+`fractional_frontier_occupation` when smearing is significant. COOP/eCOHP use
+the full occupation-weighted density over all orbitals. The gap is not an optical
 excitation energy; the input unpaired-electron count is not a predicted spin state.
 For charged molecules, the dipole and its norm depend on the supplied coordinate
 origin. Total energies have method-specific references.

@@ -77,7 +77,6 @@ def CalcFrontierDescriptors(
     result,
     *,
     fragments=None,
-    occupationThreshold=1e-7,
     degeneracyEV=1e-3,
     occupationTolerance=1e-6,
 ):
@@ -87,7 +86,7 @@ def CalcFrontierDescriptors(
     _validate_mapping(mol, result)
     _nonnegative(degeneracyEV, 'degeneracyEV')
     _nonnegative(occupationTolerance, 'occupationTolerance')
-    energies, occupations, occupied, virtual = _orbitals(result, occupationThreshold)
+    energies, occupations, occupied, virtual = _orbitals(result)
     populations = CalcOrbitalPopulations(result, scheme='lowdin')
     atom = np.asarray(populations['atom_pop'])
     groups = _fragments(fragments, mol.GetNumAtoms()) if fragments is not None else {}
@@ -123,7 +122,7 @@ def CalcFrontierDescriptors(
     assigned = set(np.concatenate(list(groups.values())).tolist()) if groups else set()
     return {
         'scheme': 'lowdin',
-        'occupation_threshold': float(occupationThreshold),
+        'frontier_definition': 'aufbau electron count',
         'degeneracy_ev': float(degeneracyEV),
         'occupation_tolerance': float(occupationTolerance),
         'homo': homo,

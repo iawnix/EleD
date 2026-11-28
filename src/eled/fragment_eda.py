@@ -126,7 +126,6 @@ def CalcFragmentInteraction(
     unpairedA: int | None = None,
     unpairedB: int | None = None,
     allowCovalentCut: bool = False,
-    occupationThreshold: float = 1e-7,
     options: XTBOptions | None = None,
     interface: str = 'native',
 ) -> dict[str, Any]:
@@ -269,15 +268,11 @@ def CalcFragmentInteraction(
     if wbo_inter is None:
         missing['wbo_inter'] = 'wbo_unavailable'
 
-    e_mo, occ_mo, occupied, _, c_mat, s_mat, ao_atom, ortho_err = _overlap_basis(
-        res_ab, occupationThreshold=occupationThreshold
-    )
-    if len(occupied):
-        c_occ = c_mat[:, occupied]
-        n_occ = occ_mo[occupied]
-        en_occ = e_mo[occupied]
-        p_mat = (c_occ * n_occ[None, :]) @ c_occ.T
-        w_mat = (c_occ * (n_occ * en_occ)[None, :]) @ c_occ.T
+    e_mo, occ_mo, _, _, c_mat, s_mat, ao_atom, ortho_err = _overlap_basis(res_ab)
+    if np.any(occ_mo > 0.0):
+        # Exact occupation-weighted density over all orbitals (no occupied cut).
+        p_mat = (c_mat * occ_mo[None, :]) @ c_mat.T
+        w_mat = (c_mat * (occ_mo * e_mo)[None, :]) @ c_mat.T
         ps = p_mat * s_mat
         ws = w_mat * s_mat
         ao_a = np.flatnonzero(np.isin(ao_atom, idx_a))
@@ -289,7 +284,7 @@ def CalcFragmentInteraction(
         missing['coop_inter_e'] = 'no_occupied_orbitals'
         missing['ecohp_inter_ev'] = 'no_occupied_orbitals'
 
-    lr = CalcLinearResponseMatrix(res_ab, scheme='lowdin', occupationThreshold=occupationThreshold)
+    lr = CalcLinearResponseMatrix(res_ab, scheme='lowdin')
     if lr['available']:
         chi_mat = np.asarray(lr['chi_e_per_ev'], dtype=float)
         chi_inter: float | None = float(np.sum(chi_mat[np.ix_(idx_a, idx_b)]))
@@ -348,7 +343,7 @@ def CalcFragmentInteraction(
             'protocol': FRAGMENT_EDA_PROTOCOL,
             'interface': interface,
             'allow_covalent_cut': allowCovalentCut,
-            'occupation_threshold': float(occupationThreshold),
+            'frontier_definition': 'aufbau electron count',
             'charge_transfer_sign': 'positive means electrons transferred from fragmentA to fragmentB',
             'coop_sign': 'positive for net inter-fragment bonding, negative for antibonding/Pauli repulsion',
             'ecohp_sign': 'negative for inter-fragment bonding stabilization, positive for destabilization',

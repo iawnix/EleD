@@ -51,7 +51,7 @@ from .properties import (
 from .realspace import CalcRealSpaceProperties
 from .result import XTBResults
 
-DESCRIPTOR_VERSION = '1.5'
+DESCRIPTOR_VERSION = '1.6'
 SCHEMA_VERSION = 2
 
 _EXTENDED_SCALAR_UNITS = (
@@ -84,8 +84,6 @@ def DescriptorColumns(frontierDepth=2):
             unit = 'Debye'
         elif '_q_' in name or name.endswith('_q_e'):
             unit = 'e'
-        elif name == 'xtb_occ_cut':
-            unit = 'dimensionless'
         elif name.startswith('xtb_n_'):
             unit = 'count'
         elif name.endswith('_idx'):
@@ -118,18 +116,23 @@ def DescriptorColumns(frontierDepth=2):
 def AssessDescriptorQuality(
     result,
     *,
-    occupationThreshold=1e-7,
     fractionalTolerance=1e-4,
     conservationTolerance=1e-5,
 ):
-    """Report observable issues and optional verified engine SCC diagnostics."""
+    """Report observable issues and optional verified engine SCC diagnostics.
+
+    Frontier orbitals follow the aufbau electron count. ``frontier_occupations``
+    reports how far Fermi smearing moves the HOMO/LUMO occupations from that
+    reference; values above ``fractionalTolerance`` raise
+    ``fractional_frontier_occupation``.
+    """
     result = _as_result(result)
     for name, value in [
         ('fractionalTolerance', fractionalTolerance),
         ('conservationTolerance', conservationTolerance),
     ]:
         _nonnegative(value, name)
-    _, occ, occupied, virtual = _orbitals(result, occupationThreshold)
+    _, occ, occupied, virtual = _orbitals(result)
     if np.any(occ > 2 + conservationTolerance):
         raise ValueError('spin-summed orbital occupations cannot exceed two')
     flags = []
@@ -140,18 +143,18 @@ def AssessDescriptorQuality(
     fractional = np.flatnonzero(np.abs(occ - np.round(occ)) > fractionalTolerance).tolist()
     if fractional:
         flag('fractional_occupations', 'warning', 'Orbital occupations differ from integer values.')
-    counts = [
-        int(np.sum(occ > t))
-        for t in (occupationThreshold * 0.1, occupationThreshold, max(occupationThreshold * 10, 1e-8))
-    ]
-    if len(set(counts)) > 1:
+    homo_occ = float(occ[occupied[-1]]) if len(occupied) else None
+    lumo_occ = float(occ[virtual[0]]) if len(virtual) else None
+    if (lumo_occ is not None and lumo_occ > fractionalTolerance) or (
+        homo_occ is not None and homo_occ < np.round(homo_occ) - fractionalTolerance
+    ):
         flag(
-            'frontier_threshold_sensitive',
+            'fractional_frontier_occupation',
             'warning',
-            'Occupied/virtual classification changes within the tested threshold window.',
+            'Fermi smearing moves electrons between the aufbau HOMO and LUMO.',
         )
     if not len(occupied) or not len(virtual):
-        flag('frontier_unavailable', 'warning', 'No occupied or no virtual orbital under this threshold.')
+        flag('frontier_unavailable', 'warning', 'No occupied or no virtual orbital in the aufbau reference.')
     if result.numUnpairedElectrons:
         flag('open_shell_spin_summed', 'info', 'No separate alpha/beta population analysis or spin-state search.')
     expected_charge = result.metadata.get('charge')
@@ -196,7 +199,7 @@ def AssessDescriptorQuality(
         'status': 'error' if 'error' in severity else 'warning' if 'warning' in severity else 'ok',
         'flags': flags,
         'fractional_orb_idx': fractional,
-        'occupied_counts_threshold_window': counts,
+        'frontier_occupations': {'homo': homo_occ, 'lumo': lumo_occ},
         'charge_sum_error_e': q_error,
         'electron_sum_error_e': electron_error,
         'scf_iterations': scf.get('iterations'),
@@ -250,7 +253,6 @@ def _base_report(recordId, columns, analysis):
 def _analysis_settings(
     *,
     frontierDepth=2,
-    occupationThreshold=1e-7,
     degeneracyEV=1e-3,
     occupationTolerance=1e-6,
     includeOrbitals=True,
@@ -267,7 +269,6 @@ def _analysis_settings(
     if not isinstance(includeExtended, bool):
         raise ValueError('includeExtended must be Boolean')
     checked = [
-        ('occupationThreshold', occupationThreshold),
         ('degeneracyEV', degeneracyEV),
         ('occupationTolerance', occupationTolerance),
         ('fractionalTolerance', fractionalTolerance),
@@ -294,7 +295,6 @@ def CalcDescriptorReport(
     recordId=None,
     fragments=None,
     frontierDepth=2,
-    occupationThreshold=1e-7,
     degeneracyEV=1e-3,
     occupationTolerance=1e-6,
     includeOrbitals=True,
@@ -311,7 +311,6 @@ def CalcDescriptorReport(
     from .mapping import _validate_mapping
     analysis = _analysis_settings(
         frontierDepth=frontierDepth,
-        occupationThreshold=occupationThreshold,
         degeneracyEV=degeneracyEV,
         occupationTolerance=occupationTolerance,
         includeOrbitals=includeOrbitals,
@@ -337,11 +336,10 @@ def CalcDescriptorReport(
     report['provenance']['cm5_available'] = bool(len(_cm5_charges(result)))
     report['quality'] = AssessDescriptorQuality(
         result,
-        occupationThreshold=occupationThreshold,
         fractionalTolerance=fractionalTolerance,
         conservationTolerance=conservationTolerance,
     )
-    scalars = CalcXTBDescriptors(result, frontierDepth=frontierDepth, occupationThreshold=occupationThreshold)
+    scalars = CalcXTBDescriptors(result, frontierDepth=frontierDepth)
     report['values'].update(scalars)
     for key, value in scalars.items():
         if value is None:
@@ -366,7 +364,6 @@ def CalcDescriptorReport(
             mol,
             result,
             fragments=fragments,
-            occupationThreshold=occupationThreshold,
             degeneracyEV=degeneracyEV,
             occupationTolerance=occupationTolerance,
         )
@@ -389,7 +386,6 @@ def CalcDescriptorReport(
                     mol,
                     r,
                     degeneracyEV=degeneracyEV,
-                    occupationThreshold=occupationThreshold,
                     occupationTolerance=occupationTolerance,
                 ),
             ),
@@ -421,23 +417,19 @@ def CalcDescriptorReport(
             extended_orbital_tasks = [
                 (
                     'orbital_weighted_fukui',
-                    lambda r: CalcOrbitalWeightedFukui(r, occupationThreshold=occupationThreshold),
+                    CalcOrbitalWeightedFukui,
                 ),
                 (
                     'atomic_orbital_energies',
-                    lambda r: CalcAtomicOrbitalEnergies(r, occupationThreshold=occupationThreshold),
+                    CalcAtomicOrbitalEnergies,
                 ),
                 (
                     'localized_orbitals',
-                    lambda r: CalcLocalizedOrbitals(
-                        mol,
-                        r,
-                        occupationThreshold=occupationThreshold if occupationThreshold > 0.0 else 1e-12,
-                    ),
+                    lambda r: CalcLocalizedOrbitals(mol, r),
                 ),
                 (
                     'linear_response',
-                    lambda r: CalcLinearResponseMatrix(r, occupationThreshold=occupationThreshold),
+                    CalcLinearResponseMatrix,
                 ),
             ]
             if len(result.atomicCharges) == mol.GetNumAtoms():
@@ -445,7 +437,7 @@ def CalcDescriptorReport(
                     2,
                     (
                         'bond_overlap',
-                        lambda r: CalcBondOverlapDescriptors(mol, r, occupationThreshold=occupationThreshold),
+                        lambda r: CalcBondOverlapDescriptors(mol, r),
                     ),
                 )
             else:

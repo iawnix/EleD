@@ -46,7 +46,6 @@ def CalcMolXTBDescriptors(
     numUnpairedElectrons: int | None = None,
     xtbLibrary: str | os.PathLike | None = None,
     frontierDepth: int = 2,
-    occupationThreshold: float = 1e-7,
     missingVal: Any = None,
     silent: bool = False,
     cache: Any = None,
@@ -74,9 +73,7 @@ def CalcMolXTBDescriptors(
             result = cache.GetOrCompute(key, lambda: calculator.Calculate(mol))
         else:
             result = calculator.Calculate(mol)
-        values = CalcXTBDescriptors(
-            result, frontierDepth=frontierDepth, occupationThreshold=occupationThreshold
-        )
+        values = CalcXTBDescriptors(result, frontierDepth=frontierDepth)
     except Exception:
         if not silent:
             raise
@@ -97,14 +94,12 @@ class _SharedMolEvaluator:
         self,
         options: XTBOptions,
         frontierDepth: int,
-        occupationThreshold: float,
         cache: Any = None,
         maxEntries: int = 32,
     ) -> None:
         self._calculator = XTBCalculator(**options.ToDict())
         self._options = options
         self._frontier_depth = frontierDepth
-        self._occupation_threshold = occupationThreshold
         self._external_cache = cache
         self._max_entries = maxEntries
         self._recent: OrderedDict[tuple[Any, ...], dict[str, Any]] = OrderedDict()
@@ -123,7 +118,6 @@ class _SharedMolEvaluator:
             self._options.method,
             self._options.xtbLibrary,
             self._frontier_depth,
-            self._occupation_threshold,
         )
         with self._lock:
             if fingerprint in self._recent:
@@ -135,11 +129,7 @@ class _SharedMolEvaluator:
             result = self._external_cache.GetOrCompute(key, lambda: self._calculator.Calculate(mol))
         else:
             result = self._calculator.Calculate(mol)
-        values = CalcXTBDescriptors(
-            result,
-            frontierDepth=self._frontier_depth,
-            occupationThreshold=self._occupation_threshold,
-        )
+        values = CalcXTBDescriptors(result, frontierDepth=self._frontier_depth)
         with self._lock:
             self._recent[fingerprint] = values
             self._recent.move_to_end(fingerprint)
@@ -167,7 +157,6 @@ def RegisterRDKitProperties(
     confId: int = -1,
     xtbLibrary: str | os.PathLike | None = None,
     frontierDepth: int = 2,
-    occupationThreshold: float = 1e-7,
     cache: Any = None,
     prefix: str = "",
 ) -> tuple[str, ...]:
@@ -184,7 +173,7 @@ def RegisterRDKitProperties(
         raise ValueError("prefix must be a string")
     options = XTBOptions(confId=confId, method=method, xtbLibrary=xtbLibrary)
     fields = _numeric_descriptor_names(frontierDepth, options.method)
-    evaluator = _SharedMolEvaluator(options, frontierDepth, occupationThreshold, cache=cache)
+    evaluator = _SharedMolEvaluator(options, frontierDepth, cache=cache)
     registered: list[str] = []
     with _REGISTRY_LOCK:
         for field_name in fields:

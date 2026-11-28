@@ -237,7 +237,7 @@ def test_atomic_orbital_energies_analytical_and_edge_cases():
     assert iso_out["atoms"][0]["missing"]["vir_e_mean_ev"] == "zero_virtual_population"
 
     # No virtual orbitals -> explicit missing.
-    no_vir = CalcAtomicOrbitalEnergies(replace(res, orbitalOccupancies=(2.0, 2.0, 2.0, 2.0)))
+    no_vir = CalcAtomicOrbitalEnergies(replace(res, numElectrons=8, orbitalOccupancies=(2.0, 2.0, 2.0, 2.0)))
     assert no_vir["missing"]["virtual"] == "no_virtual_orbitals"
     assert all(a["vir_e_mean_ev"] is None and a["pdos_lumo_win"] is None for a in no_vir["atoms"])
 

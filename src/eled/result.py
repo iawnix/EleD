@@ -13,15 +13,46 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 
+def _aufbau_occupied_count(
+    numOrbitals: int,
+    occupations: Sequence[float],
+    numElectrons: int | None = None,
+    numUnpairedElectrons: int | None = None,
+) -> int:
+    """Return the number of spatial orbitals occupied in the aufbau reference.
+
+    xTB smears occupations with a Fermi distribution, so an occupation
+    threshold does not identify the frontier orbitals: at 300 K a LUMO already
+    carries more than 1e-7 electrons when the gap is below about 0.9 eV (below
+    about 2.9 eV at 1000 K). The frontier is therefore defined by the electron
+    count. In the restricted xTB reference the alpha electrons fill the lowest
+    ``n_alpha = (N + n_unpaired) / 2`` spatial orbitals; the HOMO is orbital
+    ``n_alpha - 1`` (the SOMO for open shells) and the LUMO is orbital
+    ``n_alpha``. When the unpaired count is unknown, ``n_alpha = ceil(N / 2)``.
+    """
+    if numElectrons is None:
+        numElectrons = int(round(float(sum(occupations))))
+    if numUnpairedElectrons is None:
+        n_alpha = (int(numElectrons) + 1) // 2
+    else:
+        n_alpha = (int(numElectrons) + int(numUnpairedElectrons)) // 2
+    return max(0, min(int(numOrbitals), n_alpha))
+
+
 def _frontier_energies(
-    energies: Sequence[float], occupations: Sequence[float], threshold: float = 1.0e-7
+    energies: Sequence[float],
+    occupations: Sequence[float],
+    numElectrons: int | None = None,
+    numUnpairedElectrons: int | None = None,
 ) -> tuple[float | None, float | None]:
-    """Return HOMO and LUMO from xTB occupations."""
-    if not energies or len(energies) != len(occupations):
+    """Return aufbau HOMO and LUMO energies (see :func:`_aufbau_occupied_count`)."""
+    if not len(energies) or len(energies) != len(occupations):
         return None, None
-    occupied = [energy for energy, occupation in zip(energies, occupations) if occupation > threshold]
-    virtual = [energy for energy, occupation in zip(energies, occupations) if occupation <= threshold]
-    return (occupied[-1] if occupied else None, virtual[0] if virtual else None)
+    n_occ = _aufbau_occupied_count(len(energies), occupations, numElectrons, numUnpairedElectrons)
+    return (
+        energies[n_occ - 1] if n_occ > 0 else None,
+        energies[n_occ] if n_occ < len(energies) else None,
+    )
 
 
 @dataclass(frozen=True)
@@ -181,12 +212,16 @@ class XTBResults:
 
     @property
     def homoEV(self) -> float | None:
-        homo, _ = _frontier_energies(self.orbitalEnergiesEV, self.orbitalOccupancies)
+        homo, _ = _frontier_energies(
+            self.orbitalEnergiesEV, self.orbitalOccupancies, self.numElectrons, self.numUnpairedElectrons
+        )
         return homo
 
     @property
     def lumoEV(self) -> float | None:
-        _, lumo = _frontier_energies(self.orbitalEnergiesEV, self.orbitalOccupancies)
+        _, lumo = _frontier_energies(
+            self.orbitalEnergiesEV, self.orbitalOccupancies, self.numElectrons, self.numUnpairedElectrons
+        )
         return lumo
 
     @property

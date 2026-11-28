@@ -16,8 +16,12 @@ class AdapterTests(unittest.TestCase):
             with self.assertRaisesRegex(XTBNativeNotFoundError, 'version 30000'):
                 _NativeXTB('future-library')
 
-    def test_frontier_energies_use_fractional_occupations(self):
-        homo, lumo = _frontier_energies((-2.0, -1.0, 0.5), (2.0, 0.0001, 0.0))
+    def test_frontier_energies_follow_aufbau_count_not_smeared_occupations(self):
+        # A smeared LUMO occupation (1e-4) must not turn the LUMO into the HOMO.
+        homo, lumo = _frontier_energies((-2.0, -1.0, 0.5), (1.9999, 0.0001, 0.0))
+        self.assertEqual(homo, -2.0)
+        self.assertEqual(lumo, -1.0)
+        homo, lumo = _frontier_energies((-2.0, -1.0, 0.5), (2.0, 1.0, 0.0), 3, 1)
         self.assertEqual(homo, -1.0)
         self.assertEqual(lumo, 0.5)
 

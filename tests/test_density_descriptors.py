@@ -204,7 +204,7 @@ def test_descriptor_catalog_and_scalar_units_are_explicit():
     assert catalog['density']['n_e']['unit'] == 'e'
     assert catalog['reactivity']['ip_v_ev']['unit'] == 'eV'
     assert catalog['molecular']['xtb_dip_*_ebohr']['unit'] == 'e*Bohr'
-    assert DescriptorColumns()['xtb_occ_cut'] == 'dimensionless'
+    assert 'xtb_occ_cut' not in DescriptorColumns()
     assert all(item['missing'] for group in catalog.values() for item in group.values())
 
 
