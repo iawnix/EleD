@@ -41,9 +41,10 @@ def _basis(result):
     shell_atom = np.asarray(result.shellAtomMap, dtype=int)
     shell_l = np.asarray(result.shellAngularMomenta, dtype=int)
     if (len(shell) != len(atom) or len(shell_l) != len(shell_atom)
+            or np.any(shell < 0) or np.any(shell >= len(shell_atom))
             or not np.array_equal(shell_atom[shell], atom)
             or not np.array_equal(np.bincount(shell, minlength=len(shell_l)), 2 * shell_l + 1)):
-        raise ValueError('AO shell, shell-atom and angular-momentum maps are inconsistent')
+        raise ValueError('AO shell map is inconsistent with the atom and angular-momentum maps')
     if np.any(basis.occupations > 2 + 1e-8):
         raise ValueError('spin-summed occupations must not exceed two')
     return (result, basis.coefficients, basis.overlap, basis.density, basis.density_overlap,
