@@ -1,6 +1,6 @@
 # Changes
 
-## Unreleased (0.17.0)
+## 0.17.0 — Review fixes: aufbau frontier orbitals, exact descriptor definitions, one interface layer
 
 - **Repository scope**: removed application research from the EleD repository, as
   datasets, model training and benchmark results are maintained externally:
@@ -99,6 +99,17 @@
     at report/export boundaries), discarded validation-only calls, `is None`
     checks on tuple fields, and checks in `AnnotateMol` that repeated
     `_validate_mapping`.
+- **Remaining duplicate paths removed**: `AssessDescriptorQuality` drops the
+  `scf_iterations` / `scf_residual` copies of `scf_details`; installations built
+  with the historical 0.4 local D4 patch are no longer accepted for GFN0 (Python
+  and `rdXTBTools`); this was dead once the complete extended profile became
+  mandatory.
+- **Documentation**: zh-CN translations for the C++ interface, native build,
+  SCC diagnostics, persistent and isolated batches; the native-build guide now
+  lists the properties/realspace patches and implicit solvation. Historical
+  engineering records stay English-only and are labelled as such in the index.
+- CI artifact paths and package/CMake/conda versions are 0.17.0 (workflows had
+  still written `dist/0.13.0`).
 
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 

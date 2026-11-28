@@ -1,5 +1,5 @@
 {% set name = "eled" %}
-{% set version = "0.16.0" %}
+{% set version = "0.17.0" %}
 
 package:
   name: {{ name|lower }}

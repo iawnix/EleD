@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 from eled.options import XTBOptions
-from eled.runtime import _D4_LOCAL_REFERENCES_PATCH, _native_gfn0_build
+from eled.runtime import _UPSTREAM_D4_SHA256, _UPSTREAM_GFN0_COMMIT, _native_gfn0_build
 from eled.errors import XTBEnvironmentError
 from eled.xtb import _resolve_options
 
@@ -22,7 +22,9 @@ def verified_install(tmp_path):
     manifest = tmp_path / 'share/xtb/eled/build.json'
     manifest.parent.mkdir(parents=True)
     record = {'schema_version': 1, 'capabilities': {'native_gfn0': True},
-              'source': {'patch_sha256': _D4_LOCAL_REFERENCES_PATCH, 'commit': 'test-commit'},
+              'source': {'commit': _UPSTREAM_GFN0_COMMIT,
+                         'gfn0_fix': {'kind': 'upstream', 'commit': _UPSTREAM_GFN0_COMMIT,
+                                      'file_sha256': _UPSTREAM_D4_SHA256}},
               'files': {'lib/libxtb.so': hashlib.sha256(library.read_bytes()).hexdigest()}}
     manifest.write_text(json.dumps(record))
     return library, manifest, record
@@ -32,7 +34,7 @@ def test_verified_binary_is_recognized_through_its_symlink(verified_install):
     library, manifest, _ = verified_install
     evidence = _native_gfn0_build(str(library))
     assert evidence['manifest'] == str(manifest)
-    assert evidence['source_commit'] == 'test-commit'
+    assert evidence['source_commit'] == _UPSTREAM_GFN0_COMMIT
     assert _native_gfn0_build(str(library.parent / 'libxtb.so')) == evidence
 
 
@@ -56,7 +58,7 @@ def test_stale_or_unverified_builds_are_not_enabled(verified_install, damage):
         elif damage == 'capability':
             record['capabilities']['native_gfn0'] = False
         elif damage == 'patch':
-            record['source']['patch_sha256'] = 'unknown-patch'
+            record['source']['gfn0_fix']['file_sha256'] = 'unknown-fix'
         elif damage == 'hash':
             record['files']['lib/libxtb.so'] = 'stale-hash'
         elif damage == 'malformed-fields':

@@ -48,7 +48,7 @@ def test_success_diagnostics_and_compiled_parity(library, method):
     else:
         assert 1 <= diagnostic['iterations'] <= 250 and diagnostic['criteria_satisfied']
         assert diagnostic['energy_change_hartree'] < diagnostic['energy_threshold_hartree']
-        assert CalcDescriptorReport(molecule, result, includeOrbitals=False)['quality']['scf_iterations'] == diagnostic['iterations']
+        assert CalcDescriptorReport(molecule, result, includeOrbitals=False)['quality']['scf_details']['iterations'] == diagnostic['iterations']
     try: from eled import rdXTBTools
     except ImportError: return  # native coverage still runs without the optional extension
     if not hasattr(rdXTBTools.XTBResults, 'scfIterations'): return
