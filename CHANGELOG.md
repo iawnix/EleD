@@ -89,7 +89,10 @@
     1e-6, the rest 1e-5); `CalcOrbitalPopulations` loses its
     `orthonormalityTolerance` argument.
   - Physical constants live in `eled.constants` (previously redefined in about
-    eight modules).
+    eight modules). Length conversions now use one Bohr radius everywhere: the
+    CODATA 2014 value that the ctypes backend and rdXTBTools already used for
+    coordinates (`properties` had used CODATA 2018 for Bohr^3 -> Angstrom^3,
+    a 4e-10 relative inconsistency).
   - `XTBOptions.ToDict()` always returns every field (the "preserve cache key"
     branch was dead: cache keys already hash all package sources).
   - Removed assertion-only `json.dumps(...)` calls from analysis functions (kept
