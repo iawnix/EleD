@@ -26,39 +26,10 @@ invalid/frozen partitions, train/test group isolation, paired ID/target matching
 cluster bootstrap behavior and insufficient-group intervals. A test changes
 only held-out targets and verifies that fitted predictions do not change.
 
-See [the protocol and interpretation](../../qm8-geometry-study.md) for the
-scientific scope and limitations. The data/model/split protocol is fixed before
-execution. The source reference is the checksummed 0.9.0 pilot evidence; its
-models are retrained on the same 983 successful geometries as the generated
-features. No test-set tuning, molecule replacement or geometry fallback occurs.
-
-Evidence files:
-
-- `manifest.json`: source reference hashes, implementation/script hashes,
-  selected IDs, geometry protocol, calculation settings and model/split policy.
-- `geometry-preparation.jsonl.gz`: all 1,024 attempts, seeds, embedded IDs,
-  optimization outcomes and selected coordinates for successful preparations.
-- `generated-features.jsonl.gz`: 983 complete feature rows, input/provenance
-  hashes, quality flags and timings. Source features remain in 0.9.0 evidence.
-- `failures.json`: all 41 failed IDs, each `embedding_failed`; no xTB failures.
-- `source-splits.json.gz` / `generated-splits.json.gz`: exact common partitions.
-- `source-predictions.json.gz` / `generated-predictions.json.gz`: all 36 fits'
-  held-out targets and predictions, with IDs/feature groups/splits/seeds.
-- `summary.json`: individual fit MAE/RMSE, counts, software versions and costs.
-- `paired-comparisons.json`: all 36 matched contrasts and conditional 95%
-  intervals from 5,000 paired group-bootstrap replicates, without refitting.
-
-On scaffold splits, mean MAE is 0.3433 eV for RDKit-only features, 0.2084 eV
-with source-geometry basic xTB features and 0.2307 eV with generated-geometry
-basic xTB features. Generated-geometry orbital distributions yield 0.2304 eV;
-all three paired scaffold intervals for this incremental change include zero.
-The basic feature benefit persists on this common pilot cohort. Additional
-orbital features do not show stable incremental improvement. Geometry failures,
-the reused test cohort and conditional intervals limit broader conclusions.
-
-Generated-geometry featurization takes 113.3 s locally, including 91.9 s of
-geometry preparation for all attempts; model fitting is recorded separately.
-These timings exclude installation and source-reference geometry generation.
+Dataset-derived artifacts (QM8/QM9 cohorts, splits, features, predictions,
+geometry-preparation audits) were removed from the repository in 0.17.0;
+application studies are maintained outside EleD. They remain available in
+Git history. `SHA256SUMS.json` still lists the original evidence set.
 
 `inherited-native.json` and `inherited-compiled.json` were produced using
 isolated Python in `build/benchmark-env` with `XTB_LIBRARY`, `XTBPATH`,

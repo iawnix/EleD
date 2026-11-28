@@ -17,3 +17,6 @@ src/eled/rdXTBTools*.so
 
 # Local application studies; model training and datasets are not EleD sources.
 research/
+
+# Local agent/workspace rules are not distributed.
+AGENTS.md

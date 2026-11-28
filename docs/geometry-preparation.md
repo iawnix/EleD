@@ -120,13 +120,4 @@ calculation in this layer.
 Reliability here means explicit scope, bounded attempts, validation and recorded
 failure. It does not guarantee coverage of every molecule, a correct protonation
 state, chemical plausibility of every strained structure, thermodynamic conformer
-populations or numerical invariance across RDKit versions. This protocol is
-separate from the frozen 0.9.1 QM8 benchmark; improving preparation does not
-retroactively change that benchmark's cohort or prediction results.
-
-The separate [0.10 audit](validation/0.10.0/README.md) accepts 22 of the 41
-previous embedding failures and 39 of 40 deterministic prior-success controls.
-The remaining control fails coordinate stereo checks. Rechecking all 983
-generated geometries from the old study finds nine stereo mismatches. These
-results motivate validation of coordinates; they do not constitute a new
-excitation-energy benchmark or prove monotonic improvement in all datasets.
+populations or numerical invariance across RDKit versions.

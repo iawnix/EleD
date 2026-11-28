@@ -1,5 +1,18 @@
 # Changes
 
+## Unreleased (0.17.0)
+
+- **Repository scope**: removed application research from the EleD repository, as
+  datasets, model training and benchmark results are maintained externally:
+  `eled.eas` and both copies of the frozen EAS `protocol.json`; EAS/QM8/QM9
+  dataset and benchmark tools (`prepare_eas_dataset.py`, `run_eas_features.py`,
+  `benchmark_qm8*.py`, `validate_qm9_dipoles.py`, `benchmark-requirements.txt`);
+  RDKit embedding-algorithm research (`tools/embedding_research`, `docs/research`,
+  `validate_geometry_preparation.py`, `audit_geometry_stereo.py`); research-plan
+  documents; and dataset-derived validation artifacts. Historical validation
+  READMEs note the removal; the files remain in Git history.
+- `AGENTS.md` (local workspace rules) is no longer tracked.
+
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 
 - **DIPRO dimer-projection electronic coupling / transfer integral (`eled.dipro`)**:

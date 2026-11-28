@@ -53,12 +53,12 @@ Every value has four pieces of meaning:
    reason such as `basis_not_retained`, `spin_density_unavailable_for_open_shell`,
    or `local_plane_nonplanar`.
 
-The stable feature groups for the EAS study are:
+The stable feature groups are:
 
 - **Core features** (the default starting point for a model): xTB total energy,
   HOMO/LUMO/gap, dipole norm, atomic partial charge, and RDKit-bond Wiberg
   order. These are available from one ordinary single-point calculation.
-- **Density features** (the candidate extension for the EAS study): Mulliken
+- **Density features**: Mulliken
   and Löwdin s/p/d populations and p/s ratios. They require the extended
   libxtb result with `keepOverlap=True`, but add no engine call.
 - **Reactivity features**: vertical IP/EA, global hardness/softness and
@@ -97,6 +97,4 @@ should not be described as an excited-state observable. GFN0 shell populations
 are density populations; GFN0 EEQ charges are a separate model quantity and
 must not be used as a shell-population charge reconstruction.
 
-For the full formulas and literature positioning, see
-[density descriptors](density-descriptors.md) and the
-[literature audit](literature-density-ml-audit.md).
+For the full formulas, see [density descriptors](density-descriptors.md).

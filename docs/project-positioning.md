@@ -90,6 +90,5 @@ optimization remains an optional coordinate-preparation tool. New descriptors
 must answer a defined RDKit analysis need and pass unit, invariance, conservation
 and ctypes/compiled parity checks before entering the recommended catalog.
 
-The EAS study is an external validation application of this extension layer. Its
-model code, data and results remain outside the EleD repository and do not define
-the package's core API.
+Application studies (datasets, model code and results) are maintained outside the
+EleD repository and do not define the package's core API.
