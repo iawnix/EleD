@@ -8,7 +8,7 @@ from eled import (
     XTBResults, CalcDensityMatrix, CalcShellPopulations,
     CalcFrontierBondDescriptors,
     CalcPiDescriptors, CalcMCI, CalcMCIDescriptors,
-    DescriptorCatalog, DescriptorColumns, CalcDescriptorReport,
+    DescriptorCatalog, DescriptorColumns, CalcDescriptorReport, DescriptorStatus,
 )
 from eled.input import _input_metadata, _xyz_from_mol
 
@@ -194,7 +194,20 @@ def test_descriptor_catalog_and_scalar_units_are_explicit():
         'properties', 'solvation', 'thermochemistry',
     }
     assert catalog['fod']['n_fod_e']['unit'] == 'e'
-    assert catalog['realspace']['alie_ev / lea_ev']['unit'] == 'eV'
+    assert catalog['realspace']['alie_ev']['unit'] == 'eV'
+    assert catalog['realspace']['lea_ev']['unit'] == 'eV'
+    assert not any('/' in name for group in catalog.values() for name in group)
+    assert catalog['properties']['fermi_alpha_ha']['unit'] == 'Hartree'
+    assert catalog['properties']['fermi_alpha_ev']['unit'] == 'eV'
+    assert catalog['bond']['e_parallel_au']['unit'] == 'Hartree/(e*Bohr)'
+    assert catalog['fod']['fod_fermi_alpha_ev']['unit'] == 'eV'
+    assert catalog['solvation']['solv_delta_q_e']['unit'] == 'e'
+    assert catalog['atom']['mu_orb_ev']['unit'] == 'eV'
+    assert 'atomic_softness_e_per_ev' not in catalog['atom']
+    status = DescriptorStatus()
+    labels = [name for names in status.values() for name in names]
+    assert len(labels) == len(set(labels)) and not any('/' in name for name in labels)
+    assert 'mul_ovlp_e' in status['exploratory'] and 'mul_s_e' in status['recommended']
     assert 'mbo' not in catalog['bond']
     assert 'eht_*' not in catalog['molecular']
     assert catalog['bond']['wbo']['unit'] == 'dimensionless'

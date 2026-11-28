@@ -550,7 +550,7 @@ def test_integrated_report_conformers_viz_and_doctor(library):
         assert rep_n['values'][key] == pytest.approx(rep_c['values'][key], abs=1e-9)
 
     # Visualization directly from CalcDescriptorReport
-    for field in ('epn_au', 'alpha_bohr3', 'f_w_plus', 'occ_e_mean_ev', 'atomic_softness_e_per_ev'):
+    for field in ('epn_au', 'alpha_bohr3', 'f_w_plus', 'occ_e_mean_ev', 'neg_chi_diag_e_per_ev'):
         svg = DrawDescriptorMap(mol, rep_n, atomField=field)
         assert '<svg' in svg
     for field in ('coop_e', 'ecohp_ev'):

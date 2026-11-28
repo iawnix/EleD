@@ -110,7 +110,7 @@ def CalcOrbitalWeightedFukui(
             missing["homo_ev"] = "homo_unavailable"
         if lumo_ev is None:
             missing["lumo_ev"] = "lumo_unavailable"
-        for key in ("mu_ev", "sum_errors", "f_w_plus", "f_w_minus", "f_w_radical", "dual_w"):
+        for key in ("mu_orb_ev", "sum_errors", "f_w_plus", "f_w_minus", "f_w_radical", "dual_w"):
             missing[key] = reason
         atoms = [
             {
@@ -158,7 +158,7 @@ def CalcOrbitalWeightedFukui(
 
     output = {
         "atoms": atoms,
-        "mu_ev": mu_ev,
+        "mu_orb_ev": mu_ev,
         "homo_ev": homo_ev,
         "lumo_ev": lumo_ev,
         "delta_ev": delta,
@@ -180,7 +180,7 @@ def CalcOrbitalWeightedFukui(
             "dual_w_definition": "f_w_plus - f_w_minus",
         },
         "units": {
-            "mu_ev": "eV",
+            "mu_orb_ev": "eV",
             "homo_ev": "eV",
             "lumo_ev": "eV",
             "delta_ev": "eV",
@@ -632,7 +632,7 @@ def CalcLinearResponseMatrix(
         "homo_lumo_gap_ev": "eV",
         "chi_diag_e_per_ev": "e/eV",
         "chi_diag_e_per_ha": "e/Hartree",
-        "atomic_softness_e_per_ev": "e/eV",
+        "neg_chi_diag_e_per_ev": "e/eV",
         "nonlocal_coupling_e_per_ev": "e/eV",
     }
 
@@ -716,7 +716,7 @@ def CalcLinearResponseMatrix(
             "atom_index": int(a),
             "chi_diag_e_per_ev": diag_ev,
             "chi_diag_e_per_ha": diag_ha,
-            "atomic_softness_e_per_ev": float(-diag_ev),
+            "neg_chi_diag_e_per_ev": float(-diag_ev),
             "nonlocal_coupling_e_per_ev": off_abs,
             "missing": {},
         })

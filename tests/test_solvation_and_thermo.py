@@ -168,14 +168,14 @@ def test_calc_solvation_descriptors_physics_permutation_and_error_recovery(libra
     desc_perm = CalcSolvationDescriptors(reordered, 'water', solvationModel='alpb', xtbLibrary=library)
     assert desc_perm['delta_g_solv_ha'] == pytest.approx(desc_water['delta_g_solv_ha'], abs=1e-8)
     for new_idx, old_idx in enumerate(perm):
-        assert desc_perm['atoms'][new_idx]['delta_q_e'] == pytest.approx(
-            desc_water['atoms'][old_idx]['delta_q_e'], abs=1e-8
+        assert desc_perm['atoms'][new_idx]['solv_delta_q_e'] == pytest.approx(
+            desc_water['atoms'][old_idx]['solv_delta_q_e'], abs=1e-8
         )
 
     # GFN0 solvation: CM5 shifts must be None with explicit missing reasons
     desc_gfn0 = CalcSolvationDescriptors(mol, 'water', method='GFN0-xTB', solvationModel='alpb', xtbLibrary=library)
     assert desc_gfn0['atoms'][0]['cm5_q_gas_e'] is None
-    assert desc_gfn0['atoms'][0]['missing']['delta_cm5_q_e'] == 'cm5_undefined_for_gfn0_eeq'
+    assert desc_gfn0['atoms'][0]['missing']['solv_delta_cm5_q_e'] == 'cm5_undefined_for_gfn0_eeq'
     assert desc_gfn0['missing']['cm5_charges'] == 'cm5_undefined_for_gfn0_eeq'
     assert desc_gfn0['g_born_ha'] is None
     assert desc_gfn0['missing']['g_born_ha'] == 'not_separately_returned_by_gfn0'

@@ -122,8 +122,8 @@ def test_fod_analytical_two_level_and_temperature_limits():
     kt = BOLTZMANN_EV_PER_K * temp
     expected_nfod = 4.0 / (1.0 + math.exp((e_vir - e_occ) / (2.0 * kt)))
     assert out['n_fod_e'] == pytest.approx(expected_nfod, rel=1e-10)
-    assert out['fermi_alpha_ev'] == pytest.approx(-1.0, abs=1e-10)
-    assert out['fermi_beta_ev'] == pytest.approx(-1.0, abs=1e-10)
+    assert out['fod_fermi_alpha_ev'] == pytest.approx(-1.0, abs=1e-10)
+    assert out['fod_fermi_beta_ev'] == pytest.approx(-1.0, abs=1e-10)
     assert out['self_consistent_temperature'] is True
     assert out['atomic_fod_available'] is True
     assert out['shell_fod_available'] is True
@@ -182,7 +182,7 @@ def test_linear_response_analytical_h2_and_sum_rule():
         np.testing.assert_allclose(chi, expected, atol=1e-12)
         assert out['sum_rule_max_error_e_per_ev'] < 1e-14
         assert out['atoms'][0]['chi_diag_e_per_ev'] == pytest.approx(diag)
-        assert out['atoms'][0]['atomic_softness_e_per_ev'] == pytest.approx(-diag)
+        assert out['atoms'][0]['neg_chi_diag_e_per_ev'] == pytest.approx(-diag)
         assert out['atoms'][0]['nonlocal_coupling_e_per_ev'] == pytest.approx(-diag)
         json.dumps(out, allow_nan=False)
 

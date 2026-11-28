@@ -91,7 +91,7 @@ _FIELD_LABELS = {
     'n_localized_bonds': 'localized bonds',
     'fod_pop_e': 'FOD population',
     'chi_diag_e_per_ev': 'linear response chi_AA',
-    'atomic_softness_e_per_ev': 'atomic linear-response softness',
+    'neg_chi_diag_e_per_ev': 'negative diagonal linear response',
     'nonlocal_coupling_e_per_ev': 'nonlocal linear-response coupling',
     'alie_mean_ev': 'surface mean ALIE',
     'lea_mean_ev': 'surface mean LEA',

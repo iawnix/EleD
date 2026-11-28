@@ -133,7 +133,7 @@ def test_orbital_weighted_fukui_analytical_and_sum_rules():
     # Lowdin atom populations are exact column sums of U^2:
     # MO 0: (0.75, 0.25), MO 1: (0.90, 0.10), MO 2: (0.25, 0.75), MO 3: (0.10, 0.90)
     mu = 0.5 * (-8.0 + 1.0)
-    assert out["mu_ev"] == pytest.approx(mu)
+    assert out["mu_orb_ev"] == pytest.approx(mu)
     w_occ = np.exp(-(((mu - np.array([-12.0, -8.0])) / delta) ** 2))
     w_occ /= w_occ.sum()
     w_vir = np.exp(-(((mu - np.array([1.0, 4.0])) / delta) ** 2))
@@ -179,9 +179,9 @@ def test_orbital_weighted_fukui_missing_homo_or_lumo(occupations, expected_reaso
     _, res, _, _, _ = _nonorthogonal_diatomic_result(occupations=occupations)
     out = CalcOrbitalWeightedFukui(res)
     json.dumps(out, allow_nan=False)
-    assert out["mu_ev"] is None
+    assert out["mu_orb_ev"] is None
     assert out["sum_errors"] is None
-    assert out["missing"]["mu_ev"] == expected_reason
+    assert out["missing"]["mu_orb_ev"] == expected_reason
     assert out["missing"]["sum_errors"] == expected_reason
     if expected_reason == "homo_unavailable":
         assert out["homo_ev"] is None

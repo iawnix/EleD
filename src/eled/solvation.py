@@ -172,21 +172,21 @@ def CalcSolvationDescriptors(
             'atom_index': idx,
             'q_gas_e': float(q_gas[idx]),
             'q_solv_e': float(q_solv[idx]),
-            'delta_q_e': float(dq[idx]),
+            'solv_delta_q_e': float(dq[idx]),
         }
         if has_cm5:
             row['cm5_q_gas_e'] = float(cm5_gas[idx])
             row['cm5_q_solv_e'] = float(cm5_solv[idx])
-            row['delta_cm5_q_e'] = float(cm5_solv[idx] - cm5_gas[idx])
+            row['solv_delta_cm5_q_e'] = float(cm5_solv[idx] - cm5_gas[idx])
             row['missing'] = {}
         else:
             row['cm5_q_gas_e'] = None
             row['cm5_q_solv_e'] = None
-            row['delta_cm5_q_e'] = None
+            row['solv_delta_cm5_q_e'] = None
             row['missing'] = {
                 'cm5_q_gas_e': cm5_reason,
                 'cm5_q_solv_e': cm5_reason,
-                'delta_cm5_q_e': cm5_reason,
+                'solv_delta_cm5_q_e': cm5_reason,
             }
         atom_rows.append(row)
 
@@ -261,10 +261,10 @@ def CalcSolvationDescriptors(
             'charge_shift_l1_e': 'e',
             'q_gas_e': 'e',
             'q_solv_e': 'e',
-            'delta_q_e': 'e',
+            'solv_delta_q_e': 'e',
             'cm5_q_gas_e': 'e',
             'cm5_q_solv_e': 'e',
-            'delta_cm5_q_e': 'e',
+            'solv_delta_cm5_q_e': 'e',
         },
         'invariance': (
             'rigid-translation invariant; rotationally invariant up to Lebedev surface-grid '

@@ -729,7 +729,7 @@ def _run_xtb_native(
                 **(
                     {
                         'realspace': {
-                            'api_version': 1,
+                            'api_version': getattr(library, 'realspace_api_version', None),
                             'density_unit': 'e/bohr^3',
                             'alie_unit': 'eV',
                             'virtual_density_unit': '1/bohr^3',

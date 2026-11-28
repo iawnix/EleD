@@ -318,7 +318,7 @@ lmo = CalcLocalizedOrbitals(mol, result, scheme="lowdin")
 ```
 
 - `CalcOrbitalWeightedFukui` evaluates Pino-Rios / Martínez-Araya Gaussian-weighted
-  `f_w_plus`, `f_w_minus`, `f_w_radical` and `dual_w` centered at $\mu = (\mathrm{HOMO}+\mathrm{LUMO})/2$
+  `f_w_plus`, `f_w_minus`, `f_w_radical` and `dual_w` centered at the orbital midpoint `mu_orb_ev` $= (\mathrm{HOMO}+\mathrm{LUMO})/2$ (not the ΔSCF `mu_ev`)
   with exact sum rules ($\sum f_w^+ = \sum f_w^- = 1$, $\sum \Delta f_w = 0$).
 - `CalcAtomicOrbitalEnergies` reports per-atom occupied/virtual populations
   (`occ_n_e`, `vir_n`), mean occupied orbital energy `occ_e_mean_ev` (the negative
@@ -388,10 +388,11 @@ thermo = CalcVibrationalThermochemistry(
 
 `CalcSolvationDescriptors` reports `delta_g_solv_ha`/`kcalmol`, direct `g_solv_direct_ha`,
 `solute_polarization_energy_ha`, Born/SASA/HB/shift sub-terms (GFN1/2), dipole
-shifts, HOMO/LUMO/gap shifts, and per-atom charge shifts (`delta_q_e`, `delta_cm5_q_e`).
+shifts, HOMO/LUMO/gap shifts, and per-atom charge shifts (`solv_delta_q_e`, `solv_delta_cm5_q_e`).
 `CalcVibrationalThermochemistry` reports harmonic `frequencies_cm1`, `ir_intensities_km_mol`,
 `rotational_constants_cm1`, ZPE, thermal corrections, entropy, and Gibbs free energy
-using RRHO (`rotorCutoffCm1=0`) or Grimme qRRHO (`rotorCutoffCm1=100.0` default).
+using RRHO (`rotorCutoffCm1=0`) or Grimme qRRHO (`rotorCutoffCm1=100.0` default;
+free-rotor reduced moment uses Grimme's fixed `B_av = 1e-44 kg m^2`, as in xtb).
 Non-stationary geometries (large gradients or imaginary frequencies) are explicitly
 flagged via `is_stationary_point=False` and `warnings`.
 
@@ -412,7 +413,8 @@ iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 1 SCF exact 0.001 a.u.
 
 - `RunFOD` and `CalcFODFromResult` implement Grimme & Hansen's spin-resolved Fermi–Dirac
   fractional occupation number weighted electron density (FOD) diagnostic, returning
-  `n_fod_e`, `fermi_alpha_ev`/`fermi_beta_ev`, `orbital_fod_e`, and per-atom `fod_pop_e`
+  `n_fod_e`, `fod_fermi_alpha_ev`/`fod_fermi_beta_ev` (re-solved at the FOD
+  temperature; distinct from the engine `fermi_alpha_ev` in `CalcEnergyDecomposition`), `orbital_fod_e`, and per-atom `fod_pop_e`
   with `fod_s_e`/`fod_p_e`/`fod_d_e` shell breakdown when `keepOverlap=True`.
 - `CalcReactivityDescriptors` / `RunReactivity` (`protocol_version = "2.2"`) also report
   Gázquez electrodonating/electroaccepting powers (`omega_minus_ev`, `omega_plus_ev`),
