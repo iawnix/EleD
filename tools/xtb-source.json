@@ -64,10 +64,10 @@
   "realspace_extension": {
     "api_version": 2,
     "patch": "diagnostics/xtb_realspace_export.patch",
-    "patch_sha256": "2221b9658c10b262802cbbbac84a9d48cd3e6808fa8e59b1b0d13d20ba56b7f3",
+    "patch_sha256": "2a69bc44fbebd842619ca182cf97e17fbde487c555978d4b5d7158c2c4f6857b",
     "patched_files": {
       "include/xtb.h": "a36b74ce6ffb63e19681d19f7cd6bf28fa91b082a97b36e525a97ec0aa097011",
-      "src/api/results.f90": "7aa5773717bda79151fbdcf773221751a28f6f2ec044dbc55fdc49e20d6b9bc9",
+      "src/api/results.f90": "d9a1471518f4279e080041ec551b119ed8d5f21d3decaa5786be6daff3d59cf3",
       "src/api/interface.f90": "9e7c0eb5811f537c815b5ad049b58422e79ffb2eaf1aa7659e45e1c69fdf70bb"
     }
   }

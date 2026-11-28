@@ -32,6 +32,29 @@
 - `CalcDescriptorReport` no longer passes the frontier threshold (1e-7) to
   `CalcLocalizedOrbitals`, whose `occupationThreshold` (default 1.5) selects
   doubly occupied orbitals; reports now use that default.
+- **Descriptor definitions (breaking names)**:
+  - qRRHO now uses Grimme's fixed `B_av = 1e-44 kg m^2` (as in xtb) instead of the
+    molecule's mean principal moment; recorded as `settings.qrrho_b_av_kg_m2`.
+  - Same-name fields with different meanings are renamed: FOD Fermi levels
+    `fermi_*_ev` -> `fod_fermi_*_ev`; solvation charge shifts `delta_q_e` /
+    `delta_cm5_q_e` -> `solv_delta_q_e` / `solv_delta_cm5_q_e`; orbital-weighted
+    Fukui `mu_ev` -> `mu_orb_ev`; `atomic_softness_e_per_ev` (-chi_AA, not the
+    conceptual-DFT local softness) -> `neg_chi_diag_e_per_ev`.
+  - `DescriptorCatalog()` now has one entry per concrete field name (grouped keys
+    such as `'alie_ev / lea_ev'` are expanded, with per-field units), and
+    `DescriptorStatus()` lists concrete names with no field in two tiers
+    (`mul_ovlp_e` is exploratory; `mul_s_e`... are recommended).
+  - `xtb_energy_ha` is documented as the total (not electronic) energy.
+  - Real-space metadata records the live ABI version instead of a fixed `1`.
+  - Docs note that SambVca %Vbur literature values use Bondi radii x1.17.
+- **Real-space LEA under Fermi smearing (libxtb rebuild required)**: the realspace
+  extension weighted the virtual density/LEA only over orbitals with occupation
+  `<= occ_thr`, so a partially occupied LUMO was dropped from the LEA. Acceptor
+  orbitals are now weighted by their vacancy `2 - n_i` for every orbital with a
+  vacancy above `occ_thr`, and the LEA window starts at the lowest orbital with at
+  least one vacancy. The ABI stays v2; the patch hash changes, and the v1/old-v2
+  patch acceptance paths are removed from `runtime.py`, `rdXTBTools` and the
+  ctypes binding.
 
 ## 0.16.0 — DIPRO electronic coupling (J_AB), full 0.13–0.15 pipeline integration, and catalysis steric complements
 

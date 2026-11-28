@@ -36,7 +36,7 @@ fabricated zeros. All calculation paths use libxtb; no tblite or ASE Python depe
 | `CalcFODFromResult(result, *, scheme="lowdin", electronicTemperature=None)` / `RunFOD(mol, *, electronicTemperature=5000.0, ...)` | Grimme FOD static-correlation index (`n_fod_e`), spin-resolved Fermi levels, orbital FOD weights and atomic/shell `fod_pop_e` (`s/p/d`) | Retained result (`keepOverlap=True` for atomic/shell FOD) or explicit-H 3D `Mol` (1 SCF) |
 | `CalcLinearResponseMatrix(result, *, scheme="lowdin", ...)` | Closed-shell independent-particle atom-condensed linear response $\chi_{AB}^{\mathrm{IP}}$ (`chi_e_per_ev`, `chi_e_per_ha`, per-atom softness & nonlocal coupling) | Closed-shell integer-occupied retained basis (`keepOverlap=True`) |
 | `CalcBondElectricField(mol, *, stepAngstrom=1e-3, ...)` / `CalcBondElectricFieldFromESP(mol, result, ...)` | Bond-midpoint electric field $\mathbf{E}=-\nabla V$ projected along every RDKit bond (`e_parallel_*`, `e_perp_*`, `e_norm_*`, `e_vec_au`) | Explicit-H 3D `Mol` (1 batched ESP SCF) or matching stencil result |
-| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v1/v2 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
+| `CalcRealSpaceProperties(result)` / `CalcRealSpaceSurfaceDescriptors(mol, result, ...)` / `CalcDensityIsosurface(mol, *, isovalueAU=0.001, ...)` | Exact Cartesian GTO valence density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})/\mathrm{LEA}(\mathbf{r})$, and `0.001 a.u.` isosurface volume, area, sphericity, ESP & ALIE/LEA | `realspace_extension` ABI v2 (0 SCF for analyzers; 1 SCF for `CalcDensityIsosurface`) |
 | `CalcRealSpaceTopology(mol, pts)` / `CalcBondDensityTopology(mol)` / `CalcNCIDescriptors(mol)` | Analytical valence density derivatives, ELF, LOL, RDG, $\mathrm{sign}(\lambda_2)\rho$, bond ellipticity $\varepsilon$, and volumetric NCI/RDG regimes | `realspace_extension` ABI v2 (1 native SCF) |
 | `CalcDirectedSurfaceDescriptors(mol, *, isovalueAU=0.001, ...)` | Directed `0.001 a.u.` isosurface extrema for halogen $\sigma$-holes, polar X–H HBD, heteroatom HBA, and aromatic $\pi$-holes | `realspace_extension` + `esp_extension` (1 native SCF) |
 | `CalcFragmentInteraction(mol, fragmentA, fragmentB, ...)` | Fixed-geometry fragment EDA ($\Delta E_{\text{elec/rep/es/disp/solv}}$), charge transfer (`ct_*_a_to_b_e`), and inter-fragment WBO/COOP/ECOHP/$\chi_{AB}$ | 3 matched single points (`AB`, `A`, `B`, `keepOverlap=True`) |
@@ -318,7 +318,7 @@ lmo = CalcLocalizedOrbitals(mol, result, scheme="lowdin")
 ```
 
 - `CalcOrbitalWeightedFukui` evaluates Pino-Rios / Martínez-Araya Gaussian-weighted
-  `f_w_plus`, `f_w_minus`, `f_w_radical` and `dual_w` centered at $\mu = (\mathrm{HOMO}+\mathrm{LUMO})/2$
+  `f_w_plus`, `f_w_minus`, `f_w_radical` and `dual_w` centered at the orbital midpoint `mu_orb_ev` $= (\mathrm{HOMO}+\mathrm{LUMO})/2$ (not the ΔSCF `mu_ev`)
   with exact sum rules ($\sum f_w^+ = \sum f_w^- = 1$, $\sum \Delta f_w = 0$).
 - `CalcAtomicOrbitalEnergies` reports per-atom occupied/virtual populations
   (`occ_n_e`, `vir_n`), mean occupied orbital energy `occ_e_mean_ev` (the negative
@@ -388,10 +388,11 @@ thermo = CalcVibrationalThermochemistry(
 
 `CalcSolvationDescriptors` reports `delta_g_solv_ha`/`kcalmol`, direct `g_solv_direct_ha`,
 `solute_polarization_energy_ha`, Born/SASA/HB/shift sub-terms (GFN1/2), dipole
-shifts, HOMO/LUMO/gap shifts, and per-atom charge shifts (`delta_q_e`, `delta_cm5_q_e`).
+shifts, HOMO/LUMO/gap shifts, and per-atom charge shifts (`solv_delta_q_e`, `solv_delta_cm5_q_e`).
 `CalcVibrationalThermochemistry` reports harmonic `frequencies_cm1`, `ir_intensities_km_mol`,
 `rotational_constants_cm1`, ZPE, thermal corrections, entropy, and Gibbs free energy
-using RRHO (`rotorCutoffCm1=0`) or Grimme qRRHO (`rotorCutoffCm1=100.0` default).
+using RRHO (`rotorCutoffCm1=0`) or Grimme qRRHO (`rotorCutoffCm1=100.0` default;
+free-rotor reduced moment uses Grimme's fixed `B_av = 1e-44 kg m^2`, as in xtb).
 Non-stationary geometries (large gradients or imaginary frequencies) are explicitly
 flagged via `is_stationary_point=False` and `warnings`.
 
@@ -412,7 +413,8 @@ iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 1 SCF exact 0.001 a.u.
 
 - `RunFOD` and `CalcFODFromResult` implement Grimme & Hansen's spin-resolved Fermi–Dirac
   fractional occupation number weighted electron density (FOD) diagnostic, returning
-  `n_fod_e`, `fermi_alpha_ev`/`fermi_beta_ev`, `orbital_fod_e`, and per-atom `fod_pop_e`
+  `n_fod_e`, `fod_fermi_alpha_ev`/`fod_fermi_beta_ev` (re-solved at the FOD
+  temperature; distinct from the engine `fermi_alpha_ev` in `CalcEnergyDecomposition`), `orbital_fod_e`, and per-atom `fod_pop_e`
   with `fod_s_e`/`fod_p_e`/`fod_d_e` shell breakdown when `keepOverlap=True`.
 - `CalcReactivityDescriptors` / `RunReactivity` (`protocol_version = "2.2"`) also report
   Gázquez electrodonating/electroaccepting powers (`omega_minus_ev`, `omega_plus_ev`),
@@ -429,9 +431,12 @@ iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 1 SCF exact 0.001 a.u.
   in one batched single point (`e_parallel_au`/`mv_cm`, `e_perp_au`/`mv_cm`, `e_norm_au`/`mv_cm`,
   `e_vec_au`; `1 a.u. = 5142.2067476326 MV/cm`).
 - `CalcRealSpaceProperties`, `CalcRealSpaceSurfaceDescriptors`, and `CalcDensityIsosurface`
-  use the reviewed `realspace_extension` ABI v1 in `libxtb` to evaluate exact Cartesian GTO
+  use the reviewed `realspace_extension` ABI v2 in `libxtb` to evaluate exact Cartesian GTO
   valence electron density $\rho(\mathbf{r})$, real-space $\mathrm{ALIE}(\mathbf{r})$,
-  virtual density, and $\mathrm{LEA}(\mathbf{r})$ without additional SCF calls. Points below
+  virtual density, and $\mathrm{LEA}(\mathbf{r})$ without additional SCF calls. Under Fermi
+  smearing orbitals are weighted rather than thresholded: ALIE uses occupations $n_i$ and
+  the virtual density/LEA use vacancies $2-n_i$; the LEA window starts at the lowest orbital
+  with at least one vacancy (aufbau LUMO, or SOMO for open shells). Points below
   `densityCutoffAU` return `None` rather than zero. `CalcDensityIsosurface` locates the exact
   `0.001 a.u.` isosurface in one SCF via Voronoi-partitioned batched radial bisection and
   returns molecular volume, surface area, sphericity, surface grid, and optional isosurface

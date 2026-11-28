@@ -38,6 +38,7 @@ _ME_KG = 9.1093837015e-31
 _AMU_TO_AU = _AMU_TO_KG / _ME_KG
 _BOHR_TO_M = 5.29177210903e-11
 _ATM_TO_PA = 101325.0
+_QRRHO_B_AV_KG_M2 = 1.0e-44  # Grimme 2012 fixed average moment of inertia
 _HARTREE_TO_CM1 = 219474.6313632
 _E_CHARGE_SI = 1.602176634e-19
 _EPS0_SI = 8.8541878128e-12
@@ -329,7 +330,9 @@ def CalcVibrationalThermochemistry(
     s_elec_j = _R_SI * math.log(multiplicity)
 
     # Vibrational thermochemistry (over positive real modes).
-    b_av_si = float(np.mean(inertias_si)) if (not is_atom and float(np.mean(inertias_si)) > 0.0) else 1.0e-44
+    # Grimme (Chem. Eur. J. 2012, 18, 9955) and xtb use a fixed average moment of
+    # inertia B_av = 1e-44 kg m^2 in the free-rotor reduced moment, not the molecule's.
+    b_av_si = _QRRHO_B_AV_KG_M2
     zpe_j = 0.0
     u_vib_th_j = 0.0
     s_vib_j = 0.0
@@ -428,6 +431,7 @@ def CalcVibrationalThermochemistry(
             'imaginary_threshold_cm1': imag_thr,
             'stationary_gradient_threshold_ha_bohr': grad_thr,
             'rotor_cutoff_cm1': sthr,
+            'qrrho_b_av_kg_m2': _QRRHO_B_AV_KG_M2,
             'symmetry_number': sigma,
             'temperature_k': temp,
             'pressure_atm': press,

@@ -127,10 +127,10 @@ ef = CalcBondElectricField(mol, stepAngstrom=1e-3)      # 单次 SCF 批量计�
 iso = CalcDensityIsosurface(mol, isovalueAU=0.001)      # 单次 SCF 精确 0.001 a.u. 等值面 + ESP/ALIE/LEA
 ```
 
-- `RunFOD` / `CalcFODFromResult` 实现 Grimme–Hansen 有限温 Fermi–Dirac 分数占据电子密度（FOD）诊断，返回 `n_fod_e`、自旋分辨费米能级 `fermi_alpha_ev`/`fermi_beta_ev`、每轨道 `orbital_fod_e` 以及原子与 `s/p/d` 壳层 `fod_pop_e`/`fod_s_e`/`fod_p_e`/`fod_d_e`。
-- `CalcLinearResponseMatrix` 在 `keepOverlap=True` 的闭壳层单点结果上计算独立粒子原子凝聚线性响应矩阵 $\chi_{AB}^{\mathrm{IP}}$（`chi_e_per_ev`、`chi_e_per_ha`、对角 `chi_diag_e_per_ev`、`atomic_softness_e_per_ev`、`nonlocal_coupling_e_per_ev`），精确满足 $\sum_B \chi_{AB} = 0$，并对开壳层、未知自旋、分数占据或零能隙体系显式返回 `available=False` 与 `missing` 原因。
+- `RunFOD` / `CalcFODFromResult` 实现 Grimme–Hansen 有限温 Fermi–Dirac 分数占据电子密度（FOD）诊断，返回 `n_fod_e`、在 FOD 温度下重新求解的自旋分辨费米能级 `fod_fermi_alpha_ev`/`fod_fermi_beta_ev`（不同于 `CalcEnergyDecomposition` 中引擎给出的 `fermi_alpha_ev`）、每轨道 `orbital_fod_e` 以及原子与 `s/p/d` 壳层 `fod_pop_e`/`fod_s_e`/`fod_p_e`/`fod_d_e`。
+- `CalcLinearResponseMatrix` 在 `keepOverlap=True` 的闭壳层单点结果上计算独立粒子原子凝聚线性响应矩阵 $\chi_{AB}^{\mathrm{IP}}$（`chi_e_per_ev`、`chi_e_per_ha`、对角 `chi_diag_e_per_ev`、`neg_chi_diag_e_per_ev`（即 $-\chi_{AA}$，不是概念 DFT 的局部软度 $S f_A$）、`nonlocal_coupling_e_per_ev`），精确满足 $\sum_B \chi_{AB} = 0$，并对开壳层、未知自旋、分数占据或零能隙体系显式返回 `available=False` 与 `missing` 原因。
 - `CalcBondElectricField` / `CalcBondElectricFieldFromESP` 在单次 `libxtb` 单点计算中对全部 RDKit 键中点构造 6 点中心有限差分模板求取 $\mathbf{E} = -\nabla V$，输出键向投影 `e_parallel_au`/`e_parallel_mv_cm`、垂直分量 `e_perp_au`/`mv_cm`、模长 `e_norm_au`/`mv_cm` 及三维向量 `e_vec_au`（`1 a.u. = 5142.2067476326 MV/cm`）。
-- `CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors` 与 `CalcDensityIsosurface` 通过扩展版 `libxtb` 的 `realspace_extension` ABI v1/v2 在内存中精确求值笛卡尔 GTO 价电子密度 $\rho(\mathbf{r})$、实空间平均局域电离能 $\mathrm{ALIE}(\mathbf{r})$、虚轨道密度和局域电子亲和能 $\mathrm{LEA}(\mathbf{r})$，并在单次 SCF 内给出精确 `0.001 a.u.` 等值面的分子体积、表面积、球度以及表面 ESP/ALIE/LEA 统计；低于 `densityCutoffAU` 的点显式返回 `None`，绝不填零。
+- `CalcRealSpaceProperties`、`CalcRealSpaceSurfaceDescriptors` 与 `CalcDensityIsosurface` 通过扩展版 `libxtb` 的 `realspace_extension` ABI v2（ALIE 按占据数 $n_i$ 加权，虚轨道密度与 LEA 按空位 $2-n_i$ 加权，不按占据阈值截断；LEA 能量窗口从第一个至少有一个空位的轨道起算）在内存中精确求值笛卡尔 GTO 价电子密度 $\rho(\mathbf{r})$、实空间平均局域电离能 $\mathrm{ALIE}(\mathbf{r})$、虚轨道密度和局域电子亲和能 $\mathrm{LEA}(\mathbf{r})$，并在单次 SCF 内给出精确 `0.001 a.u.` 等值面的分子体积、表面积、球度以及表面 ESP/ALIE/LEA 统计；低于 `densityCutoffAU` 的点显式返回 `None`，绝不填零。
 
 ## 实空间价电子拓扑（ELF/LOL/椭圆度/NCI）、定向 σ/π-hole 极值、片段 EDA 与 Cremer–Kraka 局域键力常数
 
@@ -169,7 +169,7 @@ bond_ovlp = CalcBondOverlapDescriptors(mol, result)
 lmo = CalcLocalizedOrbitals(mol, result, scheme="lowdin")
 ```
 
-- `CalcOrbitalWeightedFukui` 计算以 $\mu = (\mathrm{HOMO}+\mathrm{LUMO})/2$ 为中心的高斯轨道加权
+- `CalcOrbitalWeightedFukui` 计算以轨道中点 `mu_orb_ev` $= (\mathrm{HOMO}+\mathrm{LUMO})/2$（不同于 ΔSCF 的 `mu_ev`）为中心的高斯轨道加权
   `f_w_plus`、`f_w_minus`、`f_w_radical` 和 `dual_w`（精确满足求和规则）。
 - `CalcAtomicOrbitalEnergies` 返回原子占据/虚轨道布居（`occ_n_e`、`vir_n`）、平均占据轨道能
   `occ_e_mean_ev`（凝聚态 ALIE 代理量的相反数：$\mathrm{ALIE}_A = -\bar{\varepsilon}_{\mathrm{occ},A}$）、
@@ -224,9 +224,9 @@ thermo = CalcVibrationalThermochemistry(
 
 `CalcSolvationDescriptors` 返回 `delta_g_solv_ha`/`kcalmol`、直接溶剂能 `g_solv_direct_ha`、
 溶质极化能 `solute_polarization_energy_ha`、Born/SASA/HB/shift 分项（GFN1/2）、偶极与前线能级位移
-以及原子电荷位移（`delta_q_e`、`delta_cm5_q_e`）。`CalcVibrationalThermochemistry` 返回谐振频率
+以及原子电荷位移（`solv_delta_q_e`、`solv_delta_cm5_q_e`）。`CalcVibrationalThermochemistry` 返回谐振频率
 `frequencies_cm1`、红外强度 `ir_intensities_km_mol`、转动常数 `rotational_constants_cm1` 及
-RRHO（`rotorCutoffCm1=0`）或 Grimme qRRHO（默认 `rotorCutoffCm1=100.0`）的 ZPE/U/H/S/G，
+RRHO（`rotorCutoffCm1=0`）或 Grimme qRRHO（默认 `rotorCutoffCm1=100.0`，自由转子约化转动惯量使用 Grimme 与 xtb 的固定值 `B_av = 1e-44 kg m^2`）的 ZPE/U/H/S/G，
 并通过 `is_stationary_point=False` 和 `warnings` 明确标记非驻点几何或虚频。
 
 ## 片段相互作用（EDA）与 DIPRO 电子耦合

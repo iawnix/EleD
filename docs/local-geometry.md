@@ -68,7 +68,8 @@ geometry reports as JSON or JSONL directly.
 | `CalcMCI(mol, result, ringAtomIndices)` | Ordered ring (3–9 atoms) and retained closed-shell density | `mci` and `i_ring`, dimensionless |
 
 Selections explicitly include the hydrogen atoms to be counted. Steric functions
-use RDKit van der Waals radii with `radiusScale=1.0`. Pass `radiiAngstrom` as a
+use RDKit van der Waals radii with `radiusScale=1.0`. SambVca %Vbur literature
+values use Bondi radii scaled by 1.17; pass `radiusScale=1.17` to compare. Pass `radiiAngstrom` as a
 full-length vector in original atom order for another radius set. Effective
 radii and the RDKit version are saved. Comparisons require the same radius set,
 hydrogen selection, geometric preparation and descriptor parameters.

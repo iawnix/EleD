@@ -62,7 +62,7 @@ many = RunLocalGeometryBatch([mol], selections,
 用 `json.dumps(report, allow_nan=False)` 保存 JSON 或 JSONL。
 `ExportDescriptorReports` 使用电子描述符报告 schema，局部几何报告直接保存为 JSON。
 
-位阻默认使用 RDKit van der Waals 半径，`radiusScale=1.0`。
+位阻默认使用 RDKit van der Waals 半径，`radiusScale=1.0`。SambVca 文献中的 %Vbur 使用 Bondi 半径 ×1.17，与之比较时请传入 `radiusScale=1.17`。
 其他半径体系通过完整原子长度的 `radiiAngstrom` 向量传入。
 报告保存有效半径和 RDKit 版本。氢是否参与由选择集合显式决定。
 比较结果时应保持半径、氢处理、几何准备和描述符参数一致。

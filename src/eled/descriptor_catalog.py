@@ -7,10 +7,11 @@ preserve ``None``/the reason instead of imputing zero.
 from __future__ import annotations
 
 from copy import deepcopy
+import re
 
 _CATALOG = {
     'molecular': {
-        'xtb_energy_ha': {'definition': 'xTB total electronic energy', 'unit': 'Hartree', 'invariance': 'rigid-motion invariant; method/reference dependent', 'requires': 'single point', 'missing': 'engine did not return energy'},
+        'xtb_energy_ha': {'definition': 'xTB total energy (electronic, repulsion, dispersion and, when requested, solvation terms); see e_elec_ha for the electronic part', 'unit': 'Hartree', 'invariance': 'rigid-motion invariant; method/reference dependent', 'requires': 'single point', 'missing': 'engine did not return energy'},
         'xtb_homo_ev': {'definition': 'energy of aufbau orbital n_alpha - 1, n_alpha = (N_e + N_unpaired)/2 (SOMO for open shells); independent of Fermi smearing', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'orbital energies and occupations', 'missing': 'no electrons'},
         'xtb_lumo_ev': {'definition': 'energy of aufbau orbital n_alpha, the first orbital empty in the aufbau reference; independent of Fermi smearing', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'orbital energies and occupations', 'missing': 'all orbitals occupied in the aufbau reference'},
         'xtb_gap_ev': {'definition': 'LUMO minus HOMO', 'unit': 'eV', 'invariance': 'same as frontier energies', 'requires': 'HOMO and LUMO', 'missing': 'HOMO or LUMO unavailable'},
@@ -40,13 +41,14 @@ _CATALOG = {
         'omega_minus_loc_ev / omega_plus_loc_ev / delta_omega_loc_ev': {'definition': 'local electrodonating power (omega_minus * f_minus), local electroaccepting power (omega_plus * f_plus), and multiphilic difference (omega_plus_loc - omega_minus_loc)', 'unit': 'eV', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and condensed Fukui indices', 'missing': 'hardness nonpositive or charge state failed'},
         's2_loc_1ev2': {'definition': 'local hyper-softness S^2 * dual = s_1ev^2 * (f_plus - f_minus)', 'unit': '1/eV^2', 'invariance': 'same as Fukui index', 'requires': 'positive hardness and dual descriptor', 'missing': 'hardness nonpositive or charge state failed'},
         'fod_pop_e / fod_s_e / fod_p_e / fod_d_e': {'definition': 'Grimme atomic and s/p/d shell fractional occupation number weighted electron density (FOD) static-correlation populations', 'unit': 'e', 'invariance': 'rigid-motion, AO permutation, MO phase and degenerate subspace rotation invariant; preserves RDKit atom order', 'requires': 'retained overlap basis (keepOverlap=True) and finite electronic temperature', 'missing': 'atoms empty with overlap_basis_not_retained when keepOverlap=False'},
-        'chi_diag_e_per_ev / atomic_softness_e_per_ev / nonlocal_coupling_e_per_ev': {'definition': 'diagonal independent-particle atom-condensed linear response chi_AA (<= 0), atomic softness -chi_AA (>= 0), and nonlocal coupling sum_{B!=A} |chi_AB|', 'unit': 'e/eV (also chi_diag_e_per_ha in e/Hartree)', 'invariance': 'rigid-motion, AO permutation, MO phase and degenerate subspace rotation invariant; preserves RDKit atom order', 'requires': 'closed-shell integer-occupied retained basis (keepOverlap=True) with positive HOMO-LUMO gap', 'missing': 'withheld for open-shell, unknown spin, fractional occupation or degenerate gap'},
+        'chi_diag_e_per_ev / neg_chi_diag_e_per_ev / nonlocal_coupling_e_per_ev': {'definition': 'diagonal independent-particle atom-condensed linear response chi_AA (<= 0), its negative -chi_AA (>= 0; a response measure, not the conceptual-DFT local softness S*f_A), and nonlocal coupling sum_{B!=A} |chi_AB|', 'unit': 'e/eV (also chi_diag_e_per_ha in e/Hartree)', 'invariance': 'rigid-motion, AO permutation, MO phase and degenerate subspace rotation invariant; preserves RDKit atom order', 'requires': 'closed-shell integer-occupied retained basis (keepOverlap=True) with positive HOMO-LUMO gap', 'missing': 'withheld for open-shell, unknown spin, fractional occupation or degenerate gap'},
         'f_w_plus/f_w_minus/f_w_radical/dual_w': {'definition': 'Pino-Rios / Martinez-Araya orbital-weighted condensed Fukui indices from a single retained calculation', 'unit': 'dimensionless', 'invariance': 'AO permutation, MO phase, degenerate subspace rotation and rigid-motion invariant', 'requires': 'retained overlap, MO coefficients, AO-atom map, and frontier orbitals', 'missing': 'HOMO or LUMO unavailable'},
+        'mu_orb_ev': {'definition': 'frontier orbital midpoint (eps_HOMO + eps_LUMO)/2 used to centre the orbital-weighted Fukui Gaussian weights; not the Delta-SCF chemical potential mu_ev', 'unit': 'eV', 'invariance': 'orbital phase and rigid-motion invariant', 'requires': 'aufbau HOMO and LUMO', 'missing': 'HOMO or LUMO unavailable'},
         'occ_n_e / vir_n': {'definition': 'sum of occupied / virtual atomic orbital populations (Lowdin or Mulliken)', 'unit': 'e (occ_n_e), dimensionless (vir_n)', 'invariance': 'AO permutation, MO phase and rigid-motion invariant', 'requires': 'retained overlap, MO coefficients and AO-atom map', 'missing': 'occupied or virtual subspace unavailable'},
         'occ_e_mean_ev / vir_e_mean_ev': {'definition': 'population-weighted mean occupied (negative condensed ALIE proxy: ALIE_A = -occ_e_mean_ev) and virtual atomic orbital energies', 'unit': 'eV', 'invariance': 'AO permutation, MO phase, degenerate subspace rotation and rigid-motion invariant', 'requires': 'retained basis and nonzero occupied/virtual atom weight', 'missing': 'subspace absent or zero atomic population weight'},
         'occ_e_frontier_ev / vir_e_frontier_ev': {'definition': 'Gaussian frontier-weighted occupied and virtual atomic orbital energies', 'unit': 'eV', 'invariance': 'same as occ_e_mean_ev / vir_e_mean_ev', 'requires': 'retained basis, frontier orbital and nonzero weighted denominator', 'missing': 'frontier orbital absent or zero weighted denominator'},
         'pdos_homo_win_e / pdos_lumo_win': {'definition': 'projected density of states integrated in [HOMO-window, HOMO] (e) and [LUMO, LUMO+window] (dimensionless)', 'unit': 'e (pdos_homo_win_e), dimensionless (pdos_lumo_win)', 'invariance': 'AO permutation, MO phase and rigid-motion invariant', 'requires': 'retained basis and HOMO/LUMO frontier', 'missing': 'HOMO or LUMO unavailable'},
-        'epn_au / epn_kcalmol': {'definition': 'exact valence electronic plus other-nuclei electrostatic potential at each nuclear position (EPN, V_N), omitting the singular self-nuclear term Z_A/r_iA', 'unit': 'Hartree/e (epn_au), kcal/(mol*e) (epn_kcalmol)', 'invariance': 'rigid-motion invariant; atom-permutation invariant with remapped indices', 'requires': 'libxtb extended properties ABI v1', 'missing': 'properties_extension_unavailable'},
+        'epn_au / epn_kcalmol': {'definition': 'exact valence-electron plus other-nuclei electrostatic potential at each nuclear position (EPN, V_N); nuclei carry xTB core-screened valence charges Z - n_core, consistent with the valence-only density; the singular self-nuclear term is omitted', 'unit': 'Hartree/e (epn_au), kcal/(mol*e) (epn_kcalmol)', 'invariance': 'rigid-motion invariant; atom-permutation invariant with remapped indices', 'requires': 'libxtb extended properties ABI v1', 'missing': 'properties_extension_unavailable'},
         'alpha_bohr3 / alpha_angstrom3': {'definition': 'D4 atomic static dipole polarizability', 'unit': 'Bohr^3 (alpha_bohr3), Angstrom^3 (alpha_angstrom3)', 'invariance': 'rigid-motion invariant; atom-permutation invariant with remapped indices', 'requires': 'GFN2-xTB or GFN0-xTB with libxtb extended properties ABI v1', 'missing': 'not_computed_by_gfn1_d3_dispersion or properties_extension_unavailable'},
         'c6_aa_ha_bohr6': {'definition': 'D4 homoatomic dispersion coefficient C6_AA', 'unit': 'Hartree*Bohr^6', 'invariance': 'rigid-motion invariant; atom-permutation invariant with remapped indices', 'requires': 'GFN2-xTB or GFN0-xTB with libxtb extended properties ABI v1', 'missing': 'not_computed_by_gfn1_d3_dispersion or properties_extension_unavailable'},
         'dip_ebohr / dip_norm_ebohr / dip_norm_debye': {'definition': 'CAMM atomic dipole vector and rotational-invariant magnitude', 'unit': 'e*Bohr / Debye', 'invariance': 'norm is rigid-motion invariant; Cartesian vector rotates with the coordinate frame', 'requires': 'GFN2-xTB (SCC CAMM) or GFN1-xTB (post-SCF CAMM) with properties ABI v1', 'missing': 'not_computed_by_gfn0 or properties_extension_unavailable'},
@@ -96,11 +98,11 @@ _CATALOG = {
     },
     'fod': {
         'n_fod_e': {'definition': 'Grimme total fractional occupation number weighted electron density static-correlation index N_FOD = sum_i f_FOD,i (matching xtb --fod)', 'unit': 'e', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies, electron/spin counts and finite electronic temperature (default 5000 K in RunFOD)', 'missing': 'never missing on valid completion; 0.0 at T = 0 K'},
-        'fermi_alpha_ev / fermi_beta_ev': {'definition': 'spin-resolved Fermi-Dirac chemical potentials solved at the FOD electronic temperature', 'unit': 'eV', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies and spin-channel electron counts', 'missing': 'never missing on valid completion'},
+        'fod_fermi_alpha_ev / fod_fermi_beta_ev': {'definition': 'spin-resolved Fermi-Dirac chemical potentials solved at the FOD electronic temperature', 'unit': 'eV', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies and spin-channel electron counts', 'missing': 'never missing on valid completion'},
         'orbital_fod_e': {'definition': 'per-MO spin-summed Grimme FOD weights (1 - f for eps <= E_F, f for eps > E_F)', 'unit': 'e', 'invariance': 'rigid-motion and orbital-phase invariant', 'requires': 'orbital energies and finite electronic temperature', 'missing': 'never missing on valid completion'},
     },
     'realspace': {
-        'density_au / vir_density_au': {'definition': 'exact Cartesian GTO valence electron density rho(r) and virtual orbital density evaluated via libxtb realspace ABI v1', 'unit': 'e/Bohr^3 (density_au), 1/Bohr^3 (vir_density_au)', 'invariance': 'rigid-motion invariant when points co-transform, MO phase and degenerate subspace invariant', 'requires': 'libxtb realspace extension ABI v1 and realSpacePointsAngstrom', 'missing': 'DescriptorUnavailableError if realSpacePointsAngstrom was not supplied'},
+        'density_au / vir_density_au': {'definition': 'exact Cartesian GTO valence electron density rho(r) and virtual orbital density evaluated via libxtb realspace ABI v2', 'unit': 'e/Bohr^3 (density_au), 1/Bohr^3 (vir_density_au)', 'invariance': 'rigid-motion invariant when points co-transform, MO phase and degenerate subspace invariant', 'requires': 'libxtb realspace extension ABI v1 and realSpacePointsAngstrom', 'missing': 'DescriptorUnavailableError if realSpacePointsAngstrom was not supplied'},
         'alie_ev / lea_ev': {'definition': 'exact real-space Average Local Ionization Energy ALIE(r) and Local Electron Affinity LEA(r) at sampled 3D points', 'unit': 'eV', 'invariance': 'same as density_au', 'requires': 'libxtb realspace extension ABI v1 and density > densityCutoffAU', 'missing': 'None when density (or virtual density) <= densityCutoffAU; never zero-filled'},
         'alie_min_ev / alie_max_ev / alie_mean_ev / alie_sigma2_ev2 / alie_pi_ev': {'definition': 'area-weighted molecular and per-atom surface ALIE statistics on a vdW or 0.001 a.u. density isosurface grid', 'unit': 'eV (and eV^2 for sigma2)', 'invariance': 'rigid-motion and point-permutation invariant when surface grid co-transforms; preserves RDKit atom order', 'requires': 'sampled real-space properties on a surface grid', 'missing': 'None with density_below_cutoff or no_surface_points_assigned'},
         'lea_min_ev / lea_max_ev / lea_mean_ev / lea_sigma2_ev2 / lea_pi_ev': {'definition': 'area-weighted molecular and per-atom surface LEA statistics on a vdW or 0.001 a.u. density isosurface grid', 'unit': 'eV (and eV^2 for sigma2)', 'invariance': 'same as surface ALIE statistics', 'requires': 'sampled real-space properties with virtual orbitals and virtual density > densityCutoffAU', 'missing': 'None with virtual_density_below_cutoff or no_surface_points_assigned'},
@@ -146,7 +148,7 @@ _CATALOG = {
         'delta_g_solv_ha / delta_g_solv_kcalmol': {'definition': 'vertical implicit solvation free energy E(solvent) - E(gas) at fixed geometry via ALPB or GBSA', 'unit': 'Hartree / kcal/mol', 'invariance': 'rigid-motion and atom-permutation invariant', 'requires': 'matched gas-phase and solvated single points', 'missing': 'calculation failure raises XTBError'},
         'g_solv_direct_ha / solute_polarization_energy_ha': {'definition': 'direct libxtb solvation energy and solute electronic polarization contribution delta_g_solv - g_solv_direct', 'unit': 'Hartree (and *_kcalmol)', 'invariance': 'rigid-motion and atom-permutation invariant', 'requires': 'solvated single point with properties ABI v1', 'missing': 'None with properties_extension_unavailable'},
         'delta_dipole_debye / delta_homo_ev / delta_lumo_ev / delta_gap_ev': {'definition': 'solvent-induced shifts (solvated minus gas phase) in dipole magnitude and frontier orbital energies', 'unit': 'Debye / eV', 'invariance': 'rigid-motion and atom-permutation invariant', 'requires': 'matched gas-phase and solvated single points', 'missing': 'frontier shifts are None when HOMO or LUMO is unavailable'},
-        'delta_q_e / delta_cm5_q_e': {'definition': 'per-atom charge redistribution q(solvent) - q(gas) for engine charges and CM5 charges', 'unit': 'e', 'invariance': 'rigid-motion invariant; preserves RDKit atom ordering', 'requires': 'matched gas-phase and solvated single points', 'missing': 'delta_cm5_q_e is None with cm5_undefined_for_gfn0_eeq for GFN0'},
+        'solv_delta_q_e / solv_delta_cm5_q_e': {'definition': 'per-atom charge redistribution q(solvent) - q(gas) for engine charges and CM5 charges', 'unit': 'e', 'invariance': 'rigid-motion invariant; preserves RDKit atom ordering', 'requires': 'matched gas-phase and solvated single points', 'missing': 'delta_cm5_q_e is None with cm5_undefined_for_gfn0_eeq for GFN0'},
     },
     'thermochemistry': {
         'frequencies_cm1 / ir_intensities_km_mol / rotational_constants_cm1': {'definition': 'harmonic vibrational frequencies (negative for imaginary modes), double-harmonic IR intensities from dipole derivatives, and principal rotational constants', 'unit': 'cm^-1 / km/mol / cm^-1', 'invariance': 'rigid-motion and atom-permutation invariant', 'requires': 'central finite-difference Hessian from analytical GetGradient()', 'missing': 'empty lists for monoatomic systems (0 vibrational modes)'},
@@ -159,7 +161,8 @@ _STATUS = {
         'xtb_energy_ha', 'xtb_homo_ev', 'xtb_lumo_ev', 'xtb_gap_ev',
         'xtb_dip_debye', 'xtb_dip_*_ebohr', 'xtb_q_*_e', 'xtb_wbo_sum',
         'q_e', 'wbo_sum', 'wbo',
-        'mul_*_e', 'low_*_e',
+        'mul_s_e', 'mul_p_e', 'mul_d_e', 'mul_qrec_e', 'mul_ps',
+        'low_s_e', 'low_p_e', 'low_d_e', 'low_qrec_e', 'low_ps',
         'f_plus/f_minus/f_radical/dual', 's_loc_1ev',
         'omega_loc_ev',
         'ip_v_ev', 'ea_v_ev', 'mu_ev',
@@ -191,20 +194,20 @@ _STATUS = {
         'g_solv_ha / g_born_ha / g_sasa_ha / g_hb_ha / g_shift_ha',
         'delta_g_solv_ha / delta_g_solv_kcalmol',
         'delta_dipole_debye / delta_homo_ev / delta_lumo_ev / delta_gap_ev',
-        'delta_q_e / delta_cm5_q_e',
+        'solv_delta_q_e / solv_delta_cm5_q_e',
         'frequencies_cm1 / ir_intensities_km_mol / rotational_constants_cm1',
         'zpe_ha / thermal_energy_correction_ha / thermal_enthalpy_correction_ha / entropy_j_mol_k / gibbs_correction_ha / total_gibbs_free_energy_ha',
     },
     'diagnostic': {
         'xtb_n_*', 'xtb_*_idx',
         'fermi_alpha_ha / fermi_beta_ha / fermi_alpha_ev / fermi_beta_ev',
-        'fermi_alpha_ev / fermi_beta_ev', 'orbital_fod_e',
+        'fod_fermi_alpha_ev / fod_fermi_beta_ev', 'orbital_fod_e',
         'g_solv_direct_ha / solute_polarization_energy_ha',
     },
     'exploratory': {
         'mul_ovlp_e', 'pi_n_e',
         'pi_q_e', 'pi_bo', 'mci', 'n_loc_1ev',
-        'f_w_plus/f_w_minus/f_w_radical/dual_w',
+        'f_w_plus/f_w_minus/f_w_radical/dual_w', 'mu_orb_ev',
         'occ_n_e / vir_n', 'occ_e_mean_ev / vir_e_mean_ev',
         'occ_e_frontier_ev / vir_e_frontier_ev',
         'pdos_homo_win_e / pdos_lumo_win',
@@ -218,7 +221,7 @@ _STATUS = {
         'quad_ebohr2 / quad_frobenius_ebohr2 / quad_anisotropy_ebohr2',
         'mol_quadrupole_ebohr2 / mol_quadrupole_frobenius_ebohr2 / mol_quadrupole_anisotropy_ebohr2',
         'chi_e_per_ev / chi_e_per_ha',
-        'chi_diag_e_per_ev / atomic_softness_e_per_ev / nonlocal_coupling_e_per_ev',
+        'chi_diag_e_per_ev / neg_chi_diag_e_per_ev / nonlocal_coupling_e_per_ev',
         'coop_inter_e / ecohp_inter_ev / chi_inter_e_per_ev',
         'rho_au / laplacian_au / tau_au / elf / lol / rdg / ellipticity',
         'nci_attractive / nci_vdw / nci_repulsive',
@@ -226,19 +229,70 @@ _STATUS = {
 }
 
 
+def _split_names(key):
+    return [part.strip() for part in key.split('/') if part.strip()]
+
+
+_SUFFIX_UNITS = (
+    ('_e_per_ev', 'e/eV'), ('_e_per_ha', 'e/Hartree'), ('_kcalmol2', '(kcal/mol)^2'),
+    ('_kcalmol', 'kcal/mol'), ('_j_mol_k', 'J/(mol*K)'), ('_km_mol', 'km/mol'),
+    ('_mv_cm', 'MV/cm'), ('_ebohr2', 'e*Bohr^2'), ('_ebohr', 'e*Bohr'), ('_debye', 'Debye'),
+    ('_bohr3', 'Bohr^3'), ('_angstrom3', 'Angstrom^3'), ('_a3', 'Angstrom^3'),
+    ('_bohr2', 'Bohr^2'), ('_a2', 'Angstrom^2'), ('_cm1', 'cm^-1'), ('_ev2', 'eV^2'),
+    ('_ev', 'eV'), ('_ha', 'Hartree'), ('_deg', 'degree'), ('_percent', 'percent'),
+)
+
+
+def _base_unit(unit):
+    """Drop alternate-unit notes: 'Hartree/e (and kcal/(mol*e))' -> 'Hartree/e'."""
+    note = re.compile(r'\s+\((?:[^()]|\([^()]*\))*\)')
+    return note.sub('', unit).split(' and ')[0].strip()
+
+
+def _split_units(unit, names):
+    """Assign one unit per name from a grouped unit string or the field suffix."""
+    parts = [u.strip() for u in unit.split(' / ')]
+    if len(parts) == len(names) and '(' not in unit:
+        return parts
+    tagged = {}
+    for chunk in re.split(r',\s*(?![^()]*\))', unit):
+        match = re.fullmatch(r'(.+?)\s*\(([^()]+)\)', chunk.strip())
+        if match:
+            for name in _split_names(match.group(2)):
+                tagged[name] = match.group(1).strip()
+    if tagged and all(name in tagged for name in names):
+        return [tagged[name] for name in names]
+    units = []
+    for name in names:
+        suffix = next((u for s, u in _SUFFIX_UNITS if name.endswith(s)), None)
+        units.append(suffix or _base_unit(unit))
+    return units
+
+
 def _exact_catalog():
-    """Expand grouped definitions into the concrete public field names."""
-    catalog = deepcopy(_CATALOG)
+    """Return one entry per concrete field name.
+
+    Grouped keys such as ``'alie_ev / lea_ev'`` are expanded into separate
+    entries (with per-field units where the grouped unit lists them), so
+    feature-table builders and schema validators can look up exact names.
+    Wildcard keys (``xtb_q_*_e``) are kept as patterns.
+    """
+    catalog = {}
+    for section, fields in _CATALOG.items():
+        exact = catalog[section] = {}
+        for key, entry in fields.items():
+            names = _split_names(key)
+            units = _split_units(entry['unit'], names) if len(names) > 1 else [entry['unit']]
+            for name, unit in zip(names, units):
+                if name in exact:
+                    raise RuntimeError(f'duplicate catalog field {section}.{name}')
+                exact[name] = {**deepcopy(entry), 'unit': unit}
     atom = catalog['atom']
     for prefix in ('mul', 'low'):
-        grouped = atom[f'{prefix}_*_e']
+        grouped = atom.pop(f'{prefix}_*_e')
         for channel in ('s', 'p', 'd'):
             atom[f'{prefix}_{channel}_e'] = deepcopy(grouped)
-        atom[f'{prefix}_qrec_e'] = deepcopy(atom['mul_qrec_e / low_qrec_e'])
-    density = catalog['density']
-    density['density_matrix']['unit'] = 'basis-dependent matrix; trace with S is e'
-    # Keep wildcard entries as compact documentation, but make exact lookups
-    # deterministic for feature-table builders and schema validators.
+    catalog['density']['density_matrix']['unit'] = 'basis-dependent matrix; trace with S is e'
     return catalog
 
 
@@ -248,6 +302,14 @@ def DescriptorCatalog():
 
 
 def DescriptorStatus():
-    """Return the intended validation maturity of descriptor families."""
-    return {name: sorted(values) for name, values in _STATUS.items()}
-
+    """Return the validation maturity of each field, one concrete name per entry."""
+    status = {}
+    for label, groups in _STATUS.items():
+        status[label] = sorted({name for group in groups for name in _split_names(group)})
+    seen = {}
+    for label, names in status.items():
+        for name in names:
+            if name in seen:
+                raise RuntimeError(f'{name} is listed as both {seen[name]} and {label}')
+            seen[name] = label
+    return status

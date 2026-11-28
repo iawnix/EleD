@@ -62,7 +62,7 @@ diff --git a/src/api/results.f90 b/src/api/results.f90
     end type PropsResult
  
     !> Void pointer to wavefunction and result objects
-@@ -887,4 +889,575 @@
+@@ -887,4 +889,581 @@
     ok = 1
  end function
  
@@ -148,19 +148,24 @@ diff --git a/src/api/results.f90 b/src/api/results.f90
 +
 +   call blas_gemm('T', 'N', nmo, np, nbf, 1.0_wp, C_cao, nbf, chi, nbf, 0.0_wp, psi, nmo)
 +
++   ! Fermi smearing gives every orbital a partial occupation, so occupied and
++   ! acceptor sets are weighted, not thresholded: an orbital contributes to the
++   ! ALIE with occ and to the LEA with its vacancy 2 - occ. The LEA window is
++   ! anchored at the lowest orbital with at least one vacancy (the aufbau LUMO,
++   ! or the SOMO of an open shell), independent of occ_thr.
 +   allocate(is_occ(nmo), is_vir(nmo))
 +   has_lumo = .false.
 +   lumo_ev = 0.0_wp
 +   do m = 1, nmo
 +      is_occ(m) = (occ(m) > occ_thr)
 +      is_vir(m) = .false.
-+      if (.not.is_occ(m) .and. .not.has_lumo) then
++      if (2.0_wp - occ(m) >= 1.0_wp .and. .not.has_lumo) then
 +         has_lumo = .true.
 +         lumo_ev = emo(m)
 +      end if
 +   end do
 +   do m = 1, nmo
-+      if (.not.is_occ(m)) then
++      if (2.0_wp - occ(m) > occ_thr) then
 +         if (lea_win <= 0.0_wp) then
 +            is_vir(m) = .true.
 +         else if (has_lumo .and. emo(m) <= lumo_ev + lea_win + 1.0e-12_wp) then
@@ -179,7 +184,8 @@ diff --git a/src/api/results.f90 b/src/api/results.f90
 +         if (is_occ(m)) then
 +            rho = rho + occ(m) * p2
 +            alie_num = alie_num + occ(m) * (-emo(m)) * p2
-+         else if (is_vir(m)) then
++         end if
++         if (is_vir(m)) then
 +            unocc = max(0.0_wp, 2.0_wp - occ(m))
 +            vrho = vrho + unocc * p2
 +            lea_num = lea_num + unocc * (-emo(m)) * p2
