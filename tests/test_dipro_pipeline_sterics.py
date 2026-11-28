@@ -408,7 +408,7 @@ def test_quadrant_buried_volume_and_analyze_local_geometry():
 
 
 def test_catalog_columns_and_visualization_new_fields():
-    assert DESCRIPTOR_VERSION == '1.5'
+    assert DESCRIPTOR_VERSION == '1.6'
     cols = DescriptorColumns()
     for key in (
         'e_elec_ha', 'e_rep_ha', 'e_es_ha', 'e_disp_ha',
