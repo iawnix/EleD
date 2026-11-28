@@ -201,8 +201,6 @@ def AssessDescriptorQuality(
         'frontier_occupations': {'homo': homo_occ, 'lumo': lumo_occ},
         'charge_sum_error_e': q_error,
         'electron_sum_error_e': electron_error,
-        'scf_iterations': scf.get('iterations'),
-        'scf_residual': scf.get('mixer_rms'),
         'scf_details': scf or None,
         'scf_details_unavailable_reason': (
             None if scf.get('available') else scf.get('reason', 'not_exposed_by_libxtb_c_api')

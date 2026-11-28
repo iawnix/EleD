@@ -152,8 +152,8 @@ python -m eled doctor --check compiled --method GFN2-xTB
 - [报告、质量检查和导出](docs/zh-CN/descriptor-reports.md)
 - [可视化](docs/zh-CN/visualization.md)
 - [构象准备与 xTB 几何优化](docs/zh-CN/geometry-preparation.md)
-- [C++ 接口](docs/rdxtb-tools.md)
-- [原生后端构建](docs/xtb-patched-build.md)
+- [C++ 接口](docs/zh-CN/rdxtb-tools.md)
+- [原生后端构建](docs/zh-CN/xtb-patched-build.md)
 
 应用模型训练、数据集和训练产物放在 EleD 仓库之外维护。公开包提供描述符报告
 和特征归档，外部研究工程可以直接消费这些产物。

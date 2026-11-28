@@ -3,7 +3,8 @@
 The standard installation is `python tools/install_native.py`; see
 [install.md](install.md). This lower-level builder also supports a separate
 engine prefix for development. It uses upstream's GFN0 state repair and applies
-our project-local basis-export, SCC-diagnostics and ESP patches. GFN0/1/2 and population analysis
+our project-local basis-export, SCC-diagnostics, ESP, extended-properties and
+real-space (ABI v2) patches. GFN0/1/2 and population analysis
 use this single extended library; no CLI or tblite backend is involved.
 
 ## Reproduce the build
@@ -21,14 +22,15 @@ source .xtb-native-0.5/activate.sh
 The compiler environment is separate from the RDKit runtime/SDK. Keep both it
 and `.xtb-native-0.5` installed: local binaries resolve compiler and numerical
 libraries through their RPATHs. These binaries are not portable distributions.
-The build disables `WITH_TBLITE` and `WITH_CPCMX`; xTB's own ALPB/GBSA remains
-in the engine, while this adapter exposes only gas-phase single points.
+The build disables `WITH_TBLITE` and `WITH_CPCMX`; xTB's own ALPB/GBSA implicit
+solvation remains in the engine and is exposed through `XTBOptions(solvent=...)`.
 The upstream executable is built for provenance and diagnostics; the adapter
 does not launch it.
 
 The [source lock](../tools/xtb-source.json) pins commit
 `33fe381adde775c4992610c0f90d8914b7572bb5`, the upstream-repaired D4 source,
-the basis/diagnostics/ESP patches and all modified source files by SHA256. This upstream main commit reports
+the basis/diagnostics/ESP/properties/realspace patches and all modified source
+files by SHA256. This upstream main commit reports
 6.7.1 but differs from the release tag; see [earlier verification](gfn0-reverification.md).
 The builder accepts a clean pinned checkout or an exactly matching patched
 checkout. It refuses unrelated or mismatched edits and never resets them.
@@ -92,8 +94,9 @@ the C verifier; CPCM-X is disabled in this build and not numerically tested.
 The adapter enables this capability only when the extension symbols/ABI,
 reviewed patch hash, manifest capability and selected binary hash agree.
 `capabilities.orbital_basis_api` is 1. GFN0 independently requires the verified
-upstream-fix commit/source identity and `capabilities.native_gfn0: true`.
-Historical 0.4 manifests with the reviewed local D4 patch are also accepted. An engine version string cannot
+upstream-fix commit/source identity and `capabilities.native_gfn0: true`
+(installations built with the historical 0.4 local D4 patch are no longer
+accepted since 0.17). An engine version string cannot
 establish either capability. The public adapter requires the complete extended
 profile for every GFN0/1/2 calculation.
 
@@ -118,9 +121,8 @@ See [current validation](validation.md) for measured results.
 
 This does not establish general libxtb thread safety. Adapter calls are
 serialized, including the two Python interfaces; independent bindings are
-outside that lock. The Python adapter now exposes a gas-phase gradient
-optimizer built on this single-point API; solvent models and excited-state
-calculations remain outside the adapter.
+outside that lock. The Python adapter also exposes a gradient optimizer built
+on this single-point API; excited-state calculations remain outside the adapter.
 
 The standard installer composes this engine build with locked RDKit dependencies
 and adapter-wheel installation. The conda recipe is packaging scaffolding and

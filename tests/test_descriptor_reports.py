@@ -35,7 +35,7 @@ def test_report_records_missing_basis_and_exports_fixed_columns(tmp_path):
     assert set(report['values'])==set(DescriptorColumns())
     assert report['units']['xtb_energy_ha']=='Hartree'
     assert report['units']['xtb_homo_ev']=='eV'
-    assert report['quality']['scf_iterations'] is None
+    assert 'scf_iterations' not in report['quality']
     for kind in ['csv','jsonl']:
         p=ExportDescriptorReports([report],tmp_path/f'data.{kind}')
         if kind=='csv':

@@ -103,7 +103,7 @@ if eht_ok:
 | Bond orders | `GetWibergBondOrders()`, dimensionless, `[atom,atom]` | Not the EHT overlap population matrix |
 | MO coefficients | `GetOrbitalCoefficients()`, `[AO,MO]` | Optional; xTB basis ordering, not EHT basis ordering |
 | Overlap / maps | `GetOverlapMatrix()`, `GetAOAtomMap()`, `GetAOShellMap()`, `GetShellAtomMap()`, `GetShellAngularMomenta()` | Optional native basis data; not EHT matrices |
-| Energy decomposition & Fermi | `energyDecompositionAvailable`, `electronicEnergyHartree`, `repulsionEnergyHartree`, `electrostaticEnergyHartree`, `anisotropicElectrostaticEnergyHartree`, `anisotropicXCEnergyHartree`, `dispersionEnergyHartree`, `halogenBondEnergyHartree`, `solvationEnergyHartree` (+ Born/SASA/HB/shift), `fermiLevelAlphaHartree`/`EV`, `fermiLevelBetaHartree`/`EV` | `None` when inapplicable to method, gas phase, or `electronicTemperature <= 0.1 K` |
+| Energy decomposition & Fermi | `energyDecompositionAvailable`, `energyDecompositionFlags` (engine bit mask), `electronicEnergyHartree`, `repulsionEnergyHartree`, `electrostaticEnergyHartree`, `anisotropicElectrostaticEnergyHartree`, `anisotropicXCEnergyHartree`, `dispersionEnergyHartree`, `halogenBondEnergyHartree`, `solvationEnergyHartree` (+ Born/SASA/HB/shift), `fermiLevelAlphaHartree`/`EV`, `fermiLevelBetaHartree`/`EV` | `None` when inapplicable to method, gas phase, or `electronicTemperature <= 0.1 K` |
 | D4 polarizability & dispersion | `polarizabilityAvailable`, `molecularPolarizabilityAU` (Bohr³), `molecularC6AU` (Ha·Bohr⁶), `molecularC8AU` (Ha·Bohr⁸), `GetAtomicPolarizabilities()`, `GetAtomicC6()` | GFN2 and GFN0 only; unavailable for GFN1 (DFT-D3) |
 | CAMM multipoles | `multipolesAvailable`, `GetAtomicDipoles()` (e·Bohr `[atom,3]`), `GetAtomicQuadrupoles()` (e·Bohr² `[atom,6]`), `GetMolecularQuadrupole()` (e·Bohr² `[6]`) | Traceless `(xx,xy,yy,xz,yz,zz)`; GFN2/GFN1 only (unavailable for GFN0) |
 | Nuclear ESP (EPN) | `nuclearESPAvailable`, `GetNuclearESP()` (Hartree/e `[atom]`) | Exact valence electronic + other-nuclei potential omitting self-nuclear $Z_A/r_{iA}$ |
@@ -171,7 +171,9 @@ that lock. This does not establish general libxtb thread safety.
 The low-level `rdXTBTools.XTBResults` object and the Python `XTBResults`
 dataclass share matching `camelCase` scalar properties and
 `Get*()` NumPy copy getters, and both work with the shared descriptor functions
-and `AnnotateMol`. Batch/cache APIs produce the `XTBResults` dataclass through
+and `AnnotateMol`. Both are normalized by the same function into identical fields
+and provenance, so the scalar descriptor table is the same for either interface.
+Batch/cache APIs produce the `XTBResults` dataclass through
 ctypes. Standalone C++ `RDKit::XTBTools::XTBResults` also populates
 `cm5Charges` directly for `GFN1/2` via `RDKit::XTBTools::calcCM5Charges`.
 
